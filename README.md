@@ -1,6 +1,6 @@
 # ReqStream
 
-Requirements Management Tool for YAML Files
+Requirements Management Tool
 
 ## Overview
 
