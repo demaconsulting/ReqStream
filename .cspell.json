@@ -1,0 +1,25 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "DEMA",
+    "DemaConsulting",
+    "ReqStream",
+    "reqstream",
+    "xunit",
+    "csproj",
+    "dotnet",
+    "nuget"
+  ],
+  "ignorePaths": [
+    "node_modules",
+    "bin",
+    "obj",
+    "*.min.js",
+    "*.min.css",
+    ".git",
+    "package-lock.json",
+    "*.csproj",
+    "*.sln"
+  ]
+}
