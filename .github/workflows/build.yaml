@@ -1,0 +1,61 @@
+---
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        description: 'Operating system to run on'
+        required: true
+        type: string
+      version:
+        description: 'Version number for the build'
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ${{ inputs.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8.x
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+
+      - name: Setup .NET 9.x
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.x'
+
+      - name: Setup .NET 10.x
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Restore dotnet tools
+        run: dotnet tool restore
+        working-directory: ./src/DemaConsulting.ReqStream
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore /p:Version=${{ inputs.version }}
+
+      - name: Test
+        run: dotnet test --configuration Release --no-build --verbosity normal
+
+      - name: Package
+        run: dotnet pack --configuration Release --no-build /p:Version=${{ inputs.version }}
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-${{ inputs.os }}
+          path: |
+            **/*.nupkg
+            **/*.snupkg
