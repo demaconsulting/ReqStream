@@ -6,14 +6,15 @@ namespace DemaConsulting.ReqStream.Tests;
 /// <summary>
 /// Unit tests for the ReqStream tool.
 /// </summary>
+[TestClass]
 public class BasicTests
 {
     /// <summary>
     /// Verify that the test project is set up correctly.
     /// </summary>
-    [Fact]
+    [TestMethod]
     public void TestProjectSetup()
     {
-        Assert.True(true);
+        Assert.IsTrue(true);
     }
 }
