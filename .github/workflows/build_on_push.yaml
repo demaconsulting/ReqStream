@@ -11,6 +11,8 @@ jobs:
   quality-checks:
     name: Quality Checks
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
@@ -37,6 +39,8 @@ jobs:
   build-windows:
     name: Build Windows
     needs: quality-checks
+    permissions:
+      contents: read
     uses: ./.github/workflows/build.yaml
     with:
       os: windows-latest
@@ -45,6 +49,8 @@ jobs:
   build-linux:
     name: Build Linux
     needs: quality-checks
+    permissions:
+      contents: read
     uses: ./.github/workflows/build.yaml
     with:
       os: ubuntu-latest

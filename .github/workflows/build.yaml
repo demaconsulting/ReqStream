@@ -16,6 +16,8 @@ on:
 jobs:
   build:
     runs-on: ${{ inputs.os }}
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
