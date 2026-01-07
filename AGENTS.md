@@ -31,13 +31,9 @@ ReqStream/
 │       ├── build.yaml            # Reusable build workflow
 │       └── build_on_push.yaml    # Main CI/CD pipeline
 ├── src/                          # Source code
-│   └── DemaConsulting.ReqStream/
-│       ├── Program.cs            # Main entry point
-│       └── *.csproj              # Project file
+│   └── DemaConsulting.ReqStream/ # Main application project
 ├── test/                         # Test projects
-│   └── DemaConsulting.ReqStream.Tests/
-│       ├── UnitTest1.cs          # Test files
-│       └── *.csproj              # Test project file
+│   └── DemaConsulting.ReqStream.Tests/ # Test project
 ├── .cspell.json                  # Spell checking configuration
 ├── .editorconfig                 # Code style configuration
 ├── .markdownlint.json            # Markdown linting rules
@@ -137,7 +133,7 @@ Based on `.editorconfig` settings:
 ### Code Quality
 
 - **Copyright Headers**: All source files must include the MIT license header
-- **XML Documentation**: Use triple-slash comments (`///`) for all public members
+- **XML Documentation**: Use triple-slash comments (`///`) for all members and classes (public, internal, and private)
 - **Error Handling**: Use appropriate exception types and provide meaningful error messages
 - **Resource Management**: Use `using` statements or `IDisposable` pattern for resource cleanup
 
