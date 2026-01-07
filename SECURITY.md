@@ -1,0 +1,146 @@
+# Security Policy
+
+## Supported Versions
+
+We release patches for security vulnerabilities in the following versions:
+
+| Version | Supported          |
+| ------- | ------------------ |
+| 1.0.x   | :white_check_mark: |
+| < 1.0   | :x:                |
+
+## Reporting a Vulnerability
+
+We take the security of ReqStream seriously. If you believe you have found a security vulnerability, please report it
+to us as described below.
+
+### How to Report
+
+**Please do not report security vulnerabilities through public GitHub issues.**
+
+Instead, please report them via email to:
+
+- **Email**: <security@demaconsulting.com>
+- **Subject**: [SECURITY] ReqStream Vulnerability Report
+
+Please include the following information in your report:
+
+- **Type of vulnerability** (e.g., SQL injection, cross-site scripting, etc.)
+- **Full path** of source file(s) related to the vulnerability
+- **Location** of the affected source code (tag/branch/commit or direct URL)
+- **Step-by-step instructions** to reproduce the issue
+- **Proof-of-concept or exploit code** (if possible)
+- **Impact** of the issue, including how an attacker might exploit it
+
+### What to Expect
+
+After submitting a vulnerability report, you can expect:
+
+1. **Acknowledgment**: We will acknowledge receipt of your vulnerability report within 2 business days
+2. **Investigation**: We will investigate the issue and determine its impact and severity
+3. **Updates**: We will keep you informed of our progress as we work on a fix
+4. **Resolution**: Once the vulnerability is fixed, we will:
+   - Release a security patch
+   - Publicly disclose the vulnerability (with credit to you, if desired)
+   - Update this security policy as needed
+
+### Response Timeline
+
+- **Initial Response**: Within 2 business days
+- **Status Update**: Within 7 days
+- **Fix Timeline**: Varies based on severity and complexity
+
+### Security Update Policy
+
+Security updates will be released as:
+
+- **Critical vulnerabilities**: Patch release as soon as possible
+- **High severity**: Patch release within 30 days
+- **Medium/Low severity**: Included in the next regular release
+
+## Security Best Practices
+
+When using ReqStream, we recommend following these security best practices:
+
+### Input Validation
+
+- Always validate YAML input files before processing
+- Be cautious when processing requirement files from untrusted sources
+- Use the latest version of ReqStream to benefit from security updates
+
+### Dependencies
+
+- Keep ReqStream and its dependencies up to date
+- Review the release notes for security-related updates
+- Use `dotnet list package --vulnerable` to check for vulnerable dependencies
+
+### Execution Environment
+
+- Run ReqStream with the minimum required permissions
+- Avoid running ReqStream as a privileged user unless necessary
+- Use trusted sources for YAML requirement files
+
+## Known Security Considerations
+
+### YAML Processing
+
+ReqStream processes YAML files which can contain complex nested structures. While we use secure YAML parsing
+libraries, users should:
+
+- Only process YAML files from trusted sources
+- Be aware that maliciously crafted YAML can potentially cause resource exhaustion
+- Monitor resource usage when processing large or untrusted YAML files
+
+### File System Access
+
+ReqStream reads and writes files on the local file system. Users should:
+
+- Ensure appropriate file permissions are set on requirement files
+- Be cautious when processing files in shared directories
+- Validate file paths to prevent directory traversal attacks
+
+## Security Disclosure Policy
+
+When we receive a security bug report, we will:
+
+1. Confirm the problem and determine affected versions
+2. Audit code to find similar problems
+3. Prepare fixes for all supported versions
+4. Release patches as soon as possible
+
+We will credit security researchers who report vulnerabilities responsibly. If you would like to be credited:
+
+- Provide your name or pseudonym
+- Optionally provide a link to your website or GitHub profile
+- Let us know if you prefer to remain anonymous
+
+## Third-Party Dependencies
+
+ReqStream relies on third-party packages. We:
+
+- Regularly update dependencies to address known vulnerabilities
+- Use Dependabot to monitor for security updates
+- Review security advisories for all dependencies
+
+To check for vulnerable dependencies yourself:
+
+```bash
+dotnet list package --vulnerable
+```
+
+## Contact
+
+For security concerns, please contact:
+
+- **Security Email**: <security@demaconsulting.com>
+- **General Inquiries**: <info@demaconsulting.com>
+
+For general bugs and feature requests, please use GitHub Issues.
+
+## Additional Resources
+
+- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)
+- [.NET Security Best Practices](https://docs.microsoft.com/en-us/dotnet/standard/security/)
+- [GitHub Security Advisories](https://github.com/demaconsulting/ReqStream/security/advisories)
+
+Thank you for helping keep ReqStream and its users safe!
