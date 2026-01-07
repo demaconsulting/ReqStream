@@ -140,7 +140,7 @@ For general bugs and feature requests, please use GitHub Issues.
 ## Additional Resources
 
 - [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)
-- [.NET Security Best Practices](https://docs.microsoft.com/en-us/dotnet/standard/security/)
+- [.NET Security Best Practices](https://learn.microsoft.com/en-us/dotnet/standard/security/)
 - [GitHub Security Advisories](https://github.com/demaconsulting/ReqStream/security/advisories)
 
 Thank you for helping keep ReqStream and its users safe!
