@@ -4,11 +4,13 @@ This document describes the GitHub Copilot agents available for the ReqStream pr
 
 ## Overview
 
-GitHub Copilot agents are AI-powered assistants that help with various development tasks. This document will be updated as agents are configured for this repository.
+GitHub Copilot agents are AI-powered assistants that help with various development tasks. This document will be
+updated as agents are configured for this repository.
 
 ## Available Agents
 
-Currently, no custom agents are configured for this repository. The default GitHub Copilot agent is available for general assistance.
+Currently, no custom agents are configured for this repository. The default GitHub Copilot agent is available for
+general assistance.
 
 ## Future Agents
 
