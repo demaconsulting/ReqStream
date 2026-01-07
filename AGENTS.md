@@ -154,6 +154,7 @@ The project uses built-in .NET analyzers configured in `.editorconfig`:
 - **Code Comments**: Use XML documentation for public APIs
 - **Inline Comments**: Use sparingly and only when necessary to explain complex logic
 - **Commit Messages**: Write clear, descriptive commit messages
+- **Markdown Links**: Use link references instead of inline links (e.g., `[text][ref]` with `[ref]: url` at the end of the document)
 
 ### Spelling and Markdown
 

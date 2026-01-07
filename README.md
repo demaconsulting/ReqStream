@@ -60,15 +60,20 @@ dotnet pack
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE][license] file for details.
 
 ## Contributing
 
-Contributions are welcome! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on how to get started.
+Contributions are welcome! Please see our [Contributing Guidelines][contributing] for details on how to get started.
 
-Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating
+Please note that this project is released with a [Contributor Code of Conduct][code-of-conduct]. By participating
 in this project you agree to abide by its terms.
 
 ## Security
 
-For information about reporting security vulnerabilities, please see our [Security Policy](SECURITY.md).
+For information about reporting security vulnerabilities, please see our [Security Policy][security].
+
+[license]: LICENSE
+[contributing]: CONTRIBUTING.md
+[code-of-conduct]: CODE_OF_CONDUCT.md
+[security]: SECURITY.md

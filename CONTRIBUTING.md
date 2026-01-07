@@ -5,7 +5,7 @@ contributing to the project.
 
 ## Code of Conduct
 
-This project adheres to the Contributor Covenant [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are
+This project adheres to the Contributor Covenant [Code of Conduct][code-of-conduct]. By participating, you are
 expected to uphold this code. Please report unacceptable behavior to <conduct@demaconsulting.com>.
 
 ## How to Contribute
@@ -192,10 +192,13 @@ If you have questions about contributing, feel free to:
 
 - Open an issue for discussion
 - Reach out to the maintainers
-- Check the [AGENTS.md](AGENTS.md) file for detailed technical guidelines
+- Check the [AGENTS.md][agents] file for detailed technical guidelines
 
 ## License
 
 By contributing to ReqStream, you agree that your contributions will be licensed under the MIT License.
 
 Thank you for contributing to ReqStream!
+
+[code-of-conduct]: CODE_OF_CONDUCT.md
+[agents]: AGENTS.md
