@@ -273,6 +273,7 @@ yamllint .
 ```
 
 **Important Notes:**
+
 - These checks run automatically in CI and will cause the build to fail if they don't pass
 - If the linting tools are not available locally, the checks will still run in CI
 - Always fix linting issues before finalizing your work
