@@ -1,5 +1,5 @@
 ---
-name: Bug Report
+name: 🐛 Bug Report
 description: Report a bug or issue with ReqStream
 title: "[Bug]: "
 labels: ["bug"]
