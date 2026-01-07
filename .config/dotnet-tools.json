@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "demaconsulting.spdxtool": {
+      "version": "2.6.0",
+      "commands": [
+        "spdx-tool"
+      ]
+    }
+  }
+}

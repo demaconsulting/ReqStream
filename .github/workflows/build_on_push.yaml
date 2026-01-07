@@ -33,7 +33,6 @@ jobs:
       - name: YAML Lint
         uses: ibiqlik/action-yamllint@v3
         with:
-          file_or_dir: .
           config_file: .yamllint.yaml
 
   build-windows:
