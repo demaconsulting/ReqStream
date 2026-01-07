@@ -73,7 +73,7 @@ in this project you agree to abide by its terms.
 
 For information about reporting security vulnerabilities, please see our [Security Policy][security].
 
-[license]: LICENSE
-[contributing]: CONTRIBUTING.md
-[code-of-conduct]: CODE_OF_CONDUCT.md
-[security]: SECURITY.md
+[license]: https://github.com/demaconsulting/ReqStream/blob/main/LICENSE
+[contributing]: https://github.com/demaconsulting/ReqStream/blob/main/CONTRIBUTING.md
+[code-of-conduct]: https://github.com/demaconsulting/ReqStream/blob/main/CODE_OF_CONDUCT.md
+[security]: https://github.com/demaconsulting/ReqStream/blob/main/SECURITY.md

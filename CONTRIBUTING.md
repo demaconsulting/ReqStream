@@ -6,7 +6,8 @@ contributing to the project.
 ## Code of Conduct
 
 This project adheres to the Contributor Covenant [Code of Conduct][code-of-conduct]. By participating, you are
-expected to uphold this code. Please report unacceptable behavior to <conduct@demaconsulting.com>.
+expected to uphold this code. Please report unacceptable behavior through [GitHub Issues][issues] or by contacting
+the project maintainers directly.
 
 ## How to Contribute
 
@@ -202,3 +203,4 @@ Thank you for contributing to ReqStream!
 
 [code-of-conduct]: CODE_OF_CONDUCT.md
 [agents]: AGENTS.md
+[issues]: https://github.com/demaconsulting/ReqStream/issues

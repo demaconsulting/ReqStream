@@ -151,10 +151,12 @@ The project uses built-in .NET analyzers configured in `.editorconfig`:
 ### Documentation
 
 - **README.md**: Keep the main README up to date with features and usage
+  - **Important**: README.md is included in the NuGet package, so all links must be absolute URLs to GitHub
 - **Code Comments**: Use XML documentation for public APIs
 - **Inline Comments**: Use sparingly and only when necessary to explain complex logic
 - **Commit Messages**: Write clear, descriptive commit messages
 - **Markdown Links**: Use link references instead of inline links (e.g., `[text][ref]` with `[ref]: url` at the end of the document)
+  - Exception: README.md must use absolute URLs (e.g., `https://github.com/demaconsulting/ReqStream/blob/main/FILE.md`)
 
 ### Spelling and Markdown
 

@@ -4,10 +4,10 @@
 
 We release patches for security vulnerabilities in the following versions:
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+| Version   | Supported          |
+| --------- | ------------------ |
+| Latest    | :white_check_mark: |
+| < Latest  | :x:                |
 
 ## Reporting a Vulnerability
 
@@ -18,10 +18,10 @@ to us as described below.
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-Instead, please report them via email to:
+Instead, please report them using one of the following methods:
 
-- **Email**: <security@demaconsulting.com>
-- **Subject**: [SECURITY] ReqStream Vulnerability Report
+- **Preferred**: [GitHub Security Advisories][security-advisories] - Use the private vulnerability reporting feature
+- **Alternative**: Contact the project maintainers directly through GitHub
 
 Please include the following information in your report:
 
@@ -36,7 +36,7 @@ Please include the following information in your report:
 
 After submitting a vulnerability report, you can expect:
 
-1. **Acknowledgment**: We will acknowledge receipt of your vulnerability report within 2 business days
+1. **Acknowledgment**: We will acknowledge receipt of your vulnerability report promptly
 2. **Investigation**: We will investigate the issue and determine its impact and severity
 3. **Updates**: We will keep you informed of our progress as we work on a fix
 4. **Resolution**: Once the vulnerability is fixed, we will:
@@ -46,8 +46,8 @@ After submitting a vulnerability report, you can expect:
 
 ### Response Timeline
 
-- **Initial Response**: Within 2 business days
-- **Status Update**: Within 7 days
+- **Initial Response**: Promptly
+- **Status Update**: Regular updates as investigation progresses
 - **Fix Timeline**: Varies based on severity and complexity
 
 ### Security Update Policy
@@ -130,12 +130,10 @@ dotnet list package --vulnerable
 
 ## Contact
 
-For security concerns, please contact:
+For security concerns, please use [GitHub Security Advisories][security-advisories] or contact the project
+maintainers directly through GitHub.
 
-- **Security Email**: <security@demaconsulting.com>
-- **General Inquiries**: <info@demaconsulting.com>
-
-For general bugs and feature requests, please use GitHub Issues.
+For general bugs and feature requests, please use [GitHub Issues][issues].
 
 ## Additional Resources
 
@@ -145,6 +143,8 @@ For general bugs and feature requests, please use GitHub Issues.
 
 Thank you for helping keep ReqStream and its users safe!
 
+[security-advisories]: https://github.com/demaconsulting/ReqStream/security/advisories
+[issues]: https://github.com/demaconsulting/ReqStream/issues
 [owasp-practices]: https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/
 [dotnet-security]: https://learn.microsoft.com/en-us/dotnet/standard/security/
 [gh-advisories]: https://github.com/demaconsulting/ReqStream/security/advisories
