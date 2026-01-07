@@ -151,9 +151,13 @@ The project uses built-in .NET analyzers configured in `.editorconfig`:
 ### Documentation
 
 - **README.md**: Keep the main README up to date with features and usage
+  - **Important**: README.md is included in the NuGet package, so all links must be absolute URLs to GitHub
 - **Code Comments**: Use XML documentation for public APIs
 - **Inline Comments**: Use sparingly and only when necessary to explain complex logic
 - **Commit Messages**: Write clear, descriptive commit messages
+- **Markdown Links**: Use link references instead of inline links (e.g., `[text][ref]` with `[ref]: url` at
+  the end of the document)
+  - Exception: README.md must use absolute URLs (e.g., `https://github.com/demaconsulting/ReqStream/blob/main/FILE.md`)
 
 ### Spelling and Markdown
 
@@ -215,6 +219,9 @@ dotnet pack --no-build --configuration Release
 
 ## Pre-Finalization Quality Checks
 
+**CRITICAL**: Before completing any task, agents MUST perform ALL quality checks in order. Skipping these checks
+will result in CI failures and rejected pull requests.
+
 Before completing any task, agents must perform these quality checks in order:
 
 ### 1. Build and Test Validation
@@ -248,18 +255,29 @@ dotnet test --configuration Release --verbosity normal
 
 ### 4. Linting and Format Checks
 
+**MANDATORY**: All linting checks must pass before completing any task. The CI pipeline will fail if these checks
+don't pass.
+
 ```bash
-# These are run automatically in CI, but you can check locally:
+# Markdown linting - MUST pass
+# Run this if markdownlint-cli2 is available, otherwise CI will check
+markdownlint-cli2 "**/*.md"
 
-# Markdown linting (if markdownlint-cli2 is available)
-# markdownlint-cli2 "**/*.md"
+# Spell checking - MUST pass
+# Run this if cspell is available, otherwise CI will check
+cspell "**/*.md" "**/*.cs"
 
-# Spell checking (if cspell is available)
-# cspell "**/*.md" "**/*.cs"
-
-# YAML linting (if yamllint is available)
-# yamllint .
+# YAML linting - MUST pass
+# Run this if yamllint is available, otherwise CI will check
+yamllint .
 ```
+
+**Important Notes:**
+
+- These checks run automatically in CI and will cause the build to fail if they don't pass
+- If the linting tools are not available locally, the checks will still run in CI
+- Always fix linting issues before finalizing your work
+- Check the CI build status to ensure all quality checks pass
 
 ### 5. Final Verification
 

@@ -9,7 +9,15 @@
     "xunit",
     "csproj",
     "dotnet",
-    "nuget"
+    "nuget",
+    "demaconsulting",
+    "dependabot",
+    "YAML",
+    "markdownlint",
+    "cspell",
+    "yamllint",
+    "MSTest",
+    "NuGet"
   ],
   "ignorePaths": [
     "node_modules",

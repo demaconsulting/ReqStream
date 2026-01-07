@@ -60,8 +60,20 @@ dotnet pack
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE][license] file for details.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please see our [Contributing Guidelines][contributing] for details on how to get started.
+
+Please note that this project is released with a [Contributor Code of Conduct][code-of-conduct]. By participating
+in this project you agree to abide by its terms.
+
+## Security
+
+For information about reporting security vulnerabilities, please see our [Security Policy][security].
+
+[license]: https://github.com/demaconsulting/ReqStream/blob/main/LICENSE
+[contributing]: https://github.com/demaconsulting/ReqStream/blob/main/CONTRIBUTING.md
+[code-of-conduct]: https://github.com/demaconsulting/ReqStream/blob/main/CODE_OF_CONDUCT.md
+[security]: https://github.com/demaconsulting/ReqStream/blob/main/SECURITY.md
