@@ -4,7 +4,8 @@ Requirements Management Tool
 
 ## Overview
 
-ReqStream is a .NET command-line tool for managing requirements written in YAML files. It provides functionality to create, validate, and manage requirement documents in a structured and maintainable way.
+ReqStream is a .NET command-line tool for managing requirements written in YAML files. It provides functionality to
+create, validate, and manage requirement documents in a structured and maintainable way.
 
 ## Features
 
@@ -64,4 +65,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-

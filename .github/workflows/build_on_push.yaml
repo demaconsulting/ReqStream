@@ -1,0 +1,56 @@
+---
+name: Build on Push
+
+on:
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 17 * * 1'  # 5PM UTC every Monday
+
+jobs:
+  quality-checks:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Markdown Lint
+        uses: DavidAnson/markdownlint-cli2-action@v18
+        with:
+          globs: '**/*.md'
+
+      - name: Spell Check
+        uses: streetsidesoftware/cspell-action@v6
+        with:
+          files: |
+            **/*.md
+            **/*.cs
+
+      - name: YAML Lint
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          config_file: .yamllint.yaml
+
+  build-windows:
+    name: Build Windows
+    needs: quality-checks
+    permissions:
+      contents: read
+    uses: ./.github/workflows/build.yaml
+    with:
+      os: windows-latest
+      version: 0.0.0-run.${{ github.run_number }}
+
+  build-linux:
+    name: Build Linux
+    needs: quality-checks
+    permissions:
+      contents: read
+    uses: ./.github/workflows/build.yaml
+    with:
+      os: ubuntu-latest
+      version: 0.0.0-run.${{ github.run_number }}
