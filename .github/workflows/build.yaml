@@ -91,8 +91,8 @@ jobs:
       - name: Install tool from package
         shell: bash
         run: |
-          echo "Installing package from: packages/"
-          dotnet tool install --global --add-source packages DemaConsulting.ReqStream
+          echo "Installing package version ${{ inputs.version }} from: packages/"
+          dotnet tool install --global --add-source packages --version ${{ inputs.version }} DemaConsulting.ReqStream
 
       - name: Test version command
         shell: bash
