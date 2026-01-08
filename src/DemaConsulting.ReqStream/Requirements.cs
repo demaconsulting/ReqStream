@@ -68,6 +68,69 @@ public class Requirements : Section
     }
 
     /// <summary>
+    ///     Exports the requirements to a Markdown file.
+    /// </summary>
+    /// <param name="filePath">The path to the output Markdown file.</param>
+    /// <param name="depth">The starting depth for Markdown headers (default: 1).</param>
+    /// <exception cref="ArgumentException">Thrown when filePath is null or empty.</exception>
+    public void Export(string filePath, int depth = 1)
+    {
+        // Validate file path
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            throw new ArgumentException("File path cannot be null or empty", nameof(filePath));
+        }
+
+        // Create a string builder to build the markdown content
+        using var writer = new StringWriter();
+
+        // Export all sections
+        foreach (var section in Sections)
+        {
+            ExportSection(writer, section, depth);
+        }
+
+        // Write the content to the file
+        File.WriteAllText(filePath, writer.ToString());
+    }
+
+    /// <summary>
+    ///     Exports a section to the markdown writer.
+    /// </summary>
+    /// <param name="writer">The text writer to write to.</param>
+    /// <param name="section">The section to export.</param>
+    /// <param name="depth">The current depth for Markdown headers.</param>
+    private static void ExportSection(TextWriter writer, Section section, int depth)
+    {
+        // Write section header
+        var headerPrefix = new string('#', depth);
+        writer.WriteLine($"{headerPrefix} {section.Title}");
+        writer.WriteLine();
+
+        // If there are requirements, write them as a table
+        if (section.Requirements.Count > 0)
+        {
+            // Write table header
+            writer.WriteLine("| ID | Title |");
+            writer.WriteLine("|----|-------|");
+
+            // Write each requirement
+            foreach (var requirement in section.Requirements)
+            {
+                writer.WriteLine($"| {requirement.Id} | {requirement.Title} |");
+            }
+
+            writer.WriteLine();
+        }
+
+        // Recursively export child sections
+        foreach (var childSection in section.Sections)
+        {
+            ExportSection(writer, childSection, depth + 1);
+        }
+    }
+
+    /// <summary>
     ///     Reads and processes a YAML file, including any referenced include files.
     /// </summary>
     /// <param name="path">The path to the YAML file to read.</param>
