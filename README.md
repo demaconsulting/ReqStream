@@ -60,9 +60,9 @@ sections:
           - id: "AUTH-001"
             title: "All requests shall have their credentials authenticated before being processed."
             tests: # Support test-mapping inline with requirements
-              - "credentials_valid_allowed"
-              - "credentials_invalid_refused"
-              - "credentials_missing_refused"
+              - "Credentials_Valid_Allowed"
+              - "Credentials_Invalid_Refused"
+              - "Credentials_Missing_Refused"
 
       - title: "Logging"
         requirements:
@@ -78,8 +78,8 @@ includes:
 mappings:
   - id: "DATA-001"
     tests:
-      - "logging_validrequest_logged"
-      - "logging_invalidrequest_logged"
+      - "Logging_ValidRequest_Logged"
+      - "Logging_InvalidRequest_Logged"
 ```
 
 ### Key Features
