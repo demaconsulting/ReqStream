@@ -62,8 +62,8 @@ public class ContextTests
         Assert.IsFalse(context.Help);
         Assert.IsFalse(context.Silent);
         Assert.IsFalse(context.Validate);
-        Assert.AreEqual(0, context.RequirementsFiles.Count);
-        Assert.AreEqual(0, context.TestFiles.Count);
+        Assert.IsEmpty(context.RequirementsFiles);
+        Assert.IsEmpty(context.TestFiles);
         Assert.IsNull(context.RequirementsReport);
         Assert.AreEqual(1, context.ReportDepth);
         Assert.IsNull(context.Matrix);
@@ -510,7 +510,7 @@ public class ContextTests
 
             using var context = Context.Create(["--requirements", "*.yaml"]);
 
-            Assert.AreEqual(2, context.RequirementsFiles.Count);
+            Assert.HasCount(2, context.RequirementsFiles);
             Assert.IsTrue(context.RequirementsFiles.Any(f => f.EndsWith("req1.yaml")));
             Assert.IsTrue(context.RequirementsFiles.Any(f => f.EndsWith("req2.yaml")));
             Assert.AreEqual(0, context.ExitCode);
@@ -541,7 +541,7 @@ public class ContextTests
 
             using var context = Context.Create(["--tests", "*.trx"]);
 
-            Assert.AreEqual(2, context.TestFiles.Count);
+            Assert.HasCount(2, context.TestFiles);
             Assert.IsTrue(context.TestFiles.Any(f => f.EndsWith("test1.trx")));
             Assert.IsTrue(context.TestFiles.Any(f => f.EndsWith("test2.trx")));
             Assert.AreEqual(0, context.ExitCode);
