@@ -63,8 +63,8 @@ jobs:
         with:
           name: packages-${{ inputs.os }}
           path: |
-            **/*.nupkg
-            **/*.snupkg
+            src/DemaConsulting.ReqStream/bin/Release/*.nupkg
+            src/DemaConsulting.ReqStream/bin/Release/*.snupkg
 
   integration-test:
     runs-on: ${{ inputs.os }}
