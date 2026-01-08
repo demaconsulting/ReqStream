@@ -65,3 +65,58 @@ jobs:
           path: |
             **/*.nupkg
             **/*.snupkg
+
+  integration-test:
+    runs-on: ${{ matrix.os }}
+    needs: build
+    permissions:
+      contents: read
+
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        dotnet-version: ['8.x', '9.x', '10.x']
+
+    steps:
+      - name: Download package
+        uses: actions/download-artifact@v6
+        with:
+          name: packages-${{ inputs.os }}
+          path: packages
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Install tool from package
+        shell: bash
+        run: |
+          # Find the nupkg file (not snupkg)
+          PACKAGE_PATH=$(find packages -name "*.nupkg" ! -name "*.snupkg" | head -n 1)
+          echo "Installing package from: $PACKAGE_PATH"
+          dotnet tool install --global --add-source $(dirname "$PACKAGE_PATH") DemaConsulting.ReqStream
+
+      - name: Test version command
+        shell: bash
+        run: |
+          echo "Testing version command..."
+          reqstream --version
+          if [ $? -eq 0 ]; then
+            echo "✓ Version command succeeded"
+          else
+            echo "✗ Version command failed"
+            exit 1
+          fi
+
+      - name: Test help command
+        shell: bash
+        run: |
+          echo "Testing help command..."
+          reqstream --help
+          if [ $? -eq 0 ]; then
+            echo "✓ Help command succeeded"
+          else
+            echo "✗ Help command failed"
+            exit 1
+          fi
