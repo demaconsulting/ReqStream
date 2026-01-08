@@ -123,7 +123,6 @@ public class TraceMatrix
 
         // Parse as TRX format
         DemaConsulting.TestResults.TestResults testResults;
-        
         try
         {
             testResults = TrxSerializer.Deserialize(content);
