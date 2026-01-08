@@ -21,27 +21,27 @@
 namespace DemaConsulting.ReqStream;
 
 /// <summary>
-/// Represents a single requirement with its metadata.
+///     Represents a single requirement with its metadata.
 /// </summary>
 public class Requirement
 {
     /// <summary>
-    /// Gets or sets the unique identifier for this requirement.
+    ///     Gets or sets the unique identifier for this requirement.
     /// </summary>
     public string Id { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the title or description of this requirement.
+    ///     Gets or sets the title or description of this requirement.
     /// </summary>
     public string Title { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets the list of test identifiers associated with this requirement.
+    ///     Gets the list of test identifiers associated with this requirement.
     /// </summary>
     public List<string> Tests { get; } = new();
 
     /// <summary>
-    /// Gets the list of child requirement identifiers.
+    ///     Gets the list of child requirement identifiers.
     /// </summary>
     public List<string> Children { get; } = new();
 }

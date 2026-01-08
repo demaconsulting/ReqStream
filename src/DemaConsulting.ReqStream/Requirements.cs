@@ -24,22 +24,22 @@ using YamlDotNet.Serialization.NamingConventions;
 namespace DemaConsulting.ReqStream;
 
 /// <summary>
-/// Represents the complete requirements document tree.
+///     Represents the complete requirements document tree.
 /// </summary>
 public class Requirements : Section
 {
     /// <summary>
-    /// Set of files that have already been included to prevent infinite loops.
+    ///     Set of files that have already been included to prevent infinite loops.
     /// </summary>
     private readonly HashSet<string> _includedFiles = new();
 
     /// <summary>
-    /// Dictionary mapping requirement IDs to their Requirement objects for duplicate detection.
+    ///     Dictionary mapping requirement IDs to their Requirement objects for duplicate detection.
     /// </summary>
     private readonly Dictionary<string, Requirement> _allRequirements = new();
 
     /// <summary>
-    /// Reads a requirements YAML file and returns the parsed Requirements object.
+    ///     Reads a requirements YAML file and returns the parsed Requirements object.
     /// </summary>
     /// <param name="path">The path to the YAML file to read.</param>
     /// <returns>A Requirements object containing the parsed requirements.</returns>
@@ -49,47 +49,58 @@ public class Requirements : Section
     {
         // Create a new Requirements instance to hold the parsed data
         var requirements = new Requirements();
+
         // Read and process the file and any includes
         requirements.ReadFile(path);
+
         // Return the fully populated requirements tree
         return requirements;
     }
 
     /// <summary>
-    /// Reads and processes a YAML file, including any referenced include files.
+    ///     Reads and processes a YAML file, including any referenced include files.
     /// </summary>
     /// <param name="path">The path to the YAML file to read.</param>
     private void ReadFile(string path)
     {
         // Convert to full path and check if already included to prevent loops
         var fullPath = Path.GetFullPath(path);
+
         // Skip if this file has already been included
         if (_includedFiles.Contains(fullPath))
         {
             return;
         }
+
         // Mark this file as included
         _includedFiles.Add(fullPath);
+
         // Verify the file exists before attempting to read
         if (!File.Exists(fullPath))
         {
             throw new FileNotFoundException($"Requirements file not found: {path}", path);
         }
+
         // Read the entire YAML file as text
         var yaml = File.ReadAllText(fullPath);
+
         // Create a deserializer configured for hyphenated property names
         var deserializer = new DeserializerBuilder()
             .WithNamingConvention(HyphenatedNamingConvention.Instance)
             .Build();
+
         // Deserialize the YAML into our document structure
         var document = deserializer.Deserialize<YamlDocument>(yaml);
+
         // Handle empty or null documents
         if (document == null)
         {
             return;
         }
+
         // Get the base directory for resolving relative include paths
         var baseDirectory = Path.GetDirectoryName(fullPath) ?? string.Empty;
+
         // Merge all sections from the document into the requirements tree
         if (document.Sections != null)
         {
@@ -99,6 +110,7 @@ public class Requirements : Section
                 MergeSection(this, section);
             }
         }
+
         // Apply test mappings to existing requirements
         if (document.Mappings != null)
         {
@@ -116,6 +128,7 @@ public class Requirements : Section
                 }
             }
         }
+
         // Recursively process any included files
         if (document.Includes != null)
         {
@@ -124,6 +137,7 @@ public class Requirements : Section
             {
                 // Resolve the include path relative to the current file
                 var includePath = Path.Combine(baseDirectory, include);
+
                 // Recursively read the included file
                 ReadFile(includePath);
             }
@@ -131,7 +145,7 @@ public class Requirements : Section
     }
 
     /// <summary>
-    /// Merges a YAML section into the target section.
+    ///     Merges a YAML section into the target section.
     /// </summary>
     /// <param name="target">The target section to merge into.</param>
     /// <param name="source">The source YAML section to merge from.</param>
@@ -139,12 +153,14 @@ public class Requirements : Section
     {
         // Find or create the section with matching title
         var existingSection = target.Sections.FirstOrDefault(s => s.Title == source.Title);
+
         // Create the section if it doesn't exist
         if (existingSection == null)
         {
             existingSection = new Section { Title = source.Title };
             target.Sections.Add(existingSection);
         }
+
         // Add all requirements from the source section
         if (source.Requirements != null)
         {
@@ -157,25 +173,30 @@ public class Requirements : Section
                     Id = req.Id,
                     Title = req.Title
                 };
+
                 // Add any inline tests
                 if (req.Tests != null)
                 {
                     requirement.Tests.AddRange(req.Tests);
                 }
+
                 // Add any child requirement references
                 if (req.Children != null)
                 {
                     requirement.Children.AddRange(req.Children);
                 }
+
                 // Check for duplicate requirement IDs and register the requirement
                 if (!_allRequirements.TryAdd(requirement.Id, requirement))
                 {
                     throw new InvalidOperationException($"Duplicate requirement ID found: {requirement.Id}");
                 }
+
                 // Add the requirement to the section
                 existingSection.Requirements.Add(requirement);
             }
         }
+
         // Recursively merge any child sections
         if (source.Sections != null)
         {
@@ -188,85 +209,85 @@ public class Requirements : Section
     }
 
     /// <summary>
-    /// Internal class for deserializing the YAML document structure.
+    ///     Internal class for deserializing the YAML document structure.
     /// </summary>
     private class YamlDocument
     {
         /// <summary>
-        /// Gets or sets the sections in the document.
+        ///     Gets or sets the sections in the document.
         /// </summary>
         public List<YamlSection>? Sections { get; set; }
 
         /// <summary>
-        /// Gets or sets the test mappings in the document.
+        ///     Gets or sets the test mappings in the document.
         /// </summary>
         public List<YamlMapping>? Mappings { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of include files.
+        ///     Gets or sets the list of include files.
         /// </summary>
         public List<string>? Includes { get; set; }
     }
 
     /// <summary>
-    /// Internal class for deserializing a YAML section.
+    ///     Internal class for deserializing a YAML section.
     /// </summary>
     private class YamlSection
     {
         /// <summary>
-        /// Gets or sets the title of the section.
+        ///     Gets or sets the title of the section.
         /// </summary>
         public string Title { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets the requirements in this section.
+        ///     Gets or sets the requirements in this section.
         /// </summary>
         public List<YamlRequirement>? Requirements { get; set; }
 
         /// <summary>
-        /// Gets or sets the child sections.
+        ///     Gets or sets the child sections.
         /// </summary>
         public List<YamlSection>? Sections { get; set; }
     }
 
     /// <summary>
-    /// Internal class for deserializing a YAML requirement.
+    ///     Internal class for deserializing a YAML requirement.
     /// </summary>
     private class YamlRequirement
     {
         /// <summary>
-        /// Gets or sets the requirement ID.
+        ///     Gets or sets the requirement ID.
         /// </summary>
         public string Id { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets the requirement title.
+        ///     Gets or sets the requirement title.
         /// </summary>
         public string Title { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets the list of tests.
+        ///     Gets or sets the list of tests.
         /// </summary>
         public List<string>? Tests { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of child requirement IDs.
+        ///     Gets or sets the list of child requirement IDs.
         /// </summary>
         public List<string>? Children { get; set; }
     }
 
     /// <summary>
-    /// Internal class for deserializing a YAML test mapping.
+    ///     Internal class for deserializing a YAML test mapping.
     /// </summary>
     private class YamlMapping
     {
         /// <summary>
-        /// Gets or sets the requirement ID for this mapping.
+        ///     Gets or sets the requirement ID for this mapping.
         /// </summary>
         public string Id { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets the list of tests.
+        ///     Gets or sets the list of tests.
         /// </summary>
         public List<string>? Tests { get; set; }
     }

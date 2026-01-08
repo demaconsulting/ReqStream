@@ -21,22 +21,22 @@
 namespace DemaConsulting.ReqStream;
 
 /// <summary>
-/// Represents a section containing requirements and/or child sections.
+///     Represents a section containing requirements and/or child sections.
 /// </summary>
 public class Section
 {
     /// <summary>
-    /// Gets or sets the title of this section.
+    ///     Gets or sets the title of this section.
     /// </summary>
     public string Title { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets the list of requirements in this section.
+    ///     Gets the list of requirements in this section.
     /// </summary>
     public List<Requirement> Requirements { get; } = new();
 
     /// <summary>
-    /// Gets the list of child sections.
+    ///     Gets the list of child sections.
     /// </summary>
     public List<Section> Sections { get; } = new();
 }
