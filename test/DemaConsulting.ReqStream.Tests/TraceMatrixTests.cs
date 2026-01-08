@@ -1,0 +1,397 @@
+// Copyright (c) 2026 DEMA Consulting
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+using DemaConsulting.TestResults;
+using DemaConsulting.TestResults.IO;
+using TestResult = DemaConsulting.TestResults.TestResult;
+
+namespace DemaConsulting.ReqStream.Tests;
+
+/// <summary>
+///     Unit tests for TraceMatrix functionality.
+/// </summary>
+[TestClass]
+public class TraceMatrixTests
+{
+    private string _testDirectory = string.Empty;
+
+    /// <summary>
+    ///     Initialize test by creating a temporary test directory.
+    /// </summary>
+    [TestInitialize]
+    public void TestInitialize()
+    {
+        _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
+        Directory.CreateDirectory(_testDirectory);
+    }
+
+    /// <summary>
+    ///     Clean up test by deleting the temporary test directory.
+    /// </summary>
+    [TestCleanup]
+    public void TestCleanup()
+    {
+        if (Directory.Exists(_testDirectory))
+        {
+            Directory.Delete(_testDirectory, recursive: true);
+        }
+    }
+
+    /// <summary>
+    ///     Test TraceMatrix with a TRX test result file.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_WithTrxFile_ParsesCorrectly()
+    {
+        // Create requirements
+        var reqYaml = @"---
+sections:
+  - title: ""User Authentication""
+    requirements:
+      - id: ""AUTH-001""
+        title: ""Validate user credentials""
+        tests:
+          - ""Test_Credentials_Valid""
+          - ""Test_Credentials_Invalid""
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var requirements = Requirements.Read(reqPath);
+
+        // Create TRX file using the TestResults library
+        var testResults = new TestResults.TestResults { Name = "TestRun" };
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_Credentials_Valid",
+            ClassName = "AuthTests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_Credentials_Invalid",
+            ClassName = "AuthTests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+
+        var trxPath = Path.Combine(_testDirectory, "results.trx");
+        File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
+
+        // Create TraceMatrix
+        var matrix = new TraceMatrix(requirements, trxPath);
+
+        // Verify results
+        var result1 = matrix.GetTestResult("Test_Credentials_Valid");
+        Assert.IsNotNull(result1);
+        Assert.AreEqual(1, result1.Executed);
+        Assert.AreEqual(1, result1.Passed);
+
+        var result2 = matrix.GetTestResult("Test_Credentials_Invalid");
+        Assert.IsNotNull(result2);
+        Assert.AreEqual(1, result2.Executed);
+        Assert.AreEqual(1, result2.Passed);
+    }
+
+    /// <summary>
+    ///     Test TraceMatrix with multiple test result files (matrix testing scenario).
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_WithMultipleFiles_AggregatesResults()
+    {
+        // Create requirements
+        var reqYaml = @"---
+sections:
+  - title: ""Cross-Platform Tests""
+    requirements:
+      - id: ""PLAT-001""
+        title: ""Run on multiple platforms""
+        tests:
+          - ""Test_PlatformBasic""
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var requirements = Requirements.Read(reqPath);
+
+        // Create first TRX file (Windows, passed)
+        var testResults1 = new TestResults.TestResults { Name = "WindowsRun" };
+        testResults1.Results.Add(new TestResult
+        {
+            Name = "Test_PlatformBasic",
+            ClassName = "PlatformTests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+        var trx1Path = Path.Combine(_testDirectory, "windows-results.trx");
+        File.WriteAllText(trx1Path, TrxSerializer.Serialize(testResults1));
+
+        // Create second TRX file (Linux, passed)
+        var testResults2 = new TestResults.TestResults { Name = "LinuxRun" };
+        testResults2.Results.Add(new TestResult
+        {
+            Name = "Test_PlatformBasic",
+            ClassName = "PlatformTests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+        var trx2Path = Path.Combine(_testDirectory, "linux-results.trx");
+        File.WriteAllText(trx2Path, TrxSerializer.Serialize(testResults2));
+
+        // Create third TRX file (macOS, failed)
+        var testResults3 = new TestResults.TestResults { Name = "MacOSRun" };
+        testResults3.Results.Add(new TestResult
+        {
+            Name = "Test_PlatformBasic",
+            ClassName = "PlatformTests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Failed,
+            ErrorMessage = "Test failed on macOS",
+            Duration = TimeSpan.FromSeconds(1)
+        });
+        var trx3Path = Path.Combine(_testDirectory, "macos-results.trx");
+        File.WriteAllText(trx3Path, TrxSerializer.Serialize(testResults3));
+
+        // Create TraceMatrix with all three files
+        var matrix = new TraceMatrix(requirements, trx1Path, trx2Path, trx3Path);
+
+        // Verify aggregated results
+        var result = matrix.GetTestResult("Test_PlatformBasic");
+        Assert.IsNotNull(result);
+        Assert.AreEqual(3, result.Executed, "Test should have been executed 3 times");
+        Assert.AreEqual(2, result.Passed, "Test should have passed 2 times");
+    }
+
+    /// <summary>
+    ///     Test that extra tests (beyond those in requirements) are ignored.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_WithExtraTests_IgnoresUnreferencedTests()
+    {
+        // Create requirements with only one test
+        var reqYaml = @"---
+sections:
+  - title: ""Security Tests""
+    requirements:
+      - id: ""SEC-001""
+        title: ""Authentication required""
+        tests:
+          - ""Test_Auth_Valid""
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var requirements = Requirements.Read(reqPath);
+
+        // Create TRX with multiple tests
+        var testResults = new TestResults.TestResults { Name = "TestRun" };
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_Auth_Valid",
+            ClassName = "SecurityTests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_ExtraNotInRequirements",
+            ClassName = "SecurityTests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_AnotherExtra",
+            ClassName = "SecurityTests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+
+        var trxPath = Path.Combine(_testDirectory, "results.trx");
+        File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
+
+        // Create TraceMatrix
+        var matrix = new TraceMatrix(requirements, trxPath);
+
+        // Verify only the referenced test is tracked
+        var result1 = matrix.GetTestResult("Test_Auth_Valid");
+        Assert.IsNotNull(result1);
+        Assert.AreEqual(1, result1.Executed);
+        Assert.AreEqual(1, result1.Passed);
+
+        // Extra tests should not be tracked
+        var result2 = matrix.GetTestResult("Test_ExtraNotInRequirements");
+        Assert.IsNull(result2);
+
+        var result3 = matrix.GetTestResult("Test_AnotherExtra");
+        Assert.IsNull(result3);
+
+        // Verify all results only contains the one tracked test
+        var allResults = matrix.GetAllTestResults();
+        Assert.AreEqual(1, allResults.Count);
+        Assert.IsTrue(allResults.ContainsKey("Test_Auth_Valid"));
+    }
+
+    /// <summary>
+    ///     Test that null requirements throws ArgumentNullException.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_NullRequirements_ThrowsArgumentNullException()
+    {
+        try
+        {
+            _ = new TraceMatrix(null!, Array.Empty<string>());
+            Assert.Fail("Expected ArgumentNullException was not thrown");
+        }
+        catch (ArgumentNullException ex)
+        {
+            StringAssert.Contains(ex.Message, "requirements");
+        }
+    }
+
+    /// <summary>
+    ///     Test that missing test result file throws FileNotFoundException.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_MissingFile_ThrowsFileNotFoundException()
+    {
+        // Create minimal requirements
+        var reqYaml = @"---
+sections:
+  - title: ""Test Section""
+    requirements:
+      - id: ""TEST-001""
+        title: ""Test requirement""
+        tests:
+          - ""SomeTest""
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var requirements = Requirements.Read(reqPath);
+
+        var nonExistentPath = Path.Combine(_testDirectory, "nonexistent.trx");
+
+        try
+        {
+            _ = new TraceMatrix(requirements, nonExistentPath);
+            Assert.Fail("Expected FileNotFoundException was not thrown");
+        }
+        catch (FileNotFoundException ex)
+        {
+            StringAssert.Contains(ex.Message, "Test result file not found");
+        }
+    }
+
+    /// <summary>
+    ///     Test TraceMatrix with failed tests.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_WithFailedTests_TracksFailures()
+    {
+        // Create requirements
+        var reqYaml = @"---
+sections:
+  - title: ""Failure Tests""
+    requirements:
+      - id: ""FAIL-001""
+        title: ""Test failures""
+        tests:
+          - ""Test_Passing""
+          - ""Test_Failing""
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var requirements = Requirements.Read(reqPath);
+
+        // Create TRX with passed and failed tests
+        var testResults = new TestResults.TestResults { Name = "TestRun" };
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_Passing",
+            ClassName = "FailureTests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_Failing",
+            ClassName = "FailureTests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Failed,
+            ErrorMessage = "Assertion failed",
+            Duration = TimeSpan.FromSeconds(1)
+        });
+
+        var trxPath = Path.Combine(_testDirectory, "results.trx");
+        File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
+
+        // Create TraceMatrix
+        var matrix = new TraceMatrix(requirements, trxPath);
+
+        // Verify passing test
+        var result1 = matrix.GetTestResult("Test_Passing");
+        Assert.IsNotNull(result1);
+        Assert.AreEqual(1, result1.Executed);
+        Assert.AreEqual(1, result1.Passed);
+
+        // Verify failing test
+        var result2 = matrix.GetTestResult("Test_Failing");
+        Assert.IsNotNull(result2);
+        Assert.AreEqual(1, result2.Executed);
+        Assert.AreEqual(0, result2.Passed, "Failed test should have 0 passes");
+    }
+
+    /// <summary>
+    ///     Test TraceMatrix with no test result files.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_WithNoFiles_CreatesEmptyMatrix()
+    {
+        // Create requirements
+        var reqYaml = @"---
+sections:
+  - title: ""Test Section""
+    requirements:
+      - id: ""TEST-001""
+        title: ""Test requirement""
+        tests:
+          - ""SomeTest""
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var requirements = Requirements.Read(reqPath);
+
+        // Create TraceMatrix with no files
+        var matrix = new TraceMatrix(requirements);
+
+        // Verify no results
+        var allResults = matrix.GetAllTestResults();
+        Assert.AreEqual(0, allResults.Count);
+
+        var result = matrix.GetTestResult("SomeTest");
+        Assert.IsNull(result);
+    }
+}
