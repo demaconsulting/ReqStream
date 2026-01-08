@@ -100,22 +100,12 @@ jobs:
         shell: bash
         run: |
           echo "Testing version command..."
-          reqstream --version
-          if [ $? -eq 0 ]; then
-            echo "✓ Version command succeeded"
-          else
-            echo "✗ Version command failed"
-            exit 1
-          fi
+          reqstream --version || { echo "✗ Version command failed"; exit 1; }
+          echo "✓ Version command succeeded"
 
       - name: Test help command
         shell: bash
         run: |
           echo "Testing help command..."
-          reqstream --help
-          if [ $? -eq 0 ]; then
-            echo "✓ Help command succeeded"
-          else
-            echo "✗ Help command failed"
-            exit 1
-          fi
+          reqstream --help || { echo "✗ Help command failed"; exit 1; }
+          echo "✓ Help command succeeded"
