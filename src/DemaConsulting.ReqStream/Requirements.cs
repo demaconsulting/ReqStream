@@ -47,8 +47,11 @@ public class Requirements : Section
     /// <exception cref="InvalidOperationException">Thrown when duplicate requirement IDs are found.</exception>
     public static Requirements Read(string path)
     {
+        // Create a new Requirements instance to hold the parsed data
         var requirements = new Requirements();
+        // Read and process the file and any includes
         requirements.ReadFile(path);
+        // Return the fully populated requirements tree
         return requirements;
     }
 
@@ -60,51 +63,52 @@ public class Requirements : Section
     {
         // Convert to full path and check if already included to prevent loops
         var fullPath = Path.GetFullPath(path);
-
+        // Skip if this file has already been included
         if (_includedFiles.Contains(fullPath))
         {
             return;
         }
-
+        // Mark this file as included
         _includedFiles.Add(fullPath);
-
         // Verify the file exists before attempting to read
         if (!File.Exists(fullPath))
         {
             throw new FileNotFoundException($"Requirements file not found: {path}", path);
         }
-
-        // Read and deserialize the YAML document
+        // Read the entire YAML file as text
         var yaml = File.ReadAllText(fullPath);
+        // Create a deserializer configured for hyphenated property names
         var deserializer = new DeserializerBuilder()
             .WithNamingConvention(HyphenatedNamingConvention.Instance)
             .Build();
-
+        // Deserialize the YAML into our document structure
         var document = deserializer.Deserialize<YamlDocument>(yaml);
+        // Handle empty or null documents
         if (document == null)
         {
             return;
         }
-
         // Get the base directory for resolving relative include paths
         var baseDirectory = Path.GetDirectoryName(fullPath) ?? string.Empty;
-
         // Merge all sections from the document into the requirements tree
         if (document.Sections != null)
         {
+            // Process each top-level section in the document
             foreach (var section in document.Sections)
             {
                 MergeSection(this, section);
             }
         }
-
         // Apply test mappings to existing requirements
         if (document.Mappings != null)
         {
+            // Process each mapping to add tests to requirements
             foreach (var mapping in document.Mappings)
             {
+                // Find the requirement by ID
                 if (_allRequirements.TryGetValue(mapping.Id, out var requirement))
                 {
+                    // Add the tests if they exist
                     if (mapping.Tests != null)
                     {
                         requirement.Tests.AddRange(mapping.Tests);
@@ -112,13 +116,15 @@ public class Requirements : Section
                 }
             }
         }
-
         // Recursively process any included files
         if (document.Includes != null)
         {
+            // Process each included file
             foreach (var include in document.Includes)
             {
+                // Resolve the include path relative to the current file
                 var includePath = Path.Combine(baseDirectory, include);
+                // Recursively read the included file
                 ReadFile(includePath);
             }
         }
@@ -133,15 +139,16 @@ public class Requirements : Section
     {
         // Find or create the section with matching title
         var existingSection = target.Sections.FirstOrDefault(s => s.Title == source.Title);
+        // Create the section if it doesn't exist
         if (existingSection == null)
         {
             existingSection = new Section { Title = source.Title };
             target.Sections.Add(existingSection);
         }
-
         // Add all requirements from the source section
         if (source.Requirements != null)
         {
+            // Process each requirement in the source section
             foreach (var req in source.Requirements)
             {
                 // Create the requirement with its basic properties
@@ -150,34 +157,29 @@ public class Requirements : Section
                     Id = req.Id,
                     Title = req.Title
                 };
-
                 // Add any inline tests
                 if (req.Tests != null)
                 {
                     requirement.Tests.AddRange(req.Tests);
                 }
-
                 // Add any child requirement references
                 if (req.Children != null)
                 {
                     requirement.Children.AddRange(req.Children);
                 }
-
-                // Check for duplicate requirement IDs
-                if (_allRequirements.ContainsKey(requirement.Id))
+                // Check for duplicate requirement IDs and register the requirement
+                if (!_allRequirements.TryAdd(requirement.Id, requirement))
                 {
                     throw new InvalidOperationException($"Duplicate requirement ID found: {requirement.Id}");
                 }
-
-                // Register and add the requirement
-                _allRequirements[requirement.Id] = requirement;
+                // Add the requirement to the section
                 existingSection.Requirements.Add(requirement);
             }
         }
-
         // Recursively merge any child sections
         if (source.Sections != null)
         {
+            // Process each child section recursively
             foreach (var childSection in source.Sections)
             {
                 MergeSection(existingSection, childSection);
