@@ -434,16 +434,16 @@ mappings:
         Assert.AreEqual(1, sysSec.Requirements[0].Children.Count);
         Assert.AreEqual("AUTH-001", sysSec.Requirements[0].Children[0]);
 
-        var dataMgmt = requirements.Sections[1];
-        Assert.AreEqual("Data Management", dataMgmt.Title);
-        Assert.AreEqual(2, dataMgmt.Sections.Count);
+        var dataManagement = requirements.Sections[1];
+        Assert.AreEqual("Data Management", dataManagement.Title);
+        Assert.AreEqual(2, dataManagement.Sections.Count);
 
-        var auth = dataMgmt.Sections[0];
+        var auth = dataManagement.Sections[0];
         Assert.AreEqual("User Authentication", auth.Title);
         Assert.AreEqual("AUTH-001", auth.Requirements[0].Id);
         Assert.AreEqual(3, auth.Requirements[0].Tests.Count);
 
-        var logging = dataMgmt.Sections[1];
+        var logging = dataManagement.Sections[1];
         Assert.AreEqual("Logging", logging.Title);
         Assert.AreEqual("DATA-001", logging.Requirements[0].Id);
         Assert.AreEqual(2, logging.Requirements[0].Tests.Count);
@@ -665,6 +665,184 @@ sections:
             StringAssert.Contains(ex.Message, "SYS-SEC-001");
             StringAssert.Contains(ex.Message, "Duplicate requirement ID");
             StringAssert.Contains(ex.Message, filePath);
+        }
+    }
+
+    /// <summary>
+    ///     Test reading multiple files with params array.
+    /// </summary>
+    [TestMethod]
+    public void Read_MultipleFiles_MergesAllFiles()
+    {
+        var file1Yaml = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+";
+        var file2Yaml = @"---
+sections:
+  - title: ""Data Management""
+    requirements:
+      - id: ""DATA-001""
+        title: ""All requests shall be logged.""
+";
+        var file3Yaml = @"---
+sections:
+  - title: ""Performance""
+    requirements:
+      - id: ""PERF-001""
+        title: ""The system shall respond within 100ms.""
+";
+        var file1Path = Path.Combine(_testDirectory, "file1.yaml");
+        var file2Path = Path.Combine(_testDirectory, "file2.yaml");
+        var file3Path = Path.Combine(_testDirectory, "file3.yaml");
+        File.WriteAllText(file1Path, file1Yaml);
+        File.WriteAllText(file2Path, file2Yaml);
+        File.WriteAllText(file3Path, file3Yaml);
+
+        var requirements = Requirements.Read(file1Path, file2Path, file3Path);
+
+        Assert.IsNotNull(requirements);
+        Assert.AreEqual(3, requirements.Sections.Count);
+        Assert.AreEqual("System Security", requirements.Sections[0].Title);
+        Assert.AreEqual("Data Management", requirements.Sections[1].Title);
+        Assert.AreEqual("Performance", requirements.Sections[2].Title);
+        Assert.AreEqual("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
+        Assert.AreEqual("DATA-001", requirements.Sections[1].Requirements[0].Id);
+        Assert.AreEqual("PERF-001", requirements.Sections[2].Requirements[0].Id);
+    }
+
+    /// <summary>
+    ///     Test reading multiple files that merge sections.
+    /// </summary>
+    [TestMethod]
+    public void Read_MultipleFilesWithSameSections_MergesSections()
+    {
+        var file1Yaml = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+";
+        var file2Yaml = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-002""
+        title: ""The system shall enforce password complexity.""
+";
+        var file1Path = Path.Combine(_testDirectory, "file1.yaml");
+        var file2Path = Path.Combine(_testDirectory, "file2.yaml");
+        File.WriteAllText(file1Path, file1Yaml);
+        File.WriteAllText(file2Path, file2Yaml);
+
+        var requirements = Requirements.Read(file1Path, file2Path);
+
+        Assert.IsNotNull(requirements);
+        Assert.AreEqual(1, requirements.Sections.Count);
+        Assert.AreEqual("System Security", requirements.Sections[0].Title);
+        Assert.AreEqual(2, requirements.Sections[0].Requirements.Count);
+        Assert.AreEqual("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
+        Assert.AreEqual("SYS-SEC-002", requirements.Sections[0].Requirements[1].Id);
+    }
+
+    /// <summary>
+    ///     Test reading single file with params array (backwards compatibility).
+    /// </summary>
+    [TestMethod]
+    public void Read_SingleFileWithParamsArray_WorksCorrectly()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        var requirements = Requirements.Read(filePath);
+
+        Assert.IsNotNull(requirements);
+        Assert.AreEqual(1, requirements.Sections.Count);
+        Assert.AreEqual("System Security", requirements.Sections[0].Title);
+        Assert.AreEqual(1, requirements.Sections[0].Requirements.Count);
+        Assert.AreEqual("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
+    }
+
+    /// <summary>
+    ///     Test that calling Read with no arguments throws ArgumentException.
+    /// </summary>
+    [TestMethod]
+    public void Read_NoArguments_ThrowsArgumentException()
+    {
+        try
+        {
+            Requirements.Read();
+            Assert.Fail("Expected ArgumentException was not thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            StringAssert.Contains(ex.Message, "At least one file path must be provided");
+        }
+    }
+
+    /// <summary>
+    ///     Test that calling Read with null throws ArgumentException.
+    /// </summary>
+    [TestMethod]
+    public void Read_NullArgument_ThrowsArgumentException()
+    {
+        try
+        {
+            Requirements.Read(null);
+            Assert.Fail("Expected ArgumentException was not thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            StringAssert.Contains(ex.Message, "At least one file path must be provided");
+        }
+    }
+
+    /// <summary>
+    ///     Test that duplicate IDs across multiple files are detected.
+    /// </summary>
+    [TestMethod]
+    public void Read_MultipleFilesWithDuplicateIds_ThrowsException()
+    {
+        var file1Yaml = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+";
+        var file2Yaml = @"---
+sections:
+  - title: ""Data Management""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""Duplicate requirement with same ID.""
+";
+        var file1Path = Path.Combine(_testDirectory, "file1.yaml");
+        var file2Path = Path.Combine(_testDirectory, "file2.yaml");
+        File.WriteAllText(file1Path, file1Yaml);
+        File.WriteAllText(file2Path, file2Yaml);
+
+        try
+        {
+            Requirements.Read(file1Path, file2Path);
+            Assert.Fail("Expected InvalidOperationException was not thrown");
+        }
+        catch (InvalidOperationException ex)
+        {
+            StringAssert.Contains(ex.Message, "SYS-SEC-001");
+            StringAssert.Contains(ex.Message, "Duplicate requirement ID");
+            StringAssert.Contains(ex.Message, file2Path);
         }
     }
 }

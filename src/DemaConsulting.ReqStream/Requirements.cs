@@ -39,19 +39,29 @@ public class Requirements : Section
     private readonly Dictionary<string, Requirement> _allRequirements = new();
 
     /// <summary>
-    ///     Reads a requirements YAML file and returns the parsed Requirements object.
+    ///     Reads one or more requirements YAML files and returns the parsed Requirements object.
     /// </summary>
-    /// <param name="path">The path to the YAML file to read.</param>
-    /// <returns>A Requirements object containing the parsed requirements.</returns>
-    /// <exception cref="FileNotFoundException">Thrown when the specified file does not exist.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when duplicate requirement IDs are found.</exception>
-    public static Requirements Read(string path)
+    /// <param name="paths">One or more paths to YAML files to read.</param>
+    /// <returns>A Requirements object containing the parsed requirements from all files.</returns>
+    /// <exception cref="ArgumentException">Thrown when no paths are provided.</exception>
+    /// <exception cref="FileNotFoundException">Thrown when a specified file does not exist.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when duplicate requirement IDs are found or validation fails.</exception>
+    public static Requirements Read(params string[] paths)
     {
+        // Validate that at least one path is provided
+        if (paths == null || paths.Length == 0)
+        {
+            throw new ArgumentException("At least one file path must be provided", nameof(paths));
+        }
+
         // Create a new Requirements instance to hold the parsed data
         var requirements = new Requirements();
 
-        // Read and process the file and any includes
-        requirements.ReadFile(path);
+        // Read and process each file and any includes
+        foreach (var path in paths)
+        {
+            requirements.ReadFile(path);
+        }
 
         // Return the fully populated requirements tree
         return requirements;
