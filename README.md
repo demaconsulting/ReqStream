@@ -55,7 +55,6 @@ sections:
 
   - title: "Data Management"
     sections:
-   
       - title: "User Authentication"
         requirements:
           - id: "AUTH-001"
