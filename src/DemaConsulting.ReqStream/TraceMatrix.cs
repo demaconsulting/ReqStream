@@ -34,6 +34,11 @@ public class TraceMatrix
     private readonly Dictionary<string, TestResultEntry> _testResults = new();
 
     /// <summary>
+    ///     The requirements object used to build this trace matrix.
+    /// </summary>
+    private readonly Requirements _requirements;
+
+    /// <summary>
     ///     Initializes a new instance of the TraceMatrix class.
     /// </summary>
     /// <param name="requirements">The requirements containing test mappings.</param>
@@ -46,6 +51,8 @@ public class TraceMatrix
         {
             throw new ArgumentNullException(nameof(requirements));
         }
+
+        _requirements = requirements;
 
         // Collect all test names from requirements
         var requiredTests = CollectTestNames(requirements);
@@ -74,6 +81,326 @@ public class TraceMatrix
     public IReadOnlyDictionary<string, TestResultEntry> GetAllTestResults()
     {
         return _testResults;
+    }
+
+    /// <summary>
+    ///     Exports the trace matrix to a Markdown file.
+    /// </summary>
+    /// <param name="filePath">The path to the output Markdown file.</param>
+    /// <param name="depth">The starting depth for Markdown headers (default: 1).</param>
+    /// <exception cref="ArgumentException">Thrown when filePath is null or empty.</exception>
+    public void Export(string filePath, int depth = 1)
+    {
+        // Validate file path
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            throw new ArgumentException("File path cannot be null or empty", nameof(filePath));
+        }
+
+        // Create a string builder to build the markdown content
+        using var writer = new StringWriter();
+
+        // Export Summary section
+        ExportSummary(writer, depth);
+
+        // Export Requirements section
+        ExportRequirements(writer, depth);
+
+        // Export Testing section
+        ExportTesting(writer, depth);
+
+        // Write the content to the file
+        File.WriteAllText(filePath, writer.ToString());
+    }
+
+    /// <summary>
+    ///     Exports the summary section showing satisfied requirements count.
+    /// </summary>
+    /// <param name="writer">The text writer to write to.</param>
+    /// <param name="depth">The current depth for Markdown headers.</param>
+    private void ExportSummary(TextWriter writer, int depth)
+    {
+        var headerPrefix = new string('#', depth);
+        writer.WriteLine($"{headerPrefix} Summary");
+        writer.WriteLine();
+
+        // Calculate satisfied requirements
+        var (satisfied, total) = CalculateSatisfiedRequirements(_requirements);
+
+        writer.WriteLine($"{satisfied} of {total} requirements are satisfied with tests.");
+        writer.WriteLine();
+    }
+
+    /// <summary>
+    ///     Calculates how many requirements are satisfied.
+    ///     A requirement is satisfied if it has at least one test and all tests have passed.
+    /// </summary>
+    /// <param name="section">The section to analyze.</param>
+    /// <returns>A tuple of (satisfied count, total count).</returns>
+    private (int satisfied, int total) CalculateSatisfiedRequirements(Section section)
+    {
+        var satisfied = 0;
+        var total = 0;
+
+        // Check requirements in this section
+        foreach (var requirement in section.Requirements)
+        {
+            total++;
+            if (IsRequirementSatisfied(requirement, _requirements))
+            {
+                satisfied++;
+            }
+        }
+
+        // Recursively check child sections
+        foreach (var childSection in section.Sections)
+        {
+            var (childSatisfied, childTotal) = CalculateSatisfiedRequirements(childSection);
+            satisfied += childSatisfied;
+            total += childTotal;
+        }
+
+        return (satisfied, total);
+    }
+
+    /// <summary>
+    ///     Determines if a requirement is satisfied.
+    ///     A requirement is satisfied if analyzing its tests and all child-requirement tests
+    ///     recursively shows at least one test, and all tests have passed.
+    /// </summary>
+    /// <param name="requirement">The requirement to check.</param>
+    /// <param name="rootSection">The root section for looking up child requirements.</param>
+    /// <returns>True if the requirement is satisfied, false otherwise.</returns>
+    private bool IsRequirementSatisfied(Requirement requirement, Section rootSection)
+    {
+        var allTests = new HashSet<string>();
+        CollectAllTests(requirement, rootSection, allTests);
+
+        // Must have at least one test
+        if (allTests.Count == 0)
+        {
+            return false;
+        }
+
+        // All tests must have been executed and passed
+        foreach (var testName in allTests)
+        {
+            var result = GetTestResult(testName);
+            if (result == null || result.Executed == 0 || result.Passed != result.Executed)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Collects all tests from a requirement and its children recursively.
+    /// </summary>
+    /// <param name="requirement">The requirement to collect tests from.</param>
+    /// <param name="rootSection">The root section for looking up child requirements.</param>
+    /// <param name="allTests">The set to add tests to.</param>
+    private void CollectAllTests(Requirement requirement, Section rootSection, HashSet<string> allTests)
+    {
+        // Add direct tests
+        foreach (var test in requirement.Tests)
+        {
+            allTests.Add(test);
+        }
+
+        // Recursively add tests from children
+        foreach (var childId in requirement.Children)
+        {
+            var childReq = FindRequirement(rootSection, childId);
+            if (childReq != null)
+            {
+                CollectAllTests(childReq, rootSection, allTests);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Finds a requirement by ID in the section tree.
+    /// </summary>
+    /// <param name="section">The section to search.</param>
+    /// <param name="requirementId">The requirement ID to find.</param>
+    /// <returns>The requirement if found, null otherwise.</returns>
+    private static Requirement? FindRequirement(Section section, string requirementId)
+    {
+        // Search in current section
+        foreach (var req in section.Requirements)
+        {
+            if (req.Id == requirementId)
+            {
+                return req;
+            }
+        }
+
+        // Search in child sections
+        foreach (var childSection in section.Sections)
+        {
+            var found = FindRequirement(childSection, requirementId);
+            if (found != null)
+            {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    ///     Exports the requirements section with test statistics.
+    /// </summary>
+    /// <param name="writer">The text writer to write to.</param>
+    /// <param name="depth">The current depth for Markdown headers.</param>
+    private void ExportRequirements(TextWriter writer, int depth)
+    {
+        var headerPrefix = new string('#', depth);
+        writer.WriteLine($"{headerPrefix} Requirements");
+        writer.WriteLine();
+
+        // Export all sections
+        foreach (var section in _requirements.Sections)
+        {
+            ExportRequirementSection(writer, section, depth + 1);
+        }
+    }
+
+    /// <summary>
+    ///     Exports a requirements section with test statistics.
+    /// </summary>
+    /// <param name="writer">The text writer to write to.</param>
+    /// <param name="section">The section to export.</param>
+    /// <param name="depth">The current depth for Markdown headers.</param>
+    private void ExportRequirementSection(TextWriter writer, Section section, int depth)
+    {
+        // Write section header
+        var headerPrefix = new string('#', depth);
+        writer.WriteLine($"{headerPrefix} {section.Title}");
+        writer.WriteLine();
+
+        // If there are requirements, write them as a table
+        if (section.Requirements.Count > 0)
+        {
+            // Write table header
+            writer.WriteLine("| ID | Tests Linked | Passed | Failed | Not Executed |");
+            writer.WriteLine("|----|--------------|--------|--------|--------------|");
+
+            // Write each requirement
+            foreach (var requirement in section.Requirements)
+            {
+                var (testsLinked, passed, failed, notExecuted) = GetRequirementTestStats(requirement);
+                writer.WriteLine($"| {requirement.Id} | {testsLinked} | {passed} | {failed} | {notExecuted} |");
+            }
+
+            writer.WriteLine();
+        }
+
+        // Recursively export child sections
+        foreach (var childSection in section.Sections)
+        {
+            ExportRequirementSection(writer, childSection, depth + 1);
+        }
+    }
+
+    /// <summary>
+    ///     Gets test statistics for a requirement.
+    /// </summary>
+    /// <param name="requirement">The requirement to analyze.</param>
+    /// <returns>A tuple of (tests linked, passed, failed, not executed).</returns>
+    private (int testsLinked, int passed, int failed, int notExecuted) GetRequirementTestStats(Requirement requirement)
+    {
+        var testsLinked = requirement.Tests.Count;
+        var passed = 0;
+        var failed = 0;
+        var notExecuted = 0;
+
+        foreach (var testName in requirement.Tests)
+        {
+            var result = GetTestResult(testName);
+            if (result == null || result.Executed == 0)
+            {
+                notExecuted++;
+            }
+            else
+            {
+                var failedCount = result.Executed - result.Passed;
+                if (failedCount > 0)
+                {
+                    failed++;
+                }
+                else
+                {
+                    passed++;
+                }
+            }
+        }
+
+        return (testsLinked, passed, failed, notExecuted);
+    }
+
+    /// <summary>
+    ///     Exports the testing section showing test-to-requirement mappings.
+    /// </summary>
+    /// <param name="writer">The text writer to write to.</param>
+    /// <param name="depth">The current depth for Markdown headers.</param>
+    private void ExportTesting(TextWriter writer, int depth)
+    {
+        var headerPrefix = new string('#', depth);
+        writer.WriteLine($"{headerPrefix} Testing");
+        writer.WriteLine();
+
+        // Build a mapping of test names to requirements
+        var testToRequirements = new Dictionary<string, List<string>>();
+        BuildTestToRequirementsMap(_requirements, testToRequirements);
+
+        // Write table header
+        writer.WriteLine("| Test | Requirement | Passed | Failed |");
+        writer.WriteLine("|------|-------------|--------|--------|");
+
+        // Write each test-to-requirement mapping
+        foreach (var (testName, requirementIds) in testToRequirements.OrderBy(kvp => kvp.Key))
+        {
+            var result = GetTestResult(testName);
+            var passed = result?.Passed ?? 0;
+            var failed = result != null ? result.Executed - result.Passed : 0;
+
+            foreach (var reqId in requirementIds.OrderBy(id => id))
+            {
+                writer.WriteLine($"| {testName} | {reqId} | {passed} | {failed} |");
+            }
+        }
+
+        writer.WriteLine();
+    }
+
+    /// <summary>
+    ///     Builds a mapping from test names to requirement IDs.
+    /// </summary>
+    /// <param name="section">The section to scan.</param>
+    /// <param name="testToRequirements">The dictionary to populate.</param>
+    private static void BuildTestToRequirementsMap(Section section, Dictionary<string, List<string>> testToRequirements)
+    {
+        // Process requirements in this section
+        foreach (var requirement in section.Requirements)
+        {
+            foreach (var testName in requirement.Tests)
+            {
+                if (!testToRequirements.ContainsKey(testName))
+                {
+                    testToRequirements[testName] = new List<string>();
+                }
+                testToRequirements[testName].Add(requirement.Id);
+            }
+        }
+
+        // Recursively process child sections
+        foreach (var childSection in section.Sections)
+        {
+            BuildTestToRequirementsMap(childSection, testToRequirements);
+        }
     }
 
     /// <summary>
