@@ -527,7 +527,7 @@ sections:
 sections:
   - title: ""JUnit Failure Tests""
     requirements:
-      - id: ""JFAIL-001""
+      - id: ""JUNIT-FAIL-001""
         title: ""Test JUnit failures""
         tests:
           - ""Test_JUnit_Passing""
