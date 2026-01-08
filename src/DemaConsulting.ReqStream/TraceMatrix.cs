@@ -146,7 +146,7 @@ public class TraceMatrix
         foreach (var requirement in section.Requirements)
         {
             total++;
-            if (IsRequirementSatisfied(requirement, section))
+            if (IsRequirementSatisfied(requirement, _requirements))
             {
                 satisfied++;
             }
