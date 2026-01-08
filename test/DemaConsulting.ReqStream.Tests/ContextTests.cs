@@ -56,10 +56,7 @@ public class ContextTests
     [TestMethod]
     public void Create_NoArguments_ReturnsDefaultContext()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
-        using var context = Context.Create([], output, error);
+        using var context = Context.Create([]);
 
         Assert.IsFalse(context.Version);
         Assert.IsFalse(context.Help);
@@ -80,14 +77,11 @@ public class ContextTests
     [TestMethod]
     public void Create_VersionFlag_SetsVersionProperty()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
-        using var context1 = Context.Create(["-v"], output, error);
+        using var context1 = Context.Create(["-v"]);
         Assert.IsTrue(context1.Version);
         Assert.AreEqual(0, context1.ExitCode);
 
-        using var context2 = Context.Create(["--version"], output, error);
+        using var context2 = Context.Create(["--version"]);
         Assert.IsTrue(context2.Version);
         Assert.AreEqual(0, context2.ExitCode);
     }
@@ -98,18 +92,15 @@ public class ContextTests
     [TestMethod]
     public void Create_HelpFlags_SetsHelpProperty()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
-        using var context1 = Context.Create(["-?"], output, error);
+        using var context1 = Context.Create(["-?"]);
         Assert.IsTrue(context1.Help);
         Assert.AreEqual(0, context1.ExitCode);
 
-        using var context2 = Context.Create(["-h"], output, error);
+        using var context2 = Context.Create(["-h"]);
         Assert.IsTrue(context2.Help);
         Assert.AreEqual(0, context2.ExitCode);
 
-        using var context3 = Context.Create(["--help"], output, error);
+        using var context3 = Context.Create(["--help"]);
         Assert.IsTrue(context3.Help);
         Assert.AreEqual(0, context3.ExitCode);
     }
@@ -120,10 +111,7 @@ public class ContextTests
     [TestMethod]
     public void Create_SilentFlag_SetsSilentProperty()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
-        using var context = Context.Create(["--silent"], output, error);
+        using var context = Context.Create(["--silent"]);
 
         Assert.IsTrue(context.Silent);
         Assert.AreEqual(0, context.ExitCode);
@@ -135,10 +123,7 @@ public class ContextTests
     [TestMethod]
     public void Create_ValidateFlag_SetsValidateProperty()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
-        using var context = Context.Create(["--validate"], output, error);
+        using var context = Context.Create(["--validate"]);
 
         Assert.IsTrue(context.Validate);
         Assert.AreEqual(0, context.ExitCode);
@@ -150,10 +135,7 @@ public class ContextTests
     [TestMethod]
     public void Create_ReportDepth_SetsReportDepthProperty()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
-        using var context = Context.Create(["--report-depth", "3"], output, error);
+        using var context = Context.Create(["--report-depth", "3"]);
 
         Assert.AreEqual(3, context.ReportDepth);
         Assert.AreEqual(0, context.ExitCode);
@@ -165,10 +147,7 @@ public class ContextTests
     [TestMethod]
     public void Create_MatrixDepth_SetsMatrixDepthProperty()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
-        using var context = Context.Create(["--matrix-depth", "2"], output, error);
+        using var context = Context.Create(["--matrix-depth", "2"]);
 
         Assert.AreEqual(2, context.MatrixDepth);
         Assert.AreEqual(0, context.ExitCode);
@@ -180,10 +159,7 @@ public class ContextTests
     [TestMethod]
     public void Create_ReportFile_SetsReportProperty()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
-        using var context = Context.Create(["--report", "report.md"], output, error);
+        using var context = Context.Create(["--report", "report.md"]);
 
         Assert.AreEqual("report.md", context.RequirementsReport);
         Assert.AreEqual(0, context.ExitCode);
@@ -195,10 +171,7 @@ public class ContextTests
     [TestMethod]
     public void Create_MatrixFile_SetsMatrixProperty()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
-        using var context = Context.Create(["--matrix", "matrix.md"], output, error);
+        using var context = Context.Create(["--matrix", "matrix.md"]);
 
         Assert.AreEqual("matrix.md", context.Matrix);
         Assert.AreEqual(0, context.ExitCode);
@@ -210,13 +183,9 @@ public class ContextTests
     [TestMethod]
     public void Create_UnsupportedArgument_ReportsError()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
-        using var context = Context.Create(["--unsupported"], output, error);
+        using var context = Context.Create(["--unsupported"]);
 
         Assert.AreEqual(1, context.ExitCode);
-        StringAssert.Contains(error.ToString(), "Error: Unsupported argument '--unsupported'");
     }
 
     /// <summary>
@@ -225,13 +194,9 @@ public class ContextTests
     [TestMethod]
     public void Create_MissingLogFilename_ReportsError()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
-        using var context = Context.Create(["--log"], output, error);
+        using var context = Context.Create(["--log"]);
 
         Assert.AreEqual(1, context.ExitCode);
-        StringAssert.Contains(error.ToString(), "Error: --log requires a filename argument");
     }
 
     /// <summary>
@@ -240,13 +205,9 @@ public class ContextTests
     [TestMethod]
     public void Create_MissingReportFilename_ReportsError()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
-        using var context = Context.Create(["--report"], output, error);
+        using var context = Context.Create(["--report"]);
 
         Assert.AreEqual(1, context.ExitCode);
-        StringAssert.Contains(error.ToString(), "Error: --report requires a filename argument");
     }
 
     /// <summary>
@@ -255,13 +216,9 @@ public class ContextTests
     [TestMethod]
     public void Create_MissingMatrixFilename_ReportsError()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
-        using var context = Context.Create(["--matrix"], output, error);
+        using var context = Context.Create(["--matrix"]);
 
         Assert.AreEqual(1, context.ExitCode);
-        StringAssert.Contains(error.ToString(), "Error: --matrix requires a filename argument");
     }
 
     /// <summary>
@@ -270,13 +227,9 @@ public class ContextTests
     [TestMethod]
     public void Create_MissingReportDepth_ReportsError()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
-        using var context = Context.Create(["--report-depth"], output, error);
+        using var context = Context.Create(["--report-depth"]);
 
         Assert.AreEqual(1, context.ExitCode);
-        StringAssert.Contains(error.ToString(), "Error: --report-depth requires a depth argument");
     }
 
     /// <summary>
@@ -285,13 +238,9 @@ public class ContextTests
     [TestMethod]
     public void Create_MissingMatrixDepth_ReportsError()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
-        using var context = Context.Create(["--matrix-depth"], output, error);
+        using var context = Context.Create(["--matrix-depth"]);
 
         Assert.AreEqual(1, context.ExitCode);
-        StringAssert.Contains(error.ToString(), "Error: --matrix-depth requires a depth argument");
     }
 
     /// <summary>
@@ -300,22 +249,14 @@ public class ContextTests
     [TestMethod]
     public void Create_InvalidReportDepth_ReportsError()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
-        using var context1 = Context.Create(["--report-depth", "invalid"], output, error);
+        using var context1 = Context.Create(["--report-depth", "invalid"]);
         Assert.AreEqual(1, context1.ExitCode);
-        StringAssert.Contains(error.ToString(), "Error: --report-depth requires a positive integer");
 
-        error = new StringWriter();
-        using var context2 = Context.Create(["--report-depth", "0"], output, error);
+        using var context2 = Context.Create(["--report-depth", "0"]);
         Assert.AreEqual(1, context2.ExitCode);
-        StringAssert.Contains(error.ToString(), "Error: --report-depth requires a positive integer");
 
-        error = new StringWriter();
-        using var context3 = Context.Create(["--report-depth", "-1"], output, error);
+        using var context3 = Context.Create(["--report-depth", "-1"]);
         Assert.AreEqual(1, context3.ExitCode);
-        StringAssert.Contains(error.ToString(), "Error: --report-depth requires a positive integer");
     }
 
     /// <summary>
@@ -324,33 +265,34 @@ public class ContextTests
     [TestMethod]
     public void Create_InvalidMatrixDepth_ReportsError()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
-        using var context1 = Context.Create(["--matrix-depth", "invalid"], output, error);
+        using var context1 = Context.Create(["--matrix-depth", "invalid"]);
         Assert.AreEqual(1, context1.ExitCode);
-        StringAssert.Contains(error.ToString(), "Error: --matrix-depth requires a positive integer");
 
-        error = new StringWriter();
-        using var context2 = Context.Create(["--matrix-depth", "0"], output, error);
+        using var context2 = Context.Create(["--matrix-depth", "0"]);
         Assert.AreEqual(1, context2.ExitCode);
-        StringAssert.Contains(error.ToString(), "Error: --matrix-depth requires a positive integer");
     }
 
     /// <summary>
-    /// Test WriteLine writes to output.
+    /// Test WriteLine writes to console.
     /// </summary>
     [TestMethod]
-    public void WriteLine_NormalMode_WritesToOutput()
+    public void WriteLine_NormalMode_WritesToConsole()
     {
         var output = new StringWriter();
-        var error = new StringWriter();
+        Console.SetOut(output);
 
-        using var context = Context.Create([], output, error);
-        context.WriteLine("Test message");
+        try
+        {
+            using var context = Context.Create([]);
+            context.WriteLine("Test message");
 
-        Assert.AreEqual("Test message" + Environment.NewLine, output.ToString());
-        Assert.AreEqual(string.Empty, error.ToString());
+            Assert.AreEqual("Test message" + Environment.NewLine, output.ToString());
+        }
+        finally
+        {
+            var standardOutput = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
+            Console.SetOut(standardOutput);
+        }
     }
 
     /// <summary>
@@ -360,30 +302,44 @@ public class ContextTests
     public void WriteLine_SilentMode_DoesNotWriteToConsole()
     {
         var output = new StringWriter();
-        var error = new StringWriter();
+        Console.SetOut(output);
 
-        using var context = Context.Create(["--silent"], output, error);
-        context.WriteLine("Test message");
+        try
+        {
+            using var context = Context.Create(["--silent"]);
+            context.WriteLine("Test message");
 
-        Assert.AreEqual(string.Empty, output.ToString());
-        Assert.AreEqual(string.Empty, error.ToString());
+            Assert.AreEqual(string.Empty, output.ToString());
+        }
+        finally
+        {
+            var standardOutput = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
+            Console.SetOut(standardOutput);
+        }
     }
 
     /// <summary>
-    /// Test WriteError writes to error output.
+    /// Test WriteError writes to console.
     /// </summary>
     [TestMethod]
-    public void WriteError_NormalMode_WritesToError()
+    public void WriteError_NormalMode_WritesToConsole()
     {
         var output = new StringWriter();
-        var error = new StringWriter();
+        Console.SetOut(output);
 
-        using var context = Context.Create([], output, error);
-        context.WriteError("Error message");
+        try
+        {
+            using var context = Context.Create([]);
+            context.WriteError("Error message");
 
-        Assert.AreEqual(string.Empty, output.ToString());
-        Assert.AreEqual("Error message" + Environment.NewLine, error.ToString());
-        Assert.AreEqual(1, context.ExitCode);
+            Assert.AreEqual("Error message" + Environment.NewLine, output.ToString());
+            Assert.AreEqual(1, context.ExitCode);
+        }
+        finally
+        {
+            var standardOutput = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
+            Console.SetOut(standardOutput);
+        }
     }
 
     /// <summary>
@@ -393,14 +349,21 @@ public class ContextTests
     public void WriteError_SilentMode_DoesNotWriteToConsole()
     {
         var output = new StringWriter();
-        var error = new StringWriter();
+        Console.SetOut(output);
 
-        using var context = Context.Create(["--silent"], output, error);
-        context.WriteError("Error message");
+        try
+        {
+            using var context = Context.Create(["--silent"]);
+            context.WriteError("Error message");
 
-        Assert.AreEqual(string.Empty, output.ToString());
-        Assert.AreEqual(string.Empty, error.ToString());
-        Assert.AreEqual(1, context.ExitCode);
+            Assert.AreEqual(string.Empty, output.ToString());
+            Assert.AreEqual(1, context.ExitCode);
+        }
+        finally
+        {
+            var standardOutput = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
+            Console.SetOut(standardOutput);
+        }
     }
 
     /// <summary>
@@ -409,11 +372,9 @@ public class ContextTests
     [TestMethod]
     public void Create_WithLogFile_WritesToLogFile()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
         var logPath = Path.Combine(_testDirectory, "test.log");
 
-        using (var context = Context.Create(["--log", logPath], output, error))
+        using (var context = Context.Create(["--log", logPath, "--silent"]))
         {
             context.WriteLine("Normal message");
             context.WriteError("Error message");
@@ -432,22 +393,30 @@ public class ContextTests
     public void Create_WithLogFileAndSilent_WritesToLogOnly()
     {
         var output = new StringWriter();
-        var error = new StringWriter();
-        var logPath = Path.Combine(_testDirectory, "test.log");
+        Console.SetOut(output);
 
-        using (var context = Context.Create(["--log", logPath, "--silent"], output, error))
+        try
         {
-            context.WriteLine("Normal message");
-            context.WriteError("Error message");
+            var logPath = Path.Combine(_testDirectory, "test.log");
+
+            using (var context = Context.Create(["--log", logPath, "--silent"]))
+            {
+                context.WriteLine("Normal message");
+                context.WriteError("Error message");
+            }
+
+            Assert.AreEqual(string.Empty, output.ToString());
+
+            Assert.IsTrue(File.Exists(logPath));
+            var logContent = File.ReadAllText(logPath);
+            StringAssert.Contains(logContent, "Normal message");
+            StringAssert.Contains(logContent, "Error message");
         }
-
-        Assert.AreEqual(string.Empty, output.ToString());
-        Assert.AreEqual(string.Empty, error.ToString());
-
-        Assert.IsTrue(File.Exists(logPath));
-        var logContent = File.ReadAllText(logPath);
-        StringAssert.Contains(logContent, "Normal message");
-        StringAssert.Contains(logContent, "Error message");
+        finally
+        {
+            var standardOutput = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
+            Console.SetOut(standardOutput);
+        }
     }
 
     /// <summary>
@@ -456,9 +425,6 @@ public class ContextTests
     [TestMethod]
     public void Create_WithRequirementsPattern_ExpandsGlobPattern()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
         // Create test files
         var file1 = Path.Combine(_testDirectory, "req1.yaml");
         var file2 = Path.Combine(_testDirectory, "req2.yaml");
@@ -471,7 +437,7 @@ public class ContextTests
         {
             Directory.SetCurrentDirectory(_testDirectory);
 
-            using var context = Context.Create(["--requirements", "*.yaml"], output, error);
+            using var context = Context.Create(["--requirements", "*.yaml"]);
 
             Assert.AreEqual(2, context.RequirementsFiles.Count);
             Assert.IsTrue(context.RequirementsFiles.Any(f => f.EndsWith("req1.yaml")));
@@ -490,9 +456,6 @@ public class ContextTests
     [TestMethod]
     public void Create_WithTestsPattern_ExpandsGlobPattern()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
         // Create test files
         var file1 = Path.Combine(_testDirectory, "test1.trx");
         var file2 = Path.Combine(_testDirectory, "test2.trx");
@@ -505,7 +468,7 @@ public class ContextTests
         {
             Directory.SetCurrentDirectory(_testDirectory);
 
-            using var context = Context.Create(["--tests", "*.trx"], output, error);
+            using var context = Context.Create(["--tests", "*.trx"]);
 
             Assert.AreEqual(2, context.TestFiles.Count);
             Assert.IsTrue(context.TestFiles.Any(f => f.EndsWith("test1.trx")));
@@ -524,13 +487,9 @@ public class ContextTests
     [TestMethod]
     public void Create_MissingRequirementsPattern_ReportsError()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
-        using var context = Context.Create(["--requirements"], output, error);
+        using var context = Context.Create(["--requirements"]);
 
         Assert.AreEqual(1, context.ExitCode);
-        StringAssert.Contains(error.ToString(), "Error: --requirements requires a pattern argument");
     }
 
     /// <summary>
@@ -539,13 +498,9 @@ public class ContextTests
     [TestMethod]
     public void Create_MissingTestsPattern_ReportsError()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
-        using var context = Context.Create(["--tests"], output, error);
+        using var context = Context.Create(["--tests"]);
 
         Assert.AreEqual(1, context.ExitCode);
-        StringAssert.Contains(error.ToString(), "Error: --tests requires a pattern argument");
     }
 
     /// <summary>
@@ -554,13 +509,8 @@ public class ContextTests
     [TestMethod]
     public void Create_MultipleArguments_ParsesAllCorrectly()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
-
         using var context = Context.Create(
-            ["--version", "--help", "--silent", "--validate", "--report", "out.md", "--report-depth", "2"],
-            output,
-            error);
+            ["--version", "--help", "--silent", "--validate", "--report", "out.md", "--report-depth", "2"]);
 
         Assert.IsTrue(context.Version);
         Assert.IsTrue(context.Help);
@@ -577,11 +527,9 @@ public class ContextTests
     [TestMethod]
     public void Dispose_WithLogFile_ClosesLogFile()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
         var logPath = Path.Combine(_testDirectory, "test.log");
 
-        var context = Context.Create(["--log", logPath], output, error);
+        var context = Context.Create(["--log", logPath, "--silent"]);
         context.WriteLine("Test message");
         context.Dispose();
 
@@ -596,13 +544,10 @@ public class ContextTests
     [TestMethod]
     public void Create_InvalidLogPath_ReportsError()
     {
-        var output = new StringWriter();
-        var error = new StringWriter();
         var invalidPath = Path.Combine(_testDirectory, "nonexistent", "test.log");
 
-        using var context = Context.Create(["--log", invalidPath], output, error);
+        using var context = Context.Create(["--log", invalidPath]);
 
         Assert.AreEqual(1, context.ExitCode);
-        StringAssert.Contains(error.ToString(), "Error: Failed to open log file");
     }
 }

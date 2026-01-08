@@ -29,16 +29,6 @@ namespace DemaConsulting.ReqStream;
 public sealed class Context : IDisposable
 {
     /// <summary>
-    /// Output writer for normal program output.
-    /// </summary>
-    private readonly TextWriter _outputWriter;
-
-    /// <summary>
-    /// Output writer for error output.
-    /// </summary>
-    private readonly TextWriter _errorWriter;
-
-    /// <summary>
     /// Log file stream writer (if logging is enabled).
     /// </summary>
     private StreamWriter? _logWriter;
@@ -106,12 +96,8 @@ public sealed class Context : IDisposable
     /// <summary>
     /// Private constructor - use Create factory method instead.
     /// </summary>
-    /// <param name="outputWriter">The output writer.</param>
-    /// <param name="errorWriter">The error writer.</param>
-    private Context(TextWriter outputWriter, TextWriter errorWriter)
+    private Context()
     {
-        _outputWriter = outputWriter;
-        _errorWriter = errorWriter;
     }
 
     /// <summary>
@@ -121,19 +107,7 @@ public sealed class Context : IDisposable
     /// <returns>A new Context instance.</returns>
     public static Context Create(string[] args)
     {
-        return Create(args, Console.Out, Console.Error);
-    }
-
-    /// <summary>
-    /// Creates a Context instance from command-line arguments with custom output writers.
-    /// </summary>
-    /// <param name="args">Command-line arguments.</param>
-    /// <param name="outputWriter">The output writer.</param>
-    /// <param name="errorWriter">The error writer.</param>
-    /// <returns>A new Context instance.</returns>
-    internal static Context Create(string[] args, TextWriter outputWriter, TextWriter errorWriter)
-    {
-        var context = new Context(outputWriter, errorWriter);
+        var context = new Context();
 
         var version = false;
         var help = false;
@@ -251,7 +225,7 @@ public sealed class Context : IDisposable
         }
 
         // Create the context with parsed values
-        var result = new Context(outputWriter, errorWriter)
+        var result = new Context
         {
             Version = version,
             Help = help,
@@ -262,11 +236,9 @@ public sealed class Context : IDisposable
             RequirementsReport = requirementsReport,
             ReportDepth = reportDepth,
             Matrix = matrix,
-            MatrixDepth = matrixDepth
+            MatrixDepth = matrixDepth,
+            _hasErrors = context._hasErrors
         };
-
-        // Transfer error state
-        result._hasErrors = context._hasErrors;
 
         // Open log file if specified
         if (logFile != null)
@@ -309,7 +281,7 @@ public sealed class Context : IDisposable
         // Write to console unless silent mode is enabled
         if (!Silent)
         {
-            _outputWriter.WriteLine(message);
+            Console.WriteLine(message);
         }
 
         // Write to log file if logging is enabled
@@ -327,7 +299,10 @@ public sealed class Context : IDisposable
         // Write to error console unless silent mode is enabled
         if (!Silent)
         {
-            _errorWriter.WriteLine(message);
+            var previousColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(message);
+            Console.ForegroundColor = previousColor;
         }
 
         // Write to log file if logging is enabled
