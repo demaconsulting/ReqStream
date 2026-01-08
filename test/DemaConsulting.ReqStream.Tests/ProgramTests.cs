@@ -65,8 +65,11 @@ public class ProgramTests
             using var context = Context.Create(["--version"]);
             Program.Run(context);
 
-            var outputText = output.ToString();
-            StringAssert.Contains(outputText, "ReqStream version");
+            var outputText = output.ToString().Trim();
+            // Version should be printed alone without any other text
+            Assert.IsFalse(string.IsNullOrWhiteSpace(outputText));
+            Assert.IsFalse(outputText.Contains("Copyright"));
+            Assert.IsFalse(outputText.Contains("Usage"));
         }
         finally
         {
@@ -90,7 +93,8 @@ public class ProgramTests
             Program.Run(context);
 
             var outputText = output.ToString();
-            StringAssert.Contains(outputText, "ReqStream - Requirements Management Tool");
+            StringAssert.Contains(outputText, "ReqStream version");
+            StringAssert.Contains(outputText, "Copyright");
             StringAssert.Contains(outputText, "Usage:");
             StringAssert.Contains(outputText, "Options:");
         }
@@ -269,9 +273,11 @@ sections:
             using var context = Context.Create(["--version", "--help"]);
             Program.Run(context);
 
-            var outputText = output.ToString();
-            StringAssert.Contains(outputText, "ReqStream version");
+            var outputText = output.ToString().Trim();
+            // Version should be printed alone
+            Assert.IsFalse(string.IsNullOrWhiteSpace(outputText));
             Assert.IsFalse(outputText.Contains("Usage:"));
+            Assert.IsFalse(outputText.Contains("Copyright"));
         }
         finally
         {

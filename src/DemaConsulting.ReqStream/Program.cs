@@ -28,7 +28,21 @@ namespace DemaConsulting.ReqStream;
 internal static class Program
 {
     /// <summary>
-    /// Main entry point for the application.
+    ///     Gets the application version string.
+    /// </summary>
+    private static string Version
+    {
+        get
+        {
+            var assembly = typeof(Program).Assembly;
+            return assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+                   ?? assembly.GetName().Version?.ToString()
+                   ?? "Unknown";
+        }
+    }
+
+    /// <summary>
+    ///     Main entry point for the application.
     /// </summary>
     /// <param name="args">Command line arguments.</param>
     /// <returns>Exit code.</returns>
@@ -66,7 +80,7 @@ internal static class Program
     }
 
     /// <summary>
-    /// Runs the program logic based on the provided context.
+    ///     Runs the program logic based on the provided context.
     /// </summary>
     /// <param name="context">The context containing command line arguments and program state.</param>
     public static void Run(Context context)
@@ -74,13 +88,12 @@ internal static class Program
         // Priority 1: Version query
         if (context.Version)
         {
-            var assembly = typeof(Program).Assembly;
-            var version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
-                          ?? assembly.GetName().Version?.ToString()
-                          ?? "Unknown";
-            Console.WriteLine($"ReqStream version {version}");
+            Console.WriteLine(Version);
             return;
         }
+
+        // Print application banner
+        PrintBanner();
 
         // Priority 2: Help
         if (context.Help)
@@ -101,12 +114,20 @@ internal static class Program
     }
 
     /// <summary>
-    /// Prints usage information to the console.
+    ///     Prints the application banner to the console.
+    /// </summary>
+    private static void PrintBanner()
+    {
+        Console.WriteLine($"ReqStream version {Version}");
+        Console.WriteLine("Copyright (c) 2026 DEMA Consulting");
+        Console.WriteLine();
+    }
+
+    /// <summary>
+    ///     Prints usage information to the console.
     /// </summary>
     private static void PrintHelp()
     {
-        Console.WriteLine("ReqStream - Requirements Management Tool");
-        Console.WriteLine();
         Console.WriteLine("Usage: reqstream [options]");
         Console.WriteLine();
         Console.WriteLine("Options:");
@@ -124,7 +145,7 @@ internal static class Program
     }
 
     /// <summary>
-    /// Processes requirements files and generates reports as requested.
+    ///     Processes requirements files and generates reports as requested.
     /// </summary>
     /// <param name="context">The context containing command line arguments and program state.</param>
     private static void ProcessRequirements(Context context)
