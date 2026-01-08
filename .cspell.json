@@ -17,7 +17,8 @@
     "cspell",
     "yamllint",
     "MSTest",
-    "NuGet"
+    "NuGet",
+    "Triaging"
   ],
   "ignorePaths": [
     "node_modules",

@@ -196,7 +196,7 @@ dotnet test --no-build --configuration Release --verbosity normal
 dotnet pack --no-build --configuration Release
 ```
 
-### Quality Checks
+### Linting Commands
 
 ```bash
 # Markdown linting
