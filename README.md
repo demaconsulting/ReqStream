@@ -33,6 +33,67 @@ dotnet tool install DemaConsulting.ReqStream
 reqstream help
 ```
 
+## YAML Format
+
+ReqStream uses YAML files to define and manage requirements. The YAML format supports a hierarchical structure
+with sections, requirements, test mappings, and file includes.
+
+### Basic Structure
+
+```yaml
+---
+# Requirements YAML file
+
+# Requirement sections 
+sections:
+  - title: "System Security"
+    requirements:
+      - id: "SYS-SEC-001"
+        title: "The system shall support credentials authentication."
+        children: # Support linking to child requirements
+          - "AUTH-001"
+
+  - title: "Data Management"
+    sections:
+   
+      - title: "User Authentication"
+        requirements:
+          - id: "AUTH-001"
+            title: "All requests shall have their credentials authenticated before being processed."
+            tests: # Support test-mapping inline with requirements
+              - "credentials_valid_allowed"
+              - "credentials_invalid_refused"
+              - "credentials_missing_refused"
+
+      - title: "Logging"
+        requirements:
+          - id: "DATA-001"
+            title: "All requests shall be logged."
+
+# Include other requirement files - may contain requirements and/or test mappings
+includes:
+  - more_requirements.yaml
+  - test_mappings.yaml
+
+# Test mappings support defining tests separate from requirements
+mappings:
+  - id: "DATA-001"
+    tests:
+      - "logging_validrequest_logged"
+      - "logging_invalidrequest_logged"
+```
+
+### Key Features
+
+- **Requirement IDs**: Can be of any format, but must be unique across all requirement files
+- **Section Merging**: Identical sections (where the full hierarchy is identical) are automatically merged,
+  allowing included files to add more sections or requirements to existing sections
+- **Child Requirements**: Requirements can reference other requirements as children using the `children` field
+- **Test Mappings**: Tests can be mapped to requirements either inline (within the requirement definition) or
+  separately (using the `mappings` section)
+- **File Includes**: Use the `includes` section to reference other YAML files containing additional requirements
+  or test mappings
+
 ## Development
 
 ### Prerequisites
