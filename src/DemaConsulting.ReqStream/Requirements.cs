@@ -107,7 +107,7 @@ public class Requirements : Section
             // Process each top-level section in the document
             foreach (var section in document.Sections)
             {
-                MergeSection(this, section);
+                MergeSection(this, section, fullPath);
             }
         }
 
@@ -117,12 +117,28 @@ public class Requirements : Section
             // Process each mapping to add tests to requirements
             foreach (var mapping in document.Mappings)
             {
+                // Validate mapping ID is not blank
+                if (string.IsNullOrWhiteSpace(mapping.Id))
+                {
+                    throw new InvalidOperationException($"Mapping requirement ID cannot be blank in file: {fullPath}");
+                }
+
                 // Find the requirement by ID
                 if (_allRequirements.TryGetValue(mapping.Id, out var requirement))
                 {
                     // Add the tests if they exist
                     if (mapping.Tests != null)
                     {
+                        // Validate each test name is not blank
+                        foreach (var test in mapping.Tests)
+                        {
+                            if (string.IsNullOrWhiteSpace(test))
+                            {
+                                throw new InvalidOperationException(
+                                    $"Test name cannot be blank in mapping for requirement '{mapping.Id}' in file: {fullPath}");
+                            }
+                        }
+
                         requirement.Tests.AddRange(mapping.Tests);
                     }
                 }
@@ -149,8 +165,15 @@ public class Requirements : Section
     /// </summary>
     /// <param name="target">The target section to merge into.</param>
     /// <param name="source">The source YAML section to merge from.</param>
-    private void MergeSection(Section target, YamlSection source)
+    /// <param name="filePath">The path to the file being processed for error messages.</param>
+    private void MergeSection(Section target, YamlSection source, string filePath)
     {
+        // Validate section title is not blank
+        if (string.IsNullOrWhiteSpace(source.Title))
+        {
+            throw new InvalidOperationException($"Section title cannot be blank in file: {filePath}");
+        }
+
         // Find or create the section with matching title
         var existingSection = target.Sections.FirstOrDefault(s => s.Title == source.Title);
 
@@ -167,6 +190,20 @@ public class Requirements : Section
             // Process each requirement in the source section
             foreach (var req in source.Requirements)
             {
+                // Validate requirement ID is not blank
+                if (string.IsNullOrWhiteSpace(req.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Requirement ID cannot be blank in section '{source.Title}' in file: {filePath}");
+                }
+
+                // Validate requirement title is not blank
+                if (string.IsNullOrWhiteSpace(req.Title))
+                {
+                    throw new InvalidOperationException(
+                        $"Requirement title cannot be blank for ID '{req.Id}' in file: {filePath}");
+                }
+
                 // Create the requirement with its basic properties
                 var requirement = new Requirement
                 {
@@ -177,6 +214,16 @@ public class Requirements : Section
                 // Add any inline tests
                 if (req.Tests != null)
                 {
+                    // Validate each test name is not blank
+                    foreach (var test in req.Tests)
+                    {
+                        if (string.IsNullOrWhiteSpace(test))
+                        {
+                            throw new InvalidOperationException(
+                                $"Test name cannot be blank for requirement '{req.Id}' in file: {filePath}");
+                        }
+                    }
+
                     requirement.Tests.AddRange(req.Tests);
                 }
 
@@ -189,7 +236,8 @@ public class Requirements : Section
                 // Check for duplicate requirement IDs and register the requirement
                 if (!_allRequirements.TryAdd(requirement.Id, requirement))
                 {
-                    throw new InvalidOperationException($"Duplicate requirement ID found: {requirement.Id}");
+                    throw new InvalidOperationException(
+                        $"Duplicate requirement ID found: '{requirement.Id}' in file: {filePath}");
                 }
 
                 // Add the requirement to the section
@@ -203,7 +251,7 @@ public class Requirements : Section
             // Process each child section recursively
             foreach (var childSection in source.Sections)
             {
-                MergeSection(existingSection, childSection);
+                MergeSection(existingSection, childSection, filePath);
             }
         }
     }

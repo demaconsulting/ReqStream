@@ -449,4 +449,222 @@ mappings:
         Assert.AreEqual(2, logging.Requirements[0].Tests.Count);
         Assert.AreEqual("Logging_ValidRequest_Logged", logging.Requirements[0].Tests[0]);
     }
+
+    /// <summary>
+    ///     Test that blank requirement ID throws an exception with file location.
+    /// </summary>
+    [TestMethod]
+    public void Read_BlankRequirementId_ThrowsExceptionWithFileLocation()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: """"
+        title: ""The system shall support credentials authentication.""
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        try
+        {
+            Requirements.Read(filePath);
+            Assert.Fail("Expected InvalidOperationException was not thrown");
+        }
+        catch (InvalidOperationException ex)
+        {
+            StringAssert.Contains(ex.Message, "Requirement ID cannot be blank");
+            StringAssert.Contains(ex.Message, "System Security");
+            StringAssert.Contains(ex.Message, filePath);
+        }
+    }
+
+    /// <summary>
+    ///     Test that blank requirement title throws an exception with file location.
+    /// </summary>
+    [TestMethod]
+    public void Read_BlankRequirementTitle_ThrowsExceptionWithFileLocation()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: """"
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        try
+        {
+            Requirements.Read(filePath);
+            Assert.Fail("Expected InvalidOperationException was not thrown");
+        }
+        catch (InvalidOperationException ex)
+        {
+            StringAssert.Contains(ex.Message, "Requirement title cannot be blank");
+            StringAssert.Contains(ex.Message, "SYS-SEC-001");
+            StringAssert.Contains(ex.Message, filePath);
+        }
+    }
+
+    /// <summary>
+    ///     Test that blank section title throws an exception with file location.
+    /// </summary>
+    [TestMethod]
+    public void Read_BlankSectionTitle_ThrowsExceptionWithFileLocation()
+    {
+        var yamlContent = @"---
+sections:
+  - title: """"
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        try
+        {
+            Requirements.Read(filePath);
+            Assert.Fail("Expected InvalidOperationException was not thrown");
+        }
+        catch (InvalidOperationException ex)
+        {
+            StringAssert.Contains(ex.Message, "Section title cannot be blank");
+            StringAssert.Contains(ex.Message, filePath);
+        }
+    }
+
+    /// <summary>
+    ///     Test that blank test name in requirement throws an exception with file location.
+    /// </summary>
+    [TestMethod]
+    public void Read_BlankTestNameInRequirement_ThrowsExceptionWithFileLocation()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+        tests:
+          - ""ValidTest""
+          - """"
+          - ""AnotherTest""
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        try
+        {
+            Requirements.Read(filePath);
+            Assert.Fail("Expected InvalidOperationException was not thrown");
+        }
+        catch (InvalidOperationException ex)
+        {
+            StringAssert.Contains(ex.Message, "Test name cannot be blank");
+            StringAssert.Contains(ex.Message, "SYS-SEC-001");
+            StringAssert.Contains(ex.Message, filePath);
+        }
+    }
+
+    /// <summary>
+    ///     Test that blank test name in mapping throws an exception with file location.
+    /// </summary>
+    [TestMethod]
+    public void Read_BlankTestNameInMapping_ThrowsExceptionWithFileLocation()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+
+mappings:
+  - id: ""SYS-SEC-001""
+    tests:
+      - ""ValidTest""
+      - """"
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        try
+        {
+            Requirements.Read(filePath);
+            Assert.Fail("Expected InvalidOperationException was not thrown");
+        }
+        catch (InvalidOperationException ex)
+        {
+            StringAssert.Contains(ex.Message, "Test name cannot be blank");
+            StringAssert.Contains(ex.Message, "SYS-SEC-001");
+            StringAssert.Contains(ex.Message, filePath);
+        }
+    }
+
+    /// <summary>
+    ///     Test that blank mapping ID throws an exception with file location.
+    /// </summary>
+    [TestMethod]
+    public void Read_BlankMappingId_ThrowsExceptionWithFileLocation()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+
+mappings:
+  - id: """"
+    tests:
+      - ""ValidTest""
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        try
+        {
+            Requirements.Read(filePath);
+            Assert.Fail("Expected InvalidOperationException was not thrown");
+        }
+        catch (InvalidOperationException ex)
+        {
+            StringAssert.Contains(ex.Message, "Mapping requirement ID cannot be blank");
+            StringAssert.Contains(ex.Message, filePath);
+        }
+    }
+
+    /// <summary>
+    ///     Test that duplicate requirement ID message includes file location.
+    /// </summary>
+    [TestMethod]
+    public void Read_DuplicateRequirementId_ExceptionIncludesFileLocation()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+      - id: ""SYS-SEC-001""
+        title: ""Duplicate ID requirement.""
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        try
+        {
+            Requirements.Read(filePath);
+            Assert.Fail("Expected InvalidOperationException was not thrown");
+        }
+        catch (InvalidOperationException ex)
+        {
+            StringAssert.Contains(ex.Message, "SYS-SEC-001");
+            StringAssert.Contains(ex.Message, "Duplicate requirement ID");
+            StringAssert.Contains(ex.Message, filePath);
+        }
+    }
 }
