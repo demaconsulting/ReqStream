@@ -1,0 +1,452 @@
+// Copyright (c) 2026 DEMA Consulting
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+namespace DemaConsulting.ReqStream.Tests;
+
+/// <summary>
+/// Unit tests for Requirements YAML parsing functionality.
+/// </summary>
+[TestClass]
+public class RequirementsParsingTests
+{
+    private string _testDirectory = string.Empty;
+
+    /// <summary>
+    /// Initialize test by creating a temporary test directory.
+    /// </summary>
+    [TestInitialize]
+    public void TestInitialize()
+    {
+        _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
+        Directory.CreateDirectory(_testDirectory);
+    }
+
+    /// <summary>
+    /// Clean up test by deleting the temporary test directory.
+    /// </summary>
+    [TestCleanup]
+    public void TestCleanup()
+    {
+        if (Directory.Exists(_testDirectory))
+        {
+            Directory.Delete(_testDirectory, recursive: true);
+        }
+    }
+
+    /// <summary>
+    /// Test reading a simple YAML file with a single requirement.
+    /// </summary>
+    [TestMethod]
+    public void Read_SimpleRequirement_ParsesCorrectly()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        var requirements = Requirements.Read(filePath);
+
+        Assert.IsNotNull(requirements);
+        Assert.AreEqual(1, requirements.Sections.Count);
+        Assert.AreEqual("System Security", requirements.Sections[0].Title);
+        Assert.AreEqual(1, requirements.Sections[0].Requirements.Count);
+        Assert.AreEqual("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
+        Assert.AreEqual("The system shall support credentials authentication.", requirements.Sections[0].Requirements[0].Title);
+    }
+
+    /// <summary>
+    /// Test reading a requirement with tests.
+    /// </summary>
+    [TestMethod]
+    public void Read_RequirementWithTests_ParsesTestsCorrectly()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""User Authentication""
+    requirements:
+      - id: ""AUTH-001""
+        title: ""All requests shall have their credentials authenticated.""
+        tests:
+          - ""Credentials_Valid_Allowed""
+          - ""Credentials_Invalid_Refused""
+          - ""Credentials_Missing_Refused""
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        var requirements = Requirements.Read(filePath);
+
+        Assert.IsNotNull(requirements);
+        var req = requirements.Sections[0].Requirements[0];
+        Assert.AreEqual("AUTH-001", req.Id);
+        Assert.AreEqual(3, req.Tests.Count);
+        Assert.AreEqual("Credentials_Valid_Allowed", req.Tests[0]);
+        Assert.AreEqual("Credentials_Invalid_Refused", req.Tests[1]);
+        Assert.AreEqual("Credentials_Missing_Refused", req.Tests[2]);
+    }
+
+    /// <summary>
+    /// Test reading a requirement with child requirements.
+    /// </summary>
+    [TestMethod]
+    public void Read_RequirementWithChildren_ParsesChildrenCorrectly()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+        children:
+          - ""AUTH-001""
+          - ""AUTH-002""
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        var requirements = Requirements.Read(filePath);
+
+        Assert.IsNotNull(requirements);
+        var req = requirements.Sections[0].Requirements[0];
+        Assert.AreEqual("SYS-SEC-001", req.Id);
+        Assert.AreEqual(2, req.Children.Count);
+        Assert.AreEqual("AUTH-001", req.Children[0]);
+        Assert.AreEqual("AUTH-002", req.Children[1]);
+    }
+
+    /// <summary>
+    /// Test reading nested sections.
+    /// </summary>
+    [TestMethod]
+    public void Read_NestedSections_ParsesHierarchyCorrectly()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""Data Management""
+    sections:
+      - title: ""User Authentication""
+        requirements:
+          - id: ""AUTH-001""
+            title: ""All requests shall be authenticated.""
+      - title: ""Logging""
+        requirements:
+          - id: ""LOG-001""
+            title: ""All requests shall be logged.""
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        var requirements = Requirements.Read(filePath);
+
+        Assert.IsNotNull(requirements);
+        Assert.AreEqual(1, requirements.Sections.Count);
+        Assert.AreEqual("Data Management", requirements.Sections[0].Title);
+        Assert.AreEqual(2, requirements.Sections[0].Sections.Count);
+        Assert.AreEqual("User Authentication", requirements.Sections[0].Sections[0].Title);
+        Assert.AreEqual("Logging", requirements.Sections[0].Sections[1].Title);
+        Assert.AreEqual("AUTH-001", requirements.Sections[0].Sections[0].Requirements[0].Id);
+        Assert.AreEqual("LOG-001", requirements.Sections[0].Sections[1].Requirements[0].Id);
+    }
+
+    /// <summary>
+    /// Test reading test mappings that are separate from requirements.
+    /// </summary>
+    [TestMethod]
+    public void Read_TestMappings_AppliesMappingsCorrectly()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System""
+    requirements:
+      - id: ""DATA-001""
+        title: ""All requests shall be logged.""
+
+mappings:
+  - id: ""DATA-001""
+    tests:
+      - ""Logging_ValidRequest_Logged""
+      - ""Logging_InvalidRequest_Logged""
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        var requirements = Requirements.Read(filePath);
+
+        Assert.IsNotNull(requirements);
+        var req = requirements.Sections[0].Requirements[0];
+        Assert.AreEqual("DATA-001", req.Id);
+        Assert.AreEqual(2, req.Tests.Count);
+        Assert.AreEqual("Logging_ValidRequest_Logged", req.Tests[0]);
+        Assert.AreEqual("Logging_InvalidRequest_Logged", req.Tests[1]);
+    }
+
+    /// <summary>
+    /// Test reading a file with includes.
+    /// </summary>
+    [TestMethod]
+    public void Read_WithIncludes_MergesFilesCorrectly()
+    {
+        var mainYaml = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+
+includes:
+  - ""additional.yaml""
+";
+        var includedYaml = @"---
+sections:
+  - title: ""Data Management""
+    requirements:
+      - id: ""DATA-001""
+        title: ""All requests shall be logged.""
+";
+        var mainPath = Path.Combine(_testDirectory, "main.yaml");
+        var includedPath = Path.Combine(_testDirectory, "additional.yaml");
+        File.WriteAllText(mainPath, mainYaml);
+        File.WriteAllText(includedPath, includedYaml);
+
+        var requirements = Requirements.Read(mainPath);
+
+        Assert.IsNotNull(requirements);
+        Assert.AreEqual(2, requirements.Sections.Count);
+        Assert.AreEqual("System Security", requirements.Sections[0].Title);
+        Assert.AreEqual("Data Management", requirements.Sections[1].Title);
+        Assert.AreEqual("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
+        Assert.AreEqual("DATA-001", requirements.Sections[1].Requirements[0].Id);
+    }
+
+    /// <summary>
+    /// Test that identical sections are merged.
+    /// </summary>
+    [TestMethod]
+    public void Read_IdenticalSections_MergesCorrectly()
+    {
+        var mainYaml = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+
+includes:
+  - ""additional.yaml""
+";
+        var includedYaml = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-002""
+        title: ""The system shall enforce password complexity.""
+";
+        var mainPath = Path.Combine(_testDirectory, "main.yaml");
+        var includedPath = Path.Combine(_testDirectory, "additional.yaml");
+        File.WriteAllText(mainPath, mainYaml);
+        File.WriteAllText(includedPath, includedYaml);
+
+        var requirements = Requirements.Read(mainPath);
+
+        Assert.IsNotNull(requirements);
+        Assert.AreEqual(1, requirements.Sections.Count);
+        Assert.AreEqual("System Security", requirements.Sections[0].Title);
+        Assert.AreEqual(2, requirements.Sections[0].Requirements.Count);
+        Assert.AreEqual("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
+        Assert.AreEqual("SYS-SEC-002", requirements.Sections[0].Requirements[1].Id);
+    }
+
+    /// <summary>
+    /// Test that duplicate requirement IDs throw an exception.
+    /// </summary>
+    [TestMethod]
+    public void Read_DuplicateRequirementId_ThrowsException()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+      - id: ""SYS-SEC-001""
+        title: ""Duplicate ID requirement.""
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        try
+        {
+            Requirements.Read(filePath);
+            Assert.Fail("Expected InvalidOperationException was not thrown");
+        }
+        catch (InvalidOperationException ex)
+        {
+            StringAssert.Contains(ex.Message, "SYS-SEC-001");
+            StringAssert.Contains(ex.Message, "Duplicate requirement ID");
+        }
+    }
+
+    /// <summary>
+    /// Test that include loops are prevented.
+    /// </summary>
+    [TestMethod]
+    public void Read_IncludeLoop_DoesNotCauseInfiniteLoop()
+    {
+        var fileA = @"---
+sections:
+  - title: ""File A""
+    requirements:
+      - id: ""A-001""
+        title: ""Requirement from file A.""
+
+includes:
+  - ""fileB.yaml""
+";
+        var fileB = @"---
+sections:
+  - title: ""File B""
+    requirements:
+      - id: ""B-001""
+        title: ""Requirement from file B.""
+
+includes:
+  - ""fileA.yaml""
+";
+        var pathA = Path.Combine(_testDirectory, "fileA.yaml");
+        var pathB = Path.Combine(_testDirectory, "fileB.yaml");
+        File.WriteAllText(pathA, fileA);
+        File.WriteAllText(pathB, fileB);
+
+        var requirements = Requirements.Read(pathA);
+
+        Assert.IsNotNull(requirements);
+        Assert.AreEqual(2, requirements.Sections.Count);
+    }
+
+    /// <summary>
+    /// Test that file not found throws an exception.
+    /// </summary>
+    [TestMethod]
+    public void Read_FileNotFound_ThrowsException()
+    {
+        var nonExistentPath = Path.Combine(_testDirectory, "nonexistent.yaml");
+
+        try
+        {
+            Requirements.Read(nonExistentPath);
+            Assert.Fail("Expected FileNotFoundException was not thrown");
+        }
+        catch (FileNotFoundException ex)
+        {
+            StringAssert.Contains(ex.Message, "Requirements file not found");
+        }
+    }
+
+    /// <summary>
+    /// Test reading an empty YAML file.
+    /// </summary>
+    [TestMethod]
+    public void Read_EmptyFile_ReturnsEmptyRequirements()
+    {
+        var yamlContent = @"---
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        var requirements = Requirements.Read(filePath);
+
+        Assert.IsNotNull(requirements);
+        Assert.AreEqual(0, requirements.Sections.Count);
+        Assert.AreEqual(0, requirements.Requirements.Count);
+    }
+
+    /// <summary>
+    /// Test reading a complex nested structure.
+    /// </summary>
+    [TestMethod]
+    public void Read_ComplexStructure_ParsesCorrectly()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+        children:
+          - ""AUTH-001""
+
+  - title: ""Data Management""
+    sections:
+      - title: ""User Authentication""
+        requirements:
+          - id: ""AUTH-001""
+            title: ""All requests shall have their credentials authenticated.""
+            tests:
+              - ""Credentials_Valid_Allowed""
+              - ""Credentials_Invalid_Refused""
+              - ""Credentials_Missing_Refused""
+
+      - title: ""Logging""
+        requirements:
+          - id: ""DATA-001""
+            title: ""All requests shall be logged.""
+
+mappings:
+  - id: ""DATA-001""
+    tests:
+      - ""Logging_ValidRequest_Logged""
+      - ""Logging_InvalidRequest_Logged""
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        var requirements = Requirements.Read(filePath);
+
+        Assert.IsNotNull(requirements);
+        Assert.AreEqual(2, requirements.Sections.Count);
+
+        var sysSec = requirements.Sections[0];
+        Assert.AreEqual("System Security", sysSec.Title);
+        Assert.AreEqual(1, sysSec.Requirements.Count);
+        Assert.AreEqual("SYS-SEC-001", sysSec.Requirements[0].Id);
+        Assert.AreEqual(1, sysSec.Requirements[0].Children.Count);
+        Assert.AreEqual("AUTH-001", sysSec.Requirements[0].Children[0]);
+
+        var dataMgmt = requirements.Sections[1];
+        Assert.AreEqual("Data Management", dataMgmt.Title);
+        Assert.AreEqual(2, dataMgmt.Sections.Count);
+
+        var auth = dataMgmt.Sections[0];
+        Assert.AreEqual("User Authentication", auth.Title);
+        Assert.AreEqual("AUTH-001", auth.Requirements[0].Id);
+        Assert.AreEqual(3, auth.Requirements[0].Tests.Count);
+
+        var logging = dataMgmt.Sections[1];
+        Assert.AreEqual("Logging", logging.Title);
+        Assert.AreEqual("DATA-001", logging.Requirements[0].Id);
+        Assert.AreEqual(2, logging.Requirements[0].Tests.Count);
+        Assert.AreEqual("Logging_ValidRequest_Logged", logging.Requirements[0].Tests[0]);
+    }
+}

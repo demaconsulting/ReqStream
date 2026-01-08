@@ -28,7 +28,14 @@ namespace DemaConsulting.ReqStream;
 /// </summary>
 public class Requirements : Section
 {
+    /// <summary>
+    /// Set of files that have already been included to prevent infinite loops.
+    /// </summary>
     private readonly HashSet<string> _includedFiles = new();
+
+    /// <summary>
+    /// Dictionary mapping requirement IDs to their Requirement objects for duplicate detection.
+    /// </summary>
     private readonly Dictionary<string, Requirement> _allRequirements = new();
 
     /// <summary>
@@ -51,6 +58,7 @@ public class Requirements : Section
     /// <param name="path">The path to the YAML file to read.</param>
     private void ReadFile(string path)
     {
+        // Convert to full path and check if already included to prevent loops
         var fullPath = Path.GetFullPath(path);
 
         if (_includedFiles.Contains(fullPath))
@@ -60,11 +68,13 @@ public class Requirements : Section
 
         _includedFiles.Add(fullPath);
 
+        // Verify the file exists before attempting to read
         if (!File.Exists(fullPath))
         {
             throw new FileNotFoundException($"Requirements file not found: {path}", path);
         }
 
+        // Read and deserialize the YAML document
         var yaml = File.ReadAllText(fullPath);
         var deserializer = new DeserializerBuilder()
             .WithNamingConvention(HyphenatedNamingConvention.Instance)
@@ -76,8 +86,10 @@ public class Requirements : Section
             return;
         }
 
+        // Get the base directory for resolving relative include paths
         var baseDirectory = Path.GetDirectoryName(fullPath) ?? string.Empty;
 
+        // Merge all sections from the document into the requirements tree
         if (document.Sections != null)
         {
             foreach (var section in document.Sections)
@@ -86,6 +98,7 @@ public class Requirements : Section
             }
         }
 
+        // Apply test mappings to existing requirements
         if (document.Mappings != null)
         {
             foreach (var mapping in document.Mappings)
@@ -100,6 +113,7 @@ public class Requirements : Section
             }
         }
 
+        // Recursively process any included files
         if (document.Includes != null)
         {
             foreach (var include in document.Includes)
@@ -117,6 +131,7 @@ public class Requirements : Section
     /// <param name="source">The source YAML section to merge from.</param>
     private void MergeSection(Section target, YamlSection source)
     {
+        // Find or create the section with matching title
         var existingSection = target.Sections.FirstOrDefault(s => s.Title == source.Title);
         if (existingSection == null)
         {
@@ -124,36 +139,43 @@ public class Requirements : Section
             target.Sections.Add(existingSection);
         }
 
+        // Add all requirements from the source section
         if (source.Requirements != null)
         {
             foreach (var req in source.Requirements)
             {
+                // Create the requirement with its basic properties
                 var requirement = new Requirement
                 {
                     Id = req.Id,
                     Title = req.Title
                 };
 
+                // Add any inline tests
                 if (req.Tests != null)
                 {
                     requirement.Tests.AddRange(req.Tests);
                 }
 
+                // Add any child requirement references
                 if (req.Children != null)
                 {
                     requirement.Children.AddRange(req.Children);
                 }
 
+                // Check for duplicate requirement IDs
                 if (_allRequirements.ContainsKey(requirement.Id))
                 {
                     throw new InvalidOperationException($"Duplicate requirement ID found: {requirement.Id}");
                 }
 
+                // Register and add the requirement
                 _allRequirements[requirement.Id] = requirement;
                 existingSection.Requirements.Add(requirement);
             }
         }
 
+        // Recursively merge any child sections
         if (source.Sections != null)
         {
             foreach (var childSection in source.Sections)

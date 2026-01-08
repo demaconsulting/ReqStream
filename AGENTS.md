@@ -19,7 +19,7 @@ create, validate, and manage requirement documents in a structured and maintaina
 - **Testing Framework**: MSTest
 - **Build System**: dotnet CLI
 - **Package Manager**: NuGet
-- **YAML Parser**: YamlDotNet (16.3.0)
+- **YAML Parser**: YamlDotNet
 
 ## Project Structure
 
