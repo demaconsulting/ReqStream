@@ -24,84 +24,84 @@ using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 namespace DemaConsulting.ReqStream;
 
 /// <summary>
-/// Context class that handles command-line arguments and program output.
+///     Context class that handles command-line arguments and program output.
 /// </summary>
 public sealed class Context : IDisposable
 {
     /// <summary>
-    /// Log file stream writer (if logging is enabled).
+    ///     Log file stream writer (if logging is enabled).
     /// </summary>
     private StreamWriter? _logWriter;
 
     /// <summary>
-    /// Indicates whether errors have been reported.
+    ///     Indicates whether errors have been reported.
     /// </summary>
     private bool _hasErrors;
 
     /// <summary>
-    /// Gets a value indicating whether the version flag was specified.
+    ///     Gets a value indicating whether the version flag was specified.
     /// </summary>
     public bool Version { get; private init; }
 
     /// <summary>
-    /// Gets a value indicating whether the help flag was specified.
+    ///     Gets a value indicating whether the help flag was specified.
     /// </summary>
     public bool Help { get; private init; }
 
     /// <summary>
-    /// Gets a value indicating whether the silent flag was specified.
+    ///     Gets a value indicating whether the silent flag was specified.
     /// </summary>
     public bool Silent { get; private init; }
 
     /// <summary>
-    /// Gets a value indicating whether the validate flag was specified.
+    ///     Gets a value indicating whether the validate flag was specified.
     /// </summary>
     public bool Validate { get; private init; }
 
     /// <summary>
-    /// Gets the list of requirements files found from the --requirements glob pattern.
+    ///     Gets the list of requirements files found from the --requirements glob pattern.
     /// </summary>
     public List<string> RequirementsFiles { get; private init; } = new();
 
     /// <summary>
-    /// Gets the list of test files found from the --tests glob pattern.
+    ///     Gets the list of test files found from the --tests glob pattern.
     /// </summary>
     public List<string> TestFiles { get; private init; } = new();
 
     /// <summary>
-    /// Gets the requirements report output file path.
+    ///     Gets the requirements report output file path.
     /// </summary>
     public string? RequirementsReport { get; private init; }
 
     /// <summary>
-    /// Gets the report markdown depth.
+    ///     Gets the report markdown depth.
     /// </summary>
     public int ReportDepth { get; private init; } = 1;
 
     /// <summary>
-    /// Gets the trace matrix output file path.
+    ///     Gets the trace matrix output file path.
     /// </summary>
     public string? Matrix { get; private init; }
 
     /// <summary>
-    /// Gets the trace matrix markdown depth.
+    ///     Gets the trace matrix markdown depth.
     /// </summary>
     public int MatrixDepth { get; private init; } = 1;
 
     /// <summary>
-    /// Gets the proposed exit code for the application (0 for success, 1 for errors).
+    ///     Gets the proposed exit code for the application (0 for success, 1 for errors).
     /// </summary>
     public int ExitCode => _hasErrors ? 1 : 0;
 
     /// <summary>
-    /// Private constructor - use Create factory method instead.
+    ///     Private constructor - use Create factory method instead.
     /// </summary>
     private Context()
     {
     }
 
     /// <summary>
-    /// Creates a Context instance from command-line arguments.
+    ///     Creates a Context instance from command-line arguments.
     /// </summary>
     /// <param name="args">Command-line arguments.</param>
     /// <returns>A new Context instance.</returns>
@@ -245,7 +245,7 @@ public sealed class Context : IDisposable
     }
 
     /// <summary>
-    /// Expands a glob pattern to a list of matching file paths.
+    ///     Expands a glob pattern to a list of matching file paths.
     /// </summary>
     /// <param name="pattern">The glob pattern.</param>
     /// <returns>A list of matching file paths.</returns>
@@ -261,7 +261,7 @@ public sealed class Context : IDisposable
     }
 
     /// <summary>
-    /// Writes a line of output to the console and log file (if logging is enabled).
+    ///     Writes a line of output to the console and log file (if logging is enabled).
     /// </summary>
     /// <param name="message">The message to write.</param>
     public void WriteLine(string message)
@@ -277,7 +277,7 @@ public sealed class Context : IDisposable
     }
 
     /// <summary>
-    /// Writes an error message to the error console and log file (if logging is enabled).
+    ///     Writes an error message to the error console and log file (if logging is enabled).
     /// </summary>
     /// <param name="message">The error message to write.</param>
     public void WriteError(string message)
@@ -298,7 +298,7 @@ public sealed class Context : IDisposable
     }
 
     /// <summary>
-    /// Disposes resources used by the Context.
+    ///     Disposes resources used by the Context.
     /// </summary>
     public void Dispose()
     {
