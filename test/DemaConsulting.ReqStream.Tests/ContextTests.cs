@@ -181,95 +181,166 @@ public class ContextTests
     /// Test creating a context with unsupported argument.
     /// </summary>
     [TestMethod]
-    public void Create_UnsupportedArgument_ReportsError()
+    public void Create_UnsupportedArgument_ThrowsException()
     {
-        using var context = Context.Create(["--unsupported"]);
-
-        Assert.AreEqual(1, context.ExitCode);
+        try
+        {
+            Context.Create(["--unsupported"]);
+            Assert.Fail("Expected ArgumentException was not thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            StringAssert.Contains(ex.Message, "Unsupported argument '--unsupported'");
+        }
     }
 
     /// <summary>
     /// Test creating a context with missing log filename.
     /// </summary>
     [TestMethod]
-    public void Create_MissingLogFilename_ReportsError()
+    public void Create_MissingLogFilename_ThrowsException()
     {
-        using var context = Context.Create(["--log"]);
-
-        Assert.AreEqual(1, context.ExitCode);
+        try
+        {
+            Context.Create(["--log"]);
+            Assert.Fail("Expected ArgumentException was not thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            StringAssert.Contains(ex.Message, "--log requires a filename argument");
+        }
     }
 
     /// <summary>
     /// Test creating a context with missing report filename.
     /// </summary>
     [TestMethod]
-    public void Create_MissingReportFilename_ReportsError()
+    public void Create_MissingReportFilename_ThrowsException()
     {
-        using var context = Context.Create(["--report"]);
-
-        Assert.AreEqual(1, context.ExitCode);
+        try
+        {
+            Context.Create(["--report"]);
+            Assert.Fail("Expected ArgumentException was not thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            StringAssert.Contains(ex.Message, "--report requires a filename argument");
+        }
     }
 
     /// <summary>
     /// Test creating a context with missing matrix filename.
     /// </summary>
     [TestMethod]
-    public void Create_MissingMatrixFilename_ReportsError()
+    public void Create_MissingMatrixFilename_ThrowsException()
     {
-        using var context = Context.Create(["--matrix"]);
-
-        Assert.AreEqual(1, context.ExitCode);
+        try
+        {
+            Context.Create(["--matrix"]);
+            Assert.Fail("Expected ArgumentException was not thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            StringAssert.Contains(ex.Message, "--matrix requires a filename argument");
+        }
     }
 
     /// <summary>
     /// Test creating a context with missing report depth.
     /// </summary>
     [TestMethod]
-    public void Create_MissingReportDepth_ReportsError()
+    public void Create_MissingReportDepth_ThrowsException()
     {
-        using var context = Context.Create(["--report-depth"]);
-
-        Assert.AreEqual(1, context.ExitCode);
+        try
+        {
+            Context.Create(["--report-depth"]);
+            Assert.Fail("Expected ArgumentException was not thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            StringAssert.Contains(ex.Message, "--report-depth requires a depth argument");
+        }
     }
 
     /// <summary>
     /// Test creating a context with missing matrix depth.
     /// </summary>
     [TestMethod]
-    public void Create_MissingMatrixDepth_ReportsError()
+    public void Create_MissingMatrixDepth_ThrowsException()
     {
-        using var context = Context.Create(["--matrix-depth"]);
-
-        Assert.AreEqual(1, context.ExitCode);
+        try
+        {
+            Context.Create(["--matrix-depth"]);
+            Assert.Fail("Expected ArgumentException was not thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            StringAssert.Contains(ex.Message, "--matrix-depth requires a depth argument");
+        }
     }
 
     /// <summary>
     /// Test creating a context with invalid report depth.
     /// </summary>
     [TestMethod]
-    public void Create_InvalidReportDepth_ReportsError()
+    public void Create_InvalidReportDepth_ThrowsException()
     {
-        using var context1 = Context.Create(["--report-depth", "invalid"]);
-        Assert.AreEqual(1, context1.ExitCode);
+        try
+        {
+            Context.Create(["--report-depth", "invalid"]);
+            Assert.Fail("Expected ArgumentException was not thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            StringAssert.Contains(ex.Message, "--report-depth requires a positive integer");
+        }
 
-        using var context2 = Context.Create(["--report-depth", "0"]);
-        Assert.AreEqual(1, context2.ExitCode);
+        try
+        {
+            Context.Create(["--report-depth", "0"]);
+            Assert.Fail("Expected ArgumentException was not thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            StringAssert.Contains(ex.Message, "--report-depth requires a positive integer");
+        }
 
-        using var context3 = Context.Create(["--report-depth", "-1"]);
-        Assert.AreEqual(1, context3.ExitCode);
+        try
+        {
+            Context.Create(["--report-depth", "-1"]);
+            Assert.Fail("Expected ArgumentException was not thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            StringAssert.Contains(ex.Message, "--report-depth requires a positive integer");
+        }
     }
 
     /// <summary>
     /// Test creating a context with invalid matrix depth.
     /// </summary>
     [TestMethod]
-    public void Create_InvalidMatrixDepth_ReportsError()
+    public void Create_InvalidMatrixDepth_ThrowsException()
     {
-        using var context1 = Context.Create(["--matrix-depth", "invalid"]);
-        Assert.AreEqual(1, context1.ExitCode);
+        try
+        {
+            Context.Create(["--matrix-depth", "invalid"]);
+            Assert.Fail("Expected ArgumentException was not thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            StringAssert.Contains(ex.Message, "--matrix-depth requires a positive integer");
+        }
 
-        using var context2 = Context.Create(["--matrix-depth", "0"]);
-        Assert.AreEqual(1, context2.ExitCode);
+        try
+        {
+            Context.Create(["--matrix-depth", "0"]);
+            Assert.Fail("Expected ArgumentException was not thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            StringAssert.Contains(ex.Message, "--matrix-depth requires a positive integer");
+        }
     }
 
     /// <summary>
@@ -278,6 +349,7 @@ public class ContextTests
     [TestMethod]
     public void WriteLine_NormalMode_WritesToConsole()
     {
+        var originalOut = Console.Out;
         var output = new StringWriter();
         Console.SetOut(output);
 
@@ -290,8 +362,7 @@ public class ContextTests
         }
         finally
         {
-            var standardOutput = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
-            Console.SetOut(standardOutput);
+            Console.SetOut(originalOut);
         }
     }
 
@@ -301,6 +372,7 @@ public class ContextTests
     [TestMethod]
     public void WriteLine_SilentMode_DoesNotWriteToConsole()
     {
+        var originalOut = Console.Out;
         var output = new StringWriter();
         Console.SetOut(output);
 
@@ -313,8 +385,7 @@ public class ContextTests
         }
         finally
         {
-            var standardOutput = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
-            Console.SetOut(standardOutput);
+            Console.SetOut(originalOut);
         }
     }
 
@@ -324,6 +395,7 @@ public class ContextTests
     [TestMethod]
     public void WriteError_NormalMode_WritesToConsole()
     {
+        var originalOut = Console.Out;
         var output = new StringWriter();
         Console.SetOut(output);
 
@@ -337,8 +409,7 @@ public class ContextTests
         }
         finally
         {
-            var standardOutput = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
-            Console.SetOut(standardOutput);
+            Console.SetOut(originalOut);
         }
     }
 
@@ -348,6 +419,7 @@ public class ContextTests
     [TestMethod]
     public void WriteError_SilentMode_DoesNotWriteToConsole()
     {
+        var originalOut = Console.Out;
         var output = new StringWriter();
         Console.SetOut(output);
 
@@ -361,8 +433,7 @@ public class ContextTests
         }
         finally
         {
-            var standardOutput = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
-            Console.SetOut(standardOutput);
+            Console.SetOut(originalOut);
         }
     }
 
@@ -392,6 +463,7 @@ public class ContextTests
     [TestMethod]
     public void Create_WithLogFileAndSilent_WritesToLogOnly()
     {
+        var originalOut = Console.Out;
         var output = new StringWriter();
         Console.SetOut(output);
 
@@ -414,8 +486,7 @@ public class ContextTests
         }
         finally
         {
-            var standardOutput = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
-            Console.SetOut(standardOutput);
+            Console.SetOut(originalOut);
         }
     }
 
@@ -485,22 +556,34 @@ public class ContextTests
     /// Test missing requirements pattern argument.
     /// </summary>
     [TestMethod]
-    public void Create_MissingRequirementsPattern_ReportsError()
+    public void Create_MissingRequirementsPattern_ThrowsException()
     {
-        using var context = Context.Create(["--requirements"]);
-
-        Assert.AreEqual(1, context.ExitCode);
+        try
+        {
+            Context.Create(["--requirements"]);
+            Assert.Fail("Expected ArgumentException was not thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            StringAssert.Contains(ex.Message, "--requirements requires a pattern argument");
+        }
     }
 
     /// <summary>
     /// Test missing tests pattern argument.
     /// </summary>
     [TestMethod]
-    public void Create_MissingTestsPattern_ReportsError()
+    public void Create_MissingTestsPattern_ThrowsException()
     {
-        using var context = Context.Create(["--tests"]);
-
-        Assert.AreEqual(1, context.ExitCode);
+        try
+        {
+            Context.Create(["--tests"]);
+            Assert.Fail("Expected ArgumentException was not thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            StringAssert.Contains(ex.Message, "--tests requires a pattern argument");
+        }
     }
 
     /// <summary>
@@ -542,12 +625,18 @@ public class ContextTests
     /// Test invalid log file path.
     /// </summary>
     [TestMethod]
-    public void Create_InvalidLogPath_ReportsError()
+    public void Create_InvalidLogPath_ThrowsException()
     {
         var invalidPath = Path.Combine(_testDirectory, "nonexistent", "test.log");
 
-        using var context = Context.Create(["--log", invalidPath]);
-
-        Assert.AreEqual(1, context.ExitCode);
+        try
+        {
+            Context.Create(["--log", invalidPath]);
+            Assert.Fail("Expected ArgumentException was not thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            StringAssert.Contains(ex.Message, "Failed to open log file");
+        }
     }
 }

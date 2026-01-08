@@ -105,10 +105,9 @@ public sealed class Context : IDisposable
     /// </summary>
     /// <param name="args">Command-line arguments.</param>
     /// <returns>A new Context instance.</returns>
+    /// <exception cref="ArgumentException">Thrown when arguments are invalid.</exception>
     public static Context Create(string[] args)
     {
-        var context = new Context();
-
         var version = false;
         var help = false;
         var silent = false;
@@ -150,8 +149,7 @@ public sealed class Context : IDisposable
                 case "--log":
                     if (i + 1 >= args.Length)
                     {
-                        context.WriteError($"Error: {arg} requires a filename argument");
-                        return context;
+                        throw new ArgumentException($"{arg} requires a filename argument", nameof(args));
                     }
                     logFile = args[++i];
                     break;
@@ -159,8 +157,7 @@ public sealed class Context : IDisposable
                 case "--requirements":
                     if (i + 1 >= args.Length)
                     {
-                        context.WriteError($"Error: {arg} requires a pattern argument");
-                        return context;
+                        throw new ArgumentException($"{arg} requires a pattern argument", nameof(args));
                     }
                     requirementsFiles.AddRange(ExpandGlobPattern(args[++i]));
                     break;
@@ -168,8 +165,7 @@ public sealed class Context : IDisposable
                 case "--tests":
                     if (i + 1 >= args.Length)
                     {
-                        context.WriteError($"Error: {arg} requires a pattern argument");
-                        return context;
+                        throw new ArgumentException($"{arg} requires a pattern argument", nameof(args));
                     }
                     testFiles.AddRange(ExpandGlobPattern(args[++i]));
                     break;
@@ -177,8 +173,7 @@ public sealed class Context : IDisposable
                 case "--report":
                     if (i + 1 >= args.Length)
                     {
-                        context.WriteError($"Error: {arg} requires a filename argument");
-                        return context;
+                        throw new ArgumentException($"{arg} requires a filename argument", nameof(args));
                     }
                     requirementsReport = args[++i];
                     break;
@@ -186,21 +181,18 @@ public sealed class Context : IDisposable
                 case "--report-depth":
                     if (i + 1 >= args.Length)
                     {
-                        context.WriteError($"Error: {arg} requires a depth argument");
-                        return context;
+                        throw new ArgumentException($"{arg} requires a depth argument", nameof(args));
                     }
                     if (!int.TryParse(args[++i], out reportDepth) || reportDepth < 1)
                     {
-                        context.WriteError($"Error: {arg} requires a positive integer");
-                        return context;
+                        throw new ArgumentException($"{arg} requires a positive integer", nameof(args));
                     }
                     break;
 
                 case "--matrix":
                     if (i + 1 >= args.Length)
                     {
-                        context.WriteError($"Error: {arg} requires a filename argument");
-                        return context;
+                        throw new ArgumentException($"{arg} requires a filename argument", nameof(args));
                     }
                     matrix = args[++i];
                     break;
@@ -208,19 +200,16 @@ public sealed class Context : IDisposable
                 case "--matrix-depth":
                     if (i + 1 >= args.Length)
                     {
-                        context.WriteError($"Error: {arg} requires a depth argument");
-                        return context;
+                        throw new ArgumentException($"{arg} requires a depth argument", nameof(args));
                     }
                     if (!int.TryParse(args[++i], out matrixDepth) || matrixDepth < 1)
                     {
-                        context.WriteError($"Error: {arg} requires a positive integer");
-                        return context;
+                        throw new ArgumentException($"{arg} requires a positive integer", nameof(args));
                     }
                     break;
 
                 default:
-                    context.WriteError($"Error: Unsupported argument '{arg}'");
-                    return context;
+                    throw new ArgumentException($"Unsupported argument '{arg}'", nameof(args));
             }
         }
 
@@ -236,8 +225,7 @@ public sealed class Context : IDisposable
             RequirementsReport = requirementsReport,
             ReportDepth = reportDepth,
             Matrix = matrix,
-            MatrixDepth = matrixDepth,
-            _hasErrors = context._hasErrors
+            MatrixDepth = matrixDepth
         };
 
         // Open log file if specified
@@ -249,7 +237,7 @@ public sealed class Context : IDisposable
             }
             catch (Exception ex)
             {
-                result.WriteError($"Error: Failed to open log file '{logFile}': {ex.Message}");
+                throw new ArgumentException($"Failed to open log file '{logFile}': {ex.Message}", nameof(args), ex);
             }
         }
 
