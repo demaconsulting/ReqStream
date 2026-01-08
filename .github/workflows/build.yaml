@@ -67,14 +67,13 @@ jobs:
             **/*.snupkg
 
   integration-test:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ inputs.os }}
     needs: build
     permissions:
       contents: read
 
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest]
         dotnet-version: ['8.x', '9.x', '10.x']
 
     steps:
