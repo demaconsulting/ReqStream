@@ -24,7 +24,7 @@ namespace DemaConsulting.ReqStream;
 
 /// <summary>
 ///     Represents a traceability matrix that maps test results to requirements.
-///     Currently supports TRX test result format.
+///     Supports TRX and JUnit test result formats.
 /// </summary>
 public class TraceMatrix
 {
@@ -37,7 +37,7 @@ public class TraceMatrix
     ///     Initializes a new instance of the TraceMatrix class.
     /// </summary>
     /// <param name="requirements">The requirements containing test mappings.</param>
-    /// <param name="testResultFiles">Paths to test result files (TRX format).</param>
+    /// <param name="testResultFiles">Paths to test result files (TRX or JUnit format).</param>
     /// <exception cref="ArgumentNullException">Thrown when requirements is null.</exception>
     /// <exception cref="FileNotFoundException">Thrown when a test result file does not exist.</exception>
     public TraceMatrix(Requirements requirements, params string[] testResultFiles)
@@ -121,15 +121,23 @@ public class TraceMatrix
         // Read the file content
         var content = File.ReadAllText(filePath);
 
-        // Parse as TRX format
+        // Try to parse as TRX first, then JUnit
         DemaConsulting.TestResults.TestResults testResults;
         try
         {
             testResults = TrxSerializer.Deserialize(content);
         }
-        catch (Exception ex)
+        catch
         {
-            throw new InvalidOperationException($"Failed to parse test result file as TRX format: {filePath}", ex);
+            // If TRX parsing fails, try JUnit
+            try
+            {
+                testResults = JUnitSerializer.Deserialize(content);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to parse test result file as TRX or JUnit format: {filePath}", ex);
+            }
         }
 
         // Process each test result

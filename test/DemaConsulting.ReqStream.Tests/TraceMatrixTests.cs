@@ -394,4 +394,185 @@ sections:
         var result = matrix.GetTestResult("SomeTest");
         Assert.IsNull(result);
     }
+
+    /// <summary>
+    ///     Test TraceMatrix with a JUnit test result file.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_WithJUnitFile_ParsesCorrectly()
+    {
+        // Create requirements
+        var reqYaml = @"---
+sections:
+  - title: ""Data Validation""
+    requirements:
+      - id: ""DATA-001""
+        title: ""Validate input data""
+        tests:
+          - ""Test_ValidData""
+          - ""Test_InvalidData""
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var requirements = Requirements.Read(reqPath);
+
+        // Create JUnit file using the TestResults library
+        var testResults = new TestResults.TestResults { Name = "DataTests" };
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_ValidData",
+            ClassName = "DataTests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1.2)
+        });
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_InvalidData",
+            ClassName = "DataTests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1.3)
+        });
+
+        var junitPath = Path.Combine(_testDirectory, "results.xml");
+        File.WriteAllText(junitPath, JUnitSerializer.Serialize(testResults));
+
+        // Create TraceMatrix
+        var matrix = new TraceMatrix(requirements, junitPath);
+
+        // Verify results
+        var result1 = matrix.GetTestResult("Test_ValidData");
+        Assert.IsNotNull(result1);
+        Assert.AreEqual(1, result1.Executed);
+        Assert.AreEqual(1, result1.Passed);
+
+        var result2 = matrix.GetTestResult("Test_InvalidData");
+        Assert.IsNotNull(result2);
+        Assert.AreEqual(1, result2.Executed);
+        Assert.AreEqual(1, result2.Passed);
+    }
+
+    /// <summary>
+    ///     Test TraceMatrix with mixed TRX and JUnit files.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_WithMixedFormats_ProcessesBoth()
+    {
+        // Create requirements
+        var reqYaml = @"---
+sections:
+  - title: ""Mixed Format Tests""
+    requirements:
+      - id: ""MIX-001""
+        title: ""Test with mixed formats""
+        tests:
+          - ""Test_TrxFormat""
+          - ""Test_JUnitFormat""
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var requirements = Requirements.Read(reqPath);
+
+        // Create TRX file
+        var trxResults = new TestResults.TestResults { Name = "TrxRun" };
+        trxResults.Results.Add(new TestResult
+        {
+            Name = "Test_TrxFormat",
+            ClassName = "MixedTests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+        var trxPath = Path.Combine(_testDirectory, "results.trx");
+        File.WriteAllText(trxPath, TrxSerializer.Serialize(trxResults));
+
+        // Create JUnit file
+        var junitResults = new TestResults.TestResults { Name = "JUnitRun" };
+        junitResults.Results.Add(new TestResult
+        {
+            Name = "Test_JUnitFormat",
+            ClassName = "MixedTests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1.5)
+        });
+        var junitPath = Path.Combine(_testDirectory, "results.xml");
+        File.WriteAllText(junitPath, JUnitSerializer.Serialize(junitResults));
+
+        // Create TraceMatrix with both files
+        var matrix = new TraceMatrix(requirements, trxPath, junitPath);
+
+        // Verify results from TRX
+        var result1 = matrix.GetTestResult("Test_TrxFormat");
+        Assert.IsNotNull(result1);
+        Assert.AreEqual(1, result1.Executed);
+        Assert.AreEqual(1, result1.Passed);
+
+        // Verify results from JUnit
+        var result2 = matrix.GetTestResult("Test_JUnitFormat");
+        Assert.IsNotNull(result2);
+        Assert.AreEqual(1, result2.Executed);
+        Assert.AreEqual(1, result2.Passed);
+    }
+
+    /// <summary>
+    ///     Test TraceMatrix with JUnit file containing failed tests.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_WithJUnitFailedTests_TracksFailures()
+    {
+        // Create requirements
+        var reqYaml = @"---
+sections:
+  - title: ""JUnit Failure Tests""
+    requirements:
+      - id: ""JFAIL-001""
+        title: ""Test JUnit failures""
+        tests:
+          - ""Test_JUnit_Passing""
+          - ""Test_JUnit_Failing""
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var requirements = Requirements.Read(reqPath);
+
+        // Create JUnit file with passed and failed tests
+        var testResults = new TestResults.TestResults { Name = "JUnitTestRun" };
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_JUnit_Passing",
+            ClassName = "JUnitFailureTests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_JUnit_Failing",
+            ClassName = "JUnitFailureTests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Failed,
+            ErrorMessage = "Assertion failed in JUnit",
+            Duration = TimeSpan.FromSeconds(1)
+        });
+
+        var junitPath = Path.Combine(_testDirectory, "results.xml");
+        File.WriteAllText(junitPath, JUnitSerializer.Serialize(testResults));
+
+        // Create TraceMatrix
+        var matrix = new TraceMatrix(requirements, junitPath);
+
+        // Verify passing test
+        var result1 = matrix.GetTestResult("Test_JUnit_Passing");
+        Assert.IsNotNull(result1);
+        Assert.AreEqual(1, result1.Executed);
+        Assert.AreEqual(1, result1.Passed);
+
+        // Verify failing test
+        var result2 = matrix.GetTestResult("Test_JUnit_Failing");
+        Assert.IsNotNull(result2);
+        Assert.AreEqual(1, result2.Executed);
+        Assert.AreEqual(0, result2.Passed, "Failed test should have 0 passes");
+    }
 }
