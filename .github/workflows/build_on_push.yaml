@@ -24,7 +24,7 @@ jobs:
           globs: '**/*.md'
 
       - name: Spell Check
-        uses: streetsidesoftware/cspell-action@v6
+        uses: streetsidesoftware/cspell-action@v8
         with:
           files: |
             **/*.md
