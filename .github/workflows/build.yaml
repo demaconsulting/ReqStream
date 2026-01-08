@@ -63,5 +63,47 @@ jobs:
         with:
           name: packages-${{ inputs.os }}
           path: |
-            **/*.nupkg
-            **/*.snupkg
+            src/DemaConsulting.ReqStream/bin/Release/*.nupkg
+            src/DemaConsulting.ReqStream/bin/Release/*.snupkg
+
+  integration-test:
+    runs-on: ${{ inputs.os }}
+    needs: build
+    permissions:
+      contents: read
+
+    strategy:
+      matrix:
+        dotnet-version: ['8.x', '9.x', '10.x']
+
+    steps:
+      - name: Download package
+        uses: actions/download-artifact@v6
+        with:
+          name: packages-${{ inputs.os }}
+          path: packages
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Install tool from package
+        shell: bash
+        run: |
+          echo "Installing package version ${{ inputs.version }} from: packages/"
+          dotnet tool install --global --add-source packages --version ${{ inputs.version }} DemaConsulting.ReqStream
+
+      - name: Test version command
+        shell: bash
+        run: |
+          echo "Testing version command..."
+          reqstream --version || { echo "✗ Version command failed"; exit 1; }
+          echo "✓ Version command succeeded"
+
+      - name: Test help command
+        shell: bash
+        run: |
+          echo "Testing help command..."
+          reqstream --help || { echo "✗ Help command failed"; exit 1; }
+          echo "✓ Help command succeeded"
