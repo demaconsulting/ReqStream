@@ -7,6 +7,12 @@
       "commands": [
         "spdx-tool"
       ]
+    },
+    "dotnet-sonarscanner": {
+      "version": "9.0.1",
+      "commands": [
+        "dotnet-sonarscanner"
+      ]
     }
   }
 }

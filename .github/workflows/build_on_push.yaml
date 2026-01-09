@@ -44,6 +44,8 @@ jobs:
     with:
       os: windows-latest
       version: 0.0.0-run.${{ github.run_number }}
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   build-linux:
     name: Build Linux
@@ -54,3 +56,5 @@ jobs:
     with:
       os: ubuntu-latest
       version: 0.0.0-run.${{ github.run_number }}
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
