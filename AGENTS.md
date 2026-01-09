@@ -62,11 +62,13 @@ ReqStream/
   - `Assert.IsEmpty(collection)` instead of `Assert.AreEqual(0, collection.Count)`
   - `Assert.DoesNotContain(item, collection)` for negative checks
 - **Console Testing**: Save and restore `Console.Out` in tests that modify console output:
+
   ```csharp
   var originalOut = Console.Out;
   try { /* test code */ }
   finally { Console.SetOut(originalOut); }
   ```
+
 - **All tests must pass** before merging changes
 - **No warnings allowed** in test builds
 
@@ -92,11 +94,13 @@ ReqStream/
 - **Copyright Headers**: All source files must include the MIT license header
 - **XML Documentation**: Use triple-slash comments (`///`) for all public, internal, and private members
   - **IMPORTANT**: Summary blocks must be indented with spaces after `///`
+
   ```csharp
   /// <summary>
   ///     This is the correct indentation format for summary blocks.
   /// </summary>
   ```
+
 - **Error Handling Patterns**:
   - Argument parsing: Throw `ArgumentException` with descriptive messages
   - Runtime errors during execution: Use `InvalidOperationException`
@@ -112,7 +116,7 @@ ReqStream/
 ## Quality Standards
 
 - **Static Analysis**: Built-in .NET analyzers enforce code style, naming rules, and nullable reference types
-- **Documentation**: 
+- **Documentation**:
   - README.md uses absolute URLs (included in NuGet package)
   - Other markdown files use link references: `[text][ref]` with `[ref]: url` at end
 - **Linting**:
@@ -123,10 +127,12 @@ ReqStream/
 ## CI/CD Pipelines
 
 The project uses GitHub Actions workflows in `.github/workflows/`:
+
 - **build_on_push.yaml**: Runs quality checks, builds on Windows and Linux
 - **build.yaml**: Reusable workflow for restore, build, test, and package
 
 Build commands:
+
 ```bash
 dotnet tool restore    # Restore dotnet tools
 dotnet restore         # Restore dependencies
