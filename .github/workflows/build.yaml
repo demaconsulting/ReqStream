@@ -12,12 +12,16 @@ on:
         description: 'Version number for the build'
         required: true
         type: string
+    secrets:
+      SONAR_TOKEN:
+        required: true
 
 jobs:
   build:
     runs-on: ${{ inputs.os }}
     permissions:
       contents: read
+      pull-requests: write
 
     steps:
       - name: Checkout repository
@@ -37,6 +41,16 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
+      - name: Start Sonar Scanner
+        run: >
+          dotnet sonarscanner begin
+          /k:"demaconsulting_ReqStream"
+          /o:"demaconsulting"
+          /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          /d:sonar.host.url="https://sonarcloud.io"
+          /d:sonar.cs.opencover.reportsPaths=**/*.opencover.xml
+          /d:sonar.scanner.scanAll=false
+
       - name: Build
         run: >
           dotnet build
@@ -50,6 +64,12 @@ jobs:
           --no-build
           --configuration Release
           --verbosity normal
+          --collect "XPlat Code Coverage;Format=opencover"
+
+      - name: End Sonar Scanner
+        run: >
+          dotnet sonarscanner end
+          /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
       - name: Package
         run: >
