@@ -18,15 +18,13 @@ create, validate, and manage requirement documents in a structured and maintaina
 
 ## Features
 
-| Feature | Description |
-|---------|-------------|
-| 📝 **YAML Format** | Manage requirements in human-readable YAML format |
-| 🔧 **Command-Line Interface** | Automate requirement management with CLI tools |
-| 🌐 **Multi-Platform** | Support for .NET 8, 9, and 10 across Windows, Linux, and macOS |
-| 🔗 **Hierarchical Structure** | Organize requirements with sections and subsections |
-| 🧪 **Test Mapping** | Link requirements to test cases for traceability |
-| 📦 **File Includes** | Modularize requirements across multiple YAML files |
-| ✅ **Validation** | Built-in validation for requirement structure and references |
+- 📝 **YAML Format** - Manage requirements in human-readable YAML format
+- 🔧 **Command-Line Interface** - Automate requirement management with CLI tools
+- 🌐 **Multi-Platform** - Support for .NET 8, 9, and 10 across Windows, Linux, and macOS
+- 🔗 **Hierarchical Structure** - Organize requirements with sections and subsections
+- 🧪 **Test Mapping** - Link requirements to test cases for traceability
+- 📦 **File Includes** - Modularize requirements across multiple YAML files
+- ✅ **Validation** - Built-in validation for requirement structure and references
 
 ## Installation
 
@@ -77,8 +75,29 @@ dotnet tool update DemaConsulting.ReqStream
 
 ## Usage
 
+Run the tool with the `--help` option to see available commands and options:
+
 ```bash
-reqstream help
+reqstream --help
+```
+
+This will display:
+
+```text
+Usage: reqstream [options]
+
+Options:
+  -v, --version              Display version information
+  -?, -h, --help             Display this help message
+  --silent                   Suppress console output
+  --validate                 Run self-validation
+  --log <file>               Write output to log file
+  --requirements <pattern>   Requirements files glob pattern
+  --report <file>            Export requirements to markdown file
+  --report-depth <depth>     Markdown header depth for requirements report (default: 1)
+  --tests <pattern>          Test result files glob pattern (TRX or JUnit)
+  --matrix <file>            Export trace matrix to markdown file
+  --matrix-depth <depth>     Markdown header depth for trace matrix (default: 1)
 ```
 
 ## YAML Format
@@ -187,30 +206,9 @@ This project is licensed under the MIT License - see the [LICENSE][license] file
 
 ## Support
 
-### 🐛 Report a Bug
-
-Found a bug? Please [open an issue][bug-report] with:
-
-- A clear description of the problem
-- Steps to reproduce
-- Expected vs. actual behavior
-- Version information
-
-### 💡 Request a Feature
-
-Have an idea? Please [open an issue][feature-request] with:
-
-- Description of the problem you're solving
-- Your proposed solution
-- Any alternatives you've considered
-
-### 💬 Ask Questions
-
-Have questions? Feel free to:
-
-- [Open a discussion][discussions]
-- [Open an issue][issues]
-- Check existing documentation
+- 🐛 **[Report a Bug][bug-report]** - Found an issue? Let us know
+- 💡 **[Request a Feature][feature-request]** - Have an idea? Share it with us
+- 💬 **[Ask Questions][discussions]** - Need help? Start a discussion
 
 ## Acknowledgements
 
