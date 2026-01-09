@@ -384,7 +384,7 @@ reqstream --requirements "**/*.requirements.yaml"
 ReqStream supports the following command-line options:
 
 | Option | Description |
-|--------|-------------|
+| ------ | ----------- |
 | `-v`, `--version` | Display version information |
 | `-?`, `-h`, `--help` | Display help message |
 | `--silent` | Suppress console output (useful in CI/CD) |
@@ -610,6 +610,7 @@ generating reports.
 **Q: What format should requirement IDs follow?**
 
 A: ReqStream doesn't enforce a specific ID format. You can use any format that makes sense for your project:
+
 - `REQ-001`, `REQ-002`, ...
 - `SYS-001`, `AUTH-001`, ...
 - `FR-1.1`, `FR-1.2`, ...
@@ -688,6 +689,7 @@ coverage information.
 **Q: I get an error "No requirements files specified". What's wrong?**
 
 A: This means the glob pattern in `--requirements` didn't match any files. Check that:
+
 - The path is correct relative to your current directory
 - The file extension matches (`.yaml` or `.yml`)
 - The files exist
@@ -695,6 +697,7 @@ A: This means the glob pattern in `--requirements` didn't match any files. Check
 **Q: My glob pattern isn't matching files. What should I check?**
 
 A: Ensure you're using quotes around the pattern to prevent shell expansion:
+
 ```bash
 reqstream --requirements "**/*.yaml"  # Correct
 reqstream --requirements **/*.yaml     # May not work as expected

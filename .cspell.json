@@ -19,7 +19,8 @@
     "MSTest",
     "NuGet",
     "Triaging",
-    "sonarcloud"
+    "sonarcloud",
+    "Pandoc"
   ],
   "ignorePaths": [
     "node_modules",
