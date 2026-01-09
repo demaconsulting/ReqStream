@@ -162,7 +162,7 @@ mappings:
 
 ## Development
 
-### Prerequisites
+### Requirements
 
 - .NET SDK 8.0, 9.0, or 10.0
 - C# 12
@@ -247,7 +247,6 @@ For information about reporting security vulnerabilities, please see our [Securi
 [dotnet-sdk]: https://dotnet.microsoft.com/download
 [bug-report]: https://github.com/demaconsulting/ReqStream/issues/new?template=bug_report.md
 [feature-request]: https://github.com/demaconsulting/ReqStream/issues/new?template=feature_request.md
-[issues]: https://github.com/demaconsulting/ReqStream/issues
 [discussions]: https://github.com/demaconsulting/ReqStream/discussions
 [dotnet]: https://dotnet.microsoft.com/
 [yamldotnet]: https://github.com/aaubry/YamlDotNet
