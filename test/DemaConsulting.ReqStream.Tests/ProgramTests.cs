@@ -68,8 +68,8 @@ public class ProgramTests
             var outputText = output.ToString().Trim();
             // Version should be printed alone without any other text
             Assert.IsFalse(string.IsNullOrWhiteSpace(outputText));
-            Assert.IsFalse(outputText.Contains("Copyright"));
-            Assert.IsFalse(outputText.Contains("Usage"));
+            Assert.DoesNotContain("Copyright", outputText);
+            Assert.DoesNotContain("Usage", outputText);
         }
         finally
         {
@@ -276,8 +276,8 @@ sections:
             var outputText = output.ToString().Trim();
             // Version should be printed alone
             Assert.IsFalse(string.IsNullOrWhiteSpace(outputText));
-            Assert.IsFalse(outputText.Contains("Usage:"));
-            Assert.IsFalse(outputText.Contains("Copyright"));
+            Assert.DoesNotContain("Usage:", outputText);
+            Assert.DoesNotContain("Copyright", outputText);
         }
         finally
         {
@@ -302,7 +302,7 @@ sections:
 
             var outputText = output.ToString();
             StringAssert.Contains(outputText, "Usage:");
-            Assert.IsFalse(outputText.Contains("Self-validation"));
+            Assert.DoesNotContain("Self-validation", outputText);
         }
         finally
         {

@@ -250,7 +250,7 @@ sections:
 
         // Verify all results only contains the one tracked test
         var allResults = matrix.GetAllTestResults();
-        Assert.AreEqual(1, allResults.Count);
+        Assert.HasCount(1, allResults);
         Assert.IsTrue(allResults.ContainsKey("Test_Auth_Valid"));
     }
 
@@ -389,7 +389,7 @@ sections:
 
         // Verify no results
         var allResults = matrix.GetAllTestResults();
-        Assert.AreEqual(0, allResults.Count);
+        Assert.IsEmpty(allResults);
 
         var result = matrix.GetTestResult("SomeTest");
         Assert.IsNull(result);

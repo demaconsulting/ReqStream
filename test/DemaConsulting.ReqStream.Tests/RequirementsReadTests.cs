@@ -69,9 +69,9 @@ sections:
         var requirements = Requirements.Read(filePath);
 
         Assert.IsNotNull(requirements);
-        Assert.AreEqual(1, requirements.Sections.Count);
+        Assert.HasCount(1, requirements.Sections);
         Assert.AreEqual("System Security", requirements.Sections[0].Title);
-        Assert.AreEqual(1, requirements.Sections[0].Requirements.Count);
+        Assert.HasCount(1, requirements.Sections[0].Requirements);
         Assert.AreEqual("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
         Assert.AreEqual("The system shall support credentials authentication.", requirements.Sections[0].Requirements[0].Title);
     }
@@ -101,7 +101,7 @@ sections:
         Assert.IsNotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
         Assert.AreEqual("AUTH-001", req.Id);
-        Assert.AreEqual(3, req.Tests.Count);
+        Assert.HasCount(3, req.Tests);
         Assert.AreEqual("Credentials_Valid_Allowed", req.Tests[0]);
         Assert.AreEqual("Credentials_Invalid_Refused", req.Tests[1]);
         Assert.AreEqual("Credentials_Missing_Refused", req.Tests[2]);
@@ -131,7 +131,7 @@ sections:
         Assert.IsNotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
         Assert.AreEqual("SYS-SEC-001", req.Id);
-        Assert.AreEqual(2, req.Children.Count);
+        Assert.HasCount(2, req.Children);
         Assert.AreEqual("AUTH-001", req.Children[0]);
         Assert.AreEqual("AUTH-002", req.Children[1]);
     }
@@ -161,9 +161,9 @@ sections:
         var requirements = Requirements.Read(filePath);
 
         Assert.IsNotNull(requirements);
-        Assert.AreEqual(1, requirements.Sections.Count);
+        Assert.HasCount(1, requirements.Sections);
         Assert.AreEqual("Data Management", requirements.Sections[0].Title);
-        Assert.AreEqual(2, requirements.Sections[0].Sections.Count);
+        Assert.HasCount(2, requirements.Sections[0].Sections);
         Assert.AreEqual("User Authentication", requirements.Sections[0].Sections[0].Title);
         Assert.AreEqual("Logging", requirements.Sections[0].Sections[1].Title);
         Assert.AreEqual("AUTH-001", requirements.Sections[0].Sections[0].Requirements[0].Id);
@@ -197,7 +197,7 @@ mappings:
         Assert.IsNotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
         Assert.AreEqual("DATA-001", req.Id);
-        Assert.AreEqual(2, req.Tests.Count);
+        Assert.HasCount(2, req.Tests);
         Assert.AreEqual("Logging_ValidRequest_Logged", req.Tests[0]);
         Assert.AreEqual("Logging_InvalidRequest_Logged", req.Tests[1]);
     }
@@ -233,7 +233,7 @@ sections:
         var requirements = Requirements.Read(mainPath);
 
         Assert.IsNotNull(requirements);
-        Assert.AreEqual(2, requirements.Sections.Count);
+        Assert.HasCount(2, requirements.Sections);
         Assert.AreEqual("System Security", requirements.Sections[0].Title);
         Assert.AreEqual("Data Management", requirements.Sections[1].Title);
         Assert.AreEqual("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
@@ -271,9 +271,9 @@ sections:
         var requirements = Requirements.Read(mainPath);
 
         Assert.IsNotNull(requirements);
-        Assert.AreEqual(1, requirements.Sections.Count);
+        Assert.HasCount(1, requirements.Sections);
         Assert.AreEqual("System Security", requirements.Sections[0].Title);
-        Assert.AreEqual(2, requirements.Sections[0].Requirements.Count);
+        Assert.HasCount(2, requirements.Sections[0].Requirements);
         Assert.AreEqual("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
         Assert.AreEqual("SYS-SEC-002", requirements.Sections[0].Requirements[1].Id);
     }
@@ -342,7 +342,7 @@ includes:
         var requirements = Requirements.Read(pathA);
 
         Assert.IsNotNull(requirements);
-        Assert.AreEqual(2, requirements.Sections.Count);
+        Assert.HasCount(2, requirements.Sections);
     }
 
     /// <summary>
@@ -378,8 +378,8 @@ includes:
         var requirements = Requirements.Read(filePath);
 
         Assert.IsNotNull(requirements);
-        Assert.AreEqual(0, requirements.Sections.Count);
-        Assert.AreEqual(0, requirements.Requirements.Count);
+        Assert.IsEmpty(requirements.Sections);
+        Assert.IsEmpty(requirements.Requirements);
     }
 
     /// <summary>
@@ -425,28 +425,28 @@ mappings:
         var requirements = Requirements.Read(filePath);
 
         Assert.IsNotNull(requirements);
-        Assert.AreEqual(2, requirements.Sections.Count);
+        Assert.HasCount(2, requirements.Sections);
 
         var sysSec = requirements.Sections[0];
         Assert.AreEqual("System Security", sysSec.Title);
-        Assert.AreEqual(1, sysSec.Requirements.Count);
+        Assert.HasCount(1, sysSec.Requirements);
         Assert.AreEqual("SYS-SEC-001", sysSec.Requirements[0].Id);
-        Assert.AreEqual(1, sysSec.Requirements[0].Children.Count);
+        Assert.HasCount(1, sysSec.Requirements[0].Children);
         Assert.AreEqual("AUTH-001", sysSec.Requirements[0].Children[0]);
 
         var dataManagement = requirements.Sections[1];
         Assert.AreEqual("Data Management", dataManagement.Title);
-        Assert.AreEqual(2, dataManagement.Sections.Count);
+        Assert.HasCount(2, dataManagement.Sections);
 
         var auth = dataManagement.Sections[0];
         Assert.AreEqual("User Authentication", auth.Title);
         Assert.AreEqual("AUTH-001", auth.Requirements[0].Id);
-        Assert.AreEqual(3, auth.Requirements[0].Tests.Count);
+        Assert.HasCount(3, auth.Requirements[0].Tests);
 
         var logging = dataManagement.Sections[1];
         Assert.AreEqual("Logging", logging.Title);
         Assert.AreEqual("DATA-001", logging.Requirements[0].Id);
-        Assert.AreEqual(2, logging.Requirements[0].Tests.Count);
+        Assert.HasCount(2, logging.Requirements[0].Tests);
         Assert.AreEqual("Logging_ValidRequest_Logged", logging.Requirements[0].Tests[0]);
     }
 
@@ -705,7 +705,7 @@ sections:
         var requirements = Requirements.Read(file1Path, file2Path, file3Path);
 
         Assert.IsNotNull(requirements);
-        Assert.AreEqual(3, requirements.Sections.Count);
+        Assert.HasCount(3, requirements.Sections);
         Assert.AreEqual("System Security", requirements.Sections[0].Title);
         Assert.AreEqual("Data Management", requirements.Sections[1].Title);
         Assert.AreEqual("Performance", requirements.Sections[2].Title);
@@ -742,9 +742,9 @@ sections:
         var requirements = Requirements.Read(file1Path, file2Path);
 
         Assert.IsNotNull(requirements);
-        Assert.AreEqual(1, requirements.Sections.Count);
+        Assert.HasCount(1, requirements.Sections);
         Assert.AreEqual("System Security", requirements.Sections[0].Title);
-        Assert.AreEqual(2, requirements.Sections[0].Requirements.Count);
+        Assert.HasCount(2, requirements.Sections[0].Requirements);
         Assert.AreEqual("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
         Assert.AreEqual("SYS-SEC-002", requirements.Sections[0].Requirements[1].Id);
     }
@@ -768,9 +768,9 @@ sections:
         var requirements = Requirements.Read(filePath);
 
         Assert.IsNotNull(requirements);
-        Assert.AreEqual(1, requirements.Sections.Count);
+        Assert.HasCount(1, requirements.Sections);
         Assert.AreEqual("System Security", requirements.Sections[0].Title);
-        Assert.AreEqual(1, requirements.Sections[0].Requirements.Count);
+        Assert.HasCount(1, requirements.Sections[0].Requirements);
         Assert.AreEqual("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
     }
 
@@ -799,7 +799,7 @@ sections:
     {
         try
         {
-            Requirements.Read(null);
+            Requirements.Read(null!);
             Assert.Fail("Expected ArgumentException was not thrown");
         }
         catch (ArgumentException ex)
