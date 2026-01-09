@@ -337,48 +337,15 @@ yamllint .
 
 ## Available Agents
 
-The following custom agents are configured for this repository:
+The following custom agents are configured for this repository. Each agent file contains detailed guidelines,
+responsibilities, and project-specific conventions.
 
-### Documentation Writer
-
-**Location**: `.github/agents/documentation-writer.md`
-
-Expert agent for creating, updating, and maintaining project documentation including README, guides, and API
-documentation. Responsibilities include:
-
-- Creating and updating README files and user guides
-- Documenting API endpoints and command-line interfaces
-- Writing examples and code snippets
-- Maintaining CONTRIBUTING.md, SECURITY.md, and other documentation
-- Ensuring documentation follows markdown linting and spell checking standards
-
-### Project Maintainer
-
-**Location**: `.github/agents/project-maintainer.md`
-
-Expert agent for overall project management, dependency updates, CI/CD maintenance, and release coordination.
-Responsibilities include:
-
-- Managing project dependencies and security updates
-- Maintaining CI/CD pipelines and workflows
-- Coordinating releases and versioning
-- Reviewing and merging pull requests
-- Triaging and prioritizing issues
-- Ensuring project infrastructure is well-maintained
-
-### Software Quality Enforcer
-
-**Location**: `.github/agents/software-quality-enforcer.md`
-
-Expert agent for code quality, testing standards, code reviews, security analysis, and ensuring adherence to coding
-conventions. Responsibilities include:
-
-- Reviewing code for adherence to standards and best practices
-- Ensuring adequate test coverage (aim for >80%)
-- Conducting thorough code reviews
-- Performing security analysis and vulnerability scanning
-- Enforcing coding conventions and naming standards
-- Validating that quality gates are met
+- **Documentation Writer** (`.github/agents/documentation-writer.md`) - Expert agent for creating, updating, and
+  maintaining project documentation
+- **Project Maintainer** (`.github/agents/project-maintainer.md`) - Expert agent for overall project management,
+  dependency updates, CI/CD maintenance, and release coordination
+- **Software Quality Enforcer** (`.github/agents/software-quality-enforcer.md`) - Expert agent for code quality,
+  testing standards, code reviews, and security analysis
 
 ## Future Agents
 
