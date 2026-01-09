@@ -60,6 +60,7 @@ jobs:
       - name: Publish to NuGet.org
         if: inputs.publish == 'publish'
         run: |
+          set -e
           dotnet nuget push packages/*.nupkg \
             --api-key ${{ secrets.DEMACONSULTINGNUGETKEY }} \
             --source https://api.nuget.org/v3/index.json \
