@@ -14,7 +14,6 @@ on:
         type: string
     secrets:
       SONAR_TOKEN:
-        description: 'SonarCloud token'
         required: true
 
 jobs:
