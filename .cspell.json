@@ -18,7 +18,8 @@
     "yamllint",
     "MSTest",
     "NuGet",
-    "Triaging"
+    "Triaging",
+    "sonarcloud"
   ],
   "ignorePaths": [
     "node_modules",
