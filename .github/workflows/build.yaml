@@ -44,7 +44,7 @@ jobs:
 
       - name: Start Sonar Scanner
         run: >
-          dotnet sonarscanner begin
+          dotnet dotnet-sonarscanner begin
           /k:"demaconsulting_ReqStream"
           /o:"demaconsulting"
           /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
@@ -69,7 +69,7 @@ jobs:
 
       - name: End Sonar Scanner
         run: >
-          dotnet sonarscanner end
+          dotnet dotnet-sonarscanner end
           /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
       - name: Package
