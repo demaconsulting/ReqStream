@@ -22,6 +22,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 /// <summary>
 /// Configure test parallelization for the test assembly.
-/// Tests are configured to run in parallel at the class level for better performance.
+/// Tests are configured to run sequentially to avoid conflicts with console output capturing.
 /// </summary>
-[assembly: Parallelize(Workers = 0, Scope = ExecutionScope.ClassLevel)]
+[assembly: DoNotParallelize]
