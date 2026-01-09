@@ -337,15 +337,20 @@ yamllint .
 
 ## Available Agents
 
-Currently, no custom agents are configured for this repository. The default GitHub Copilot agent is available for
-general assistance.
+The following custom agents are configured for this repository. Each agent file contains detailed guidelines,
+responsibilities, and project-specific conventions.
+
+- **Documentation Writer** (`.github/agents/documentation-writer.md`) - Expert agent for creating, updating, and
+  maintaining project documentation
+- **Project Maintainer** (`.github/agents/project-maintainer.md`) - Expert agent for overall project management,
+  dependency updates, CI/CD maintenance, and release coordination
+- **Software Quality Enforcer** (`.github/agents/software-quality-enforcer.md`) - Expert agent for code quality,
+  testing standards, code reviews, and security analysis
 
 ## Future Agents
 
-As the project grows, we may add custom agents for:
+As the project grows, we may add additional custom agents for:
 
-- Code review and quality assurance
-- Documentation generation
 - Test generation
 - Requirements validation
 - YAML file parsing and validation
