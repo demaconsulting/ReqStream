@@ -190,7 +190,7 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "Unsupported argument '--unsupported'");
+            Assert.Contains("Unsupported argument '--unsupported'", ex.Message);
         }
     }
 
@@ -207,7 +207,7 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "--log requires a filename argument");
+            Assert.Contains("--log requires a filename argument", ex.Message);
         }
     }
 
@@ -224,7 +224,7 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "--report requires a filename argument");
+            Assert.Contains("--report requires a filename argument", ex.Message);
         }
     }
 
@@ -241,7 +241,7 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "--matrix requires a filename argument");
+            Assert.Contains("--matrix requires a filename argument", ex.Message);
         }
     }
 
@@ -258,7 +258,7 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "--report-depth requires a depth argument");
+            Assert.Contains("--report-depth requires a depth argument", ex.Message);
         }
     }
 
@@ -275,7 +275,7 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "--matrix-depth requires a depth argument");
+            Assert.Contains("--matrix-depth requires a depth argument", ex.Message);
         }
     }
 
@@ -292,7 +292,7 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "--report-depth requires a positive integer");
+            Assert.Contains("--report-depth requires a positive integer", ex.Message);
         }
 
         try
@@ -302,7 +302,7 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "--report-depth requires a positive integer");
+            Assert.Contains("--report-depth requires a positive integer", ex.Message);
         }
 
         try
@@ -312,7 +312,7 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "--report-depth requires a positive integer");
+            Assert.Contains("--report-depth requires a positive integer", ex.Message);
         }
     }
 
@@ -329,7 +329,7 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "--matrix-depth requires a positive integer");
+            Assert.Contains("--matrix-depth requires a positive integer", ex.Message);
         }
 
         try
@@ -339,7 +339,7 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "--matrix-depth requires a positive integer");
+            Assert.Contains("--matrix-depth requires a positive integer", ex.Message);
         }
     }
 
@@ -453,8 +453,8 @@ public class ContextTests
 
         Assert.IsTrue(File.Exists(logPath));
         var logContent = File.ReadAllText(logPath);
-        StringAssert.Contains(logContent, "Normal message");
-        StringAssert.Contains(logContent, "Error message");
+        Assert.Contains("Normal message", logContent);
+        Assert.Contains("Error message", logContent);
     }
 
     /// <summary>
@@ -481,8 +481,8 @@ public class ContextTests
 
             Assert.IsTrue(File.Exists(logPath));
             var logContent = File.ReadAllText(logPath);
-            StringAssert.Contains(logContent, "Normal message");
-            StringAssert.Contains(logContent, "Error message");
+            Assert.Contains("Normal message", logContent);
+            Assert.Contains("Error message", logContent);
         }
         finally
         {
@@ -565,7 +565,7 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "--requirements requires a pattern argument");
+            Assert.Contains("--requirements requires a pattern argument", ex.Message);
         }
     }
 
@@ -582,7 +582,7 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "--tests requires a pattern argument");
+            Assert.Contains("--tests requires a pattern argument", ex.Message);
         }
     }
 
@@ -636,7 +636,7 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "Failed to open log file");
+            Assert.Contains("Failed to open log file", ex.Message);
         }
     }
 }

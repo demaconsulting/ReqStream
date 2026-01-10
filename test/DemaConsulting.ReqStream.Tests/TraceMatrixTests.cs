@@ -267,7 +267,7 @@ sections:
         }
         catch (ArgumentNullException ex)
         {
-            StringAssert.Contains(ex.Message, "requirements");
+            Assert.Contains("requirements", ex.Message);
         }
     }
 
@@ -300,7 +300,7 @@ sections:
         }
         catch (FileNotFoundException ex)
         {
-            StringAssert.Contains(ex.Message, "Test result file not found");
+            Assert.Contains("Test result file not found", ex.Message);
         }
     }
 

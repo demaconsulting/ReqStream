@@ -303,8 +303,8 @@ sections:
         }
         catch (InvalidOperationException ex)
         {
-            StringAssert.Contains(ex.Message, "SYS-SEC-001");
-            StringAssert.Contains(ex.Message, "Duplicate requirement ID");
+            Assert.Contains("SYS-SEC-001", ex.Message);
+            Assert.Contains("Duplicate requirement ID", ex.Message);
         }
     }
 
@@ -360,7 +360,7 @@ includes:
         }
         catch (FileNotFoundException ex)
         {
-            StringAssert.Contains(ex.Message, "Requirements file not found");
+            Assert.Contains("Requirements file not found", ex.Message);
         }
     }
 
@@ -473,9 +473,9 @@ sections:
         }
         catch (InvalidOperationException ex)
         {
-            StringAssert.Contains(ex.Message, "Requirement ID cannot be blank");
-            StringAssert.Contains(ex.Message, "System Security");
-            StringAssert.Contains(ex.Message, filePath);
+            Assert.Contains("Requirement ID cannot be blank", ex.Message);
+            Assert.Contains("System Security", ex.Message);
+            Assert.Contains(filePath, ex.Message);
         }
     }
 
@@ -502,9 +502,9 @@ sections:
         }
         catch (InvalidOperationException ex)
         {
-            StringAssert.Contains(ex.Message, "Requirement title cannot be blank");
-            StringAssert.Contains(ex.Message, "SYS-SEC-001");
-            StringAssert.Contains(ex.Message, filePath);
+            Assert.Contains("Requirement title cannot be blank", ex.Message);
+            Assert.Contains("SYS-SEC-001", ex.Message);
+            Assert.Contains(filePath, ex.Message);
         }
     }
 
@@ -531,8 +531,8 @@ sections:
         }
         catch (InvalidOperationException ex)
         {
-            StringAssert.Contains(ex.Message, "Section title cannot be blank");
-            StringAssert.Contains(ex.Message, filePath);
+            Assert.Contains("Section title cannot be blank", ex.Message);
+            Assert.Contains(filePath, ex.Message);
         }
     }
 
@@ -563,9 +563,9 @@ sections:
         }
         catch (InvalidOperationException ex)
         {
-            StringAssert.Contains(ex.Message, "Test name cannot be blank");
-            StringAssert.Contains(ex.Message, "SYS-SEC-001");
-            StringAssert.Contains(ex.Message, filePath);
+            Assert.Contains("Test name cannot be blank", ex.Message);
+            Assert.Contains("SYS-SEC-001", ex.Message);
+            Assert.Contains(filePath, ex.Message);
         }
     }
 
@@ -598,9 +598,9 @@ mappings:
         }
         catch (InvalidOperationException ex)
         {
-            StringAssert.Contains(ex.Message, "Test name cannot be blank");
-            StringAssert.Contains(ex.Message, "SYS-SEC-001");
-            StringAssert.Contains(ex.Message, filePath);
+            Assert.Contains("Test name cannot be blank", ex.Message);
+            Assert.Contains("SYS-SEC-001", ex.Message);
+            Assert.Contains(filePath, ex.Message);
         }
     }
 
@@ -632,8 +632,8 @@ mappings:
         }
         catch (InvalidOperationException ex)
         {
-            StringAssert.Contains(ex.Message, "Mapping requirement ID cannot be blank");
-            StringAssert.Contains(ex.Message, filePath);
+            Assert.Contains("Mapping requirement ID cannot be blank", ex.Message);
+            Assert.Contains(filePath, ex.Message);
         }
     }
 
@@ -662,9 +662,9 @@ sections:
         }
         catch (InvalidOperationException ex)
         {
-            StringAssert.Contains(ex.Message, "SYS-SEC-001");
-            StringAssert.Contains(ex.Message, "Duplicate requirement ID");
-            StringAssert.Contains(ex.Message, filePath);
+            Assert.Contains("SYS-SEC-001", ex.Message);
+            Assert.Contains("Duplicate requirement ID", ex.Message);
+            Assert.Contains(filePath, ex.Message);
         }
     }
 
@@ -787,7 +787,7 @@ sections:
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "At least one file path must be provided");
+            Assert.Contains("At least one file path must be provided", ex.Message);
         }
     }
 
@@ -804,7 +804,7 @@ sections:
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "At least one file path must be provided");
+            Assert.Contains("At least one file path must be provided", ex.Message);
         }
     }
 
@@ -840,9 +840,9 @@ sections:
         }
         catch (InvalidOperationException ex)
         {
-            StringAssert.Contains(ex.Message, "SYS-SEC-001");
-            StringAssert.Contains(ex.Message, "Duplicate requirement ID");
-            StringAssert.Contains(ex.Message, file2Path);
+            Assert.Contains("SYS-SEC-001", ex.Message);
+            Assert.Contains("Duplicate requirement ID", ex.Message);
+            Assert.Contains(file2Path, ex.Message);
         }
     }
 }

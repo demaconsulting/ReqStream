@@ -38,10 +38,10 @@ public class Requirement
     /// <summary>
     ///     Gets the list of test identifiers associated with this requirement.
     /// </summary>
-    public List<string> Tests { get; } = new();
+    public List<string> Tests { get; } = [];
 
     /// <summary>
     ///     Gets the list of child requirement identifiers.
     /// </summary>
-    public List<string> Children { get; } = new();
+    public List<string> Children { get; } = [];
 }

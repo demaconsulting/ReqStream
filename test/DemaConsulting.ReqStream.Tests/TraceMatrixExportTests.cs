@@ -30,6 +30,8 @@ namespace DemaConsulting.ReqStream.Tests;
 [TestClass]
 public class TraceMatrixExportTests
 {
+    private static readonly string[] SplitDelimiter = ["| Test_Credentials |"];
+
     private string _testDirectory = string.Empty;
 
     /// <summary>
@@ -105,16 +107,16 @@ sections:
 
         Assert.IsTrue(File.Exists(mdPath));
         var content = File.ReadAllText(mdPath);
-        StringAssert.Contains(content, "# Summary");
-        StringAssert.Contains(content, "1 of 1 requirements are satisfied with tests.");
-        StringAssert.Contains(content, "# Requirements");
-        StringAssert.Contains(content, "## User Authentication");
-        StringAssert.Contains(content, "| ID | Tests Linked | Passed | Failed | Not Executed |");
-        StringAssert.Contains(content, "| AUTH-001 | 2 | 2 | 0 | 0 |");
-        StringAssert.Contains(content, "# Testing");
-        StringAssert.Contains(content, "| Test | Requirement | Passed | Failed |");
-        StringAssert.Contains(content, "| Test_Credentials_Invalid | AUTH-001 | 1 | 0 |");
-        StringAssert.Contains(content, "| Test_Credentials_Valid | AUTH-001 | 1 | 0 |");
+        Assert.Contains("# Summary", content);
+        Assert.Contains("1 of 1 requirements are satisfied with tests.", content);
+        Assert.Contains("# Requirements", content);
+        Assert.Contains("## User Authentication", content);
+        Assert.Contains("| ID | Tests Linked | Passed | Failed | Not Executed |", content);
+        Assert.Contains("| AUTH-001 | 2 | 2 | 0 | 0 |", content);
+        Assert.Contains("# Testing", content);
+        Assert.Contains("| Test | Requirement | Passed | Failed |", content);
+        Assert.Contains("| Test_Credentials_Invalid | AUTH-001 | 1 | 0 |", content);
+        Assert.Contains("| Test_Credentials_Valid | AUTH-001 | 1 | 0 |", content);
     }
 
     /// <summary>
@@ -158,10 +160,10 @@ sections:
         matrix.Export(mdPath, depth: 2);
 
         var content = File.ReadAllText(mdPath);
-        StringAssert.Contains(content, "## Summary");
-        StringAssert.Contains(content, "## Requirements");
-        StringAssert.Contains(content, "### User Authentication");
-        StringAssert.Contains(content, "## Testing");
+        Assert.Contains("## Summary", content);
+        Assert.Contains("## Requirements", content);
+        Assert.Contains("### User Authentication", content);
+        Assert.Contains("## Testing", content);
     }
 
     /// <summary>
@@ -215,10 +217,10 @@ sections:
         matrix.Export(mdPath);
 
         var content = File.ReadAllText(mdPath);
-        StringAssert.Contains(content, "0 of 1 requirements are satisfied with tests.");
-        StringAssert.Contains(content, "| AUTH-001 | 2 | 1 | 1 | 0 |");
-        StringAssert.Contains(content, "| Test_Credentials_Invalid | AUTH-001 | 0 | 1 |");
-        StringAssert.Contains(content, "| Test_Credentials_Valid | AUTH-001 | 1 | 0 |");
+        Assert.Contains("0 of 1 requirements are satisfied with tests.", content);
+        Assert.Contains("| AUTH-001 | 2 | 1 | 1 | 0 |", content);
+        Assert.Contains("| Test_Credentials_Invalid | AUTH-001 | 0 | 1 |", content);
+        Assert.Contains("| Test_Credentials_Valid | AUTH-001 | 1 | 0 |", content);
     }
 
     /// <summary>
@@ -263,9 +265,9 @@ sections:
         matrix.Export(mdPath);
 
         var content = File.ReadAllText(mdPath);
-        StringAssert.Contains(content, "0 of 1 requirements are satisfied with tests.");
-        StringAssert.Contains(content, "| AUTH-001 | 2 | 1 | 0 | 1 |");
-        StringAssert.Contains(content, "| Test_Credentials_Invalid | AUTH-001 | 0 | 0 |");
+        Assert.Contains("0 of 1 requirements are satisfied with tests.", content);
+        Assert.Contains("| AUTH-001 | 2 | 1 | 0 | 1 |", content);
+        Assert.Contains("| Test_Credentials_Invalid | AUTH-001 | 0 | 0 |", content);
     }
 
     /// <summary>
@@ -325,12 +327,12 @@ sections:
         matrix.Export(mdPath);
 
         var content = File.ReadAllText(mdPath);
-        StringAssert.Contains(content, "2 of 2 requirements are satisfied with tests.");
-        StringAssert.Contains(content, "## Data Management");
-        StringAssert.Contains(content, "### User Authentication");
-        StringAssert.Contains(content, "### Logging");
-        StringAssert.Contains(content, "| AUTH-001 | 1 | 1 | 0 | 0 |");
-        StringAssert.Contains(content, "| LOG-001 | 1 | 1 | 0 | 0 |");
+        Assert.Contains("2 of 2 requirements are satisfied with tests.", content);
+        Assert.Contains("## Data Management", content);
+        Assert.Contains("### User Authentication", content);
+        Assert.Contains("### Logging", content);
+        Assert.Contains("| AUTH-001 | 1 | 1 | 0 | 0 |", content);
+        Assert.Contains("| LOG-001 | 1 | 1 | 0 | 0 |", content);
     }
 
     /// <summary>
@@ -363,7 +365,7 @@ sections:
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "File path cannot be null or empty");
+            Assert.Contains("File path cannot be null or empty", ex.Message);
         }
     }
 
@@ -397,7 +399,7 @@ sections:
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "File path cannot be null or empty");
+            Assert.Contains("File path cannot be null or empty", ex.Message);
         }
     }
 
@@ -449,9 +451,9 @@ sections:
 
         var content = File.ReadAllText(mdPath);
         // Both requirements should be satisfied because SYS-SEC-001 has child AUTH-001 which has passing tests
-        StringAssert.Contains(content, "2 of 2 requirements are satisfied with tests.");
-        StringAssert.Contains(content, "| SYS-SEC-001 | 0 | 0 | 0 | 0 |");
-        StringAssert.Contains(content, "| AUTH-001 | 1 | 1 | 0 | 0 |");
+        Assert.Contains("2 of 2 requirements are satisfied with tests.", content);
+        Assert.Contains("| SYS-SEC-001 | 0 | 0 | 0 | 0 |", content);
+        Assert.Contains("| AUTH-001 | 1 | 1 | 0 | 0 |", content);
     }
 
     /// <summary>
@@ -479,8 +481,8 @@ sections:
         matrix.Export(mdPath);
 
         var content = File.ReadAllText(mdPath);
-        StringAssert.Contains(content, "0 of 1 requirements are satisfied with tests.");
-        StringAssert.Contains(content, "| AUTH-001 | 0 | 0 | 0 | 0 |");
+        Assert.Contains("0 of 1 requirements are satisfied with tests.", content);
+        Assert.Contains("| AUTH-001 | 0 | 0 | 0 | 0 |", content);
     }
 
     /// <summary>
@@ -528,9 +530,9 @@ sections:
         matrix.Export(mdPath);
 
         var content = File.ReadAllText(mdPath);
-        StringAssert.Contains(content, "2 of 2 requirements are satisfied with tests.");
+        Assert.Contains("2 of 2 requirements are satisfied with tests.", content);
         // Test should appear twice in the testing section, once for each requirement
-        var testCredentialsCount = content.Split(new[] { "| Test_Credentials |" }, StringSplitOptions.None).Length - 1;
+        var testCredentialsCount = content.Split(SplitDelimiter, StringSplitOptions.None).Length - 1;
         Assert.AreEqual(2, testCredentialsCount, "Test_Credentials should appear twice in the testing section");
     }
 }

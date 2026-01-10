@@ -31,7 +31,7 @@ public class TraceMatrix
     /// <summary>
     ///     Dictionary mapping test names to their execution results.
     /// </summary>
-    private readonly Dictionary<string, TestResultEntry> _testResults = new();
+    private readonly Dictionary<string, TestResultEntry> _testResults = [];
 
     /// <summary>
     ///     The requirements object used to build this trace matrix.
@@ -47,10 +47,7 @@ public class TraceMatrix
     /// <exception cref="FileNotFoundException">Thrown when a test result file does not exist.</exception>
     public TraceMatrix(Requirements requirements, params string[] testResultFiles)
     {
-        if (requirements == null)
-        {
-            throw new ArgumentNullException(nameof(requirements));
-        }
+        ArgumentNullException.ThrowIfNull(requirements);
 
         _requirements = requirements;
 
@@ -201,7 +198,7 @@ public class TraceMatrix
     /// <param name="requirement">The requirement to collect tests from.</param>
     /// <param name="rootSection">The root section for looking up child requirements.</param>
     /// <param name="allTests">The set to add tests to.</param>
-    private void CollectAllTests(Requirement requirement, Section rootSection, HashSet<string> allTests)
+    private static void CollectAllTests(Requirement requirement, Section rootSection, HashSet<string> allTests)
     {
         // Add direct tests
         foreach (var test in requirement.Tests)
@@ -388,11 +385,12 @@ public class TraceMatrix
         {
             foreach (var testName in requirement.Tests)
             {
-                if (!testToRequirements.ContainsKey(testName))
+                if (!testToRequirements.TryGetValue(testName, out var requirementIds))
                 {
-                    testToRequirements[testName] = new List<string>();
+                    requirementIds = [];
+                    testToRequirements[testName] = requirementIds;
                 }
-                testToRequirements[testName].Add(requirement.Id);
+                requirementIds.Add(requirement.Id);
             }
         }
 

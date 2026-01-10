@@ -32,12 +32,12 @@ public class Requirements : Section
     /// <summary>
     ///     Set of files that have already been included to prevent infinite loops.
     /// </summary>
-    private readonly HashSet<string> _includedFiles = new();
+    private readonly HashSet<string> _includedFiles = [];
 
     /// <summary>
     ///     Dictionary mapping requirement IDs to their Requirement objects for duplicate detection.
     /// </summary>
-    private readonly Dictionary<string, Requirement> _allRequirements = new();
+    private readonly Dictionary<string, Requirement> _allRequirements = [];
 
     /// <summary>
     ///     Reads one or more requirements YAML files and returns the parsed Requirements object.

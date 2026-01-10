@@ -74,10 +74,10 @@ sections:
 
         Assert.IsTrue(File.Exists(mdPath));
         var content = File.ReadAllText(mdPath);
-        StringAssert.Contains(content, "# System Security");
-        StringAssert.Contains(content, "| ID | Title |");
-        StringAssert.Contains(content, "| SYS-SEC-001 | The system shall support credentials authentication. |");
-        StringAssert.Contains(content, "| SYS-SEC-002 | The system shall enforce password complexity. |");
+        Assert.Contains("# System Security", content);
+        Assert.Contains("| ID | Title |", content);
+        Assert.Contains("| SYS-SEC-001 | The system shall support credentials authentication. |", content);
+        Assert.Contains("| SYS-SEC-002 | The system shall enforce password complexity. |", content);
     }
 
     /// <summary>
@@ -101,7 +101,7 @@ sections:
         requirements.Export(mdPath, depth: 3);
 
         var content = File.ReadAllText(mdPath);
-        StringAssert.Contains(content, "### System Security");
+        Assert.Contains("### System Security", content);
     }
 
     /// <summary>
@@ -131,11 +131,11 @@ sections:
         requirements.Export(mdPath);
 
         var content = File.ReadAllText(mdPath);
-        StringAssert.Contains(content, "# Data Management");
-        StringAssert.Contains(content, "## User Authentication");
-        StringAssert.Contains(content, "## Logging");
-        StringAssert.Contains(content, "| AUTH-001 | All requests shall be authenticated. |");
-        StringAssert.Contains(content, "| LOG-001 | All requests shall be logged. |");
+        Assert.Contains("# Data Management", content);
+        Assert.Contains("## User Authentication", content);
+        Assert.Contains("## Logging", content);
+        Assert.Contains("| AUTH-001 | All requests shall be authenticated. |", content);
+        Assert.Contains("| LOG-001 | All requests shall be logged. |", content);
     }
 
     /// <summary>
@@ -161,9 +161,9 @@ sections:
         requirements.Export(mdPath);
 
         var content = File.ReadAllText(mdPath);
-        StringAssert.Contains(content, "# Parent Section");
-        StringAssert.Contains(content, "## Child Section");
-        StringAssert.Contains(content, "| CHILD-001 | Child requirement. |");
+        Assert.Contains("# Parent Section", content);
+        Assert.Contains("## Child Section", content);
+        Assert.Contains("| CHILD-001 | Child requirement. |", content);
     }
 
     /// <summary>
@@ -190,7 +190,7 @@ sections:
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "File path cannot be null or empty");
+            Assert.Contains("File path cannot be null or empty", ex.Message);
         }
     }
 
@@ -218,7 +218,7 @@ sections:
         }
         catch (ArgumentException ex)
         {
-            StringAssert.Contains(ex.Message, "File path cannot be null or empty");
+            Assert.Contains("File path cannot be null or empty", ex.Message);
         }
     }
 
@@ -247,10 +247,10 @@ sections:
         requirements.Export(mdPath);
 
         var content = File.ReadAllText(mdPath);
-        StringAssert.Contains(content, "# System Security");
-        StringAssert.Contains(content, "# Data Management");
-        StringAssert.Contains(content, "| SYS-SEC-001 | The system shall support credentials authentication. |");
-        StringAssert.Contains(content, "| DATA-001 | All requests shall be logged. |");
+        Assert.Contains("# System Security", content);
+        Assert.Contains("# Data Management", content);
+        Assert.Contains("| SYS-SEC-001 | The system shall support credentials authentication. |", content);
+        Assert.Contains("| DATA-001 | All requests shall be logged. |", content);
     }
 
     /// <summary>
