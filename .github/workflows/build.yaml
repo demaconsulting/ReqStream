@@ -148,6 +148,9 @@ jobs:
         shell: bash
         run: |
           echo "Testing self-validation with TRX results output..."
-          reqstream --validate --results validation-results.trx || { echo "✗ Self-validation with results failed"; exit 1; }
+          reqstream --validate --results validation-results.trx || {
+            echo "✗ Self-validation with results failed"
+            exit 1
+          }
           [ -f validation-results.trx ] || { echo "✗ Results file not created"; exit 1; }
           echo "✓ Self-validation with results succeeded"
