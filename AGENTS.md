@@ -149,7 +149,8 @@ dotnet pack --no-build --configuration Release
 
 Before completing any task, you **MUST** perform these checks in order and ensure they all pass:
 
-1. **Build and Test**: Run `dotnet build --configuration Release && dotnet test --configuration Release` - all tests must pass with zero warnings
+1. **Build and Test**: Run `dotnet build --configuration Release && dotnet test --configuration Release` - all tests
+   must pass with zero warnings
 2. **Code Review**: Use `code_review` tool and address all valid concerns
 3. **Security Scanning**: Use `codeql_checker` tool after code review - must report zero vulnerabilities
 4. **Linting**: **MANDATORY** - Run all linters locally and fix any issues before pushing changes:
