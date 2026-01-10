@@ -136,3 +136,18 @@ jobs:
           echo "Testing help command..."
           reqstream --help || { echo "✗ Help command failed"; exit 1; }
           echo "✓ Help command succeeded"
+
+      - name: Test self-validation
+        shell: bash
+        run: |
+          echo "Testing self-validation..."
+          reqstream --validate || { echo "✗ Self-validation failed"; exit 1; }
+          echo "✓ Self-validation succeeded"
+
+      - name: Test self-validation with results output
+        shell: bash
+        run: |
+          echo "Testing self-validation with TRX results output..."
+          reqstream --validate --results validation-results.trx || { echo "✗ Self-validation with results failed"; exit 1; }
+          [ -f validation-results.trx ] || { echo "✗ Results file not created"; exit 1; }
+          echo "✓ Self-validation with results succeeded"
