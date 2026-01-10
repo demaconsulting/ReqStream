@@ -120,6 +120,32 @@ sections:
               - "Create_WithTestsPattern_ExpandsGlobPattern"
               - "TraceMatrix_WithMixedFormats_ProcessesBoth"
 
+          - id: "TEST-005"
+            title: "The tool shall support source-specific test matching using filepart@testname pattern."
+            tests:
+              - "TraceMatrix_WithSourceSpecificTests_MatchesCorrectly"
+              - "TraceMatrix_WithSourceSpecificTests_DoesNotMatchOtherSources"
+
+          - id: "TEST-006"
+            title: "The tool shall perform case-insensitive matching of file parts in source-specific test names."
+            tests:
+              - "TraceMatrix_WithSourceSpecificTests_IsCaseInsensitive"
+
+          - id: "TEST-007"
+            title: "The tool shall support partial filename matching for source-specific tests."
+            tests:
+              - "TraceMatrix_WithSourceSpecificTests_MatchesPartialFilename"
+
+          - id: "TEST-008"
+            title: "The tool shall support plain test names that aggregate from all sources."
+            tests:
+              - "TraceMatrix_WithPlainTestNames_MatchesAllSources"
+
+          - id: "TEST-009"
+            title: "The tool shall support mixing plain and source-specific test names in the same requirement."
+            tests:
+              - "TraceMatrix_WithMixedTestNames_MatchesAppropriately"
+
       - title: "Reporting"
         requirements:
           - id: "RPT-001"

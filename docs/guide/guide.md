@@ -237,6 +237,54 @@ mappings:
 The separate `mappings` section is useful when test mappings are maintained by a different team or in a different
 file from the requirements.
 
+### Test Source Linking
+
+When testing requirements across multiple platforms or configurations, use test source linking to distinguish tests
+from different sources. This is particularly useful for matrix testing scenarios.
+
+**Pattern**: `[filepart@]testname`
+
+- `filepart` (optional): A substring matching the base filename (without extension) of the test result file
+- `testname`: The exact test name from the test result file
+
+**Example - Platform-specific testing:**
+
+```yaml
+requirements:
+  - id: "PLAT-001"
+    title: "Shall support Windows operating systems"
+    tests:
+      - "windows-latest@Test_PlatformBasic"
+      - "windows-latest@Test_FileSystem"
+  
+  - id: "PLAT-002"
+    title: "Shall support Linux operating systems"
+    tests:
+      - "ubuntu-latest@Test_PlatformBasic"
+      - "ubuntu-latest@Test_FileSystem"
+  
+  - id: "PLAT-003"
+    title: "Shall support cross-platform APIs"
+    tests:
+      - "Test_CrossPlatformAPI"  # Aggregates from all platforms
+```
+
+With test result files:
+
+- `test-results-windows-latest.trx`
+- `test-results-ubuntu-latest.trx`
+- `test-results-macos-latest.trx`
+
+The `windows-latest@Test_PlatformBasic` test will only match results from files containing "windows-latest" in their
+base filename. The `Test_CrossPlatformAPI` test without a source specifier will aggregate results from all three
+files.
+
+**Key features:**
+
+- Case-insensitive matching: `windows@Test` matches `test-results-WINDOWS-latest.trx`
+- Partial matching: `ubuntu@Test` matches `test-results-ubuntu-22.04-latest.trx`
+- Plain test names: Tests without `filepart@` prefix aggregate results from all test result files
+
 ### File Includes
 
 Large projects can be split across multiple YAML files using the `includes` section:
@@ -661,6 +709,32 @@ trace matrix.
 
 A: No, test names must be specified exactly. However, you can use patterns when specifying test result files
 (`--tests "**/*.trx"`).
+
+**Q: How can I link tests to specific test result files?**
+
+A: Use the test source linking feature with the `[filepart@]testname` pattern. The `filepart` is a substring that
+matches the base filename (without extension) of the test result file. For example:
+
+```yaml
+requirements:
+  - id: "WIN-001"
+    title: "Shall support Windows"
+    tests:
+      - "windows-latest@Test_PlatformFeature"  # Matches only from files containing "windows-latest"
+  
+  - id: "LIN-001"
+    title: "Shall support Linux"
+    tests:
+      - "ubuntu-latest@Test_PlatformFeature"   # Matches only from files containing "ubuntu-latest"
+```
+
+File part matching is case-insensitive and supports partial matches. Tests without the `filepart@` prefix aggregate
+results from all test result files.
+
+**Q: Can I mix plain and source-specific test names?**
+
+A: Yes, you can mix both styles in the same requirement. Plain test names will aggregate results from all test result
+files, while source-specific test names will only match their specified sources.
 
 ### Export Questions
 

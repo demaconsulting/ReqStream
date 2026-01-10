@@ -157,8 +157,49 @@ mappings:
 - **Child Requirements**: Requirements can reference other requirements as children using the `children` field
 - **Test Mappings**: Tests can be mapped to requirements either inline (within the requirement definition) or
   separately (using the `mappings` section)
+- **Test Source Linking**: Support for source-specific test matching using the `[filepart@]testname` pattern,
+  allowing requirements to specify tests from specific result files (e.g., `windows-latest@MyTest`)
 - **File Includes**: Use the `includes` section to reference other YAML files containing additional requirements
   or test mappings
+
+### Test Source Linking
+
+When testing requirements across multiple platforms or configurations, test result files often include platform
+identifiers in their names (e.g., `test-results-windows-latest.trx`, `test-results-ubuntu-latest.junit.xml`).
+Test source linking allows requirements to specify which test results should come from which source files.
+
+**Pattern**: `[filepart@]testname`
+
+- `filepart` (optional): A substring that matches the base filename (without extension) of the test result file.
+  Matching is case-insensitive and supports partial matches.
+- `testname`: The exact name of the test as it appears in the test result file.
+
+**Examples**:
+
+```yaml
+requirements:
+  - id: "PLAT-001"
+    title: "Shall support Windows"
+    tests:
+      - "windows-latest@Test_PlatformFeature"  # Matches only from files containing "windows-latest"
+  
+  - id: "PLAT-002"
+    title: "Shall support Linux"
+    tests:
+      - "ubuntu-latest@Test_PlatformFeature"   # Matches only from files containing "ubuntu-latest"
+  
+  - id: "PLAT-003"
+    title: "Shall support cross-platform features"
+    tests:
+      - "Test_CrossPlatformFeature"             # Aggregates from all test result files
+```
+
+**Key behaviors**:
+
+- Tests with source specifiers only match results from files containing the specified `filepart`
+- Tests without source specifiers aggregate results from all test result files
+- File part matching is case-insensitive and supports partial filename matching
+- Both plain and source-specific test names can be mixed in the same requirement
 
 ## Development
 
