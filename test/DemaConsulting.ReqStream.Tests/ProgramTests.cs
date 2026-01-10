@@ -126,9 +126,9 @@ public class ProgramTests
         var logContent = File.ReadAllText(logFile);
         Assert.Contains("DEMA Consulting ReqStream", logContent);
         Assert.Contains("ReqStream Version", logContent);
-        Assert.Contains("YAML Parsing Test - PASSED", logContent);
-        Assert.Contains("Requirements Read Test - PASSED", logContent);
-        Assert.Contains("Test Results Parsing Test - PASSED", logContent);
+        Assert.Contains("Requirements Processing Test - PASSED", logContent);
+        Assert.Contains("Trace Matrix Test - PASSED", logContent);
+        Assert.Contains("Report Export Test - PASSED", logContent);
         Assert.Contains("Total Tests: 3", logContent);
         Assert.Contains("Passed: 3", logContent);
         Assert.Contains("Failed: 0", logContent);
@@ -158,9 +158,9 @@ public class ProgramTests
         // Check results file is valid TRX
         var trxContent = File.ReadAllText(resultsFile);
         Assert.Contains("TestRun", trxContent);
-        Assert.Contains("YamlParsing", trxContent);
-        Assert.Contains("RequirementsRead", trxContent);
-        Assert.Contains("TestResultsParsing", trxContent);
+        Assert.Contains("RequirementsProcessing", trxContent);
+        Assert.Contains("TraceMatrix", trxContent);
+        Assert.Contains("ReportExport", trxContent);
         Assert.Contains("outcome=\"Passed\"", trxContent);
 
         // Check log confirms results were written
@@ -192,9 +192,9 @@ public class ProgramTests
         // Check results file is valid JUnit XML
         var xmlContent = File.ReadAllText(resultsFile);
         Assert.Contains("<testsuite", xmlContent);
-        Assert.Contains("YamlParsing", xmlContent);
-        Assert.Contains("RequirementsRead", xmlContent);
-        Assert.Contains("TestResultsParsing", xmlContent);
+        Assert.Contains("RequirementsProcessing", xmlContent);
+        Assert.Contains("TraceMatrix", xmlContent);
+        Assert.Contains("ReportExport", xmlContent);
 
         // Check log confirms results were written
         var logContent = File.ReadAllText(logFile);

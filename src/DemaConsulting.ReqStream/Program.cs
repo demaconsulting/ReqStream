@@ -30,7 +30,7 @@ internal static class Program
     /// <summary>
     ///     Gets the application version string.
     /// </summary>
-    private static string Version
+    public static string Version
     {
         get
         {
@@ -93,12 +93,12 @@ internal static class Program
         }
 
         // Print application banner
-        PrintBanner();
+        PrintBanner(context);
 
         // Priority 2: Help
         if (context.Help)
         {
-            PrintHelp();
+            PrintHelp(context);
             return;
         }
 
@@ -114,36 +114,38 @@ internal static class Program
     }
 
     /// <summary>
-    ///     Prints the application banner to the console.
+    ///     Prints the application banner.
     /// </summary>
-    private static void PrintBanner()
+    /// <param name="context">The context for output.</param>
+    private static void PrintBanner(Context context)
     {
-        Console.WriteLine($"ReqStream version {Version}");
-        Console.WriteLine("Copyright (c) 2026 DEMA Consulting");
-        Console.WriteLine();
+        context.WriteLine($"ReqStream version {Version}");
+        context.WriteLine("Copyright (c) 2026 DEMA Consulting");
+        context.WriteLine("");
     }
 
     /// <summary>
-    ///     Prints usage information to the console.
+    ///     Prints usage information.
     /// </summary>
-    private static void PrintHelp()
+    /// <param name="context">The context for output.</param>
+    private static void PrintHelp(Context context)
     {
-        Console.WriteLine("Usage: reqstream [options]");
-        Console.WriteLine();
-        Console.WriteLine("Options:");
-        Console.WriteLine("  -v, --version              Display version information");
-        Console.WriteLine("  -?, -h, --help             Display this help message");
-        Console.WriteLine("  --silent                   Suppress console output");
-        Console.WriteLine("  --validate                 Run self-validation");
-        Console.WriteLine("  --results <file>           Write validation results to file (TRX or JUnit format)");
-        Console.WriteLine("  --log <file>               Write output to log file");
-        Console.WriteLine("  --requirements <pattern>   Requirements files glob pattern");
-        Console.WriteLine("  --report <file>            Export requirements to markdown file");
-        Console.WriteLine("  --report-depth <depth>     Markdown header depth for requirements report (default: 1)");
-        Console.WriteLine("  --tests <pattern>          Test result files glob pattern (TRX or JUnit)");
-        Console.WriteLine("  --matrix <file>            Export trace matrix to markdown file");
-        Console.WriteLine("  --matrix-depth <depth>     Markdown header depth for trace matrix (default: 1)");
-        Console.WriteLine("  --enforce                  Fail if requirements are not fully tested");
+        context.WriteLine("Usage: reqstream [options]");
+        context.WriteLine("");
+        context.WriteLine("Options:");
+        context.WriteLine("  -v, --version              Display version information");
+        context.WriteLine("  -?, -h, --help             Display this help message");
+        context.WriteLine("  --silent                   Suppress console output");
+        context.WriteLine("  --validate                 Run self-validation");
+        context.WriteLine("  --results <file>           Write validation results to file (TRX or JUnit format)");
+        context.WriteLine("  --log <file>               Write output to log file");
+        context.WriteLine("  --requirements <pattern>   Requirements files glob pattern");
+        context.WriteLine("  --report <file>            Export requirements to markdown file");
+        context.WriteLine("  --report-depth <depth>     Markdown header depth for requirements report (default: 1)");
+        context.WriteLine("  --tests <pattern>          Test result files glob pattern (TRX or JUnit)");
+        context.WriteLine("  --matrix <file>            Export trace matrix to markdown file");
+        context.WriteLine("  --matrix-depth <depth>     Markdown header depth for trace matrix (default: 1)");
+        context.WriteLine("  --enforce                  Fail if requirements are not fully tested");
     }
 
     /// <summary>

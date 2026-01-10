@@ -43,9 +43,9 @@ public static class Validation
         testResults.Name = "ReqStream Self-Validation";
 
         // Run core functionality tests
-        RunYamlParsingTest(context, testResults);
-        RunRequirementsReadTest(context, testResults);
-        RunTestResultsParsingTest(context, testResults);
+        RunRequirementsProcessingTest(context, testResults);
+        RunTraceMatrixTest(context, testResults);
+        RunReportExportTest(context, testResults);
 
         // Calculate totals
         var totalTests = testResults.Results.Count;
@@ -78,16 +78,11 @@ public static class Validation
     /// <param name="context">The context for output.</param>
     private static void PrintValidationHeader(Context context)
     {
-        var assembly = typeof(Validation).Assembly;
-        var version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
-                      ?? assembly.GetName().Version?.ToString()
-                      ?? "Unknown";
-
         context.WriteLine("# DEMA Consulting ReqStream");
         context.WriteLine("");
         context.WriteLine("| Information         | Value                                              |");
         context.WriteLine("| :------------------ | :------------------------------------------------- |");
-        context.WriteLine($"| ReqStream Version   | {version,-50} |");
+        context.WriteLine($"| ReqStream Version   | {Program.Version,-50} |");
         context.WriteLine($"| Machine Name        | {Environment.MachineName,-50} |");
         context.WriteLine($"| OS Version          | {RuntimeInformation.OSDescription,-50} |");
         context.WriteLine($"| DotNet Runtime      | {RuntimeInformation.FrameworkDescription,-50} |");
@@ -96,55 +91,94 @@ public static class Validation
     }
 
     /// <summary>
-    ///     Runs a test for YAML parsing functionality.
+    ///     Runs a test for requirements processing functionality.
     /// </summary>
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results collection.</param>
-    private static void RunYamlParsingTest(Context context, DemaConsulting.TestResults.TestResults testResults)
+    private static void RunRequirementsProcessingTest(Context context, DemaConsulting.TestResults.TestResults testResults)
     {
         var startTime = DateTime.UtcNow;
         var test = new DemaConsulting.TestResults.TestResult
         {
-            Name = "YamlParsing",
+            Name = "RequirementsProcessing",
             ClassName = "Validation",
             CodeBase = "ReqStream"
         };
 
         try
         {
-            // Create a simple YAML document in memory
-            var yaml = @"
-sections:
+            // Create a temporary directory for test files
+            var testDir = Path.Combine(Path.GetTempPath(), $"reqstream_validation_{Guid.NewGuid()}");
+            Directory.CreateDirectory(testDir);
+
+            try
+            {
+                // Create a simple requirements file
+                var reqFile = Path.Combine(testDir, "test-requirements.yaml");
+                var yaml = @"sections:
   - title: Test Requirements
     requirements:
       - id: TEST-001
-        title: Test requirement
+        title: Test requirement one
+      - id: TEST-002
+        title: Test requirement two
 ";
-            var tempFile = Path.GetTempFileName();
-            try
-            {
-                File.WriteAllText(tempFile, yaml);
-                var requirements = Requirements.Read(tempFile);
-                
-                if (requirements.Sections.Count == 1 && 
-                    requirements.Sections[0].Requirements.Count == 1 &&
-                    requirements.Sections[0].Requirements[0].Id == "TEST-001")
+                File.WriteAllText(reqFile, yaml);
+
+                // Create a log file to capture output
+                var logFile = Path.Combine(testDir, "requirements-test.log");
+
+                // Save current directory and change to test directory
+                var originalDir = Directory.GetCurrentDirectory();
+                try
                 {
-                    test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
-                    context.WriteLine("✓ YAML Parsing Test - PASSED");
+                    Directory.SetCurrentDirectory(testDir);
+
+                    // Run the program with requirements file (using relative pattern)
+                    int exitCode;
+                    using (var testContext = Context.Create(["--silent", "--log", "requirements-test.log", "--requirements", "*.yaml"]))
+                    {
+                        Program.Run(testContext);
+                        exitCode = testContext.ExitCode;
+                    }
+
+                    // Check if execution succeeded
+                    if (exitCode == 0)
+                    {
+                        // Verify log contains expected output (read after context is disposed to ensure log is flushed)
+                        var logContent = File.ReadAllText(logFile);
+                        
+                        if (logContent.Contains("Reading 1 requirements file(s)") && 
+                            logContent.Contains("Requirements loaded successfully"))
+                        {
+                            test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
+                            context.WriteLine("✓ Requirements Processing Test - PASSED");
+                        }
+                        else
+                        {
+                            test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
+                            test.ErrorMessage = "Expected output not found in log";
+                            context.WriteError("✗ Requirements Processing Test - FAILED: Expected output not found");
+                        }
+                    }
+                    else
+                    {
+                        test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
+                        test.ErrorMessage = $"Program exited with code {exitCode}";
+                        context.WriteError($"✗ Requirements Processing Test - FAILED: Exit code {exitCode}");
+                    }
                 }
-                else
+                finally
                 {
-                    test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
-                    test.ErrorMessage = "Parsed requirements do not match expected values";
-                    context.WriteError("✗ YAML Parsing Test - FAILED: Parsed requirements do not match expected values");
+                    Directory.SetCurrentDirectory(originalDir);
                 }
             }
             finally
             {
-                if (File.Exists(tempFile))
+                // Clean up temporary directory
+                if (Directory.Exists(testDir))
                 {
-                    File.Delete(tempFile);
+                    Directory.Delete(testDir, true);
                 }
             }
         }
@@ -152,7 +186,7 @@ sections:
         {
             test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
             test.ErrorMessage = $"Exception: {ex.Message}";
-            context.WriteError($"✗ YAML Parsing Test - FAILED: {ex.Message}");
+            context.WriteError($"✗ Requirements Processing Test - FAILED: {ex.Message}");
         }
 
         test.Duration = DateTime.UtcNow - startTime;
@@ -160,56 +194,105 @@ sections:
     }
 
     /// <summary>
-    ///     Runs a test for requirements reading functionality.
+    ///     Runs a test for trace matrix functionality.
     /// </summary>
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results collection.</param>
-    private static void RunRequirementsReadTest(Context context, DemaConsulting.TestResults.TestResults testResults)
+    private static void RunTraceMatrixTest(Context context, DemaConsulting.TestResults.TestResults testResults)
     {
         var startTime = DateTime.UtcNow;
         var test = new DemaConsulting.TestResults.TestResult
         {
-            Name = "RequirementsRead",
+            Name = "TraceMatrix",
             ClassName = "Validation",
             CodeBase = "ReqStream"
         };
 
         try
         {
-            // Create a YAML document with nested sections
-            var yaml = @"
-sections:
-  - title: Section 1
+            // Create a temporary directory for test files
+            var testDir = Path.Combine(Path.GetTempPath(), $"reqstream_validation_{Guid.NewGuid()}");
+            Directory.CreateDirectory(testDir);
+
+            try
+            {
+                // Create requirements and test results files
+                var reqFile = Path.Combine(testDir, "matrix-requirements.yaml");
+                var reqYaml = @"sections:
+  - title: Matrix Test
     requirements:
-      - id: REQ-001
-        title: Requirement 1
-      - id: REQ-002
-        title: Requirement 2
+      - id: MTX-001
+        title: Matrix requirement
+        tests:
+          - Test_Matrix_Validation
 ";
-            var tempFile = Path.GetTempFileName();
-            try
-            {
-                File.WriteAllText(tempFile, yaml);
-                var requirements = Requirements.Read(tempFile);
-                
-                if (requirements.Sections.Count == 1 && 
-                    requirements.Sections[0].Requirements.Count == 2)
+                File.WriteAllText(reqFile, reqYaml);
+
+                // Create a simple TRX file
+                var trxFile = Path.Combine(testDir, "test-results.trx");
+                var testData = new DemaConsulting.TestResults.TestResults { Name = "ValidationTests" };
+                testData.Results.Add(new DemaConsulting.TestResults.TestResult
                 {
-                    test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
-                    context.WriteLine("✓ Requirements Read Test - PASSED");
+                    Name = "Test_Matrix_Validation",
+                    ClassName = "MatrixTests",
+                    CodeBase = "Tests.dll",
+                    Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
+                    Duration = TimeSpan.FromSeconds(1)
+                });
+                File.WriteAllText(trxFile, TrxSerializer.Serialize(testData));
+
+                // Save current directory and change to test directory
+                var originalDir = Directory.GetCurrentDirectory();
+                try
+                {
+                    Directory.SetCurrentDirectory(testDir);
+
+                    // Run the program with trace matrix (using relative paths)
+                    int exitCode;
+                    using (var testContext = Context.Create(["--silent", "--log", "matrix-test.log", "--requirements", "*-requirements.yaml", 
+                                                              "--tests", "*.trx", "--matrix", "matrix.md"]))
+                    {
+                        Program.Run(testContext);
+                        exitCode = testContext.ExitCode;
+                    }
+
+                    // Check if execution succeeded and matrix file was created (check after context disposed)
+                    var matrixFile = Path.Combine(testDir, "matrix.md");
+                    if (exitCode == 0 && File.Exists(matrixFile))
+                    {
+                        var matrixContent = File.ReadAllText(matrixFile);
+                        if (matrixContent.Contains("MTX-001") && matrixContent.Contains("Test_Matrix_Validation"))
+                        {
+                            test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
+                            context.WriteLine("✓ Trace Matrix Test - PASSED");
+                        }
+                        else
+                        {
+                            test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
+                            test.ErrorMessage = "Matrix file missing expected content";
+                            context.WriteError("✗ Trace Matrix Test - FAILED: Matrix file missing expected content");
+                        }
+                    }
+                    else
+                    {
+                        test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
+                        test.ErrorMessage = exitCode != 0 
+                            ? $"Program exited with code {exitCode}" 
+                            : "Matrix file not created";
+                        context.WriteError($"✗ Trace Matrix Test - FAILED: {test.ErrorMessage}");
+                    }
                 }
-                else
+                finally
                 {
-                    test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
-                    test.ErrorMessage = "Requirements structure does not match expected values";
-                    context.WriteError("✗ Requirements Read Test - FAILED: Requirements structure does not match expected values");
+                    Directory.SetCurrentDirectory(originalDir);
                 }
             }
             finally
             {
-                if (File.Exists(tempFile))
+                // Clean up temporary directory
+                if (Directory.Exists(testDir))
                 {
-                    File.Delete(tempFile);
+                    Directory.Delete(testDir, true);
                 }
             }
         }
@@ -217,7 +300,7 @@ sections:
         {
             test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
             test.ErrorMessage = $"Exception: {ex.Message}";
-            context.WriteError($"✗ Requirements Read Test - FAILED: {ex.Message}");
+            context.WriteError($"✗ Trace Matrix Test - FAILED: {ex.Message}");
         }
 
         test.Duration = DateTime.UtcNow - startTime;
@@ -225,58 +308,90 @@ sections:
     }
 
     /// <summary>
-    ///     Runs a test for test results parsing functionality.
+    ///     Runs a test for report export functionality.
     /// </summary>
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results collection.</param>
-    private static void RunTestResultsParsingTest(Context context, DemaConsulting.TestResults.TestResults testResults)
+    private static void RunReportExportTest(Context context, DemaConsulting.TestResults.TestResults testResults)
     {
         var startTime = DateTime.UtcNow;
         var test = new DemaConsulting.TestResults.TestResult
         {
-            Name = "TestResultsParsing",
+            Name = "ReportExport",
             ClassName = "Validation",
             CodeBase = "ReqStream"
         };
 
         try
         {
-            // Create a simple TRX document - use the library's serializer instead
-            var testData = new DemaConsulting.TestResults.TestResults { Name = "ValidationTest" };
-            testData.Results.Add(new DemaConsulting.TestResults.TestResult
-            {
-                Name = "TestMethod1",
-                ClassName = "ValidationTests",
-                CodeBase = "Validation.dll",
-                Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
-                Duration = TimeSpan.FromSeconds(1)
-            });
-            
-            var trxContent = TrxSerializer.Serialize(testData);
-            var tempFile = Path.GetTempFileName();
+            // Create a temporary directory for test files
+            var testDir = Path.Combine(Path.GetTempPath(), $"reqstream_validation_{Guid.NewGuid()}");
+            Directory.CreateDirectory(testDir);
+
             try
             {
-                File.WriteAllText(tempFile, trxContent);
-                var content = File.ReadAllText(tempFile);
-                var results = TrxSerializer.Deserialize(content);
-                
-                if (results.Results.Count == 1 && results.Results[0].Outcome == DemaConsulting.TestResults.TestOutcome.Passed)
+                // Create a requirements file
+                var reqFile = Path.Combine(testDir, "export-requirements.yaml");
+                var reqYaml = @"sections:
+  - title: Export Test
+    requirements:
+      - id: EXP-001
+        title: Export requirement
+";
+                File.WriteAllText(reqFile, reqYaml);
+
+                // Save current directory and change to test directory
+                var originalDir = Directory.GetCurrentDirectory();
+                try
                 {
-                    test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
-                    context.WriteLine("✓ Test Results Parsing Test - PASSED");
+                    Directory.SetCurrentDirectory(testDir);
+
+                    // Run the program with report export (using relative paths)
+                    int exitCode;
+                    using (var testContext = Context.Create(["--silent", "--log", "export-test.log", "--requirements", "*-requirements.yaml", 
+                                                              "--report", "report.md"]))
+                    {
+                        Program.Run(testContext);
+                        exitCode = testContext.ExitCode;
+                    }
+
+                    // Check if execution succeeded and report file was created (check after context disposed)
+                    var reportFile = Path.Combine(testDir, "report.md");
+                    if (exitCode == 0 && File.Exists(reportFile))
+                    {
+                        var reportContent = File.ReadAllText(reportFile);
+                        if (reportContent.Contains("EXP-001") && reportContent.Contains("Export requirement"))
+                        {
+                            test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
+                            context.WriteLine("✓ Report Export Test - PASSED");
+                        }
+                        else
+                        {
+                            test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
+                            test.ErrorMessage = "Report file missing expected content";
+                            context.WriteError("✗ Report Export Test - FAILED: Report file missing expected content");
+                        }
+                    }
+                    else
+                    {
+                        test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
+                        test.ErrorMessage = exitCode != 0 
+                            ? $"Program exited with code {exitCode}" 
+                            : "Report file not created";
+                        context.WriteError($"✗ Report Export Test - FAILED: {test.ErrorMessage}");
+                    }
                 }
-                else
+                finally
                 {
-                    test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
-                    test.ErrorMessage = "Parsed test results do not match expected values";
-                    context.WriteError("✗ Test Results Parsing Test - FAILED: Parsed test results do not match expected values");
+                    Directory.SetCurrentDirectory(originalDir);
                 }
             }
             finally
             {
-                if (File.Exists(tempFile))
+                // Clean up temporary directory
+                if (Directory.Exists(testDir))
                 {
-                    File.Delete(tempFile);
+                    Directory.Delete(testDir, true);
                 }
             }
         }
@@ -284,7 +399,7 @@ sections:
         {
             test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
             test.ErrorMessage = $"Exception: {ex.Message}";
-            context.WriteError($"✗ Test Results Parsing Test - FAILED: {ex.Message}");
+            context.WriteError($"✗ Report Export Test - FAILED: {ex.Message}");
         }
 
         test.Duration = DateTime.UtcNow - startTime;
