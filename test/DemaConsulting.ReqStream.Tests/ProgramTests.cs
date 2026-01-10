@@ -309,4 +309,201 @@ sections:
             Console.SetOut(originalOut);
         }
     }
+
+    /// <summary>
+    /// Test enforcement with fully satisfied requirements succeeds.
+    /// </summary>
+    [TestMethod]
+    public void Run_WithEnforcementAndFullySatisfiedRequirements_Succeeds()
+    {
+        // Create a test requirements file
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, @"
+sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Test Requirement
+        tests:
+          - TestMethod1
+");
+
+        // Create a test TRX file with passing test using TestResults library
+        var testResults = new DemaConsulting.TestResults.TestResults { Name = "TestRun" };
+        testResults.Results.Add(new DemaConsulting.TestResults.TestResult
+        {
+            Name = "TestMethod1",
+            ClassName = "TestClass",
+            CodeBase = "Tests.dll",
+            Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+
+        var trxFile = Path.Combine(_testDirectory, "tests.trx");
+        File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
+
+        // Save current directory and change to test directory
+        var originalDir = Directory.GetCurrentDirectory();
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory);
+
+            using var context = Context.Create([
+                "--requirements", "*.yaml",
+                "--tests", "*.trx",
+                "--enforce"
+            ]);
+            Program.Run(context);
+
+            Assert.AreEqual(0, context.ExitCode);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+    }
+
+    /// <summary>
+    /// Test enforcement with unsatisfied requirements fails.
+    /// </summary>
+    [TestMethod]
+    public void Run_WithEnforcementAndUnsatisfiedRequirements_Fails()
+    {
+        // Create a test requirements file with one tested and one untested requirement
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, @"
+sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Tested Requirement
+        tests:
+          - TestMethod1
+      - id: REQ-002
+        title: Untested Requirement
+");
+
+        // Create a test TRX file with passing test using TestResults library
+        var testResults = new DemaConsulting.TestResults.TestResults { Name = "TestRun" };
+        testResults.Results.Add(new DemaConsulting.TestResults.TestResult
+        {
+            Name = "TestMethod1",
+            ClassName = "TestClass",
+            CodeBase = "Tests.dll",
+            Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+
+        var trxFile = Path.Combine(_testDirectory, "tests.trx");
+        File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
+
+        // Save current directory and change to test directory
+        var originalDir = Directory.GetCurrentDirectory();
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory);
+
+            using var context = Context.Create([
+                "--requirements", "*.yaml",
+                "--tests", "*.trx",
+                "--enforce"
+            ]);
+            Program.Run(context);
+
+            Assert.AreEqual(1, context.ExitCode);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+    }
+
+    /// <summary>
+    /// Test enforcement without test files fails.
+    /// </summary>
+    [TestMethod]
+    public void Run_WithEnforcementAndNoTests_Fails()
+    {
+        // Create a test requirements file
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, @"
+sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Test Requirement
+");
+
+        // Save current directory and change to test directory
+        var originalDir = Directory.GetCurrentDirectory();
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory);
+
+            using var context = Context.Create([
+                "--requirements", "*.yaml",
+                "--enforce"
+            ]);
+            Program.Run(context);
+
+            Assert.AreEqual(1, context.ExitCode);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+    }
+
+    /// <summary>
+    /// Test enforcement with failed tests fails.
+    /// </summary>
+    [TestMethod]
+    public void Run_WithEnforcementAndFailedTests_Fails()
+    {
+        // Create a test requirements file
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, @"
+sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Test Requirement
+        tests:
+          - TestMethod1
+");
+
+        // Create a test TRX file with failing test using TestResults library
+        var testResults = new DemaConsulting.TestResults.TestResults { Name = "TestRun" };
+        testResults.Results.Add(new DemaConsulting.TestResults.TestResult
+        {
+            Name = "TestMethod1",
+            ClassName = "TestClass",
+            CodeBase = "Tests.dll",
+            Outcome = DemaConsulting.TestResults.TestOutcome.Failed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+
+        var trxFile = Path.Combine(_testDirectory, "tests.trx");
+        File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
+
+        // Save current directory and change to test directory
+        var originalDir = Directory.GetCurrentDirectory();
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory);
+
+            using var context = Context.Create([
+                "--requirements", "*.yaml",
+                "--tests", "*.trx",
+                "--enforce"
+            ]);
+            Program.Run(context);
+
+            Assert.AreEqual(1, context.ExitCode);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+    }
 }

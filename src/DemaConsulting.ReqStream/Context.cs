@@ -59,6 +59,11 @@ public sealed class Context : IDisposable
     public bool Validate { get; private init; }
 
     /// <summary>
+    ///     Gets a value indicating whether the enforce flag was specified.
+    /// </summary>
+    public bool Enforce { get; private init; }
+
+    /// <summary>
     ///     Gets the list of requirements files found from the --requirements glob pattern.
     /// </summary>
     public List<string> RequirementsFiles { get; private init; } = [];
@@ -113,6 +118,7 @@ public sealed class Context : IDisposable
         var help = false;
         var silent = false;
         var validate = false;
+        var enforce = false;
 
         // Initialize collection variables
         var requirementsFiles = new List<string>();
@@ -151,6 +157,10 @@ public sealed class Context : IDisposable
 
                 case "--validate":
                     validate = true;
+                    break;
+
+                case "--enforce":
+                    enforce = true;
                     break;
 
                 case "--log":
@@ -245,6 +255,7 @@ public sealed class Context : IDisposable
             Help = help,
             Silent = silent,
             Validate = validate,
+            Enforce = enforce,
             RequirementsFiles = requirementsFiles,
             TestFiles = testFiles,
             RequirementsReport = requirementsReport,

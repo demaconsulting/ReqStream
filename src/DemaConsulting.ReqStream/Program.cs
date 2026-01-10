@@ -142,6 +142,7 @@ internal static class Program
         Console.WriteLine("  --tests <pattern>          Test result files glob pattern (TRX or JUnit)");
         Console.WriteLine("  --matrix <file>            Export trace matrix to markdown file");
         Console.WriteLine("  --matrix-depth <depth>     Markdown header depth for trace matrix (default: 1)");
+        Console.WriteLine("  --enforce                  Fail if requirements are not fully tested");
     }
 
     /// <summary>
@@ -171,10 +172,11 @@ internal static class Program
         }
 
         // Create trace matrix if test files are specified
+        TraceMatrix? traceMatrix = null;
         if (context.TestFiles.Count > 0)
         {
             context.WriteLine($"Processing {context.TestFiles.Count} test result file(s)...");
-            var traceMatrix = new TraceMatrix(requirements, context.TestFiles.ToArray());
+            traceMatrix = new TraceMatrix(requirements, context.TestFiles.ToArray());
             context.WriteLine("Trace matrix created successfully.");
 
             // Export trace matrix if requested
@@ -183,6 +185,23 @@ internal static class Program
                 context.WriteLine($"Exporting trace matrix to {context.Matrix}...");
                 traceMatrix.Export(context.Matrix, context.MatrixDepth);
                 context.WriteLine("Trace matrix report generated successfully.");
+            }
+        }
+
+        // Enforce requirements coverage if requested
+        if (context.Enforce)
+        {
+            if (traceMatrix != null)
+            {
+                var (satisfied, total) = traceMatrix.CalculateSatisfiedRequirements();
+                if (satisfied < total)
+                {
+                    context.WriteError($"Error: Only {satisfied} of {total} requirements are satisfied with tests.");
+                }
+            }
+            else
+            {
+                context.WriteError("Error: Cannot enforce requirements without test results. Use --tests to specify test result files.");
             }
         }
     }

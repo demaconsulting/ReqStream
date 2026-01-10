@@ -132,6 +132,16 @@ public class TraceMatrix
     ///     Calculates how many requirements are satisfied.
     ///     A requirement is satisfied if it has at least one test and all tests have passed.
     /// </summary>
+    /// <returns>A tuple of (satisfied count, total count).</returns>
+    public (int satisfied, int total) CalculateSatisfiedRequirements()
+    {
+        return CalculateSatisfiedRequirements(_requirements);
+    }
+
+    /// <summary>
+    ///     Calculates how many requirements are satisfied.
+    ///     A requirement is satisfied if it has at least one test and all tests have passed.
+    /// </summary>
     /// <param name="section">The section to analyze.</param>
     /// <returns>A tuple of (satisfied count, total count).</returns>
     private (int satisfied, int total) CalculateSatisfiedRequirements(Section section)
