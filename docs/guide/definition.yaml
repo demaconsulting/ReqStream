@@ -3,9 +3,19 @@ resource-path:
   - docs/guide
   - docs/template
 input-files:
-  - docs/guide/title.txt
   - docs/guide/guide.md
 template: guide_template.html
 table-of-contents: true
 number-sections: true
----
+metadata:
+  title: ReqStream User Guide
+  subtitle: A .NET Command-Line Tool for Requirements Management
+  lang: en-US
+  keywords:
+    - ReqStream
+    - Requirements Management
+    - .NET
+    - YAML
+    - Command-Line Tool
+    - Documentation
+
