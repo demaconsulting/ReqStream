@@ -8,4 +8,3 @@ input-files:
 template: guide_template.html
 table-of-contents: true
 number-sections: true
-
