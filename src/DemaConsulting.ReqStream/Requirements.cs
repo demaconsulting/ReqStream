@@ -322,9 +322,6 @@ public class Requirements : Section
     /// <summary>
     ///     Internal class for deserializing the YAML document structure.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "Sonar analyzer false positives for deserializer DTOs")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S3459:Unassigned members should be removed", Justification = "Properties are set by YAML deserializer")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S1144:Unused private types or members should be removed", Justification = "Setters are used by YAML deserializer")]
     private sealed class YamlDocument
     {
         /// <summary>
@@ -346,9 +343,6 @@ public class Requirements : Section
     /// <summary>
     ///     Internal class for deserializing a YAML section.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "Sonar analyzer false positives for deserializer DTOs")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S3459:Unassigned members should be removed", Justification = "Properties are set by YAML deserializer")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S1144:Unused private types or members should be removed", Justification = "Setters are used by YAML deserializer")]
     private sealed class YamlSection
     {
         /// <summary>
@@ -370,9 +364,6 @@ public class Requirements : Section
     /// <summary>
     ///     Internal class for deserializing a YAML requirement.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "Sonar analyzer false positives for deserializer DTOs")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S3459:Unassigned members should be removed", Justification = "Properties are set by YAML deserializer")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S1144:Unused private types or members should be removed", Justification = "Setters are used by YAML deserializer")]
     private sealed class YamlRequirement
     {
         /// <summary>
@@ -399,9 +390,6 @@ public class Requirements : Section
     /// <summary>
     ///     Internal class for deserializing a YAML test mapping.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "Sonar analyzer false positives for deserializer DTOs")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S3459:Unassigned members should be removed", Justification = "Properties are set by YAML deserializer")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S1144:Unused private types or members should be removed", Justification = "Setters are used by YAML deserializer")]
     private sealed class YamlMapping
     {
         /// <summary>
