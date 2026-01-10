@@ -387,7 +387,7 @@ public class TraceMatrix
             {
                 if (!testToRequirements.TryGetValue(testName, out var requirementIds))
                 {
-                    requirementIds = new List<string>();
+                    requirementIds = [];
                     testToRequirements[testName] = requirementIds;
                 }
                 requirementIds.Add(requirement.Id);
