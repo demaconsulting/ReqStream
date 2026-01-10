@@ -121,9 +121,11 @@ public sealed class Context : IDisposable
         string? logFile = null;
 
         // Parse command-line arguments
-        for (int i = 0; i < args.Length; i++)
+        int i = 0;
+        while (i < args.Length)
         {
             var arg = args[i];
+            i++; // Increment at start, will be incremented again for arguments that consume next value
 
             switch (arg)
             {
@@ -147,62 +149,62 @@ public sealed class Context : IDisposable
                     break;
 
                 case "--log":
-                    if (i + 1 >= args.Length)
+                    if (i >= args.Length)
                     {
                         throw new ArgumentException($"{arg} requires a filename argument", nameof(args));
                     }
-                    logFile = args[++i];
+                    logFile = args[i++];
                     break;
 
                 case "--requirements":
-                    if (i + 1 >= args.Length)
+                    if (i >= args.Length)
                     {
                         throw new ArgumentException($"{arg} requires a pattern argument", nameof(args));
                     }
-                    requirementsFiles.AddRange(ExpandGlobPattern(args[++i]));
+                    requirementsFiles.AddRange(ExpandGlobPattern(args[i++]));
                     break;
 
                 case "--tests":
-                    if (i + 1 >= args.Length)
+                    if (i >= args.Length)
                     {
                         throw new ArgumentException($"{arg} requires a pattern argument", nameof(args));
                     }
-                    testFiles.AddRange(ExpandGlobPattern(args[++i]));
+                    testFiles.AddRange(ExpandGlobPattern(args[i++]));
                     break;
 
                 case "--report":
-                    if (i + 1 >= args.Length)
+                    if (i >= args.Length)
                     {
                         throw new ArgumentException($"{arg} requires a filename argument", nameof(args));
                     }
-                    requirementsReport = args[++i];
+                    requirementsReport = args[i++];
                     break;
 
                 case "--report-depth":
-                    if (i + 1 >= args.Length)
+                    if (i >= args.Length)
                     {
                         throw new ArgumentException($"{arg} requires a depth argument", nameof(args));
                     }
-                    if (!int.TryParse(args[++i], out reportDepth) || reportDepth < 1)
+                    if (!int.TryParse(args[i++], out reportDepth) || reportDepth < 1)
                     {
                         throw new ArgumentException($"{arg} requires a positive integer", nameof(args));
                     }
                     break;
 
                 case "--matrix":
-                    if (i + 1 >= args.Length)
+                    if (i >= args.Length)
                     {
                         throw new ArgumentException($"{arg} requires a filename argument", nameof(args));
                     }
-                    matrix = args[++i];
+                    matrix = args[i++];
                     break;
 
                 case "--matrix-depth":
-                    if (i + 1 >= args.Length)
+                    if (i >= args.Length)
                     {
                         throw new ArgumentException($"{arg} requires a depth argument", nameof(args));
                     }
-                    if (!int.TryParse(args[++i], out matrixDepth) || matrixDepth < 1)
+                    if (!int.TryParse(args[i++], out matrixDepth) || matrixDepth < 1)
                     {
                         throw new ArgumentException($"{arg} requires a positive integer", nameof(args));
                     }
