@@ -137,7 +137,7 @@ sections:
               - "TraceMatrix_WithSourceSpecificTests_MatchesPartialFilename"
 
           - id: "TEST-008"
-            title: "The tool shall maintain backward compatibility with plain test names that aggregate from all sources."
+            title: "The tool shall support plain test names that aggregate from all sources."
             tests:
               - "TraceMatrix_WithPlainTestNames_MatchesAllSources"
 
