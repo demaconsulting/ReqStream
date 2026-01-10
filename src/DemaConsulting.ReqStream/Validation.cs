@@ -83,7 +83,7 @@ public static class Validation
                       ?? assembly.GetName().Version?.ToString()
                       ?? "Unknown";
 
-        context.WriteLine("# DEMAConsulting.ReqStream");
+        context.WriteLine("# DEMA Consulting ReqStream");
         context.WriteLine("");
         context.WriteLine("| Information         | Value                                              |");
         context.WriteLine("| :------------------ | :------------------------------------------------- |");
