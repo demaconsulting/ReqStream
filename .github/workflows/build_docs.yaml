@@ -32,10 +32,17 @@ jobs:
         run: dotnet tool restore
 
       - name: Generate HTML with Pandoc
-        run: dotnet pandoc --defaults docs/guide/definition.yaml --filter mermaid-filter.cmd --output docs/guide/guide.html
+        run: >
+          dotnet pandoc
+          --defaults docs/guide/definition.yaml
+          --filter mermaid-filter.cmd
+          --output docs/guide/guide.html
 
       - name: Generate PDF with Weasyprint
-        run: dotnet weasyprint docs/guide/guide.html docs/guide/guide.pdf
+        run: >
+          dotnet weasyprint
+          docs/guide/guide.html
+          docs/guide/guide.pdf
 
       - name: Upload documentation
         uses: actions/upload-artifact@v6
