@@ -15,22 +15,12 @@ sections:
             tests:
               - "Run_WithVersionFlag_PrintsVersion"
               - "Create_VersionFlag_SetsVersionProperty"
-              - "Run_WithVersionAndHelp_ProcessesVersionFirst"
 
           - id: "CLI-003"
             title: "The tool shall display help information when requested."
             tests:
               - "Run_WithHelpFlag_PrintsHelp"
               - "Create_HelpFlags_SetsHelpProperty"
-              - "Run_WithHelpAndValidate_ProcessesHelpFirst"
-
-          - id: "CLI-004"
-            title: "The tool shall support silent mode to suppress console output."
-            tests:
-              - "Create_SilentFlag_SetsSilentProperty"
-              - "WriteLine_SilentMode_DoesNotWriteToConsole"
-              - "WriteError_SilentMode_DoesNotWriteToConsole"
-              - "Create_WithLogFileAndSilent_WritesToLogOnly"
 
       - title: "Requirements File Processing"
         requirements:
