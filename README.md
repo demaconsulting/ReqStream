@@ -98,6 +98,7 @@ Options:
   --tests <pattern>          Test result files glob pattern (TRX or JUnit)
   --matrix <file>            Export trace matrix to markdown file
   --matrix-depth <depth>     Markdown header depth for trace matrix (default: 1)
+  --enforce                  Fail if requirements are not fully tested
 ```
 
 ## YAML Format
@@ -200,6 +201,57 @@ requirements:
 - Tests without source specifiers aggregate results from all test result files
 - File part matching is case-insensitive and supports partial filename matching
 - Both plain and source-specific test names can be mixed in the same requirement
+
+## Requirements Enforcement
+
+ReqStream can enforce that all requirements have adequate test coverage, making it ideal for use in CI/CD pipelines
+to ensure quality gates are met.
+
+### Enforcement Mode
+
+Use the `--enforce` flag to fail the build if any requirements are not fully satisfied with tests:
+
+```bash
+reqstream --requirements "**/*.yaml" --tests "**/*.trx" --enforce
+```
+
+When enforcement mode is enabled:
+
+- All requirements must have at least one test mapped (either directly or through child requirements)
+- All mapped tests must be present in the test results
+- All mapped tests must pass
+- If any requirement is not satisfied, an error is reported and the exit code is non-zero
+
+### CI/CD Integration
+
+Enforcement mode is designed for CI/CD pipelines. The error message is printed after all reports are generated,
+allowing you to review the reports for failure analysis:
+
+```bash
+# GitHub Actions example
+- name: Validate Requirements Coverage
+  run: |
+    dotnet reqstream \
+      --requirements "docs/**/*.yaml" \
+      --tests "test-results/**/*.trx" \
+      --matrix trace-matrix.md \
+      --enforce
+```
+
+If requirements are not fully satisfied, the tool will print:
+
+```text
+Error: Only X of Y requirements are satisfied with tests.
+```
+
+And exit with code 1, failing the build.
+
+### Best Practices
+
+- Use `--enforce` in CI/CD to prevent merging code that reduces requirements coverage
+- Generate the trace matrix (`--matrix`) alongside enforcement to review coverage details
+- Start without enforcement initially, then enable it once baseline coverage is established
+- Use transitive coverage through child requirements for high-level requirements that don't have direct tests
 
 ## Development
 

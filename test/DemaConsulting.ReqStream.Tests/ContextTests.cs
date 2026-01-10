@@ -54,7 +54,7 @@ public class ContextTests
     /// Test creating a context with no arguments.
     /// </summary>
     [TestMethod]
-    public void Create_NoArguments_ReturnsDefaultContext()
+    public void Context_Create_NoArguments_ReturnsDefaultContext()
     {
         using var context = Context.Create([]);
 
@@ -75,7 +75,7 @@ public class ContextTests
     /// Test creating a context with version flag.
     /// </summary>
     [TestMethod]
-    public void Create_VersionFlag_SetsVersionProperty()
+    public void Context_Create_VersionFlag_SetsVersionProperty()
     {
         using var context1 = Context.Create(["-v"]);
         Assert.IsTrue(context1.Version);
@@ -90,7 +90,7 @@ public class ContextTests
     /// Test creating a context with help flags.
     /// </summary>
     [TestMethod]
-    public void Create_HelpFlags_SetsHelpProperty()
+    public void Context_Create_HelpFlags_SetsHelpProperty()
     {
         using var context1 = Context.Create(["-?"]);
         Assert.IsTrue(context1.Help);
@@ -109,7 +109,7 @@ public class ContextTests
     /// Test creating a context with silent flag.
     /// </summary>
     [TestMethod]
-    public void Create_SilentFlag_SetsSilentProperty()
+    public void Context_Create_SilentFlag_SetsSilentProperty()
     {
         using var context = Context.Create(["--silent"]);
 
@@ -121,7 +121,7 @@ public class ContextTests
     /// Test creating a context with validate flag.
     /// </summary>
     [TestMethod]
-    public void Create_ValidateFlag_SetsValidateProperty()
+    public void Context_Create_ValidateFlag_SetsValidateProperty()
     {
         using var context = Context.Create(["--validate"]);
 
@@ -130,10 +130,22 @@ public class ContextTests
     }
 
     /// <summary>
+    /// Test creating a context with enforce flag.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_EnforceFlag_SetsEnforceProperty()
+    {
+        using var context = Context.Create(["--enforce"]);
+
+        Assert.IsTrue(context.Enforce);
+        Assert.AreEqual(0, context.ExitCode);
+    }
+
+    /// <summary>
     /// Test creating a context with report depth.
     /// </summary>
     [TestMethod]
-    public void Create_ReportDepth_SetsReportDepthProperty()
+    public void Context_Create_ReportDepth_SetsReportDepthProperty()
     {
         using var context = Context.Create(["--report-depth", "3"]);
 
@@ -145,7 +157,7 @@ public class ContextTests
     /// Test creating a context with matrix depth.
     /// </summary>
     [TestMethod]
-    public void Create_MatrixDepth_SetsMatrixDepthProperty()
+    public void Context_Create_MatrixDepth_SetsMatrixDepthProperty()
     {
         using var context = Context.Create(["--matrix-depth", "2"]);
 
@@ -157,7 +169,7 @@ public class ContextTests
     /// Test creating a context with report file.
     /// </summary>
     [TestMethod]
-    public void Create_ReportFile_SetsReportProperty()
+    public void Context_Create_ReportFile_SetsReportProperty()
     {
         using var context = Context.Create(["--report", "report.md"]);
 
@@ -169,7 +181,7 @@ public class ContextTests
     /// Test creating a context with matrix file.
     /// </summary>
     [TestMethod]
-    public void Create_MatrixFile_SetsMatrixProperty()
+    public void Context_Create_MatrixFile_SetsMatrixProperty()
     {
         using var context = Context.Create(["--matrix", "matrix.md"]);
 
@@ -181,7 +193,7 @@ public class ContextTests
     /// Test creating a context with unsupported argument.
     /// </summary>
     [TestMethod]
-    public void Create_UnsupportedArgument_ThrowsException()
+    public void Context_Create_UnsupportedArgument_ThrowsException()
     {
         try
         {
@@ -198,7 +210,7 @@ public class ContextTests
     /// Test creating a context with missing log filename.
     /// </summary>
     [TestMethod]
-    public void Create_MissingLogFilename_ThrowsException()
+    public void Context_Create_MissingLogFilename_ThrowsException()
     {
         try
         {
@@ -215,7 +227,7 @@ public class ContextTests
     /// Test creating a context with missing report filename.
     /// </summary>
     [TestMethod]
-    public void Create_MissingReportFilename_ThrowsException()
+    public void Context_Create_MissingReportFilename_ThrowsException()
     {
         try
         {
@@ -232,7 +244,7 @@ public class ContextTests
     /// Test creating a context with missing matrix filename.
     /// </summary>
     [TestMethod]
-    public void Create_MissingMatrixFilename_ThrowsException()
+    public void Context_Create_MissingMatrixFilename_ThrowsException()
     {
         try
         {
@@ -249,7 +261,7 @@ public class ContextTests
     /// Test creating a context with missing report depth.
     /// </summary>
     [TestMethod]
-    public void Create_MissingReportDepth_ThrowsException()
+    public void Context_Create_MissingReportDepth_ThrowsException()
     {
         try
         {
@@ -266,7 +278,7 @@ public class ContextTests
     /// Test creating a context with missing matrix depth.
     /// </summary>
     [TestMethod]
-    public void Create_MissingMatrixDepth_ThrowsException()
+    public void Context_Create_MissingMatrixDepth_ThrowsException()
     {
         try
         {
@@ -283,7 +295,7 @@ public class ContextTests
     /// Test creating a context with invalid report depth.
     /// </summary>
     [TestMethod]
-    public void Create_InvalidReportDepth_ThrowsException()
+    public void Context_Create_InvalidReportDepth_ThrowsException()
     {
         try
         {
@@ -320,7 +332,7 @@ public class ContextTests
     /// Test creating a context with invalid matrix depth.
     /// </summary>
     [TestMethod]
-    public void Create_InvalidMatrixDepth_ThrowsException()
+    public void Context_Create_InvalidMatrixDepth_ThrowsException()
     {
         try
         {
@@ -347,7 +359,7 @@ public class ContextTests
     /// Test WriteLine writes to console.
     /// </summary>
     [TestMethod]
-    public void WriteLine_NormalMode_WritesToConsole()
+    public void Context_WriteLine_NormalMode_WritesToConsole()
     {
         var originalOut = Console.Out;
         var output = new StringWriter();
@@ -370,7 +382,7 @@ public class ContextTests
     /// Test WriteLine in silent mode doesn't write to console.
     /// </summary>
     [TestMethod]
-    public void WriteLine_SilentMode_DoesNotWriteToConsole()
+    public void Context_WriteLine_SilentMode_DoesNotWriteToConsole()
     {
         var originalOut = Console.Out;
         var output = new StringWriter();
@@ -393,7 +405,7 @@ public class ContextTests
     /// Test WriteError writes to console.
     /// </summary>
     [TestMethod]
-    public void WriteError_NormalMode_WritesToConsole()
+    public void Context_WriteError_NormalMode_WritesToConsole()
     {
         var originalOut = Console.Out;
         var output = new StringWriter();
@@ -417,7 +429,7 @@ public class ContextTests
     /// Test WriteError in silent mode doesn't write to console.
     /// </summary>
     [TestMethod]
-    public void WriteError_SilentMode_DoesNotWriteToConsole()
+    public void Context_WriteError_SilentMode_DoesNotWriteToConsole()
     {
         var originalOut = Console.Out;
         var output = new StringWriter();
@@ -441,7 +453,7 @@ public class ContextTests
     /// Test log file creation and writing.
     /// </summary>
     [TestMethod]
-    public void Create_WithLogFile_WritesToLogFile()
+    public void Context_Create_WithLogFile_WritesToLogFile()
     {
         var logPath = Path.Combine(_testDirectory, "test.log");
 
@@ -461,7 +473,7 @@ public class ContextTests
     /// Test log file with silent mode still writes to log.
     /// </summary>
     [TestMethod]
-    public void Create_WithLogFileAndSilent_WritesToLogOnly()
+    public void Context_Create_WithLogFileAndSilent_WritesToLogOnly()
     {
         var originalOut = Console.Out;
         var output = new StringWriter();
@@ -494,7 +506,7 @@ public class ContextTests
     /// Test requirements glob pattern expansion.
     /// </summary>
     [TestMethod]
-    public void Create_WithRequirementsPattern_ExpandsGlobPattern()
+    public void Context_Create_WithRequirementsPattern_ExpandsGlobPattern()
     {
         // Create test files
         var file1 = Path.Combine(_testDirectory, "req1.yaml");
@@ -525,7 +537,7 @@ public class ContextTests
     /// Test tests glob pattern expansion.
     /// </summary>
     [TestMethod]
-    public void Create_WithTestsPattern_ExpandsGlobPattern()
+    public void Context_Create_WithTestsPattern_ExpandsGlobPattern()
     {
         // Create test files
         var file1 = Path.Combine(_testDirectory, "test1.trx");
@@ -556,7 +568,7 @@ public class ContextTests
     /// Test missing requirements pattern argument.
     /// </summary>
     [TestMethod]
-    public void Create_MissingRequirementsPattern_ThrowsException()
+    public void Context_Create_MissingRequirementsPattern_ThrowsException()
     {
         try
         {
@@ -573,7 +585,7 @@ public class ContextTests
     /// Test missing tests pattern argument.
     /// </summary>
     [TestMethod]
-    public void Create_MissingTestsPattern_ThrowsException()
+    public void Context_Create_MissingTestsPattern_ThrowsException()
     {
         try
         {
@@ -590,7 +602,7 @@ public class ContextTests
     /// Test combining multiple arguments.
     /// </summary>
     [TestMethod]
-    public void Create_MultipleArguments_ParsesAllCorrectly()
+    public void Context_Create_MultipleArguments_ParsesAllCorrectly()
     {
         using var context = Context.Create(
             ["--version", "--help", "--silent", "--validate", "--report", "out.md", "--report-depth", "2"]);
@@ -608,7 +620,7 @@ public class ContextTests
     /// Test dispose closes log file.
     /// </summary>
     [TestMethod]
-    public void Dispose_WithLogFile_ClosesLogFile()
+    public void Context_Dispose_WithLogFile_ClosesLogFile()
     {
         var logPath = Path.Combine(_testDirectory, "test.log");
 
@@ -625,7 +637,7 @@ public class ContextTests
     /// Test invalid log file path.
     /// </summary>
     [TestMethod]
-    public void Create_InvalidLogPath_ThrowsException()
+    public void Context_Create_InvalidLogPath_ThrowsException()
     {
         var invalidPath = Path.Combine(_testDirectory, "nonexistent", "test.log");
 

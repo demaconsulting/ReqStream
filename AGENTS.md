@@ -55,8 +55,11 @@ ReqStream/
 ## Testing Guidelines
 
 - **Test Framework**: MSTest v4 (Microsoft.VisualStudio.TestTools.UnitTesting)
-- **Test File Naming**: `[Component]Tests.cs` (e.g., `BasicTests.cs`)
-- **Test Method Naming**: `TestMethod_Scenario_ExpectedBehavior` format
+- **Test File Naming**: `[Component]Tests.cs` (e.g., `ContextTests.cs`, `ProgramTests.cs`)
+- **Test Method Naming**: `ClassName_MethodUnderTest_Scenario_ExpectedBehavior` format
+  - Example: `Context_Create_NoArguments_ReturnsDefaultContext` clearly indicates testing the `Context.Create` method
+  - Example: `Context_WriteLine_NormalMode_WritesToConsole` clearly indicates testing the `Context.WriteLine` method
+  - This pattern makes test intent clear for requirements traceability
 - **MSTest v4 APIs**: Use modern assertions:
   - `Assert.HasCount(collection, expectedCount)` instead of `Assert.AreEqual(count, collection.Count)`
   - `Assert.IsEmpty(collection)` instead of `Assert.AreEqual(0, collection.Count)`
