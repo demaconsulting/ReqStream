@@ -1,0 +1,44 @@
+---
+name: Build Documentation
+
+on:
+  workflow_call:
+
+jobs:
+  build-docs:
+    name: Build Documentation
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.x
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Restore dotnet tools
+        run: dotnet tool restore
+
+      - name: Generate HTML with Pandoc
+        run: dotnet pandoc --defaults docs/guide/definition.yaml --output docs/guide/guide.html
+
+      - name: Generate PDF with Weasyprint
+        run: dotnet weasyprint docs/guide/guide.html docs/guide/guide.pdf
+
+      - name: Upload documentation
+        uses: actions/upload-artifact@v6
+        with:
+          name: documentation
+          path: docs/guide/guide.pdf

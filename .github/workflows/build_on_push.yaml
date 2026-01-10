@@ -60,3 +60,10 @@ jobs:
       version: 0.0.0-run.${{ github.run_number }}
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  build-docs:
+    name: Build Documentation
+    needs: quality-checks
+    permissions:
+      contents: read
+    uses: ./.github/workflows/build_docs.yaml
