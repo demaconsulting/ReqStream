@@ -436,7 +436,8 @@ ReqStream supports the following command-line options:
 | `-v`, `--version` | Display version information |
 | `-?`, `-h`, `--help` | Display help message |
 | `--silent` | Suppress console output (useful in CI/CD) |
-| `--validate` | Run self-validation (placeholder for future use) |
+| `--validate` | Run self-validation and display test results |
+| `--results <file>` | Write validation test results to a file (TRX or JUnit format, use .trx or .xml extension) |
 | `--log <file>` | Write output to specified log file |
 | `--requirements <pattern>` | Glob pattern for requirements YAML files |
 | `--report <file>` | Export requirements to markdown file |
@@ -447,6 +448,28 @@ ReqStream supports the following command-line options:
 | `--enforce` | Fail if requirements are not fully tested |
 
 ### Examples
+
+#### Running Self-Validation
+
+Run self-validation to verify core functionality:
+
+```bash
+reqstream --validate
+```
+
+Run self-validation and save results to a TRX file:
+
+```bash
+reqstream --validate --results validation-results.trx
+```
+
+Run self-validation and save results to a JUnit XML file:
+
+```bash
+reqstream --validate --results validation-results.xml
+```
+
+#### Requirements Processing
 
 **Process requirements and create a report:**
 

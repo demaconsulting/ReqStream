@@ -105,16 +105,100 @@ public class ProgramTests
     }
 
     /// <summary>
-    /// Test Run with validate flag shows placeholder message.
+    /// Test running the program with validate flag.
     /// </summary>
     [TestMethod]
-    public void Program_Run_WithValidateFlag_ShowsPlaceholder()
+    public void Program_Run_WithValidateFlag_RunsValidation()
     {
-        using var context = Context.Create(["--validate"]);
-        Program.Run(context);
+        var logFile = Path.Combine(_testDirectory, "validation.log");
+        
+        // Run validation with silent and log flags
+        using (var context = Context.Create(["--validate", "--silent", "--log", logFile]))
+        {
+            Program.Run(context);
 
-        // Validate flag should not cause errors, just placeholder message
-        Assert.AreEqual(0, context.ExitCode);
+            // Validation should succeed with exit code 0
+            Assert.AreEqual(0, context.ExitCode);
+        }
+
+        // Check log file contains validation output (after context is disposed to flush log)
+        Assert.IsTrue(File.Exists(logFile), "Log file should exist");
+        var logContent = File.ReadAllText(logFile);
+        Assert.Contains("DEMA Consulting ReqStream", logContent);
+        Assert.Contains("ReqStream Version", logContent);
+        Assert.Contains("Requirements Processing Test - PASSED", logContent);
+        Assert.Contains("Trace Matrix Test - PASSED", logContent);
+        Assert.Contains("Report Export Test - PASSED", logContent);
+        Assert.Contains("Total Tests: 3", logContent);
+        Assert.Contains("Passed: 3", logContent);
+        Assert.Contains("Failed: 0", logContent);
+    }
+
+    /// <summary>
+    /// Test running the program with validate flag and results file.
+    /// </summary>
+    [TestMethod]
+    public void Program_Run_WithValidateAndResults_WritesResultsFile()
+    {
+        var logFile = Path.Combine(_testDirectory, "validation.log");
+        var resultsFile = Path.Combine(_testDirectory, "validation-results.trx");
+        
+        // Run validation with results file
+        using (var context = Context.Create(["--validate", "--silent", "--log", logFile, "--results", resultsFile]))
+        {
+            Program.Run(context);
+
+            // Validation should succeed with exit code 0
+            Assert.AreEqual(0, context.ExitCode);
+        }
+
+        // Check results file was created
+        Assert.IsTrue(File.Exists(resultsFile));
+
+        // Check results file is valid TRX
+        var trxContent = File.ReadAllText(resultsFile);
+        Assert.Contains("TestRun", trxContent);
+        Assert.Contains("RequirementsProcessing", trxContent);
+        Assert.Contains("TraceMatrix", trxContent);
+        Assert.Contains("ReportExport", trxContent);
+        Assert.Contains("outcome=\"Passed\"", trxContent);
+
+        // Check log confirms results were written
+        var logContent = File.ReadAllText(logFile);
+        Assert.Contains($"Results written to {resultsFile}", logContent);
+    }
+
+    /// <summary>
+    /// Test running the program with validate flag and JUnit results file.
+    /// </summary>
+    [TestMethod]
+    public void Program_Run_WithValidateAndJUnitResults_WritesJUnitFile()
+    {
+        var logFile = Path.Combine(_testDirectory, "validation.log");
+        var resultsFile = Path.Combine(_testDirectory, "validation-results.xml");
+        
+        // Run validation with JUnit results file
+        using (var context = Context.Create(["--validate", "--silent", "--log", logFile, "--results", resultsFile]))
+        {
+            Program.Run(context);
+
+            // Validation should succeed with exit code 0
+            Assert.AreEqual(0, context.ExitCode);
+        }
+
+        // Check results file was created
+        Assert.IsTrue(File.Exists(resultsFile));
+
+        // Check results file is valid JUnit XML
+        var xmlContent = File.ReadAllText(resultsFile);
+        Assert.Contains("<testsuite", xmlContent);
+        Assert.Contains("RequirementsProcessing", xmlContent);
+        Assert.Contains("TraceMatrix", xmlContent);
+        Assert.Contains("ReportExport", xmlContent);
+
+        // Check log confirms results were written
+        var logContent = File.ReadAllText(logFile);
+        Assert.Contains($"Results written to {resultsFile}", logContent);
     }
 
     /// <summary>

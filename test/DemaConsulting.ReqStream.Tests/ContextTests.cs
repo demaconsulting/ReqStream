@@ -130,6 +130,35 @@ public class ContextTests
     }
 
     /// <summary>
+    /// Test creating a context with results flag and filename.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_ResultsFlag_SetsResultsFileProperty()
+    {
+        using var context = Context.Create(["--results", "results.trx"]);
+
+        Assert.AreEqual("results.trx", context.ResultsFile);
+        Assert.AreEqual(0, context.ExitCode);
+    }
+
+    /// <summary>
+    /// Test creating a context with missing results filename.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_MissingResultsFilename_ThrowsException()
+    {
+        try
+        {
+            Context.Create(["--results"]);
+            Assert.Fail("Expected ArgumentException was not thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            Assert.Contains("--results requires a filename argument", ex.Message);
+        }
+    }
+
+    /// <summary>
     /// Test creating a context with enforce flag.
     /// </summary>
     [TestMethod]
