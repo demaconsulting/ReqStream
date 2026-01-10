@@ -108,12 +108,17 @@ public sealed class Context : IDisposable
     /// <exception cref="ArgumentException">Thrown when arguments are invalid.</exception>
     public static Context Create(string[] args)
     {
+        // Initialize flag variables
         var version = false;
         var help = false;
         var silent = false;
         var validate = false;
+
+        // Initialize collection variables
         var requirementsFiles = new List<string>();
         var testFiles = new List<string>();
+
+        // Initialize optional parameters
         string? requirementsReport = null;
         var reportDepth = 1;
         string? matrix = null;
@@ -121,9 +126,11 @@ public sealed class Context : IDisposable
         string? logFile = null;
 
         // Parse command-line arguments
-        for (int i = 0; i < args.Length; i++)
+        int i = 0;
+        while (i < args.Length)
         {
-            var arg = args[i];
+            // Get current argument and advance index
+            var arg = args[i++];
 
             switch (arg)
             {
@@ -147,65 +154,83 @@ public sealed class Context : IDisposable
                     break;
 
                 case "--log":
-                    if (i + 1 >= args.Length)
+                    // Ensure argument has a value
+                    if (i >= args.Length)
                     {
                         throw new ArgumentException($"{arg} requires a filename argument", nameof(args));
                     }
-                    logFile = args[++i];
+
+                    logFile = args[i++];
                     break;
 
                 case "--requirements":
-                    if (i + 1 >= args.Length)
+                    // Ensure argument has a value
+                    if (i >= args.Length)
                     {
                         throw new ArgumentException($"{arg} requires a pattern argument", nameof(args));
                     }
-                    requirementsFiles.AddRange(ExpandGlobPattern(args[++i]));
+
+                    requirementsFiles.AddRange(ExpandGlobPattern(args[i++]));
                     break;
 
                 case "--tests":
-                    if (i + 1 >= args.Length)
+                    // Ensure argument has a value
+                    if (i >= args.Length)
                     {
                         throw new ArgumentException($"{arg} requires a pattern argument", nameof(args));
                     }
-                    testFiles.AddRange(ExpandGlobPattern(args[++i]));
+
+                    testFiles.AddRange(ExpandGlobPattern(args[i++]));
                     break;
 
                 case "--report":
-                    if (i + 1 >= args.Length)
+                    // Ensure argument has a value
+                    if (i >= args.Length)
                     {
                         throw new ArgumentException($"{arg} requires a filename argument", nameof(args));
                     }
-                    requirementsReport = args[++i];
+
+                    requirementsReport = args[i++];
                     break;
 
                 case "--report-depth":
-                    if (i + 1 >= args.Length)
+                    // Ensure argument has a value
+                    if (i >= args.Length)
                     {
                         throw new ArgumentException($"{arg} requires a depth argument", nameof(args));
                     }
-                    if (!int.TryParse(args[++i], out reportDepth) || reportDepth < 1)
+
+                    // Parse and validate depth value
+                    if (!int.TryParse(args[i++], out reportDepth) || reportDepth < 1)
                     {
                         throw new ArgumentException($"{arg} requires a positive integer", nameof(args));
                     }
+
                     break;
 
                 case "--matrix":
-                    if (i + 1 >= args.Length)
+                    // Ensure argument has a value
+                    if (i >= args.Length)
                     {
                         throw new ArgumentException($"{arg} requires a filename argument", nameof(args));
                     }
-                    matrix = args[++i];
+
+                    matrix = args[i++];
                     break;
 
                 case "--matrix-depth":
-                    if (i + 1 >= args.Length)
+                    // Ensure argument has a value
+                    if (i >= args.Length)
                     {
                         throw new ArgumentException($"{arg} requires a depth argument", nameof(args));
                     }
-                    if (!int.TryParse(args[++i], out matrixDepth) || matrixDepth < 1)
+
+                    // Parse and validate depth value
+                    if (!int.TryParse(args[i++], out matrixDepth) || matrixDepth < 1)
                     {
                         throw new ArgumentException($"{arg} requires a positive integer", nameof(args));
                     }
+
                     break;
 
                 default:
@@ -251,12 +276,17 @@ public sealed class Context : IDisposable
     /// <returns>A list of matching file paths.</returns>
     private static List<string> ExpandGlobPattern(string pattern)
     {
+        // Create a matcher and add the glob pattern
         var matcher = new Matcher();
         matcher.AddInclude(pattern);
 
+        // Get the current directory for matching
         var currentDirectory = Directory.GetCurrentDirectory();
+
+        // Execute the matcher against the current directory
         var result = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(currentDirectory)));
 
+        // Return the full paths of matched files
         return result.Files.Select(f => Path.Combine(currentDirectory, f.Path)).ToList();
     }
 
@@ -282,6 +312,7 @@ public sealed class Context : IDisposable
     /// <param name="message">The error message to write.</param>
     public void WriteError(string message)
     {
+        // Mark that we have encountered errors
         _hasErrors = true;
 
         // Write to error console unless silent mode is enabled
@@ -302,6 +333,7 @@ public sealed class Context : IDisposable
     /// </summary>
     public void Dispose()
     {
+        // Close and dispose the log file writer if it exists
         _logWriter?.Dispose();
         _logWriter = null;
     }

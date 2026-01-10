@@ -196,24 +196,17 @@ public class Requirements : Section
                     throw new InvalidOperationException($"Mapping requirement ID cannot be blank in file: {fullPath}");
                 }
 
-                // Find the requirement by ID
-                if (_allRequirements.TryGetValue(mapping.Id, out var requirement))
+                // Find the requirement by ID and add tests if they exist
+                if (_allRequirements.TryGetValue(mapping.Id, out var requirement) && mapping.Tests != null)
                 {
-                    // Add the tests if they exist
-                    if (mapping.Tests != null)
+                    // Validate no test names are blank
+                    if (mapping.Tests.Any(string.IsNullOrWhiteSpace))
                     {
-                        // Validate each test name is not blank
-                        foreach (var test in mapping.Tests)
-                        {
-                            if (string.IsNullOrWhiteSpace(test))
-                            {
-                                throw new InvalidOperationException(
-                                    $"Test name cannot be blank in mapping for requirement '{mapping.Id}' in file: {fullPath}");
-                            }
-                        }
-
-                        requirement.Tests.AddRange(mapping.Tests);
+                        throw new InvalidOperationException(
+                            $"Test name cannot be blank in mapping for requirement '{mapping.Id}' in file: {fullPath}");
                     }
+
+                    requirement.Tests.AddRange(mapping.Tests);
                 }
             }
         }
@@ -287,14 +280,11 @@ public class Requirements : Section
                 // Add any inline tests
                 if (req.Tests != null)
                 {
-                    // Validate each test name is not blank
-                    foreach (var test in req.Tests)
+                    // Validate no test names are blank
+                    if (req.Tests.Any(string.IsNullOrWhiteSpace))
                     {
-                        if (string.IsNullOrWhiteSpace(test))
-                        {
-                            throw new InvalidOperationException(
-                                $"Test name cannot be blank for requirement '{req.Id}' in file: {filePath}");
-                        }
+                        throw new InvalidOperationException(
+                            $"Test name cannot be blank for requirement '{req.Id}' in file: {filePath}");
                     }
 
                     requirement.Tests.AddRange(req.Tests);
@@ -332,7 +322,7 @@ public class Requirements : Section
     /// <summary>
     ///     Internal class for deserializing the YAML document structure.
     /// </summary>
-    private class YamlDocument
+    private sealed class YamlDocument
     {
         /// <summary>
         ///     Gets or sets the sections in the document.
@@ -353,7 +343,7 @@ public class Requirements : Section
     /// <summary>
     ///     Internal class for deserializing a YAML section.
     /// </summary>
-    private class YamlSection
+    private sealed class YamlSection
     {
         /// <summary>
         ///     Gets or sets the title of the section.
@@ -374,7 +364,7 @@ public class Requirements : Section
     /// <summary>
     ///     Internal class for deserializing a YAML requirement.
     /// </summary>
-    private class YamlRequirement
+    private sealed class YamlRequirement
     {
         /// <summary>
         ///     Gets or sets the requirement ID.
@@ -400,7 +390,7 @@ public class Requirements : Section
     /// <summary>
     ///     Internal class for deserializing a YAML test mapping.
     /// </summary>
-    private class YamlMapping
+    private sealed class YamlMapping
     {
         /// <summary>
         ///     Gets or sets the requirement ID for this mapping.
