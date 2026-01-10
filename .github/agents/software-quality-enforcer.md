@@ -90,10 +90,12 @@ Based on `.editorconfig` and project preferences:
 ### Test Requirements
 
 - **Test Framework**: MSTest (Microsoft.VisualStudio.TestTools.UnitTesting)
-- **Test File Naming**: `[Component]Tests.cs` (e.g., `BasicTests.cs`)
+- **Test File Naming**: `[Component]Tests.cs` (e.g., `ContextTests.cs`, `ProgramTests.cs`)
 - **Test Class Naming**: Descriptive names ending with `Tests`
-- **Test Method Naming**: `TestMethod_Scenario_ExpectedBehavior`
-  - Examples: `Parse_ValidYaml_ReturnsDocument()`, `Validate_MissingRequiredField_ThrowsException()`
+- **Test Method Naming**: `ClassName_MethodUnderTest_Scenario_ExpectedBehavior`
+  - Example: `Context_Create_NoArguments_ReturnsDefaultContext` clearly indicates testing the `Context.Create` method
+  - Example: `Program_Run_WithVersionFlag_PrintsVersion` clearly indicates testing the `Program.Run` method
+  - This pattern makes test intent clear for requirements traceability and linking
 - **All tests must pass** before merging
 - **No warnings allowed** in test builds
 

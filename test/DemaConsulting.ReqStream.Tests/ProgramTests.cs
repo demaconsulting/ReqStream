@@ -54,7 +54,7 @@ public class ProgramTests
     /// Test Run with version flag prints version information.
     /// </summary>
     [TestMethod]
-    public void Run_WithVersionFlag_PrintsVersion()
+    public void Program_Run_WithVersionFlag_PrintsVersion()
     {
         var originalOut = Console.Out;
         var output = new StringWriter();
@@ -81,7 +81,7 @@ public class ProgramTests
     /// Test Run with help flag prints help information.
     /// </summary>
     [TestMethod]
-    public void Run_WithHelpFlag_PrintsHelp()
+    public void Program_Run_WithHelpFlag_PrintsHelp()
     {
         var originalOut = Console.Out;
         var output = new StringWriter();
@@ -108,7 +108,7 @@ public class ProgramTests
     /// Test Run with validate flag shows placeholder message.
     /// </summary>
     [TestMethod]
-    public void Run_WithValidateFlag_ShowsPlaceholder()
+    public void Program_Run_WithValidateFlag_ShowsPlaceholder()
     {
         using var context = Context.Create(["--validate"]);
         Program.Run(context);
@@ -121,7 +121,7 @@ public class ProgramTests
     /// Test Run with no requirements files shows message.
     /// </summary>
     [TestMethod]
-    public void Run_WithNoRequirementsFiles_ShowsMessage()
+    public void Program_Run_WithNoRequirementsFiles_ShowsMessage()
     {
         using var context = Context.Create([]);
         Program.Run(context);
@@ -134,7 +134,7 @@ public class ProgramTests
     /// Test Run with requirements files processes them successfully.
     /// </summary>
     [TestMethod]
-    public void Run_WithRequirementsFiles_ProcessesSuccessfully()
+    public void Program_Run_WithRequirementsFiles_ProcessesSuccessfully()
     {
         // Create a test requirements file
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
@@ -167,7 +167,7 @@ sections:
     /// Test Run with requirements export generates report file.
     /// </summary>
     [TestMethod]
-    public void Run_WithRequirementsExport_GeneratesReport()
+    public void Program_Run_WithRequirementsExport_GeneratesReport()
     {
         // Create a test requirements file
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
@@ -207,7 +207,7 @@ sections:
     /// Test Run with trace matrix export generates matrix file.
     /// </summary>
     [TestMethod]
-    public void Run_WithTraceMatrixExport_GeneratesMatrix()
+    public void Program_Run_WithTraceMatrixExport_GeneratesMatrix()
     {
         // Create a test requirements file
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
@@ -262,7 +262,7 @@ sections:
     /// Test priority order: version takes precedence over help.
     /// </summary>
     [TestMethod]
-    public void Run_WithVersionAndHelp_ProcessesVersionFirst()
+    public void Program_Run_WithVersionAndHelp_ProcessesVersionFirst()
     {
         var originalOut = Console.Out;
         var output = new StringWriter();
@@ -289,7 +289,7 @@ sections:
     /// Test priority order: help takes precedence over validate.
     /// </summary>
     [TestMethod]
-    public void Run_WithHelpAndValidate_ProcessesHelpFirst()
+    public void Program_Run_WithHelpAndValidate_ProcessesHelpFirst()
     {
         var originalOut = Console.Out;
         var output = new StringWriter();
@@ -314,7 +314,7 @@ sections:
     /// Test enforcement with fully satisfied requirements succeeds.
     /// </summary>
     [TestMethod]
-    public void Run_WithEnforcementAndFullySatisfiedRequirements_Succeeds()
+    public void Program_Run_WithEnforcementAndFullySatisfiedRequirements_Succeeds()
     {
         // Create a test requirements file
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
@@ -367,7 +367,7 @@ sections:
     /// Test enforcement with unsatisfied requirements fails.
     /// </summary>
     [TestMethod]
-    public void Run_WithEnforcementAndUnsatisfiedRequirements_Fails()
+    public void Program_Run_WithEnforcementAndUnsatisfiedRequirements_Fails()
     {
         // Create a test requirements file with one tested and one untested requirement
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
@@ -422,7 +422,7 @@ sections:
     /// Test enforcement without test files fails.
     /// </summary>
     [TestMethod]
-    public void Run_WithEnforcementAndNoTests_Fails()
+    public void Program_Run_WithEnforcementAndNoTests_Fails()
     {
         // Create a test requirements file
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
@@ -458,7 +458,7 @@ sections:
     /// Test enforcement with failed tests fails.
     /// </summary>
     [TestMethod]
-    public void Run_WithEnforcementAndFailedTests_Fails()
+    public void Program_Run_WithEnforcementAndFailedTests_Fails()
     {
         // Create a test requirements file
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
