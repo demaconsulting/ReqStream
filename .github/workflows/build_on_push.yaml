@@ -63,7 +63,7 @@ jobs:
 
   build-docs:
     name: Build Documentation
-    needs: 
+    needs:
       - build-windows
       - build-linux
     permissions:
