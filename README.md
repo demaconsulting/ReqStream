@@ -91,6 +91,7 @@ Options:
   -?, -h, --help             Display this help message
   --silent                   Suppress console output
   --validate                 Run self-validation
+  --results <file>           Write validation results to file (TRX or JUnit format)
   --log <file>               Write output to log file
   --requirements <pattern>   Requirements files glob pattern
   --report <file>            Export requirements to markdown file
