@@ -197,7 +197,7 @@ requirements:
 **Key behaviors**:
 
 - Tests with source specifiers only match results from files containing the specified `filepart`
-- Tests without source specifiers aggregate results from all test result files (backward compatible)
+- Tests without source specifiers aggregate results from all test result files
 - File part matching is case-insensitive and supports partial filename matching
 - Both plain and source-specific test names can be mixed in the same requirement
 

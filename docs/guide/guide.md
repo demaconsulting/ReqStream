@@ -282,7 +282,7 @@ files.
 
 - Case-insensitive matching: `windows@Test` matches `test-results-WINDOWS-latest.trx`
 - Partial matching: `ubuntu@Test` matches `test-results-ubuntu-22.04-latest.trx`
-- Backward compatible: Tests without `filepart@` prefix work as before
+- Plain test names: Tests without `filepart@` prefix aggregate results from all test result files
 
 ### File Includes
 
@@ -727,8 +727,8 @@ requirements:
       - "ubuntu-latest@Test_PlatformFeature"   # Matches only from files containing "ubuntu-latest"
 ```
 
-File part matching is case-insensitive and supports partial matches. Tests without the `filepart@` prefix continue to
-aggregate results from all test result files (backward compatible).
+File part matching is case-insensitive and supports partial matches. Tests without the `filepart@` prefix aggregate
+results from all test result files.
 
 **Q: Can I mix plain and source-specific test names?**
 

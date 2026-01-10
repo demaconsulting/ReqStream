@@ -688,7 +688,7 @@ sections:
     }
 
     /// <summary>
-    ///     Test that plain test names still match all sources (backward compatibility).
+    ///     Test that plain test names match all sources.
     /// </summary>
     [TestMethod]
     public void TraceMatrix_WithPlainTestNames_MatchesAllSources()
@@ -736,7 +736,7 @@ sections:
         // Create TraceMatrix with both files
         var matrix = new TraceMatrix(requirements, windowsPath, linuxPath);
 
-        // Verify test is aggregated from both sources (backward compatibility)
+        // Verify test is aggregated from both sources
         var result = matrix.GetTestResult("Test_CrossPlatform");
         Assert.IsNotNull(result);
         Assert.AreEqual(2, result.Executed, "Should aggregate from both sources");
