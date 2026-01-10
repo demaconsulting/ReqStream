@@ -1,0 +1,109 @@
+---
+sections:
+  - title: "ReqStream Requirements"
+    sections:
+      - title: "Command-Line Interface"
+        requirements:
+          - id: "CLI-001"
+            title: "The tool shall provide a command-line interface."
+
+          - id: "CLI-002"
+            title: "The tool shall display version information when requested."
+
+          - id: "CLI-003"
+            title: "The tool shall display help information when requested."
+
+          - id: "CLI-004"
+            title: "The tool shall support silent mode to suppress console output."
+
+      - title: "Requirements File Processing"
+        requirements:
+          - id: "REQ-001"
+            title: "The tool shall process YAML requirements files."
+
+          - id: "REQ-002"
+            title: "The tool shall support glob patterns for requirements files."
+
+          - id: "REQ-003"
+            title: "The tool shall validate requirements file structure."
+
+          - id: "REQ-004"
+            title: "The tool shall support hierarchical sections and subsections."
+
+          - id: "REQ-005"
+            title: "The tool shall support file includes in requirements files."
+
+          - id: "REQ-006"
+            title: "The tool shall merge sections with the same hierarchy path."
+
+      - title: "Requirements Definition"
+        requirements:
+          - id: "REQ-007"
+            title: "The tool shall require each requirement to have a unique identifier."
+
+          - id: "REQ-008"
+            title: "The tool shall require each requirement to have a title."
+
+          - id: "REQ-009"
+            title: "The tool shall support parent-child relationships between requirements."
+
+          - id: "REQ-010"
+            title: "The tool shall support test mappings for requirements."
+
+      - title: "Test Integration"
+        requirements:
+          - id: "TEST-001"
+            title: "The tool shall support processing test result files."
+
+          - id: "TEST-002"
+            title: "The tool shall support TRX format test results."
+
+          - id: "TEST-003"
+            title: "The tool shall support JUnit format test results."
+
+          - id: "TEST-004"
+            title: "The tool shall support glob patterns for test result files."
+
+      - title: "Reporting"
+        requirements:
+          - id: "RPT-001"
+            title: "The tool shall export requirements to markdown format."
+
+          - id: "RPT-002"
+            title: "The tool shall support configurable markdown header depth for requirements reports."
+
+          - id: "RPT-003"
+            title: "The tool shall export trace matrices to markdown format."
+
+          - id: "RPT-004"
+            title: "The tool shall support configurable markdown header depth for trace matrices."
+
+      - title: "Logging"
+        requirements:
+          - id: "LOG-001"
+            title: "The tool shall support writing output to a log file."
+
+      - title: "Validation"
+        requirements:
+          - id: "VAL-001"
+            title: "The tool shall support self-validation mode."
+
+      - title: "Platform Support"
+        requirements:
+          - id: "PLT-001"
+            title: "The tool shall run on Windows operating systems."
+
+          - id: "PLT-002"
+            title: "The tool shall run on Linux operating systems."
+
+          - id: "PLT-003"
+            title: "The tool shall run on macOS operating systems."
+
+          - id: "PLT-004"
+            title: "The tool shall support .NET 8.0 runtime."
+
+          - id: "PLT-005"
+            title: "The tool shall support .NET 9.0 runtime."
+
+          - id: "PLT-006"
+            title: "The tool shall support .NET 10.0 runtime."

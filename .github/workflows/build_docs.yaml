@@ -31,6 +31,18 @@ jobs:
       - name: Restore dotnet tools
         run: dotnet tool restore
 
+      - name: Generate Requirements Report
+        run: >
+          dotnet reqstream
+          --requirements requirements.yaml
+          --report docs/requirements/requirements.md
+
+      - name: Generate Trace Matrix
+        run: >
+          dotnet reqstream
+          --requirements requirements.yaml
+          --matrix docs/tracematrix/tracematrix.md
+
       - name: Generate HTML with Pandoc
         run: >
           dotnet pandoc
@@ -42,10 +54,34 @@ jobs:
         run: >
           dotnet weasyprint
           docs/guide/guide.html
-          docs/guide/guide.pdf
+          docs/guide.pdf
+
+      - name: Generate Requirements HTML with Pandoc
+        run: >
+          dotnet pandoc
+          --defaults docs/requirements/definition.yaml
+          --output docs/requirements/requirements.html
+
+      - name: Generate Requirements PDF with Weasyprint
+        run: >
+          dotnet weasyprint
+          docs/requirements/requirements.html
+          docs/requirements.pdf
+
+      - name: Generate Trace Matrix HTML with Pandoc
+        run: >
+          dotnet pandoc
+          --defaults docs/tracematrix/definition.yaml
+          --output docs/tracematrix/tracematrix.html
+
+      - name: Generate Trace Matrix PDF with Weasyprint
+        run: >
+          dotnet weasyprint
+          docs/tracematrix/tracematrix.html
+          docs/tracematrix.pdf
 
       - name: Upload documentation
         uses: actions/upload-artifact@v6
         with:
           name: documentation
-          path: docs/guide/guide.pdf
+          path: docs/*.pdf
