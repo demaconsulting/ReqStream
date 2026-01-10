@@ -113,3 +113,10 @@ _ReSharper*/
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+# Node.js
+node_modules/
+
+# Generated documentation
+docs/guide/*.html
+docs/guide/*.pdf

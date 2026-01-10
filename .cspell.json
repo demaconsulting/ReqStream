@@ -20,7 +20,12 @@
     "NuGet",
     "Triaging",
     "sonarcloud",
-    "Pandoc"
+    "Pandoc",
+    "Weasyprint",
+    "weasyprint",
+    "pagetitle",
+    "dcterms",
+    "Blockquotes"
   ],
   "ignorePaths": [
     "node_modules",
