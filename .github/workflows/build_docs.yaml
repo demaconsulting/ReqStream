@@ -45,18 +45,12 @@ jobs:
       - name: Restore dotnet tools
         run: dotnet tool restore
 
-      - name: Generate Requirements Report
+      - name: Generate Requirements Report and Trace Matrix
         run: >
           dotnet reqstream
           --requirements requirements.yaml
           --tests "test-results/**/*.trx"
           --report docs/requirements/requirements.md
-
-      - name: Generate Trace Matrix
-        run: >
-          dotnet reqstream
-          --requirements requirements.yaml
-          --tests "test-results/**/*.trx"
           --matrix docs/tracematrix/tracematrix.md
 
       - name: Generate HTML with Pandoc

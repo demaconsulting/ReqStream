@@ -65,7 +65,7 @@ jobs:
           --configuration Release
           --verbosity normal
           --collect "XPlat Code Coverage;Format=opencover"
-          --logger "trx;LogFileName=test-results.trx"
+          --logger "trx;LogFileName=test-results-${{ inputs.os }}.trx"
 
       - name: Upload test results
         if: always()

@@ -64,8 +64,8 @@ jobs:
   build-docs:
     name: Build Documentation
     needs:
-      - build-windows
-      - build-linux
+      - build-windows  # Needed for test results
+      - build-linux    # Needed for test results
     permissions:
       contents: read
     uses: ./.github/workflows/build_docs.yaml
