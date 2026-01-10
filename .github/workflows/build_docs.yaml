@@ -35,7 +35,7 @@ jobs:
         run: >
           dotnet pandoc
           --defaults docs/guide/definition.yaml
-          --filter mermaid-filter.cmd
+          --filter node_modules/.bin/mermaid-filter.cmd
           --output docs/guide/guide.html
 
       - name: Generate PDF with Weasyprint
