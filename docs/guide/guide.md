@@ -715,14 +715,7 @@ processing is complete, it checks requirement satisfaction.
 **If all requirements are satisfied:**
 
 ```text
-ReqStream version 1.0.0
-Copyright (c) 2026 DEMA Consulting
-
-Reading 1 requirements file(s)...
-Requirements loaded successfully.
-Processing 1 test result file(s)...
-Trace matrix created successfully.
-Exporting trace matrix to trace-matrix.md...
+...
 Trace matrix report generated successfully.
 ```
 
@@ -731,14 +724,7 @@ Exit code: **0** (success)
 **If requirements are not satisfied:**
 
 ```text
-ReqStream version 1.0.0
-Copyright (c) 2026 DEMA Consulting
-
-Reading 1 requirements file(s)...
-Requirements loaded successfully.
-Processing 1 test result file(s)...
-Trace matrix created successfully.
-Exporting trace matrix to trace-matrix.md...
+...
 Trace matrix report generated successfully.
 Error: Only 15 of 20 requirements are satisfied with tests.
 ```
