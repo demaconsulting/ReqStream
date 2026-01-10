@@ -65,6 +65,15 @@ jobs:
           --configuration Release
           --verbosity normal
           --collect "XPlat Code Coverage;Format=opencover"
+          --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: test-results-${{ inputs.os }}
+          path: |
+            test/**/TestResults/*.trx
 
       - name: End Sonar Scanner
         run: >

@@ -6,87 +6,177 @@ sections:
         requirements:
           - id: "CLI-001"
             title: "The tool shall provide a command-line interface."
+            tests:
+              - "Create_NoArguments_ReturnsDefaultContext"
+              - "Create_MultipleArguments_ParsesAllCorrectly"
 
           - id: "CLI-002"
             title: "The tool shall display version information when requested."
+            tests:
+              - "Run_WithVersionFlag_PrintsVersion"
+              - "Create_VersionFlag_SetsVersionProperty"
+              - "Run_WithVersionAndHelp_ProcessesVersionFirst"
 
           - id: "CLI-003"
             title: "The tool shall display help information when requested."
+            tests:
+              - "Run_WithHelpFlag_PrintsHelp"
+              - "Create_HelpFlags_SetsHelpProperty"
+              - "Run_WithHelpAndValidate_ProcessesHelpFirst"
 
           - id: "CLI-004"
             title: "The tool shall support silent mode to suppress console output."
+            tests:
+              - "Create_SilentFlag_SetsSilentProperty"
+              - "WriteLine_SilentMode_DoesNotWriteToConsole"
+              - "WriteError_SilentMode_DoesNotWriteToConsole"
+              - "Create_WithLogFileAndSilent_WritesToLogOnly"
 
       - title: "Requirements File Processing"
         requirements:
           - id: "REQ-001"
             title: "The tool shall process YAML requirements files."
+            tests:
+              - "Read_SimpleRequirement_ParsesCorrectly"
+              - "Run_WithRequirementsFiles_ProcessesSuccessfully"
+              - "Read_ComplexStructure_ParsesCorrectly"
 
           - id: "REQ-002"
             title: "The tool shall support glob patterns for requirements files."
+            tests:
+              - "Create_WithRequirementsPattern_ExpandsGlobPattern"
 
           - id: "REQ-003"
             title: "The tool shall validate requirements file structure."
+            tests:
+              - "Read_BlankSectionTitle_ThrowsExceptionWithFileLocation"
+              - "Read_BlankRequirementId_ThrowsExceptionWithFileLocation"
+              - "Read_BlankRequirementTitle_ThrowsExceptionWithFileLocation"
+              - "Read_DuplicateRequirementId_ThrowsException"
+              - "Read_DuplicateRequirementId_ExceptionIncludesFileLocation"
 
           - id: "REQ-004"
             title: "The tool shall support hierarchical sections and subsections."
+            tests:
+              - "Read_NestedSections_ParsesHierarchyCorrectly"
+              - "Export_NestedSections_CreatesHierarchy"
 
           - id: "REQ-005"
             title: "The tool shall support file includes in requirements files."
+            tests:
+              - "Read_WithIncludes_MergesFilesCorrectly"
+              - "Read_MultipleFiles_MergesAllFiles"
+              - "Read_IncludeLoop_DoesNotCauseInfiniteLoop"
 
           - id: "REQ-006"
             title: "The tool shall merge sections with the same hierarchy path."
+            tests:
+              - "Read_IdenticalSections_MergesCorrectly"
+              - "Read_MultipleFilesWithSameSections_MergesSections"
 
       - title: "Requirements Definition"
         requirements:
           - id: "REQ-007"
             title: "The tool shall require each requirement to have a unique identifier."
+            tests:
+              - "Read_DuplicateRequirementId_ThrowsException"
+              - "Read_BlankRequirementId_ThrowsExceptionWithFileLocation"
+              - "Read_MultipleFilesWithDuplicateIds_ThrowsException"
 
           - id: "REQ-008"
             title: "The tool shall require each requirement to have a title."
+            tests:
+              - "Read_BlankRequirementTitle_ThrowsExceptionWithFileLocation"
 
           - id: "REQ-009"
             title: "The tool shall support parent-child relationships between requirements."
+            tests:
+              - "Read_RequirementWithChildren_ParsesChildrenCorrectly"
+              - "Export_WithChildRequirements_ConsidersChildTests"
 
           - id: "REQ-010"
             title: "The tool shall support test mappings for requirements."
+            tests:
+              - "Read_RequirementWithTests_ParsesTestsCorrectly"
+              - "Read_BlankTestNameInRequirement_ThrowsExceptionWithFileLocation"
+              - "Read_TestMappings_AppliesMappingsCorrectly"
+              - "Read_BlankTestNameInMapping_ThrowsExceptionWithFileLocation"
+              - "Read_BlankMappingId_ThrowsExceptionWithFileLocation"
 
       - title: "Test Integration"
         requirements:
           - id: "TEST-001"
             title: "The tool shall support processing test result files."
+            tests:
+              - "TraceMatrix_WithNoFiles_CreatesEmptyMatrix"
+              - "TraceMatrix_MissingFile_ThrowsFileNotFoundException"
+              - "TraceMatrix_WithMultipleFiles_AggregatesResults"
 
           - id: "TEST-002"
             title: "The tool shall support TRX format test results."
+            tests:
+              - "TraceMatrix_WithTrxFile_ParsesCorrectly"
+              - "TraceMatrix_WithFailedTests_TracksFailures"
 
           - id: "TEST-003"
             title: "The tool shall support JUnit format test results."
+            tests:
+              - "TraceMatrix_WithJUnitFile_ParsesCorrectly"
+              - "TraceMatrix_WithJUnitFailedTests_TracksFailures"
 
           - id: "TEST-004"
             title: "The tool shall support glob patterns for test result files."
+            tests:
+              - "Create_WithTestsPattern_ExpandsGlobPattern"
+              - "TraceMatrix_WithMixedFormats_ProcessesBoth"
 
       - title: "Reporting"
         requirements:
           - id: "RPT-001"
             title: "The tool shall export requirements to markdown format."
+            tests:
+              - "Run_WithRequirementsExport_GeneratesReport"
+              - "Export_SimpleRequirements_CreatesMarkdownFile"
+              - "Export_MultipleSections_ExportsAll"
+              - "Export_EmptyRequirements_CreatesEmptyFile"
 
           - id: "RPT-002"
             title: "The tool shall support configurable markdown header depth for requirements reports."
+            tests:
+              - "Create_ReportDepth_SetsReportDepthProperty"
+              - "Export_WithCustomDepth_UsesCorrectHeaderLevel"
 
           - id: "RPT-003"
             title: "The tool shall export trace matrices to markdown format."
+            tests:
+              - "Run_WithTraceMatrixExport_GeneratesMatrix"
+              - "Export_SimpleTraceMatrix_CreatesMarkdownFile"
+              - "Export_WithFailedTests_ShowsFailures"
+              - "Export_WithNoTests_ShowsNotSatisfied"
+              - "Export_WithNotExecutedTests_ShowsNotExecuted"
 
           - id: "RPT-004"
             title: "The tool shall support configurable markdown header depth for trace matrices."
+            tests:
+              - "Create_MatrixDepth_SetsMatrixDepthProperty"
+              - "Export_WithCustomDepth_UsesCorrectHeaderLevel"
 
       - title: "Logging"
         requirements:
           - id: "LOG-001"
             title: "The tool shall support writing output to a log file."
+            tests:
+              - "Create_WithLogFile_WritesToLogFile"
+              - "Create_WithLogFileAndSilent_WritesToLogOnly"
+              - "Dispose_WithLogFile_ClosesLogFile"
 
       - title: "Validation"
         requirements:
           - id: "VAL-001"
             title: "The tool shall support self-validation mode."
+            tests:
+              - "Run_WithValidateFlag_ShowsPlaceholder"
+              - "Create_ValidateFlag_SetsValidateProperty"
 
       - title: "Platform Support"
         requirements:

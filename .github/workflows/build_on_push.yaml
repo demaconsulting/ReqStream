@@ -63,7 +63,9 @@ jobs:
 
   build-docs:
     name: Build Documentation
-    needs: quality-checks
+    needs: 
+      - build-windows
+      - build-linux
     permissions:
       contents: read
     uses: ./.github/workflows/build_docs.yaml

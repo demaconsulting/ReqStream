@@ -15,6 +15,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Download test results from Windows
+        uses: actions/download-artifact@v6
+        with:
+          name: test-results-windows-latest
+          path: test-results
+        continue-on-error: true
+
+      - name: Download test results from Linux
+        uses: actions/download-artifact@v6
+        with:
+          name: test-results-ubuntu-latest
+          path: test-results
+        continue-on-error: true
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -35,12 +49,14 @@ jobs:
         run: >
           dotnet reqstream
           --requirements requirements.yaml
+          --tests "test-results/**/*.trx"
           --report docs/requirements/requirements.md
 
       - name: Generate Trace Matrix
         run: >
           dotnet reqstream
           --requirements requirements.yaml
+          --tests "test-results/**/*.trx"
           --matrix docs/tracematrix/tracematrix.md
 
       - name: Generate HTML with Pandoc
