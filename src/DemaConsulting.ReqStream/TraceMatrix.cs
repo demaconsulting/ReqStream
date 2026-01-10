@@ -443,6 +443,9 @@ public class TraceMatrix
             throw new FileNotFoundException($"Test result file not found: {filePath}", filePath);
         }
 
+        // Extract the base filename (without extension) for source matching
+        var fileBaseName = Path.GetFileNameWithoutExtension(filePath);
+
         // Read the file content
         var content = File.ReadAllText(filePath);
 
@@ -468,17 +471,18 @@ public class TraceMatrix
         // Process each test result
         foreach (var result in testResults.Results)
         {
-            // Only process tests that are referenced in requirements
-            if (!requiredTests.Contains(result.Name))
+            // Check if any required test matches this result
+            var matchingTestName = FindMatchingTestName(requiredTests, result.Name, fileBaseName);
+            if (matchingTestName == null)
             {
                 continue;
             }
 
-            // Get or create the test result entry
-            if (!_testResults.TryGetValue(result.Name, out var entry))
+            // Get or create the test result entry using the full test name from requirements
+            if (!_testResults.TryGetValue(matchingTestName, out var entry))
             {
                 entry = new TestResultEntry();
-                _testResults[result.Name] = entry;
+                _testResults[matchingTestName] = entry;
             }
 
             // Update execution counts
@@ -489,5 +493,64 @@ public class TraceMatrix
                 entry.Passed++;
             }
         }
+    }
+
+    /// <summary>
+    ///     Finds a matching test name from the required tests set.
+    ///     Supports both plain test names and source-specific test names with the pattern: [filepart@]testname.
+    /// </summary>
+    /// <param name="requiredTests">Set of test names from requirements.</param>
+    /// <param name="actualTestName">The actual test name from the test result file.</param>
+    /// <param name="fileBaseName">The base name of the test result file (without extension).</param>
+    /// <returns>The matching test name from requirements, or null if no match found.</returns>
+    private static string? FindMatchingTestName(HashSet<string> requiredTests, string actualTestName, string fileBaseName)
+    {
+        // First, try to find an exact match with source specifier: <filepart>@<testname>
+        // Check if any filepart from the base name matches
+        foreach (var requiredTest in requiredTests)
+        {
+            var (filePart, testName) = ParseTestName(requiredTest);
+            
+            // If there's a file part, check if it matches and the test name matches
+            if (filePart != null && 
+                fileBaseName.Contains(filePart, StringComparison.OrdinalIgnoreCase) && 
+                testName == actualTestName)
+            {
+                return requiredTest;
+            }
+        }
+
+        // Second, try to find a plain test name match (no source specifier)
+        foreach (var requiredTest in requiredTests)
+        {
+            var (filePart, testName) = ParseTestName(requiredTest);
+            
+            // If there's no file part and the test name matches
+            if (filePart == null && testName == actualTestName)
+            {
+                return requiredTest;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    ///     Parses a test name to extract the optional file part and the actual test name.
+    ///     Format: [filepart@]testname
+    /// </summary>
+    /// <param name="testName">The test name from requirements.</param>
+    /// <returns>A tuple of (filePart, testName). filePart is null if not specified.</returns>
+    private static (string? filePart, string testName) ParseTestName(string testName)
+    {
+        var atIndex = testName.IndexOf('@');
+        if (atIndex > 0 && atIndex < testName.Length - 1)
+        {
+            var filePart = testName[..atIndex];
+            var actualTestName = testName[(atIndex + 1)..];
+            return (filePart, actualTestName);
+        }
+
+        return (null, testName);
     }
 }
