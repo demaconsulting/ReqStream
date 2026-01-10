@@ -59,6 +59,11 @@ public sealed class Context : IDisposable
     public bool Validate { get; private init; }
 
     /// <summary>
+    ///     Gets the validation results output file path.
+    /// </summary>
+    public string? ResultsFile { get; private init; }
+
+    /// <summary>
     ///     Gets a value indicating whether the enforce flag was specified.
     /// </summary>
     public bool Enforce { get; private init; }
@@ -130,6 +135,7 @@ public sealed class Context : IDisposable
         string? matrix = null;
         var matrixDepth = 1;
         string? logFile = null;
+        string? resultsFile = null;
 
         // Parse command-line arguments
         int i = 0;
@@ -157,6 +163,16 @@ public sealed class Context : IDisposable
 
                 case "--validate":
                     validate = true;
+                    break;
+
+                case "--results":
+                    // Ensure argument has a value
+                    if (i >= args.Length)
+                    {
+                        throw new ArgumentException($"{arg} requires a filename argument", nameof(args));
+                    }
+
+                    resultsFile = args[i++];
                     break;
 
                 case "--enforce":
@@ -255,6 +271,7 @@ public sealed class Context : IDisposable
             Help = help,
             Silent = silent,
             Validate = validate,
+            ResultsFile = resultsFile,
             Enforce = enforce,
             RequirementsFiles = requirementsFiles,
             TestFiles = testFiles,

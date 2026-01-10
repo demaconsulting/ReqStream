@@ -102,10 +102,10 @@ internal static class Program
             return;
         }
 
-        // Priority 3: Self-Validation (placeholder for now)
+        // Priority 3: Self-Validation
         if (context.Validate)
         {
-            context.WriteLine("Self-validation not yet implemented.");
+            Validation.Run(context);
             return;
         }
 
@@ -135,6 +135,7 @@ internal static class Program
         Console.WriteLine("  -?, -h, --help             Display this help message");
         Console.WriteLine("  --silent                   Suppress console output");
         Console.WriteLine("  --validate                 Run self-validation");
+        Console.WriteLine("  --results <file>           Write validation results to file (TRX or JUnit format)");
         Console.WriteLine("  --log <file>               Write output to log file");
         Console.WriteLine("  --requirements <pattern>   Requirements files glob pattern");
         Console.WriteLine("  --report <file>            Export requirements to markdown file");
