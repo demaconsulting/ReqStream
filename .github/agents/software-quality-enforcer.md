@@ -51,7 +51,7 @@ adherence to coding conventions.
 
 ### Code Style Standards
 
-Based on `.editorconfig`:
+Based on `.editorconfig` and project preferences:
 
 - **Indentation**: 4 spaces for C#, 2 spaces for YAML/JSON/XML
 - **Namespaces**: Use file-scoped namespaces (C# 10+)
@@ -59,6 +59,8 @@ Based on `.editorconfig`:
 - **Using Directives**: Sort system directives first
 - **Encoding**: UTF-8 with BOM
 - **Line Endings**: LF with final newline
+- **Literate Coding Style**: Each "paragraph" of code should start with a comment explaining what it does, with
+  paragraphs separated by blank lines. This makes code more readable and self-documenting.
 
 ### Naming Conventions
 
@@ -77,6 +79,13 @@ Based on `.editorconfig`:
 - **Expression-Bodied Members**: Use for properties, indexers, accessors, and lambdas; avoid for methods,
   constructors, and operators
 - **Unused Parameters**: Trigger warnings
+- **Code Analyzers**: 
+  - Microsoft.CodeAnalysis.NetAnalyzers v9.0.0+ enabled
+  - SonarAnalyzer.CSharp v10.4.0+ enabled
+  - EnforceCodeStyleInBuild enabled
+  - AnalysisLevel set to latest
+- **Analyzer Suppressions**: Use `.globalconfig` file to disable rules globally when needed (e.g., for serializer
+  DTOs), rather than SuppressMessage attributes
 
 ### Test Requirements
 
