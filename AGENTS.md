@@ -121,8 +121,12 @@ ReqStream/
   - Other markdown files use link references: `[text][ref]` with `[ref]: url` at end
 - **Linting**:
   - **Markdown**: Must pass markdownlint (max line length: 120 chars)
+    - Lists must be surrounded by blank lines (MD032)
+    - Run locally: Check CI workflow for markdownlint-cli2-action usage
   - **Spell Check**: Must pass cspell (custom dictionary in `.cspell.json`)
+    - Add project-specific terms to the custom dictionary if needed
   - **YAML**: Must pass yamllint (2-space indentation, max line length: 120 chars)
+  - **All linting must pass locally before committing** - CI will reject changes with linting errors
 
 ## CI/CD Pipelines
 
@@ -143,12 +147,17 @@ dotnet pack --no-build --configuration Release
 
 ## Pre-Finalization Quality Checks
 
-Before completing any task, perform these checks in order:
+Before completing any task, you **MUST** perform these checks in order and ensure they all pass:
 
-1. **Build and Test**: Run `dotnet build --configuration Release && dotnet test --configuration Release`
-2. **Code Review**: Use `code_review` tool and address valid concerns
-3. **Security Scanning**: Use `codeql_checker` tool after code review
-4. **Linting**: Ensure markdown, spell check, and YAML linting pass (runs in CI)
+1. **Build and Test**: Run `dotnet build --configuration Release && dotnet test --configuration Release` - all tests must pass with zero warnings
+2. **Code Review**: Use `code_review` tool and address all valid concerns
+3. **Security Scanning**: Use `codeql_checker` tool after code review - must report zero vulnerabilities
+4. **Linting**: **MANDATORY** - Run all linters locally and fix any issues before pushing changes:
+   - **Markdown**: Run markdownlint on all changed `.md` files - must pass with zero errors
+   - **Spell Check**: Run cspell on all changed files - must pass with zero errors
+   - **YAML**: Run yamllint on all changed `.yaml` or `.yml` files - must pass with zero errors
+   - These linters run in CI and will fail the build if not passing
+   - **DO NOT** rely solely on CI to catch linting issues - catch them locally first
 
 ## Project-Specific Guidelines
 

@@ -270,6 +270,7 @@ requirements:
 ```
 
 With test result files:
+
 - `test-results-windows-latest.trx`
 - `test-results-ubuntu-latest.trx`
 - `test-results-macos-latest.trx`
