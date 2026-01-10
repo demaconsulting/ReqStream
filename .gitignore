@@ -119,4 +119,8 @@ node_modules/
 
 # Generated documentation
 docs/guide/*.html
-docs/guide/*.pdf
+docs/requirements/*.html
+docs/requirements/requirements.md
+docs/tracematrix/*.html
+docs/tracematrix/tracematrix.md
+docs/*.pdf

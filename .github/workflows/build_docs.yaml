@@ -15,6 +15,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Download test results from Windows
+        uses: actions/download-artifact@v6
+        with:
+          name: test-results-windows-latest
+          path: test-results
+        continue-on-error: true
+
+      - name: Download test results from Linux
+        uses: actions/download-artifact@v6
+        with:
+          name: test-results-ubuntu-latest
+          path: test-results
+        continue-on-error: true
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -31,6 +45,14 @@ jobs:
       - name: Restore dotnet tools
         run: dotnet tool restore
 
+      - name: Generate Requirements Report and Trace Matrix
+        run: >
+          dotnet reqstream
+          --requirements requirements.yaml
+          --tests "test-results/**/*.trx"
+          --report docs/requirements/requirements.md
+          --matrix docs/tracematrix/tracematrix.md
+
       - name: Generate HTML with Pandoc
         run: >
           dotnet pandoc
@@ -42,10 +64,34 @@ jobs:
         run: >
           dotnet weasyprint
           docs/guide/guide.html
-          docs/guide/guide.pdf
+          docs/guide.pdf
+
+      - name: Generate Requirements HTML with Pandoc
+        run: >
+          dotnet pandoc
+          --defaults docs/requirements/definition.yaml
+          --output docs/requirements/requirements.html
+
+      - name: Generate Requirements PDF with Weasyprint
+        run: >
+          dotnet weasyprint
+          docs/requirements/requirements.html
+          docs/requirements.pdf
+
+      - name: Generate Trace Matrix HTML with Pandoc
+        run: >
+          dotnet pandoc
+          --defaults docs/tracematrix/definition.yaml
+          --output docs/tracematrix/tracematrix.html
+
+      - name: Generate Trace Matrix PDF with Weasyprint
+        run: >
+          dotnet weasyprint
+          docs/tracematrix/tracematrix.html
+          docs/tracematrix.pdf
 
       - name: Upload documentation
         uses: actions/upload-artifact@v6
         with:
           name: documentation
-          path: docs/guide/guide.pdf
+          path: docs/*.pdf

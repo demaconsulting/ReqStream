@@ -25,7 +25,8 @@
     "weasyprint",
     "pagetitle",
     "dcterms",
-    "Blockquotes"
+    "Blockquotes",
+    "tracematrix"
   ],
   "ignorePaths": [
     "node_modules",
