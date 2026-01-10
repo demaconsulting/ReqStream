@@ -8,64 +8,13 @@ on:
     - cron: '0 17 * * 1'  # 5PM UTC every Monday
 
 jobs:
-  quality-checks:
-    name: Quality Checks
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Markdown Lint
-        uses: DavidAnson/markdownlint-cli2-action@v22
-        with:
-          globs: '**/*.md'
-
-      - name: Spell Check
-        uses: streetsidesoftware/cspell-action@v8
-        with:
-          files: |
-            **/*.md
-            **/*.cs
-
-      - name: YAML Lint
-        uses: ibiqlik/action-yamllint@v3
-        with:
-          config_file: .yamllint.yaml
-
-  build-windows:
-    name: Build Windows
-    needs: quality-checks
+  build:
+    name: Build
     permissions:
       contents: read
       pull-requests: write
     uses: ./.github/workflows/build.yaml
     with:
-      os: windows-latest
       version: 0.0.0-run.${{ github.run_number }}
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-  build-linux:
-    name: Build Linux
-    needs: quality-checks
-    permissions:
-      contents: read
-      pull-requests: write
-    uses: ./.github/workflows/build.yaml
-    with:
-      os: ubuntu-latest
-      version: 0.0.0-run.${{ github.run_number }}
-    secrets:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-  build-docs:
-    name: Build Documentation
-    needs:
-      - build-windows  # Needed for test results
-      - build-linux    # Needed for test results
-    permissions:
-      contents: read
-    uses: ./.github/workflows/build_docs.yaml

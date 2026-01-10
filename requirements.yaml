@@ -198,18 +198,38 @@ sections:
         requirements:
           - id: "PLT-001"
             title: "The tool shall run on Windows operating systems."
+            tests:
+              - "Program_Run_WithVersionFlag_PrintsVersion"
+              - "Program_Run_WithHelpFlag_PrintsHelp"
+              - "Context_Create_ValidateFlag_SetsValidateProperty"
 
           - id: "PLT-002"
             title: "The tool shall run on Linux operating systems."
+            tests:
+              - "Program_Run_WithVersionFlag_PrintsVersion"
+              - "Program_Run_WithHelpFlag_PrintsHelp"
+              - "Context_Create_ValidateFlag_SetsValidateProperty"
 
           - id: "PLT-003"
             title: "The tool shall run on macOS operating systems."
 
           - id: "PLT-004"
             title: "The tool shall support .NET 8.0 runtime."
+            tests:
+              - "Program_Run_WithVersionFlag_PrintsVersion"
+              - "Program_Run_WithHelpFlag_PrintsHelp"
+              - "Context_Create_ValidateFlag_SetsValidateProperty"
 
           - id: "PLT-005"
             title: "The tool shall support .NET 9.0 runtime."
+            tests:
+              - "Program_Run_WithVersionFlag_PrintsVersion"
+              - "Program_Run_WithHelpFlag_PrintsHelp"
+              - "Context_Create_ValidateFlag_SetsValidateProperty"
 
           - id: "PLT-006"
             title: "The tool shall support .NET 10.0 runtime."
+            tests:
+              - "Program_Run_WithVersionFlag_PrintsVersion"
+              - "Program_Run_WithHelpFlag_PrintsHelp"
+              - "Context_Create_ValidateFlag_SetsValidateProperty"
