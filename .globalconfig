@@ -1,8 +1,0 @@
-# Global analyzer configuration for ReqStream project
-is_global = true
-
-# Disable S3459 (unassigned auto-property) - False positive for YAML deserializer DTOs
-dotnet_diagnostic.S3459.severity = none
-
-# Disable S1144 (unused private setter) - False positive for YAML deserializer DTOs
-dotnet_diagnostic.S1144.severity = none

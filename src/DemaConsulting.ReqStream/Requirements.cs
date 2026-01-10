@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Diagnostics.CodeAnalysis;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -322,6 +323,9 @@ public class Requirements : Section
     /// <summary>
     ///     Internal class for deserializing the YAML document structure.
     /// </summary>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
+    [SuppressMessage("SonarAnalyzer.CSharp", "S3459:Unassigned members should be removed", Justification = "Properties are set by YamlDotNet deserializer via reflection")]
+    [SuppressMessage("SonarAnalyzer.CSharp", "S1144:Unused private types or members should be removed", Justification = "Properties are accessed by YamlDotNet deserializer via reflection")]
     private sealed class YamlDocument
     {
         /// <summary>
@@ -343,6 +347,9 @@ public class Requirements : Section
     /// <summary>
     ///     Internal class for deserializing a YAML section.
     /// </summary>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
+    [SuppressMessage("SonarAnalyzer.CSharp", "S3459:Unassigned members should be removed", Justification = "Properties are set by YamlDotNet deserializer via reflection")]
+    [SuppressMessage("SonarAnalyzer.CSharp", "S1144:Unused private types or members should be removed", Justification = "Properties are accessed by YamlDotNet deserializer via reflection")]
     private sealed class YamlSection
     {
         /// <summary>
@@ -364,6 +371,9 @@ public class Requirements : Section
     /// <summary>
     ///     Internal class for deserializing a YAML requirement.
     /// </summary>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
+    [SuppressMessage("SonarAnalyzer.CSharp", "S3459:Unassigned members should be removed", Justification = "Properties are set by YamlDotNet deserializer via reflection")]
+    [SuppressMessage("SonarAnalyzer.CSharp", "S1144:Unused private types or members should be removed", Justification = "Properties are accessed by YamlDotNet deserializer via reflection")]
     private sealed class YamlRequirement
     {
         /// <summary>
@@ -390,6 +400,9 @@ public class Requirements : Section
     /// <summary>
     ///     Internal class for deserializing a YAML test mapping.
     /// </summary>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
+    [SuppressMessage("SonarAnalyzer.CSharp", "S3459:Unassigned members should be removed", Justification = "Properties are set by YamlDotNet deserializer via reflection")]
+    [SuppressMessage("SonarAnalyzer.CSharp", "S1144:Unused private types or members should be removed", Justification = "Properties are accessed by YamlDotNet deserializer via reflection")]
     private sealed class YamlMapping
     {
         /// <summary>
