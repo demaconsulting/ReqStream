@@ -79,7 +79,7 @@ Based on `.editorconfig` and project preferences:
 - **Expression-Bodied Members**: Use for properties, indexers, accessors, and lambdas; avoid for methods,
   constructors, and operators
 - **Unused Parameters**: Trigger warnings
-- **Code Analyzers**: 
+- **Code Analyzers**:
   - Microsoft.CodeAnalysis.NetAnalyzers enabled
   - SonarAnalyzer.CSharp enabled
   - EnforceCodeStyleInBuild enabled
