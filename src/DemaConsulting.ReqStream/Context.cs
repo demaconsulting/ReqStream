@@ -130,8 +130,7 @@ public sealed class Context : IDisposable
         while (i < args.Length)
         {
             // Get current argument and advance index
-            var arg = args[i];
-            i++;
+            var arg = args[i++];
 
             switch (arg)
             {
