@@ -80,8 +80,8 @@ Based on `.editorconfig` and project preferences:
   constructors, and operators
 - **Unused Parameters**: Trigger warnings
 - **Code Analyzers**: 
-  - Microsoft.CodeAnalysis.NetAnalyzers v9.0.0+ enabled
-  - SonarAnalyzer.CSharp v10.4.0+ enabled
+  - Microsoft.CodeAnalysis.NetAnalyzers enabled
+  - SonarAnalyzer.CSharp enabled
   - EnforceCodeStyleInBuild enabled
   - AnalysisLevel set to latest
 - **Analyzer Suppressions**: Use `.globalconfig` file to disable rules globally when needed (e.g., for serializer
