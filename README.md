@@ -224,21 +224,21 @@ ReqStream is built with the help of these amazing open-source projects:
 
 For information about reporting security vulnerabilities, please see our [Security Policy][security].
 
-[forks-shield]: https://img.shields.io/github/forks/demaconsulting/ReqStream?style=flat-square
+[forks-shield]: https://img.shields.io/github/forks/demaconsulting/ReqStream
 [forks-url]: https://github.com/demaconsulting/ReqStream/network/members
-[stars-shield]: https://img.shields.io/github/stars/demaconsulting/ReqStream?style=flat-square
+[stars-shield]: https://img.shields.io/github/stars/demaconsulting/ReqStream
 [stars-url]: https://github.com/demaconsulting/ReqStream/stargazers
-[contributors-shield]: https://img.shields.io/github/contributors/demaconsulting/ReqStream?style=flat-square
+[contributors-shield]: https://img.shields.io/github/contributors/demaconsulting/ReqStream
 [contributors-url]: https://github.com/demaconsulting/ReqStream/graphs/contributors
-[license-shield]: https://img.shields.io/github/license/demaconsulting/ReqStream?style=flat-square
+[license-shield]: https://img.shields.io/github/license/demaconsulting/ReqStream
 [license-url]: https://github.com/demaconsulting/ReqStream/blob/main/LICENSE
-[build-shield]: https://img.shields.io/github/actions/workflow/status/demaconsulting/ReqStream/build_on_push.yaml?style=flat-square
+[build-shield]: https://img.shields.io/github/actions/workflow/status/demaconsulting/ReqStream/build_on_push.yaml
 [build-url]: https://github.com/demaconsulting/ReqStream/actions/workflows/build_on_push.yaml
-[quality-gate-shield]: https://img.shields.io/sonar/quality_gate/demaconsulting_ReqStream?server=https%3A%2F%2Fsonarcloud.io&style=flat-square
+[quality-gate-shield]: https://sonarcloud.io/api/project_badges/measure?project=demaconsulting_ReqStream&metric=alert_status
 [quality-gate-url]: https://sonarcloud.io/dashboard?id=demaconsulting_ReqStream
-[security-shield]: https://img.shields.io/sonar/security_rating/demaconsulting_ReqStream?server=https%3A%2F%2Fsonarcloud.io&style=flat-square
+[security-shield]: https://sonarcloud.io/api/project_badges/measure?project=demaconsulting_ReqStream&metric=security_rating
 [security-url]: https://sonarcloud.io/dashboard?id=demaconsulting_ReqStream
-[nuget-shield]: https://img.shields.io/nuget/v/DemaConsulting.ReqStream?style=flat-square
+[nuget-shield]: https://img.shields.io/nuget/v/DemaConsulting.ReqStream
 [nuget-url]: https://www.nuget.org/packages/DemaConsulting.ReqStream
 [license]: https://github.com/demaconsulting/ReqStream/blob/main/LICENSE
 [contributing]: https://github.com/demaconsulting/ReqStream/blob/main/CONTRIBUTING.md
