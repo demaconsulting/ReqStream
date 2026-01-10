@@ -33,10 +33,10 @@ public class Section
     /// <summary>
     ///     Gets the list of requirements in this section.
     /// </summary>
-    public List<Requirement> Requirements { get; } = new();
+    public List<Requirement> Requirements { get; } = [];
 
     /// <summary>
     ///     Gets the list of child sections.
     /// </summary>
-    public List<Section> Sections { get; } = new();
+    public List<Section> Sections { get; } = [];
 }

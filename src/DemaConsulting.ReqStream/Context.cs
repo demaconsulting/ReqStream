@@ -61,12 +61,12 @@ public sealed class Context : IDisposable
     /// <summary>
     ///     Gets the list of requirements files found from the --requirements glob pattern.
     /// </summary>
-    public List<string> RequirementsFiles { get; private init; } = new();
+    public List<string> RequirementsFiles { get; private init; } = [];
 
     /// <summary>
     ///     Gets the list of test files found from the --tests glob pattern.
     /// </summary>
-    public List<string> TestFiles { get; private init; } = new();
+    public List<string> TestFiles { get; private init; } = [];
 
     /// <summary>
     ///     Gets the requirements report output file path.

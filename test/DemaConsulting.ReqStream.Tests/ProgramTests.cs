@@ -93,10 +93,10 @@ public class ProgramTests
             Program.Run(context);
 
             var outputText = output.ToString();
-            StringAssert.Contains(outputText, "ReqStream version");
-            StringAssert.Contains(outputText, "Copyright");
-            StringAssert.Contains(outputText, "Usage:");
-            StringAssert.Contains(outputText, "Options:");
+            Assert.Contains("ReqStream version", outputText);
+            Assert.Contains("Copyright", outputText);
+            Assert.Contains("Usage:", outputText);
+            Assert.Contains("Options:", outputText);
         }
         finally
         {
@@ -194,8 +194,8 @@ sections:
             Assert.IsTrue(File.Exists(reportFile));
 
             var reportContent = File.ReadAllText(reportFile);
-            StringAssert.Contains(reportContent, "Test Section");
-            StringAssert.Contains(reportContent, "REQ-001");
+            Assert.Contains("Test Section", reportContent);
+            Assert.Contains("REQ-001", reportContent);
         }
         finally
         {
@@ -249,8 +249,8 @@ sections:
             Assert.IsTrue(File.Exists(matrixFile));
 
             var matrixContent = File.ReadAllText(matrixFile);
-            StringAssert.Contains(matrixContent, "Summary");
-            StringAssert.Contains(matrixContent, "REQ-001");
+            Assert.Contains("Summary", matrixContent);
+            Assert.Contains("REQ-001", matrixContent);
         }
         finally
         {
@@ -301,7 +301,7 @@ sections:
             Program.Run(context);
 
             var outputText = output.ToString();
-            StringAssert.Contains(outputText, "Usage:");
+            Assert.Contains("Usage:", outputText);
             Assert.DoesNotContain("Self-validation", outputText);
         }
         finally
