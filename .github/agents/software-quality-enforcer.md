@@ -84,8 +84,6 @@ Based on `.editorconfig` and project preferences:
   - SonarAnalyzer.CSharp enabled
   - EnforceCodeStyleInBuild enabled
   - AnalysisLevel set to latest
-- **Analyzer Suppressions**: Use `.globalconfig` file to disable rules globally when needed (e.g., for serializer
-  DTOs), rather than SuppressMessage attributes
 
 ### Test Requirements
 

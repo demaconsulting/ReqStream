@@ -654,7 +654,7 @@ Requirements enforcement validates that:
 If any requirement doesn't meet these criteria, the tool reports an error and exits with a non-zero status code,
 causing CI/CD builds to fail.
 
-### Basic Usage
+### Usage
 
 Enable enforcement with the `--enforce` flag:
 
@@ -896,7 +896,7 @@ requirements:
 
 ### Troubleshooting Enforcement
 
-**Error: Cannot enforce requirements without test results**
+#### Error: Cannot enforce requirements without test results
 
 This error occurs when `--enforce` is used without the `--tests` option. You must provide test result files to
 validate coverage:
@@ -909,7 +909,7 @@ reqstream --requirements "**/*.yaml" --enforce
 reqstream --requirements "**/*.yaml" --tests "**/*.trx" --enforce
 ```
 
-**All requirements show as unsatisfied**
+#### All requirements show as unsatisfied
 
 If all or most requirements are showing as unsatisfied, check:
 
@@ -918,7 +918,7 @@ If all or most requirements are showing as unsatisfied, check:
 3. Tests are actually being executed (check test result file contents)
 4. Tests are passing (failing tests count as unsatisfied)
 
-**Some tests don't match**
+#### Some tests don't match
 
 If specific tests aren't being recognized:
 
@@ -927,7 +927,7 @@ If specific tests aren't being recognized:
 3. If using source-specific tests (`filepart@testname`), verify the file part matches the test result filename
 4. Run without `--enforce` first and review the trace matrix to see which tests are found
 
-**Requirements with no direct tests show as unsatisfied**
+#### Requirements with no direct tests show as unsatisfied
 
 Ensure parent requirements reference their children via the `children` field:
 
@@ -943,8 +943,6 @@ requirements:
     tests:
       - "Test_Child"
 ```
-
-
 
 ## FAQ
 
