@@ -249,6 +249,7 @@ jobs:
           --tests "test-results/**/*.trx"
           --report docs/requirements/requirements.md
           --matrix docs/tracematrix/tracematrix.md
+          --enforce
 
       - name: Generate HTML with Pandoc
         run: >

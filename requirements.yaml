@@ -125,6 +125,7 @@ sections:
             tests:
               - "TraceMatrix_WithSourceSpecificTests_MatchesCorrectly"
               - "TraceMatrix_WithSourceSpecificTests_DoesNotMatchOtherSources"
+              - "TraceMatrix_WithMultipleSourceSpecifiers_MatchesAllRequirements"
 
           - id: "TEST-006"
             title: "The tool shall perform case-insensitive matching of file parts in source-specific test names."
@@ -191,7 +192,7 @@ sections:
           - id: "VAL-001"
             title: "The tool shall support self-validation mode."
             tests:
-              - "Program_Run_WithValidateFlag_ShowsPlaceholder"
+              - "Program_Run_WithValidateFlag_RunsValidation"
               - "Context_Create_ValidateFlag_SetsValidateProperty"
 
       - title: "Platform Support"
@@ -199,37 +200,34 @@ sections:
           - id: "PLT-001"
             title: "The tool shall run on Windows operating systems."
             tests:
-              - "windows-latest@Program_Run_WithVersionFlag_PrintsVersion"
-              - "windows-latest@Program_Run_WithHelpFlag_PrintsHelp"
-              - "windows-latest@Context_Create_ValidateFlag_SetsValidateProperty"
+              - "windows-latest@RequirementsProcessing"
+              - "windows-latest@TraceMatrix"
+              - "windows-latest@ReportExport"
 
           - id: "PLT-002"
             title: "The tool shall run on Linux operating systems."
             tests:
-              - "ubuntu-latest@Program_Run_WithVersionFlag_PrintsVersion"
-              - "ubuntu-latest@Program_Run_WithHelpFlag_PrintsHelp"
-              - "ubuntu-latest@Context_Create_ValidateFlag_SetsValidateProperty"
-
-          - id: "PLT-003"
-            title: "The tool shall run on macOS operating systems."
+              - "ubuntu-latest@RequirementsProcessing"
+              - "ubuntu-latest@TraceMatrix"
+              - "ubuntu-latest@ReportExport"
 
           - id: "PLT-004"
             title: "The tool shall support .NET 8.0 runtime."
             tests:
-              - "dotnet8.x@Program_Run_WithVersionFlag_PrintsVersion"
-              - "dotnet8.x@Program_Run_WithHelpFlag_PrintsHelp"
-              - "dotnet8.x@Context_Create_ValidateFlag_SetsValidateProperty"
+              - "dotnet8.x@RequirementsProcessing"
+              - "dotnet8.x@TraceMatrix"
+              - "dotnet8.x@ReportExport"
 
           - id: "PLT-005"
             title: "The tool shall support .NET 9.0 runtime."
             tests:
-              - "dotnet9.x@Program_Run_WithVersionFlag_PrintsVersion"
-              - "dotnet9.x@Program_Run_WithHelpFlag_PrintsHelp"
-              - "dotnet9.x@Context_Create_ValidateFlag_SetsValidateProperty"
+              - "dotnet9.x@RequirementsProcessing"
+              - "dotnet9.x@TraceMatrix"
+              - "dotnet9.x@ReportExport"
 
           - id: "PLT-006"
             title: "The tool shall support .NET 10.0 runtime."
             tests:
-              - "dotnet10.x@Program_Run_WithVersionFlag_PrintsVersion"
-              - "dotnet10.x@Program_Run_WithHelpFlag_PrintsHelp"
-              - "dotnet10.x@Context_Create_ValidateFlag_SetsValidateProperty"
+              - "dotnet10.x@RequirementsProcessing"
+              - "dotnet10.x@TraceMatrix"
+              - "dotnet10.x@ReportExport"

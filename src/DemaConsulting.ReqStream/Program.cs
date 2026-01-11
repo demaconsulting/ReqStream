@@ -199,7 +199,13 @@ internal static class Program
                 var (satisfied, total) = traceMatrix.CalculateSatisfiedRequirements();
                 if (satisfied < total)
                 {
+                    var unsatisfied = traceMatrix.GetUnsatisfiedRequirements();
                     context.WriteError($"Error: Only {satisfied} of {total} requirements are satisfied with tests.");
+                    context.WriteError("Unsatisfied requirements:");
+                    foreach (var reqId in unsatisfied)
+                    {
+                        context.WriteError($"  - {reqId}");
+                    }
                 }
             }
             else
