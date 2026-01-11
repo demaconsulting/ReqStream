@@ -4,10 +4,6 @@ name: Build
 on:
   workflow_call:
     inputs:
-      os:
-        description: 'Operating system to run on'
-        required: true
-        type: string
       version:
         description: 'Version number for the build'
         required: true
@@ -17,11 +13,44 @@ on:
         required: true
 
 jobs:
+  quality-checks:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Markdown Lint
+        uses: DavidAnson/markdownlint-cli2-action@v22
+        with:
+          globs: '**/*.md'
+
+      - name: Spell Check
+        uses: streetsidesoftware/cspell-action@v8
+        with:
+          files: |
+            **/*.md
+            **/*.cs
+
+      - name: YAML Lint
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          config_file: .yamllint.yaml
+
   build:
-    runs-on: ${{ inputs.os }}
+    name: Build ${{ matrix.os }}
+    needs: quality-checks
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: read
       pull-requests: write
+
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
 
     steps:
       - name: Checkout repository
@@ -65,13 +94,13 @@ jobs:
           --configuration Release
           --verbosity normal
           --collect "XPlat Code Coverage;Format=opencover"
-          --logger "trx;LogFileName=test-results-${{ inputs.os }}.trx"
+          --logger "trx;LogFileName=test-results-${{ matrix.os }}.trx"
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: test-results-${{ inputs.os }}
+          name: test-results-${{ matrix.os }}
           path: |
             test/**/TestResults/*.trx
 
@@ -90,26 +119,28 @@ jobs:
       - name: Upload package
         uses: actions/upload-artifact@v6
         with:
-          name: packages-${{ inputs.os }}
+          name: packages-${{ matrix.os }}
           path: |
             src/DemaConsulting.ReqStream/bin/Release/*.nupkg
             src/DemaConsulting.ReqStream/bin/Release/*.snupkg
 
   integration-test:
-    runs-on: ${{ inputs.os }}
+    name: Integration Test ${{ matrix.os }} .NET ${{ matrix.dotnet-version }}
+    runs-on: ${{ matrix.os }}
     needs: build
     permissions:
       contents: read
 
     strategy:
       matrix:
+        os: [windows-latest, ubuntu-latest]
         dotnet-version: ['8.x', '9.x', '10.x']
 
     steps:
       - name: Download package
         uses: actions/download-artifact@v6
         with:
-          name: packages-${{ inputs.os }}
+          name: packages-${{ matrix.os }}
           path: packages
 
       - name: Setup dotnet
@@ -148,9 +179,116 @@ jobs:
         shell: bash
         run: |
           echo "Testing self-validation with TRX results output..."
-          reqstream --validate --results validation-results.trx || {
+          # Create a unique filename with OS and dotnet version
+          OS_NAME="${{ matrix.os }}"
+          DOTNET_VERSION="${{ matrix.dotnet-version }}"
+          TRX_FILE="integration-test-${OS_NAME}-dotnet${DOTNET_VERSION}.trx"
+          reqstream --validate --results "$TRX_FILE" || {
             echo "✗ Self-validation with results failed"
             exit 1
           }
-          [ -f validation-results.trx ] || { echo "✗ Results file not created"; exit 1; }
+          [ -f "$TRX_FILE" ] || { echo "✗ Results file not created"; exit 1; }
           echo "✓ Self-validation with results succeeded"
+
+      - name: Upload integration test results
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: integration-test-results-${{ matrix.os }}-dotnet${{ matrix.dotnet-version }}
+          path: integration-test-*.trx
+
+  build-docs:
+    name: Build Documentation
+    runs-on: windows-latest
+    needs: [build, integration-test]
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Download all test results
+        uses: actions/download-artifact@v6
+        with:
+          path: test-results
+          pattern: '*test-results*'
+        continue-on-error: true
+
+      - name: Download package
+        uses: actions/download-artifact@v6
+        with:
+          name: packages-windows-latest
+          path: packages
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.x
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Restore dotnet tools
+        run: dotnet tool restore
+
+      - name: Install ReqStream from build
+        run: |
+          echo "Installing ReqStream version ${{ inputs.version }} from build..."
+          dotnet tool install --global --add-source packages --version ${{ inputs.version }} DemaConsulting.ReqStream
+
+      - name: Generate Requirements Report and Trace Matrix
+        run: >
+          reqstream
+          --requirements requirements.yaml
+          --tests "test-results/**/*.trx"
+          --report docs/requirements/requirements.md
+          --matrix docs/tracematrix/tracematrix.md
+
+      - name: Generate HTML with Pandoc
+        run: >
+          dotnet pandoc
+          --defaults docs/guide/definition.yaml
+          --filter node_modules/.bin/mermaid-filter.cmd
+          --output docs/guide/guide.html
+
+      - name: Generate PDF with Weasyprint
+        run: >
+          dotnet weasyprint
+          docs/guide/guide.html
+          docs/guide.pdf
+
+      - name: Generate Requirements HTML with Pandoc
+        run: >
+          dotnet pandoc
+          --defaults docs/requirements/definition.yaml
+          --output docs/requirements/requirements.html
+
+      - name: Generate Requirements PDF with Weasyprint
+        run: >
+          dotnet weasyprint
+          docs/requirements/requirements.html
+          docs/requirements.pdf
+
+      - name: Generate Trace Matrix HTML with Pandoc
+        run: >
+          dotnet pandoc
+          --defaults docs/tracematrix/definition.yaml
+          --output docs/tracematrix/tracematrix.html
+
+      - name: Generate Trace Matrix PDF with Weasyprint
+        run: >
+          dotnet weasyprint
+          docs/tracematrix/tracematrix.html
+          docs/tracematrix.pdf
+
+      - name: Upload documentation
+        uses: actions/upload-artifact@v6
+        with:
+          name: documentation
+          path: docs/*.pdf

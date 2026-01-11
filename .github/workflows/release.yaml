@@ -25,21 +25,14 @@ jobs:
       pull-requests: write
     uses: ./.github/workflows/build.yaml
     with:
-      os: ubuntu-latest
       version: ${{ inputs.version }}
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  build-docs:
-    name: Build Documentation
-    permissions:
-      contents: read
-    uses: ./.github/workflows/build_docs.yaml
-
   release:
     name: Release
     runs-on: ubuntu-latest
-    needs: [build, build-docs]
+    needs: build
     permissions:
       contents: write
 
