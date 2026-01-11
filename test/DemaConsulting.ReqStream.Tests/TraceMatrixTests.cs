@@ -918,4 +918,62 @@ sections:
         Assert.AreEqual(1, result.Executed);
         Assert.AreEqual(1, result.Passed);
     }
+
+    /// <summary>
+    ///     Test that a single test result can match multiple source-specific requirement tests.
+    ///     This occurs when a filename contains multiple matching source specifiers.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_WithMultipleSourceSpecifiers_MatchesAllRequirements()
+    {
+        // Create requirements with multiple source-specific tests for the same test name
+        var reqYaml = @"---
+sections:
+  - title: ""Multiple Source Specifiers Test""
+    requirements:
+      - id: ""MULTI-001""
+        title: ""Windows platform support""
+        tests:
+          - ""windows@Test_Platform""
+      - id: ""MULTI-002""
+        title: ""dotnet8 runtime support""
+        tests:
+          - ""dotnet8@Test_Platform""
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var requirements = Requirements.Read(reqPath);
+
+        // Create test results with filename containing both windows and dotnet8
+        var testResults = new TestResults.TestResults { Name = "TestRun" };
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_Platform",
+            ClassName = "Tests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+        var testPath = Path.Combine(_testDirectory, "integration-test-windows-latest-dotnet8.x.trx");
+        File.WriteAllText(testPath, TrxSerializer.Serialize(testResults));
+
+        // Create TraceMatrix
+        var matrix = new TraceMatrix(requirements, testPath);
+
+        // Verify the test matches both source-specific requirements
+        var windowsResult = matrix.GetTestResult("windows@Test_Platform");
+        Assert.IsNotNull(windowsResult);
+        Assert.AreEqual(1, windowsResult.Executed);
+        Assert.AreEqual(1, windowsResult.Passed);
+
+        var dotnet8Result = matrix.GetTestResult("dotnet8@Test_Platform");
+        Assert.IsNotNull(dotnet8Result);
+        Assert.AreEqual(1, dotnet8Result.Executed);
+        Assert.AreEqual(1, dotnet8Result.Passed);
+
+        // Verify both requirements would be satisfied
+        var (satisfied, total) = matrix.CalculateSatisfiedRequirements();
+        Assert.AreEqual(2, satisfied);
+        Assert.AreEqual(2, total);
+    }
 }

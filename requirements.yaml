@@ -125,6 +125,7 @@ sections:
             tests:
               - "TraceMatrix_WithSourceSpecificTests_MatchesCorrectly"
               - "TraceMatrix_WithSourceSpecificTests_DoesNotMatchOtherSources"
+              - "TraceMatrix_WithMultipleSourceSpecifiers_MatchesAllRequirements"
 
           - id: "TEST-006"
             title: "The tool shall perform case-insensitive matching of file parts in source-specific test names."
