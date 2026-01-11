@@ -481,68 +481,77 @@ public class TraceMatrix
         // Process each test result
         foreach (var result in testResults.Results)
         {
-            // Check if any required test matches this result
-            var matchingTestName = FindMatchingTestName(requiredTests, result.Name, fileBaseName);
-            if (matchingTestName == null)
+            // Find all required tests that match this result
+            var matchingTestNames = FindAllMatchingTestNames(requiredTests, result.Name, fileBaseName);
+            if (matchingTestNames.Count == 0)
             {
                 continue;
             }
 
-            // Get or create the test result entry using the full test name from requirements
-            if (!_testResults.TryGetValue(matchingTestName, out var entry))
+            // Update counts for each matching required test
+            foreach (var matchingTestName in matchingTestNames)
             {
-                entry = new TestResultEntry();
-                _testResults[matchingTestName] = entry;
-            }
+                // Get or create the test result entry using the full test name from requirements
+                if (!_testResults.TryGetValue(matchingTestName, out var entry))
+                {
+                    entry = new TestResultEntry();
+                    _testResults[matchingTestName] = entry;
+                }
 
-            // Update execution counts
-            entry.Executed++;
-            
-            if (result.Outcome == DemaConsulting.TestResults.TestOutcome.Passed)
-            {
-                entry.Passed++;
+                // Update execution counts
+                entry.Executed++;
+                
+                if (result.Outcome == DemaConsulting.TestResults.TestOutcome.Passed)
+                {
+                    entry.Passed++;
+                }
             }
         }
     }
 
     /// <summary>
-    ///     Finds a matching test name from the required tests set.
+    ///     Finds all matching test names from the required tests set.
     ///     Supports both plain test names and source-specific test names with the pattern: [filepart@]testname.
+    ///     A single test result can match multiple required test names if the file contains multiple matching source specifiers.
     /// </summary>
     /// <param name="requiredTests">Set of test names from requirements.</param>
     /// <param name="actualTestName">The actual test name from the test result file.</param>
     /// <param name="fileBaseName">The base name of the test result file (without extension).</param>
-    /// <returns>The matching test name from requirements, or null if no match found.</returns>
-    private static string? FindMatchingTestName(HashSet<string> requiredTests, string actualTestName, string fileBaseName)
+    /// <returns">A list of matching test names from requirements.</returns>
+    private static List<string> FindAllMatchingTestNames(HashSet<string> requiredTests, string actualTestName, string fileBaseName)
     {
-        // First, try to find an exact match with source specifier: <filepart>@<testname>
-        // Check if any filepart from the base name matches
+        var matches = new List<string>();
+
+        // Find all source-specific matches
         foreach (var requiredTest in requiredTests)
         {
             var (filePart, testName) = ParseTestName(requiredTest);
             
-            // If there's a file part, check if it matches and the test name matches
+            // If there's a file part and it matches the test name
             if (filePart != null && 
                 fileBaseName.Contains(filePart, StringComparison.OrdinalIgnoreCase) && 
                 testName == actualTestName)
             {
-                return requiredTest;
+                matches.Add(requiredTest);
             }
         }
 
-        // Second, try to find a plain test name match (no source specifier)
-        foreach (var requiredTest in requiredTests)
+        // If no source-specific matches were found, try plain test name match
+        if (matches.Count == 0)
         {
-            var (filePart, testName) = ParseTestName(requiredTest);
-            
-            // If there's no file part and the test name matches
-            if (filePart == null && testName == actualTestName)
+            foreach (var requiredTest in requiredTests)
             {
-                return requiredTest;
+                var (filePart, testName) = ParseTestName(requiredTest);
+                
+                // If there's no file part and the test name matches
+                if (filePart == null && testName == actualTestName)
+                {
+                    matches.Add(requiredTest);
+                }
             }
         }
 
-        return null;
+        return matches;
     }
 
     /// <summary>
