@@ -194,23 +194,32 @@ internal static class Program
         // Enforce requirements coverage if requested
         if (context.Enforce)
         {
-            if (traceMatrix != null)
+            EnforceRequirementsCoverage(context, traceMatrix);
+        }
+    }
+
+    /// <summary>
+    ///     Enforces that all requirements are satisfied with passing tests.
+    /// </summary>
+    /// <param name="context">The context for output.</param>
+    /// <param name="traceMatrix">The trace matrix containing test results, or null if no tests were provided.</param>
+    private static void EnforceRequirementsCoverage(Context context, TraceMatrix? traceMatrix)
+    {
+        if (traceMatrix == null)
+        {
+            context.WriteError("Error: Cannot enforce requirements without test results. Use --tests to specify test result files.");
+            return;
+        }
+
+        var (satisfied, total) = traceMatrix.CalculateSatisfiedRequirements();
+        if (satisfied < total)
+        {
+            var unsatisfied = traceMatrix.GetUnsatisfiedRequirements();
+            context.WriteError($"Error: Only {satisfied} of {total} requirements are satisfied with tests.");
+            context.WriteError("Unsatisfied requirements:");
+            foreach (var reqId in unsatisfied)
             {
-                var (satisfied, total) = traceMatrix.CalculateSatisfiedRequirements();
-                if (satisfied < total)
-                {
-                    var unsatisfied = traceMatrix.GetUnsatisfiedRequirements();
-                    context.WriteError($"Error: Only {satisfied} of {total} requirements are satisfied with tests.");
-                    context.WriteError("Unsatisfied requirements:");
-                    foreach (var reqId in unsatisfied)
-                    {
-                        context.WriteError($"  - {reqId}");
-                    }
-                }
-            }
-            else
-            {
-                context.WriteError("Error: Cannot enforce requirements without test results. Use --tests to specify test result files.");
+                context.WriteError($"  - {reqId}");
             }
         }
     }

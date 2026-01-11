@@ -257,54 +257,7 @@ public class Requirements : Section
             // Process each requirement in the source section
             foreach (var req in source.Requirements)
             {
-                // Validate requirement ID is not blank
-                if (string.IsNullOrWhiteSpace(req.Id))
-                {
-                    throw new InvalidOperationException(
-                        $"Requirement ID cannot be blank in section '{source.Title}' in file: {filePath}");
-                }
-
-                // Validate requirement title is not blank
-                if (string.IsNullOrWhiteSpace(req.Title))
-                {
-                    throw new InvalidOperationException(
-                        $"Requirement title cannot be blank for ID '{req.Id}' in file: {filePath}");
-                }
-
-                // Create the requirement with its basic properties
-                var requirement = new Requirement
-                {
-                    Id = req.Id,
-                    Title = req.Title
-                };
-
-                // Add any inline tests
-                if (req.Tests != null)
-                {
-                    // Validate no test names are blank
-                    if (req.Tests.Any(string.IsNullOrWhiteSpace))
-                    {
-                        throw new InvalidOperationException(
-                            $"Test name cannot be blank for requirement '{req.Id}' in file: {filePath}");
-                    }
-
-                    requirement.Tests.AddRange(req.Tests);
-                }
-
-                // Add any child requirement references
-                if (req.Children != null)
-                {
-                    requirement.Children.AddRange(req.Children);
-                }
-
-                // Check for duplicate requirement IDs and register the requirement
-                if (!_allRequirements.TryAdd(requirement.Id, requirement))
-                {
-                    throw new InvalidOperationException(
-                        $"Duplicate requirement ID found: '{requirement.Id}' in file: {filePath}");
-                }
-
-                // Add the requirement to the section
+                var requirement = CreateAndValidateRequirement(req, source.Title, filePath);
                 existingSection.Requirements.Add(requirement);
             }
         }
@@ -318,6 +271,66 @@ public class Requirements : Section
                 MergeSection(existingSection, childSection, filePath);
             }
         }
+    }
+
+    /// <summary>
+    ///     Creates and validates a requirement from YAML data.
+    /// </summary>
+    /// <param name="req">The YAML requirement to process.</param>
+    /// <param name="sectionTitle">The title of the section containing this requirement.</param>
+    /// <param name="filePath">The path to the file being processed for error messages.</param>
+    /// <returns>A validated Requirement object.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when validation fails.</exception>
+    private Requirement CreateAndValidateRequirement(YamlRequirement req, string sectionTitle, string filePath)
+    {
+        // Validate requirement ID is not blank
+        if (string.IsNullOrWhiteSpace(req.Id))
+        {
+            throw new InvalidOperationException(
+                $"Requirement ID cannot be blank in section '{sectionTitle}' in file: {filePath}");
+        }
+
+        // Validate requirement title is not blank
+        if (string.IsNullOrWhiteSpace(req.Title))
+        {
+            throw new InvalidOperationException(
+                $"Requirement title cannot be blank for ID '{req.Id}' in file: {filePath}");
+        }
+
+        // Create the requirement with its basic properties
+        var requirement = new Requirement
+        {
+            Id = req.Id,
+            Title = req.Title
+        };
+
+        // Add any inline tests
+        if (req.Tests != null)
+        {
+            // Validate no test names are blank
+            if (req.Tests.Any(string.IsNullOrWhiteSpace))
+            {
+                throw new InvalidOperationException(
+                    $"Test name cannot be blank for requirement '{req.Id}' in file: {filePath}");
+            }
+
+            requirement.Tests.AddRange(req.Tests);
+        }
+
+        // Add any child requirement references
+        if (req.Children != null)
+        {
+            requirement.Children.AddRange(req.Children);
+        }
+
+        // Check for duplicate requirement IDs and register the requirement
+        if (!_allRequirements.TryAdd(requirement.Id, requirement))
+        {
+            throw new InvalidOperationException(
+                $"Duplicate requirement ID found: '{requirement.Id}' in file: {filePath}");
+        }
+
+        return requirement;
     }
 
     /// <summary>
