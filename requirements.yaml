@@ -82,7 +82,7 @@ sections:
             title: "The tool shall support parent-child relationships between requirements."
             tests:
               - "Requirements_Read_RequirementWithChildren_ParsesChildrenCorrectly"
-              - "Export_WithChildRequirements_ConsidersChildTests"
+              - "TraceMatrix_Export_WithChildRequirements_ConsidersChildTests"
 
           - id: "REQ-010"
             title: "The tool shall support test mappings for requirements."
@@ -167,10 +167,10 @@ sections:
             title: "The tool shall export trace matrices to markdown format."
             tests:
               - "Program_Run_WithTraceMatrixExport_GeneratesMatrix"
-              - "Export_SimpleTraceMatrix_CreatesMarkdownFile"
-              - "Export_WithFailedTests_ShowsFailures"
-              - "Export_WithNoTests_ShowsNotSatisfied"
-              - "Export_WithNotExecutedTests_ShowsNotExecuted"
+              - "TraceMatrix_Export_SimpleTraceMatrix_CreatesMarkdownFile"
+              - "TraceMatrix_Export_WithFailedTests_ShowsFailures"
+              - "TraceMatrix_Export_WithNoTests_ShowsNotSatisfied"
+              - "TraceMatrix_Export_WithNotExecutedTests_ShowsNotExecuted"
 
           - id: "RPT-004"
             title: "The tool shall support configurable markdown header depth for trace matrices."

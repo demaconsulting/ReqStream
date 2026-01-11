@@ -60,7 +60,7 @@ public class TraceMatrixExportTests
     ///     Test exporting a simple trace matrix to Markdown.
     /// </summary>
     [TestMethod]
-    public void Export_SimpleTraceMatrix_CreatesMarkdownFile()
+    public void TraceMatrix_Export_SimpleTraceMatrix_CreatesMarkdownFile()
     {
         // Create requirements
         var reqYaml = @"---
@@ -123,7 +123,7 @@ sections:
     ///     Test exporting trace matrix with custom depth.
     /// </summary>
     [TestMethod]
-    public void Export_WithCustomDepth_UsesCorrectHeaderLevel()
+    public void TraceMatrix_Export_WithCustomDepth_UsesCorrectHeaderLevel()
     {
         // Create requirements
         var reqYaml = @"---
@@ -170,7 +170,7 @@ sections:
     ///     Test exporting trace matrix with failed tests.
     /// </summary>
     [TestMethod]
-    public void Export_WithFailedTests_ShowsFailures()
+    public void TraceMatrix_Export_WithFailedTests_ShowsFailures()
     {
         // Create requirements
         var reqYaml = @"---
@@ -227,7 +227,7 @@ sections:
     ///     Test exporting trace matrix with not executed tests.
     /// </summary>
     [TestMethod]
-    public void Export_WithNotExecutedTests_ShowsNotExecuted()
+    public void TraceMatrix_Export_WithNotExecutedTests_ShowsNotExecuted()
     {
         // Create requirements
         var reqYaml = @"---
@@ -274,7 +274,7 @@ sections:
     ///     Test exporting trace matrix with nested sections.
     /// </summary>
     [TestMethod]
-    public void Export_WithNestedSections_CreatesHierarchy()
+    public void TraceMatrix_Export_WithNestedSections_CreatesHierarchy()
     {
         // Create requirements
         var reqYaml = @"---
@@ -339,7 +339,7 @@ sections:
     ///     Test that export throws exception when file path is null.
     /// </summary>
     [TestMethod]
-    public void Export_NullFilePath_ThrowsArgumentException()
+    public void TraceMatrix_Export_NullFilePath_ThrowsArgumentException()
     {
         // Create requirements
         var reqYaml = @"---
@@ -373,7 +373,7 @@ sections:
     ///     Test that export throws exception when file path is empty.
     /// </summary>
     [TestMethod]
-    public void Export_EmptyFilePath_ThrowsArgumentException()
+    public void TraceMatrix_Export_EmptyFilePath_ThrowsArgumentException()
     {
         // Create requirements
         var reqYaml = @"---
@@ -407,7 +407,7 @@ sections:
     ///     Test exporting trace matrix with requirements that have child requirements.
     /// </summary>
     [TestMethod]
-    public void Export_WithChildRequirements_ConsidersChildTests()
+    public void TraceMatrix_Export_WithChildRequirements_ConsidersChildTests()
     {
         // Create requirements with children
         var reqYaml = @"---
@@ -460,7 +460,7 @@ sections:
     ///     Test exporting trace matrix with requirements that have no tests.
     /// </summary>
     [TestMethod]
-    public void Export_WithNoTests_ShowsNotSatisfied()
+    public void TraceMatrix_Export_WithNoTests_ShowsNotSatisfied()
     {
         // Create requirements with no tests
         var reqYaml = @"---
@@ -489,7 +489,7 @@ sections:
     ///     Test exporting trace matrix where a test maps to multiple requirements.
     /// </summary>
     [TestMethod]
-    public void Export_TestMapsToMultipleRequirements_ShowsAllMappings()
+    public void TraceMatrix_Export_TestMapsToMultipleRequirements_ShowsAllMappings()
     {
         // Create requirements where one test maps to multiple requirements
         var reqYaml = @"---
