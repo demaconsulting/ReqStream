@@ -199,16 +199,16 @@ sections:
           - id: "PLT-001"
             title: "The tool shall run on Windows operating systems."
             tests:
-              - "Program_Run_WithVersionFlag_PrintsVersion"
-              - "Program_Run_WithHelpFlag_PrintsHelp"
-              - "Context_Create_ValidateFlag_SetsValidateProperty"
+              - "windows-latest@Program_Run_WithVersionFlag_PrintsVersion"
+              - "windows-latest@Program_Run_WithHelpFlag_PrintsHelp"
+              - "windows-latest@Context_Create_ValidateFlag_SetsValidateProperty"
 
           - id: "PLT-002"
             title: "The tool shall run on Linux operating systems."
             tests:
-              - "Program_Run_WithVersionFlag_PrintsVersion"
-              - "Program_Run_WithHelpFlag_PrintsHelp"
-              - "Context_Create_ValidateFlag_SetsValidateProperty"
+              - "ubuntu-latest@Program_Run_WithVersionFlag_PrintsVersion"
+              - "ubuntu-latest@Program_Run_WithHelpFlag_PrintsHelp"
+              - "ubuntu-latest@Context_Create_ValidateFlag_SetsValidateProperty"
 
           - id: "PLT-003"
             title: "The tool shall run on macOS operating systems."
@@ -216,20 +216,20 @@ sections:
           - id: "PLT-004"
             title: "The tool shall support .NET 8.0 runtime."
             tests:
-              - "Program_Run_WithVersionFlag_PrintsVersion"
-              - "Program_Run_WithHelpFlag_PrintsHelp"
-              - "Context_Create_ValidateFlag_SetsValidateProperty"
+              - "dotnet8.x@Program_Run_WithVersionFlag_PrintsVersion"
+              - "dotnet8.x@Program_Run_WithHelpFlag_PrintsHelp"
+              - "dotnet8.x@Context_Create_ValidateFlag_SetsValidateProperty"
 
           - id: "PLT-005"
             title: "The tool shall support .NET 9.0 runtime."
             tests:
-              - "Program_Run_WithVersionFlag_PrintsVersion"
-              - "Program_Run_WithHelpFlag_PrintsHelp"
-              - "Context_Create_ValidateFlag_SetsValidateProperty"
+              - "dotnet9.x@Program_Run_WithVersionFlag_PrintsVersion"
+              - "dotnet9.x@Program_Run_WithHelpFlag_PrintsHelp"
+              - "dotnet9.x@Context_Create_ValidateFlag_SetsValidateProperty"
 
           - id: "PLT-006"
             title: "The tool shall support .NET 10.0 runtime."
             tests:
-              - "Program_Run_WithVersionFlag_PrintsVersion"
-              - "Program_Run_WithHelpFlag_PrintsHelp"
-              - "Context_Create_ValidateFlag_SetsValidateProperty"
+              - "dotnet10.x@Program_Run_WithVersionFlag_PrintsVersion"
+              - "dotnet10.x@Program_Run_WithHelpFlag_PrintsHelp"
+              - "dotnet10.x@Context_Create_ValidateFlag_SetsValidateProperty"

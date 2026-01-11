@@ -208,60 +208,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Download test results from Windows
+      - name: Download all test results
         uses: actions/download-artifact@v6
         with:
-          name: test-results-windows-latest
           path: test-results
-        continue-on-error: true
-
-      - name: Download test results from Linux
-        uses: actions/download-artifact@v6
-        with:
-          name: test-results-ubuntu-latest
-          path: test-results
-        continue-on-error: true
-
-      - name: Download integration test results Windows .NET 8.x
-        uses: actions/download-artifact@v6
-        with:
-          name: integration-test-results-windows-latest-dotnet8.x
-          path: test-results
-        continue-on-error: true
-
-      - name: Download integration test results Windows .NET 9.x
-        uses: actions/download-artifact@v6
-        with:
-          name: integration-test-results-windows-latest-dotnet9.x
-          path: test-results
-        continue-on-error: true
-
-      - name: Download integration test results Windows .NET 10.x
-        uses: actions/download-artifact@v6
-        with:
-          name: integration-test-results-windows-latest-dotnet10.x
-          path: test-results
-        continue-on-error: true
-
-      - name: Download integration test results Linux .NET 8.x
-        uses: actions/download-artifact@v6
-        with:
-          name: integration-test-results-ubuntu-latest-dotnet8.x
-          path: test-results
-        continue-on-error: true
-
-      - name: Download integration test results Linux .NET 9.x
-        uses: actions/download-artifact@v6
-        with:
-          name: integration-test-results-ubuntu-latest-dotnet9.x
-          path: test-results
-        continue-on-error: true
-
-      - name: Download integration test results Linux .NET 10.x
-        uses: actions/download-artifact@v6
-        with:
-          name: integration-test-results-ubuntu-latest-dotnet10.x
-          path: test-results
+          pattern: '*test-results*'
         continue-on-error: true
 
       - name: Setup Node.js
