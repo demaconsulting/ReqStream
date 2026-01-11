@@ -82,7 +82,7 @@ sections:
             title: "The tool shall support parent-child relationships between requirements."
             tests:
               - "Requirements_Read_RequirementWithChildren_ParsesChildrenCorrectly"
-              - "TraceMatrix_Export_WithChildRequirements_ConsidersChildTests"
+              - "Export_WithChildRequirements_ConsidersChildTests"
 
           - id: "REQ-010"
             title: "The tool shall support test mappings for requirements."
@@ -166,10 +166,10 @@ sections:
             title: "The tool shall export trace matrices to markdown format."
             tests:
               - "Program_Run_WithTraceMatrixExport_GeneratesMatrix"
-              - "TraceMatrix_Export_SimpleTraceMatrix_CreatesMarkdownFile"
-              - "TraceMatrix_Export_WithFailedTests_ShowsFailures"
-              - "TraceMatrix_Export_WithNoTests_ShowsNotSatisfied"
-              - "TraceMatrix_Export_WithNotExecutedTests_ShowsNotExecuted"
+              - "Export_SimpleTraceMatrix_CreatesMarkdownFile"
+              - "Export_WithFailedTests_ShowsFailures"
+              - "Export_WithNoTests_ShowsNotSatisfied"
+              - "Export_WithNotExecutedTests_ShowsNotExecuted"
 
           - id: "RPT-004"
             title: "The tool shall support configurable markdown header depth for trace matrices."
@@ -191,7 +191,7 @@ sections:
           - id: "VAL-001"
             title: "The tool shall support self-validation mode."
             tests:
-              - "Program_Run_WithValidateFlag_ShowsPlaceholder"
+              - "Program_Run_WithValidateFlag_RunsValidation"
               - "Context_Create_ValidateFlag_SetsValidateProperty"
 
       - title: "Platform Support"
@@ -199,37 +199,34 @@ sections:
           - id: "PLT-001"
             title: "The tool shall run on Windows operating systems."
             tests:
-              - "windows-latest@Program_Run_WithVersionFlag_PrintsVersion"
-              - "windows-latest@Program_Run_WithHelpFlag_PrintsHelp"
-              - "windows-latest@Context_Create_ValidateFlag_SetsValidateProperty"
+              - "windows-latest@RequirementsProcessing"
+              - "windows-latest@TraceMatrix"
+              - "windows-latest@ReportExport"
 
           - id: "PLT-002"
             title: "The tool shall run on Linux operating systems."
             tests:
-              - "ubuntu-latest@Program_Run_WithVersionFlag_PrintsVersion"
-              - "ubuntu-latest@Program_Run_WithHelpFlag_PrintsHelp"
-              - "ubuntu-latest@Context_Create_ValidateFlag_SetsValidateProperty"
-
-          - id: "PLT-003"
-            title: "The tool shall run on macOS operating systems."
+              - "ubuntu-latest@RequirementsProcessing"
+              - "ubuntu-latest@TraceMatrix"
+              - "ubuntu-latest@ReportExport"
 
           - id: "PLT-004"
             title: "The tool shall support .NET 8.0 runtime."
             tests:
-              - "dotnet8.x@Program_Run_WithVersionFlag_PrintsVersion"
-              - "dotnet8.x@Program_Run_WithHelpFlag_PrintsHelp"
-              - "dotnet8.x@Context_Create_ValidateFlag_SetsValidateProperty"
+              - "dotnet8.x@RequirementsProcessing"
+              - "dotnet8.x@TraceMatrix"
+              - "dotnet8.x@ReportExport"
 
           - id: "PLT-005"
             title: "The tool shall support .NET 9.0 runtime."
             tests:
-              - "dotnet9.x@Program_Run_WithVersionFlag_PrintsVersion"
-              - "dotnet9.x@Program_Run_WithHelpFlag_PrintsHelp"
-              - "dotnet9.x@Context_Create_ValidateFlag_SetsValidateProperty"
+              - "dotnet9.x@RequirementsProcessing"
+              - "dotnet9.x@TraceMatrix"
+              - "dotnet9.x@ReportExport"
 
           - id: "PLT-006"
             title: "The tool shall support .NET 10.0 runtime."
             tests:
-              - "dotnet10.x@Program_Run_WithVersionFlag_PrintsVersion"
-              - "dotnet10.x@Program_Run_WithHelpFlag_PrintsHelp"
-              - "dotnet10.x@Context_Create_ValidateFlag_SetsValidateProperty"
+              - "dotnet10.x@RequirementsProcessing"
+              - "dotnet10.x@TraceMatrix"
+              - "dotnet10.x@ReportExport"
