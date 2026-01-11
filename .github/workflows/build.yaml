@@ -215,6 +215,12 @@ jobs:
           pattern: '*test-results*'
         continue-on-error: true
 
+      - name: Download package
+        uses: actions/download-artifact@v6
+        with:
+          name: packages-windows-latest
+          path: packages
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -230,6 +236,11 @@ jobs:
 
       - name: Restore dotnet tools
         run: dotnet tool restore
+
+      - name: Install ReqStream from build
+        run: |
+          echo "Installing ReqStream version ${{ inputs.version }} from build..."
+          dotnet tool install --global --add-source packages --version ${{ inputs.version }} DemaConsulting.ReqStream
 
       - name: Generate Requirements Report and Trace Matrix
         run: >

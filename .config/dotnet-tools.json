@@ -2,12 +2,6 @@
   "version": 1,
   "isRoot": true,
   "tools": {
-    "demaconsulting.reqstream": {
-      "version": "0.1.0",
-      "commands": [
-        "reqstream"
-      ]
-    },
     "demaconsulting.spdxtool": {
       "version": "2.6.0",
       "commands": [
