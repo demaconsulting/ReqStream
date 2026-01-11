@@ -261,6 +261,8 @@ jobs:
       - name: Generate PDF with Weasyprint
         run: >
           dotnet weasyprint
+          --pdf-variant pdf/a-3u
+          --uncompressed-pdf
           docs/guide/guide.html
           docs/guide.pdf
 
@@ -273,6 +275,8 @@ jobs:
       - name: Generate Requirements PDF with Weasyprint
         run: >
           dotnet weasyprint
+          --pdf-variant pdf/a-3u
+          --uncompressed-pdf
           docs/requirements/requirements.html
           docs/requirements.pdf
 
@@ -285,6 +289,8 @@ jobs:
       - name: Generate Trace Matrix PDF with Weasyprint
         run: >
           dotnet weasyprint
+          --pdf-variant pdf/a-3u
+          --uncompressed-pdf
           docs/tracematrix/tracematrix.html
           docs/tracematrix.pdf
 
