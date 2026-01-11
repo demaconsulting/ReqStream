@@ -517,7 +517,7 @@ public class TraceMatrix
     /// <param name="requiredTests">Set of test names from requirements.</param>
     /// <param name="actualTestName">The actual test name from the test result file.</param>
     /// <param name="fileBaseName">The base name of the test result file (without extension).</param>
-    /// <returns">A list of matching test names from requirements.</returns>
+    /// <returns>A list of matching test names from requirements.</returns>
     private static List<string> FindAllMatchingTestNames(HashSet<string> requiredTests, string actualTestName, string fileBaseName)
     {
         var matches = new List<string>();

@@ -938,7 +938,7 @@ sections:
       - id: ""MULTI-002""
         title: ""dotnet8 runtime support""
         tests:
-          - ""dotnet8@Test_Platform""
+          - ""dotnet8.x@Test_Platform""
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
@@ -966,7 +966,7 @@ sections:
         Assert.AreEqual(1, windowsResult.Executed);
         Assert.AreEqual(1, windowsResult.Passed);
 
-        var dotnet8Result = matrix.GetTestResult("dotnet8@Test_Platform");
+        var dotnet8Result = matrix.GetTestResult("dotnet8.x@Test_Platform");
         Assert.IsNotNull(dotnet8Result);
         Assert.AreEqual(1, dotnet8Result.Executed);
         Assert.AreEqual(1, dotnet8Result.Passed);
