@@ -511,7 +511,8 @@ public class TraceMatrix
 
     /// <summary>
     ///     Finds all matching test names from the required tests set.
-    ///     Supports both plain test names and source-specific test names with the pattern: [filepart@]testname.
+    ///     Supports both plain test names and source-specific test names.
+    ///     Source-specific format: filepart@testname (where filepart matches part of the test result filename).
     ///     A single test result can match multiple required test names if the file contains multiple matching source specifiers.
     /// </summary>
     /// <param name="requiredTests">Set of test names from requirements.</param>
@@ -522,7 +523,8 @@ public class TraceMatrix
     {
         var matches = new List<string>();
 
-        // Find all source-specific matches
+        // Find all source-specific matches first
+        // This is O(n) where n is the number of required tests, which is acceptable for typical use cases
         foreach (var requiredTest in requiredTests)
         {
             var (filePart, testName) = ParseTestName(requiredTest);
