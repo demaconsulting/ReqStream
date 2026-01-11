@@ -263,7 +263,7 @@ jobs:
           dotnet weasyprint
           --pdf-variant pdf/a-3u
           docs/guide/guide.html
-          docs/guide.pdf
+          "docs/ReqStream User Guide.pdf"
 
       - name: Generate Requirements HTML with Pandoc
         run: >
@@ -276,7 +276,7 @@ jobs:
           dotnet weasyprint
           --pdf-variant pdf/a-3u
           docs/requirements/requirements.html
-          docs/requirements.pdf
+          "docs/ReqStream Requirements.pdf"
 
       - name: Generate Trace Matrix HTML with Pandoc
         run: >
@@ -289,7 +289,7 @@ jobs:
           dotnet weasyprint
           --pdf-variant pdf/a-3u
           docs/tracematrix/tracematrix.html
-          docs/tracematrix.pdf
+          "docs/ReqStream Trace Matrix.pdf"
 
       - name: Upload documentation
         uses: actions/upload-artifact@v6

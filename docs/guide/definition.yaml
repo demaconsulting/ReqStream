@@ -5,6 +5,6 @@ resource-path:
 input-files:
   - docs/guide/title.txt
   - docs/guide/guide.md
-template: guide_template.html
+template: template.html
 table-of-contents: true
 number-sections: true
