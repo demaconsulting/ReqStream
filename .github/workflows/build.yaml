@@ -262,7 +262,6 @@ jobs:
         run: >
           dotnet weasyprint
           --pdf-variant pdf/a-3u
-          --uncompressed-pdf
           docs/guide/guide.html
           docs/guide.pdf
 
@@ -276,7 +275,6 @@ jobs:
         run: >
           dotnet weasyprint
           --pdf-variant pdf/a-3u
-          --uncompressed-pdf
           docs/requirements/requirements.html
           docs/requirements.pdf
 
@@ -290,7 +288,6 @@ jobs:
         run: >
           dotnet weasyprint
           --pdf-variant pdf/a-3u
-          --uncompressed-pdf
           docs/tracematrix/tracematrix.html
           docs/tracematrix.pdf
 
