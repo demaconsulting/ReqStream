@@ -44,6 +44,7 @@ ReqStream/
 ├── .markdownlint.json            # Markdown linting rules
 ├── .yamllint.yaml                # YAML linting rules
 ├── AGENTS.md                     # This file
+├── ARCHITECTURE.md               # Architecture documentation
 ├── LICENSE                       # MIT License
 └── README.md                     # Project documentation
 ```
