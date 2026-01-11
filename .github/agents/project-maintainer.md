@@ -67,6 +67,7 @@ Located in `.github/workflows/`:
 - **`.yamllint.yaml`**: YAML linting rules
 - **`.config/dotnet-tools.json`**: Dotnet tools manifest
 - **`DemaConsulting.ReqStream.sln`**: Solution file
+- **`ARCHITECTURE.md`**: Comprehensive architecture documentation (reference for understanding tool behavior)
 
 ### Quality Standards
 

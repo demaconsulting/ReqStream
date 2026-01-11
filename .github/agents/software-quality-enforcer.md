@@ -85,6 +85,13 @@ Based on `.editorconfig` and project preferences:
   - EnforceCodeStyleInBuild enabled
   - AnalysisLevel set to latest
 
+### Architecture Understanding
+
+- **ARCHITECTURE.md**: Contains comprehensive guide to the tool's architecture and internal workings
+  - Review this document to understand the data model, processing flows, and design decisions
+  - Reference when reviewing changes to ensure they align with the architectural patterns
+  - Use when providing feedback about implementation choices
+
 ### Test Requirements
 
 - **Test Framework**: MSTest (Microsoft.VisualStudio.TestTools.UnitTesting)
