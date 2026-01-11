@@ -261,6 +261,11 @@ And exit with code 1, failing the build.
 - .NET SDK 8.0, 9.0, or 10.0
 - C# 12
 
+### Architecture
+
+For a comprehensive guide to the architecture and internal workings of ReqStream, see the
+[Architecture Documentation][architecture].
+
 ### Building
 
 ```bash
@@ -335,6 +340,7 @@ For information about reporting security vulnerabilities, please see our [Securi
 [nuget-shield]: https://img.shields.io/nuget/v/DemaConsulting.ReqStream
 [nuget-url]: https://www.nuget.org/packages/DemaConsulting.ReqStream
 [license]: https://github.com/demaconsulting/ReqStream/blob/main/LICENSE
+[architecture]: https://github.com/demaconsulting/ReqStream/blob/main/ARCHITECTURE.md
 [contributing]: https://github.com/demaconsulting/ReqStream/blob/main/CONTRIBUTING.md
 [code-of-conduct]: https://github.com/demaconsulting/ReqStream/blob/main/CODE_OF_CONDUCT.md
 [security]: https://github.com/demaconsulting/ReqStream/blob/main/SECURITY.md
