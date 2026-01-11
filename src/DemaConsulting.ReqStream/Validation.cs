@@ -105,7 +105,7 @@ public static class Validation
             using var tempDir = new TemporaryDirectory();
 
             // Create a simple requirements file
-            var reqFile = Path.Combine(tempDir.Path, "test-requirements.yaml");
+            var reqFile = Path.Combine(tempDir.DirectoryPath, "test-requirements.yaml");
             var yaml = @"sections:
   - title: Test Requirements
     requirements:
@@ -117,9 +117,9 @@ public static class Validation
             File.WriteAllText(reqFile, yaml);
 
             // Create a log file to capture output
-            var logFile = Path.Combine(tempDir.Path, "requirements-test.log");
+            var logFile = Path.Combine(tempDir.DirectoryPath, "requirements-test.log");
 
-            using (new DirectorySwitch(tempDir.Path))
+            using (new DirectorySwitch(tempDir.DirectoryPath))
             {
                 // Run the program with requirements file (using relative pattern)
                 int exitCode;
@@ -179,7 +179,7 @@ public static class Validation
             using var tempDir = new TemporaryDirectory();
 
             // Create requirements and test results files
-            var reqFile = Path.Combine(tempDir.Path, "matrix-requirements.yaml");
+            var reqFile = Path.Combine(tempDir.DirectoryPath, "matrix-requirements.yaml");
             var reqYaml = @"sections:
   - title: Matrix Test
     requirements:
@@ -191,7 +191,7 @@ public static class Validation
             File.WriteAllText(reqFile, reqYaml);
 
             // Create a simple TRX file
-            var trxFile = Path.Combine(tempDir.Path, "test-results.trx");
+            var trxFile = Path.Combine(tempDir.DirectoryPath, "test-results.trx");
             var testData = new DemaConsulting.TestResults.TestResults { Name = "ValidationTests" };
             testData.Results.Add(new DemaConsulting.TestResults.TestResult
             {
@@ -203,7 +203,7 @@ public static class Validation
             });
             File.WriteAllText(trxFile, TrxSerializer.Serialize(testData));
 
-            using (new DirectorySwitch(tempDir.Path))
+            using (new DirectorySwitch(tempDir.DirectoryPath))
             {
                 // Run the program with trace matrix (using relative paths)
                 int exitCode;
@@ -215,7 +215,7 @@ public static class Validation
                 }
 
                 // Check if execution succeeded and matrix file was created (check after context disposed)
-                var matrixFile = Path.Combine(tempDir.Path, "matrix.md");
+                var matrixFile = Path.Combine(tempDir.DirectoryPath, "matrix.md");
                 if (exitCode == 0 && File.Exists(matrixFile))
                 {
                     var matrixContent = File.ReadAllText(matrixFile);
@@ -264,7 +264,7 @@ public static class Validation
             using var tempDir = new TemporaryDirectory();
 
             // Create a requirements file
-            var reqFile = Path.Combine(tempDir.Path, "export-requirements.yaml");
+            var reqFile = Path.Combine(tempDir.DirectoryPath, "export-requirements.yaml");
             var reqYaml = @"sections:
   - title: Export Test
     requirements:
@@ -273,7 +273,7 @@ public static class Validation
 ";
             File.WriteAllText(reqFile, reqYaml);
 
-            using (new DirectorySwitch(tempDir.Path))
+            using (new DirectorySwitch(tempDir.DirectoryPath))
             {
                 // Run the program with report export (using relative paths)
                 int exitCode;
@@ -285,7 +285,7 @@ public static class Validation
                 }
 
                 // Check if execution succeeded and report file was created (check after context disposed)
-                var reportFile = Path.Combine(tempDir.Path, "report.md");
+                var reportFile = Path.Combine(tempDir.DirectoryPath, "report.md");
                 if (exitCode == 0 && File.Exists(reportFile))
                 {
                     var reportContent = File.ReadAllText(reportFile);
@@ -416,15 +416,15 @@ public static class Validation
         /// <summary>
         ///     Gets the path to the temporary directory.
         /// </summary>
-        public string Path { get; }
+        public string DirectoryPath { get; }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="TemporaryDirectory"/> class.
         /// </summary>
         public TemporaryDirectory()
         {
-            Path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"reqstream_validation_{Guid.NewGuid()}");
-            Directory.CreateDirectory(Path);
+            DirectoryPath = Path.Combine(Path.GetTempPath(), $"reqstream_validation_{Guid.NewGuid()}");
+            Directory.CreateDirectory(DirectoryPath);
         }
 
         /// <summary>
@@ -432,9 +432,9 @@ public static class Validation
         /// </summary>
         public void Dispose()
         {
-            if (Directory.Exists(Path))
+            if (Directory.Exists(DirectoryPath))
             {
-                Directory.Delete(Path, true);
+                Directory.Delete(DirectoryPath, true);
             }
         }
     }
