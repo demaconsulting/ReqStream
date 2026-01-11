@@ -325,7 +325,7 @@ public class TraceMatrix
         {
             // Write table header
             writer.WriteLine("| ID | Tests Linked | Passed | Failed | Not Executed |");
-            writer.WriteLine("|----|--------------|--------|--------|--------------|");
+            writer.WriteLine("| :- | -----------: | :-: | :-: | :-: |");
 
             // Write each requirement
             foreach (var requirement in section.Requirements)

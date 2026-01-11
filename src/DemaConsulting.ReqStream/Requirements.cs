@@ -113,7 +113,7 @@ public class Requirements : Section
         {
             // Write table header
             writer.WriteLine("| ID | Title |");
-            writer.WriteLine("|----|-------|");
+            writer.WriteLine("| :- | :---- |");
 
             // Write each requirement
             foreach (var requirement in section.Requirements)
