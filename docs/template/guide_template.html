@@ -18,6 +18,12 @@ $if(description-meta)$
 $endif$
   <title>$if(title-prefix)$$title-prefix$ – $endif$$pagetitle$</title>
   <style>
+/* 
+ * This template uses CSS Paged Media Level 3 features (@page, string-set, target-counter)
+ * which require a compatible PDF generator such as Weasyprint or Prince.
+ * These features may not work with other tools like wkhtmltopdf or Puppeteer.
+ */
+
 /* General styling */
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
