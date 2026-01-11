@@ -2,7 +2,7 @@
 title: ReqStream User Guide
 subtitle: A .NET Command-Line Tool for Requirements Management
 author: DEMA Consulting
-subject: A .NET Command-Line Tool for Requirements Management
+description: A .NET Command-Line Tool for Requirements Management
 lang: en-US
 keywords:
   - ReqStream
