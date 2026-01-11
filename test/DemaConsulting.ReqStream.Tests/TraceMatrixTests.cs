@@ -55,6 +55,9 @@ public class TraceMatrixTests
     }
 
     /// <summary>
+    ///     Test source-specific test matching with filepart@testname pattern.
+    /// </summary>
+    [TestMethod]
     public void TraceMatrix_WithSourceSpecificTests_MatchesCorrectly()
     {
         // Create requirements with source-specific test names

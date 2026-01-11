@@ -139,6 +139,41 @@ public class TraceMatrix
     }
 
     /// <summary>
+    ///     Gets a list of requirement IDs that are not satisfied.
+    ///     A requirement is not satisfied if it has no tests or any of its tests have not been executed or have failed.
+    /// </summary>
+    /// <returns>A list of unsatisfied requirement IDs.</returns>
+    public List<string> GetUnsatisfiedRequirements()
+    {
+        var unsatisfied = new List<string>();
+        CollectUnsatisfiedRequirements(_requirements, unsatisfied);
+        return unsatisfied;
+    }
+
+    /// <summary>
+    ///     Collects unsatisfied requirement IDs from a section and its subsections.
+    /// </summary>
+    /// <param name="section">The section to analyze.</param>
+    /// <param name="unsatisfied">The list to add unsatisfied requirement IDs to.</param>
+    private void CollectUnsatisfiedRequirements(Section section, List<string> unsatisfied)
+    {
+        // Check requirements in this section
+        foreach (var requirement in section.Requirements)
+        {
+            if (!IsRequirementSatisfied(requirement, _requirements))
+            {
+                unsatisfied.Add(requirement.Id);
+            }
+        }
+
+        // Recursively check child sections
+        foreach (var childSection in section.Sections)
+        {
+            CollectUnsatisfiedRequirements(childSection, unsatisfied);
+        }
+    }
+
+    /// <summary>
     ///     Calculates how many requirements are satisfied.
     ///     A requirement is satisfied if it has at least one test and all tests have passed.
     /// </summary>

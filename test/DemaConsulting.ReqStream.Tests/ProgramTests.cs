@@ -483,6 +483,10 @@ sections:
 
         // Save current directory and change to test directory
         var originalDir = Directory.GetCurrentDirectory();
+        var originalOut = Console.Out;
+        var output = new StringWriter();
+        Console.SetOut(output);
+
         try
         {
             Directory.SetCurrentDirectory(_testDirectory);
@@ -495,9 +499,16 @@ sections:
             Program.Run(context);
 
             Assert.AreEqual(1, context.ExitCode);
+            
+            // Verify error message includes the unsatisfied requirement
+            var outputText = output.ToString();
+            Assert.Contains("Only 1 of 2 requirements are satisfied", outputText);
+            Assert.Contains("Unsatisfied requirements:", outputText);
+            Assert.Contains("REQ-002", outputText);
         }
         finally
         {
+            Console.SetOut(originalOut);
             Directory.SetCurrentDirectory(originalDir);
         }
     }
