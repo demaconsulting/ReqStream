@@ -244,7 +244,7 @@ jobs:
 
       - name: Generate Requirements Report and Trace Matrix
         run: >
-          dotnet reqstream
+          reqstream
           --requirements requirements.yaml
           --tests "test-results/**/*.trx"
           --report docs/requirements/requirements.md
