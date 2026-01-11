@@ -157,14 +157,11 @@ public class TraceMatrix
     /// <param name="unsatisfied">The list to add unsatisfied requirement IDs to.</param>
     private void CollectUnsatisfiedRequirements(Section section, List<string> unsatisfied)
     {
-        // Check requirements in this section
-        foreach (var requirement in section.Requirements)
-        {
-            if (!IsRequirementSatisfied(requirement, _requirements))
-            {
-                unsatisfied.Add(requirement.Id);
-            }
-        }
+        // Check requirements in this section using LINQ Where
+        unsatisfied.AddRange(
+            section.Requirements
+                .Where(requirement => !IsRequirementSatisfied(requirement, _requirements))
+                .Select(requirement => requirement.Id));
 
         // Recursively check child sections
         foreach (var childSection in section.Sections)
