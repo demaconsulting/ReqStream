@@ -295,7 +295,4 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: documentation
-          path: |
-            docs/ReqStream User Guide.pdf
-            docs/ReqStream Requirements.pdf
-            docs/ReqStream Trace Matrix.pdf
+          path: docs/*.pdf
