@@ -48,12 +48,15 @@ update, and maintain high-quality documentation that is clear, accurate, and hel
 ### Documentation Content
 
 - **README.md**: Keep concise and focused on getting started quickly
+- **ARCHITECTURE.md**: Comprehensive guide to the tool's architecture and internal workings (reference this when
+  explaining how the tool works)
 - **Code Examples**: Use proper YAML formatting for requirement examples
 - **CLI Usage**: Document all command-line options and arguments
 - **API Documentation**: Use clear descriptions and examples
 
 ### Technical Accuracy
 
+- Review ARCHITECTURE.md for understanding the tool's behavior and internal design
 - Verify all code examples work correctly
 - Test CLI commands before documenting them
 - Keep documentation synchronized with code changes

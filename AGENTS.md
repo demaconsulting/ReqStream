@@ -12,6 +12,10 @@ updated as agents are configured for this repository.
 ReqStream is a .NET command-line tool for managing requirements written in YAML files. It provides functionality to
 create, validate, and manage requirement documents in a structured and maintainable way.
 
+For detailed information about the architecture and internal workings of ReqStream, see [ARCHITECTURE.md][architecture].
+This document provides comprehensive coverage of the data model, requirements processing flow, trace matrix
+construction, and test coverage enforcement mechanisms.
+
 ### Technology Stack
 
 - **Language**: C# 12
@@ -51,6 +55,7 @@ ReqStream/
 - **`.markdownlint.json`**: Markdown linting rules
 - **`.yamllint.yaml`**: YAML linting rules
 - **`DemaConsulting.ReqStream.sln`**: Solution file containing all projects
+- **`ARCHITECTURE.md`**: Comprehensive guide to the tool's architecture and internal design
 
 ## Testing Guidelines
 
@@ -209,3 +214,5 @@ As the project grows, we may add additional custom agents for:
 
 If you have suggestions for custom agents that would benefit this project, please open an issue or submit a pull
 request.
+
+[architecture]: ARCHITECTURE.md
