@@ -7,24 +7,6 @@ This document provides comprehensive guidance for GitHub Copilot agents working 
 GitHub Copilot agents are AI-powered assistants that help with various development tasks. This document will be
 updated as agents are configured for this repository.
 
-## ⚠️ CRITICAL: Quality Checks Are Mandatory
-
-**Before completing ANY task or using report_progress:**
-
-1. **ALWAYS include quality checks in your initial plan** - Add "Run quality checks (markdownlint, cspell, yamllint)"
-   as a checklist item when you create your plan with report_progress
-2. **ALWAYS run quality checks BEFORE the final commit** - Even for documentation-only changes
-3. **NEVER skip quality checks** - CI will fail if you don't catch issues locally
-
-**Quality checks to run:**
-
-- **Markdown files changed**: Check line length ≤120 chars with `grep -n "^.\{121,\}" file.md`
-- **All files changed**: Verify spelling (check against `.cspell.json` custom dictionary)
-- **YAML files changed**: Run `yamllint file.yaml` (already installed at `/opt/pipx_bin/yamllint`)
-
-**Why this matters**: Quality check failures block the entire CI pipeline, preventing builds and tests from running.
-Fix issues locally before pushing to avoid wasting CI resources and blocking the build.
-
 ## Project Overview
 
 ReqStream is a .NET command-line tool for managing requirements written in YAML files. It provides functionality to
@@ -174,26 +156,17 @@ dotnet pack --no-build --configuration Release
 
 ## Pre-Finalization Quality Checks
 
-**⚠️ CRITICAL REMINDER: These checks are MANDATORY before every commit/push!**
-
 Before completing any task, you **MUST** perform these checks in order and ensure they all pass:
 
 1. **Build and Test**: Run `dotnet build --configuration Release && dotnet test --configuration Release` - all tests
    must pass with zero warnings
 2. **Code Review**: Use `code_review` tool and address all valid concerns
 3. **Security Scanning**: Use `codeql_checker` tool after code review - must report zero vulnerabilities
-4. **Linting**: **MANDATORY** - Run all linters locally and fix any issues before pushing changes:
+4. **Linting**: Run all linters locally and fix any issues before pushing changes:
    - **Markdown**: Run markdownlint on all changed `.md` files - must pass with zero errors
-     - Quick check: `grep -n "^.\{121,\}" file.md` to find lines over 120 characters
    - **Spell Check**: Run cspell on all changed files - must pass with zero errors
-     - Check words against `.cspell.json` custom dictionary
    - **YAML**: Run yamllint on all changed `.yaml` or `.yml` files - must pass with zero errors
-     - Command: `yamllint file.yaml` (installed at `/opt/pipx_bin/yamllint`)
    - These linters run in CI and will fail the build if not passing
-   - **DO NOT** rely solely on CI to catch linting issues - catch them locally first
-
-**Why these checks matter**: Quality check failures in CI block the entire pipeline, preventing builds, tests, and
-deployments. Always validate locally to avoid wasting CI resources and blocking other work.
 
 ## Project-Specific Guidelines
 
@@ -228,18 +201,5 @@ responsibilities, and project-specific conventions.
   dependency updates, CI/CD maintenance, and release coordination
 - **Software Quality Enforcer** (`.github/agents/software-quality-enforcer.md`) - Expert agent for code quality,
   testing standards, code reviews, and security analysis
-
-## Future Agents
-
-As the project grows, we may add additional custom agents for:
-
-- Test generation
-- Requirements validation
-- YAML file parsing and validation
-
-## Contributing
-
-If you have suggestions for custom agents that would benefit this project, please open an issue or submit a pull
-request.
 
 [architecture]: ARCHITECTURE.md
