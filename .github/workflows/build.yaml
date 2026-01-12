@@ -138,7 +138,7 @@ jobs:
 
     steps:
       - name: Download package
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: packages-${{ matrix.os }}
           path: packages
@@ -209,14 +209,14 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Download all test results
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           path: test-results
           pattern: '*test-results*'
         continue-on-error: true
 
       - name: Download package
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: packages-windows-latest
           path: packages
