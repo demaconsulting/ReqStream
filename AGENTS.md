@@ -131,7 +131,7 @@ ReqStream/
 - **Linting**:
   - **Markdown**: Must pass markdownlint (max line length: 120 chars)
     - Lists must be surrounded by blank lines (MD032)
-    - Check CI workflow files in `.github/workflows/` for linting tool configurations
+    - Run locally: Check CI workflow for markdownlint-cli2-action usage
   - **Spell Check**: Must pass cspell (custom dictionary in `.cspell.json`)
     - Add project-specific terms to the custom dictionary if needed
   - **YAML**: Must pass yamllint (2-space indentation, max line length: 120 chars)
@@ -162,10 +162,10 @@ Before completing any task, you **MUST** perform these checks in order and ensur
    must pass with zero warnings
 2. **Code Review**: Use `code_review` tool and address all valid concerns
 3. **Security Scanning**: Use `codeql_checker` tool after code review - must report zero vulnerabilities
-4. **Linting**: **MANDATORY** - All linting checks must pass before pushing changes:
-   - **Markdown**: Must pass markdownlint checks - must pass with zero errors
-   - **Spell Check**: Must pass cspell checks - must pass with zero errors
-   - **YAML**: Must pass yamllint checks - must pass with zero errors
+4. **Linting**: **MANDATORY** - Run all linters locally and fix any issues before pushing changes:
+   - **Markdown**: Run markdownlint on all changed `.md` files - must pass with zero errors
+   - **Spell Check**: Run cspell on all changed files - must pass with zero errors
+   - **YAML**: Run yamllint on all changed `.yaml` or `.yml` files - must pass with zero errors
    - These linters run in CI and will fail the build if not passing
    - **DO NOT** rely solely on CI to catch linting issues - catch them locally first
 

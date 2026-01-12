@@ -140,7 +140,18 @@ The CI pipeline runs the following checks:
 - **Spell checking**: Validates spelling in markdown and C# files
 - **YAML linting**: Validates YAML file structure
 
-Refer to the CI/CD workflow files in `.github/workflows/` for specific linting tool configurations and versions.
+You can run these locally if you have the tools installed:
+
+```bash
+# Markdown linting
+markdownlint-cli2 "**/*.md"
+
+# Spell checking
+cspell "**/*.md" "**/*.cs"
+
+# YAML linting
+yamllint .
+```
 
 ## Pull Request Process
 
