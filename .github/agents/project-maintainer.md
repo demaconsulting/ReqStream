@@ -199,16 +199,7 @@ dotnet pack --no-build --configuration Release
 
 ### Linting Commands
 
-```bash
-# Markdown linting
-markdownlint-cli2 "**/*.md"
-
-# Spell checking
-cspell "**/*.md" "**/*.cs"
-
-# YAML linting
-yamllint .
-```
+Use the project's CI pipeline configuration as the source of truth for linting commands. Linting tools and their specific versions are managed through the CI/CD workflows.
 
 ## Integration with Development
 
