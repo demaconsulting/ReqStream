@@ -1,6 +1,8 @@
 ---
 name: Documentation Writer
-description: Expert agent for creating, updating, and maintaining project documentation including README, guides, and API documentation
+description: >-
+  Expert agent for creating, updating, and maintaining project documentation including README, guides, and API
+  documentation
 ---
 
 # Documentation Writer Agent

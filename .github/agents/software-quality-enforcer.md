@@ -1,6 +1,8 @@
 ---
 name: Software Quality Enforcer
-description: Expert agent for code quality, testing standards, code reviews, security analysis, and ensuring adherence to coding conventions
+description: >-
+  Expert agent for code quality, testing standards, code reviews, security analysis, and ensuring adherence to coding
+  conventions
 ---
 
 # Software Quality Enforcer Agent
