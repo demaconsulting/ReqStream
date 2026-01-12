@@ -59,6 +59,8 @@ Based on `.editorconfig` and project preferences:
 - **Using Directives**: Sort system directives first
 - **Encoding**: UTF-8 with BOM
 - **Line Endings**: LF with final newline
+- **Literate Coding Style**: Each "paragraph" of code should start with a comment explaining what it does, with
+  paragraphs separated by blank lines. This makes code more readable and self-documenting.
 
 ### Naming Conventions
 
