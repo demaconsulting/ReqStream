@@ -162,12 +162,11 @@ Before completing any task, you **MUST** perform these checks in order and ensur
    must pass with zero warnings
 2. **Code Review**: Use `code_review` tool and address all valid concerns
 3. **Security Scanning**: Use `codeql_checker` tool after code review - must report zero vulnerabilities
-4. **Linting**: **MANDATORY** - Run all linters locally and fix any issues before pushing changes:
+4. **Linting**: Run all linters locally and fix any issues before pushing changes:
    - **Markdown**: Run markdownlint on all changed `.md` files - must pass with zero errors
    - **Spell Check**: Run cspell on all changed files - must pass with zero errors
    - **YAML**: Run yamllint on all changed `.yaml` or `.yml` files - must pass with zero errors
    - These linters run in CI and will fail the build if not passing
-   - **DO NOT** rely solely on CI to catch linting issues - catch them locally first
 
 ## Project-Specific Guidelines
 
@@ -202,18 +201,5 @@ responsibilities, and project-specific conventions.
   dependency updates, CI/CD maintenance, and release coordination
 - **Software Quality Enforcer** (`.github/agents/software-quality-enforcer.md`) - Expert agent for code quality,
   testing standards, code reviews, and security analysis
-
-## Future Agents
-
-As the project grows, we may add additional custom agents for:
-
-- Test generation
-- Requirements validation
-- YAML file parsing and validation
-
-## Contributing
-
-If you have suggestions for custom agents that would benefit this project, please open an issue or submit a pull
-request.
 
 [architecture]: ARCHITECTURE.md

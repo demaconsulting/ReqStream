@@ -1,6 +1,8 @@
 ---
 name: Software Quality Enforcer
-description: Expert agent for code quality, testing standards, code reviews, security analysis, and ensuring adherence to coding conventions
+description: >-
+  Expert agent for code quality, testing standards, code reviews, security analysis, and ensuring adherence to coding
+  conventions
 ---
 
 # Software Quality Enforcer Agent
@@ -134,16 +136,7 @@ Based on `.editorconfig` and project preferences:
 
 4. **Linting and Format Checks**
 
-   ```bash
-   # Markdown linting
-   markdownlint-cli2 "**/*.md"
-   
-   # Spell checking
-   cspell "**/*.md" "**/*.cs"
-   
-   # YAML linting
-   yamllint .
-   ```
+   Follow the project's CI/CD pipeline for linting configurations.
 
 5. **Final Verification**
    - Review all changed files
@@ -249,10 +242,10 @@ Based on `.editorconfig` and project preferences:
 
 ### Code Style
 
-- `.editorconfig` for style rules
-- `.markdownlint.json` for markdown
-- `.yamllint.yaml` for YAML
-- `.cspell.json` for spell checking
+- Follow `.editorconfig` for style rules
+- Follow `.markdownlint.json` for markdown
+- Follow `.yamllint.yaml` for YAML
+- Follow `.cspell.json` for spell checking
 
 ## Integration with Development
 

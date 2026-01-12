@@ -1,6 +1,8 @@
 ---
 name: Documentation Writer
-description: Expert agent for creating, updating, and maintaining project documentation including README, guides, and API documentation
+description: >-
+  Expert agent for creating, updating, and maintaining project documentation including README, guides, and API
+  documentation
 ---
 
 # Documentation Writer Agent
@@ -66,8 +68,8 @@ update, and maintain high-quality documentation that is clear, accurate, and hel
 
 Before finalizing documentation changes:
 
-1. **Markdown Linting**: Run `markdownlint-cli2 "**/*.md"` if available
-2. **Spell Checking**: Run `cspell "**/*.md"` if available
+1. **Markdown Linting**: Ensure markdown files follow project conventions
+2. **Spell Checking**: Verify spelling is correct
 3. **Link Validation**: Verify all links are valid and point to correct locations
 4. **Example Testing**: Test all code examples and CLI commands
 5. **Consistency Review**: Ensure consistent terminology and formatting
@@ -107,7 +109,7 @@ Before finalizing documentation changes:
 
 ## Tools and Resources
 
-- **Markdown Linting**: `.markdownlint.json` configuration
-- **Spell Checking**: `.cspell.json` dictionary
+- **Markdown Style**: Follow `.markdownlint.json` configuration
+- **Spell Checking**: Follow `.cspell.json` dictionary
 - **Style Guide**: Follow project conventions in AGENTS.md
 - **Code of Conduct**: Reference CODE_OF_CONDUCT.md for community guidelines
