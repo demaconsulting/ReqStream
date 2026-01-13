@@ -147,6 +147,11 @@ sections:
             tests:
               - "TraceMatrix_WithMixedTestNames_MatchesAppropriately"
 
+          - id: "TEST-010"
+            title: "The tool shall allow a test to satisfy multiple requirements when referenced with and without file filters."
+            tests:
+              - "TraceMatrix_WithMixedFilterAndPlainReferences_MatchesBoth"
+
       - title: "Reporting"
         requirements:
           - id: "RPT-001"
