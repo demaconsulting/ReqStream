@@ -545,7 +545,7 @@ public class TraceMatrix
     ///     Finds all matching test names from the required tests set.
     ///     Supports both plain test names and source-specific test names.
     ///     Source-specific format: filepart@testname (where filepart matches part of the test result filename).
-    ///     A single test result can match multiple required test names if the file contains multiple matching source specifiers.
+    ///     A single test result can match multiple required test names, including both source-specific and plain names.
     /// </summary>
     /// <param name="requiredTests">Set of test names from requirements.</param>
     /// <param name="actualTestName">The actual test name from the test result file.</param>
@@ -555,33 +555,30 @@ public class TraceMatrix
     {
         var matches = new List<string>();
 
-        // Find all source-specific matches first
+        // Check all required tests for matches
+        // A test can match both source-specific formats and plain formats
         // This is O(n) where n is the number of required tests, which is acceptable for typical use cases
         foreach (var requiredTest in requiredTests)
         {
             var (filePart, testName) = ParseTestName(requiredTest);
             
-            // If there's a file part and it matches the test name
-            if (filePart != null && 
-                fileBaseName.Contains(filePart, StringComparison.OrdinalIgnoreCase) && 
-                testName == actualTestName)
+            // Skip if test name doesn't match
+            if (testName != actualTestName)
+            {
+                continue;
+            }
+
+            // Match if it's a plain test name (no file part)
+            if (filePart == null)
             {
                 matches.Add(requiredTest);
+                continue;
             }
-        }
 
-        // If no source-specific matches were found, try plain test name match
-        if (matches.Count == 0)
-        {
-            foreach (var requiredTest in requiredTests)
+            // Match if it's a source-specific test and the file part matches
+            if (fileBaseName.Contains(filePart, StringComparison.OrdinalIgnoreCase))
             {
-                var (filePart, testName) = ParseTestName(requiredTest);
-                
-                // If there's no file part and the test name matches
-                if (filePart == null && testName == actualTestName)
-                {
-                    matches.Add(requiredTest);
-                }
+                matches.Add(requiredTest);
             }
         }
 
