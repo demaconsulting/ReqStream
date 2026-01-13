@@ -454,4 +454,65 @@ sections:
         Assert.AreEqual(2, satisfied);
         Assert.AreEqual(2, total);
     }
+
+    /// <summary>
+    ///     Test that a test referenced in multiple requirements (some with file-filter, some without)
+    ///     is correctly detected for all requirements.
+    ///     This is a regression test for the issue where a test with source-specific format would
+    ///     prevent matching the same test with plain format in the same file.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_WithMixedFilterAndPlainReferences_MatchesBoth()
+    {
+        // Create requirements where the same test is referenced with and without file filter
+        var reqYaml = @"---
+sections:
+  - title: ""Mixed References Test""
+    requirements:
+      - id: ""REQ-001""
+        title: ""Platform-specific requirement""
+        tests:
+          - ""windows@Test_SharedTest""
+      - id: ""REQ-002""
+        title: ""General requirement (no filter)""
+        tests:
+          - ""Test_SharedTest""
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var requirements = Requirements.Read(reqPath);
+
+        // Create a Windows test result file containing the shared test
+        var testResults = new TestResults.TestResults { Name = "TestRun" };
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_SharedTest",
+            ClassName = "Tests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+        var testPath = Path.Combine(_testDirectory, "test-results-windows-latest.trx");
+        File.WriteAllText(testPath, TrxSerializer.Serialize(testResults));
+
+        // Create TraceMatrix
+        var matrix = new TraceMatrix(requirements, testPath);
+
+        // Verify the source-specific test is tracked
+        var sourceSpecificResult = matrix.GetTestResult("windows@Test_SharedTest");
+        Assert.IsNotNull(sourceSpecificResult, "Source-specific test should be tracked");
+        Assert.AreEqual(1, sourceSpecificResult.Executed);
+        Assert.AreEqual(1, sourceSpecificResult.Passed);
+
+        // Verify the plain test is ALSO tracked (this is the bug - it won't be tracked)
+        var plainResult = matrix.GetTestResult("Test_SharedTest");
+        Assert.IsNotNull(plainResult, "Plain test name should also be tracked from the same file");
+        Assert.AreEqual(1, plainResult.Executed);
+        Assert.AreEqual(1, plainResult.Passed);
+
+        // Verify both requirements are satisfied
+        var (satisfied, total) = matrix.CalculateSatisfiedRequirements();
+        Assert.AreEqual(2, satisfied, "Both requirements should be satisfied");
+        Assert.AreEqual(2, total);
+    }
 }
