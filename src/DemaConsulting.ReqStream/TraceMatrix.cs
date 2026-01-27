@@ -242,13 +242,9 @@ public class TraceMatrix
         }
 
         // Recursively add tests from children
-        foreach (var childId in requirement.Children)
+        foreach (var childReq in requirement.Children.Select(childId => FindRequirement(rootSection, childId)).Where(childReq => childReq != null))
         {
-            var childReq = FindRequirement(rootSection, childId);
-            if (childReq != null)
-            {
-                CollectAllTests(childReq, rootSection, allTests);
-            }
+            CollectAllTests(childReq!, rootSection, allTests);
         }
     }
 
@@ -340,9 +336,8 @@ public class TraceMatrix
         var failed = 0;
         var notExecuted = 0;
 
-        foreach (var testName in requirement.Tests)
+        foreach (var result in requirement.Tests.Select(testName => GetTestResult(testName)))
         {
-            var result = GetTestResult(testName);
             if (result == null || result.Executed == 0)
             {
                 notExecuted++;

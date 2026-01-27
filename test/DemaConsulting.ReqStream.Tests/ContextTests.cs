@@ -653,14 +653,9 @@ public class ContextTests
     {
         var logPath = Path.Combine(_testDirectory, "test.log");
 
-        var context = Context.Create(["--log", logPath, "--silent"]);
-        try
+        using (var context = Context.Create(["--log", logPath, "--silent"]))
         {
             context.WriteLine("Test message");
-        }
-        finally
-        {
-            context.Dispose();
         }
 
         // Should be able to delete the file after dispose
