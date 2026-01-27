@@ -28,7 +28,11 @@
     "Blockquotes",
     "tracematrix",
     "testname",
-    "filepart"
+    "filepart",
+    "hotspots",
+    "CodeQL",
+    "SonarMark",
+    "SarifMark"
   ],
   "ignorePaths": [
     "node_modules",

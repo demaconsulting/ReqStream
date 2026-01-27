@@ -1,0 +1,17 @@
+---
+# CodeQL configuration for ReqStream
+# Excludes test code from path-combine security analysis
+# Excludes justified generic exception handlers
+
+name: "ReqStream CodeQL Config"
+
+# Query filters to disable specific queries for certain paths
+query-filters:
+  - exclude:
+      id: cs/path-combine
+    paths:
+      - test/**/*.cs
+  - exclude:
+      id: cs/catch-of-all-exceptions
+    paths:
+      - src/DemaConsulting.ReqStream/Program.cs

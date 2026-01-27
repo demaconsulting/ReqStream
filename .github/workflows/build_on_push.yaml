@@ -13,6 +13,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      security-events: write
     uses: ./.github/workflows/build.yaml
     with:
       version: 0.0.0-run.${{ github.run_number }}

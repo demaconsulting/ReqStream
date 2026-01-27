@@ -197,10 +197,65 @@ jobs:
           name: integration-test-results-${{ matrix.os }}-dotnet${{ matrix.dotnet-version }}
           path: integration-test-*.trx
 
+  codeql:
+    name: CodeQL Analysis
+    needs: quality-checks
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            8.x
+            9.x
+            10.x
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: csharp
+          queries: security-and-quality
+          config-file: ./.github/codeql-config.yml
+          build-mode: manual
+
+      - name: Restore dotnet tools
+        run: dotnet tool restore
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: >
+          dotnet build
+          --no-restore
+          --configuration Release
+          --property:Version=${{ inputs.version }}
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:csharp"
+          output: sarif-results
+          upload: false
+
+      - name: Upload SARIF
+        uses: actions/upload-artifact@v6
+        with:
+          name: codeql-sarif
+          path: sarif-results/csharp.sarif
+
   build-docs:
     name: Build Documentation
     runs-on: windows-latest
-    needs: [build, integration-test]
+    needs: [build, integration-test, codeql]
     permissions:
       contents: read
 
@@ -220,6 +275,12 @@ jobs:
         with:
           name: packages-windows-latest
           path: packages
+
+      - name: Download CodeQL SARIF
+        uses: actions/download-artifact@v7
+        with:
+          name: codeql-sarif
+          path: codeql-results
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -290,6 +351,53 @@ jobs:
           --pdf-variant pdf/a-3u
           docs/tracematrix/tracematrix.html
           "docs/ReqStream Trace Matrix.pdf"
+
+      - name: Generate CodeQL Quality Report with SarifMark
+        shell: pwsh
+        run: >
+          dotnet sarifmark
+          --sarif codeql-results/csharp.sarif
+          --report docs/quality/codeql-quality.md
+          --heading "ReqStream CodeQL Analysis"
+          --report-depth 1
+
+      - name: Display CodeQL Quality Report
+        shell: pwsh
+        run: |
+          echo "=== CodeQL Quality Report ==="
+          Get-Content docs/quality/codeql-quality.md
+
+      - name: Generate Code Quality Report with SonarMark
+        shell: pwsh
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: >
+          dotnet sonarmark
+          --server https://sonarcloud.io
+          --project-key demaconsulting_ReqStream
+          --branch ${{ github.ref_name }}
+          --token "$env:SONAR_TOKEN"
+          --report docs/quality/sonar-quality.md
+          --report-depth 1
+
+      - name: Display SonarCloud Quality Report
+        shell: pwsh
+        run: |
+          echo "=== SonarCloud Quality Report ==="
+          Get-Content docs/quality/sonar-quality.md
+
+      - name: Generate Code Quality HTML with Pandoc
+        run: >
+          dotnet pandoc
+          --defaults docs/quality/definition.yaml
+          --output docs/quality/quality.html
+
+      - name: Generate Code Quality PDF with Weasyprint
+        run: >
+          dotnet weasyprint
+          --pdf-variant pdf/a-3u
+          docs/quality/quality.html
+          "docs/ReqStream Code Quality.pdf"
 
       - name: Upload documentation
         uses: actions/upload-artifact@v6
