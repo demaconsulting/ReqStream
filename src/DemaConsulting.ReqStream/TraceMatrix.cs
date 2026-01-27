@@ -222,16 +222,9 @@ public class TraceMatrix
         }
 
         // All tests must have been executed and passed
-        foreach (var testName in allTests)
-        {
-            var result = GetTestResult(testName);
-            if (result == null || result.Executed == 0 || result.Passed != result.Executed)
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return allTests
+            .Select(testName => GetTestResult(testName))
+            .All(result => result != null && result.Executed > 0 && result.Passed == result.Executed);
     }
 
     /// <summary>
@@ -249,13 +242,9 @@ public class TraceMatrix
         }
 
         // Recursively add tests from children
-        foreach (var childId in requirement.Children)
+        foreach (var childReq in requirement.Children.Select(childId => FindRequirement(rootSection, childId)).Where(childReq => childReq != null))
         {
-            var childReq = FindRequirement(rootSection, childId);
-            if (childReq != null)
-            {
-                CollectAllTests(childReq, rootSection, allTests);
-            }
+            CollectAllTests(childReq!, rootSection, allTests);
         }
     }
 
@@ -268,25 +257,16 @@ public class TraceMatrix
     private static Requirement? FindRequirement(Section section, string requirementId)
     {
         // Search in current section
-        foreach (var req in section.Requirements)
+        var requirement = section.Requirements.FirstOrDefault(req => req.Id == requirementId);
+        if (requirement != null)
         {
-            if (req.Id == requirementId)
-            {
-                return req;
-            }
+            return requirement;
         }
 
         // Search in child sections
-        foreach (var childSection in section.Sections)
-        {
-            var found = FindRequirement(childSection, requirementId);
-            if (found != null)
-            {
-                return found;
-            }
-        }
-
-        return null;
+        return section.Sections
+            .Select(childSection => FindRequirement(childSection, requirementId))
+            .FirstOrDefault(found => found != null);
     }
 
     /// <summary>
@@ -356,24 +336,19 @@ public class TraceMatrix
         var failed = 0;
         var notExecuted = 0;
 
-        foreach (var testName in requirement.Tests)
+        foreach (var result in requirement.Tests.Select(testName => GetTestResult(testName)))
         {
-            var result = GetTestResult(testName);
             if (result == null || result.Executed == 0)
             {
                 notExecuted++;
             }
+            else if (result.Executed - result.Passed > 0)
+            {
+                failed++;
+            }
             else
             {
-                var failedCount = result.Executed - result.Passed;
-                if (failedCount > 0)
-                {
-                    failed++;
-                }
-                else
-                {
-                    passed++;
-                }
+                passed++;
             }
         }
 
@@ -453,18 +428,14 @@ public class TraceMatrix
         var testNames = new HashSet<string>();
 
         // Collect tests from requirements in this section
-        foreach (var requirement in section.Requirements)
+        foreach (var test in section.Requirements.SelectMany(requirement => requirement.Tests))
         {
-            foreach (var test in requirement.Tests)
-            {
-                testNames.Add(test);
-            }
+            testNames.Add(test);
         }
 
         // Recursively collect tests from child sections
-        foreach (var childSection in section.Sections)
+        foreach (var childTests in section.Sections.Select(childSection => CollectTestNames(childSection)))
         {
-            var childTests = CollectTestNames(childSection);
             testNames.UnionWith(childTests);
         }
 

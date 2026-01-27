@@ -215,13 +215,9 @@ public class Requirements : Section
         // Recursively process any included files
         if (document.Includes != null)
         {
-            // Process each included file
-            foreach (var include in document.Includes)
+            // Process each included file by resolving paths and recursively reading
+            foreach (var includePath in document.Includes.Select(include => Path.Combine(baseDirectory, include)))
             {
-                // Resolve the include path relative to the current file
-                var includePath = Path.Combine(baseDirectory, include);
-
-                // Recursively read the included file
                 ReadFile(includePath);
             }
         }
