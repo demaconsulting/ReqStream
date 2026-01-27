@@ -1,6 +1,6 @@
 ---
 name: ✨ Feature Request
-description: Suggest a new feature or enhancement for the ReqStream library
+description: Suggest a new feature or enhancement for the ReqStream tool
 title: "[Feature]: "
 labels: ["enhancement"]
 assignees: []
@@ -50,7 +50,7 @@ body:
     id: benefits
     attributes:
       label: Benefits
-      description: Explain why this enhancement would be useful to ReqStream users
+      description: Explain why this enhancement would be useful to ReqStream tool users
       placeholder: This would be useful because...
     validations:
       required: true

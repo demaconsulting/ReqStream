@@ -1,6 +1,6 @@
 ---
 name: 🐛 Bug Report
-description: Report a bug or issue with the ReqStream library
+description: Report a bug or issue with the ReqStream tool
 title: "[Bug]: "
 labels: ["bug"]
 assignees: []
@@ -68,8 +68,8 @@ body:
   - type: input
     id: version
     attributes:
-      label: Library Version
-      description: What version of the ReqStream library are you using?
+      label: Tool Version
+      description: What version of the ReqStream tool are you using?
       placeholder: e.g., 1.0.0
     validations:
       required: true
