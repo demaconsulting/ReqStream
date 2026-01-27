@@ -242,11 +242,13 @@ public class TraceMatrix
         }
 
         // Recursively add tests from children
-        foreach (var childReq in requirement.Children
-            .Select(childId => FindRequirement(rootSection, childId))
-            .Where(childReq => childReq != null))
+        foreach (var childId in requirement.Children)
         {
-            CollectAllTests(childReq!, rootSection, allTests);
+            var childReq = FindRequirement(rootSection, childId);
+            if (childReq != null)
+            {
+                CollectAllTests(childReq, rootSection, allTests);
+            }
         }
     }
 
@@ -334,13 +336,26 @@ public class TraceMatrix
     private (int testsLinked, int passed, int failed, int notExecuted) GetRequirementTestStats(Requirement requirement)
     {
         var testsLinked = requirement.Tests.Count;
-        var testResults = requirement.Tests
-            .Select(testName => GetTestResult(testName))
-            .ToList();
+        var passed = 0;
+        var failed = 0;
+        var notExecuted = 0;
 
-        var notExecuted = testResults.Count(result => result == null || result.Executed == 0);
-        var failed = testResults.Count(result => result != null && result.Executed > 0 && result.Executed - result.Passed > 0);
-        var passed = testResults.Count(result => result != null && result.Executed > 0 && result.Executed - result.Passed == 0);
+        foreach (var testName in requirement.Tests)
+        {
+            var result = GetTestResult(testName);
+            if (result == null || result.Executed == 0)
+            {
+                notExecuted++;
+            }
+            else if (result.Executed - result.Passed > 0)
+            {
+                failed++;
+            }
+            else
+            {
+                passed++;
+            }
+        }
 
         return (testsLinked, passed, failed, notExecuted);
     }
