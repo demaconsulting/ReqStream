@@ -242,11 +242,12 @@ public class TraceMatrix
         }
 
         // Recursively add tests from children
-        requirement.Children
+        foreach (var childReq in requirement.Children
             .Select(childId => FindRequirement(rootSection, childId))
-            .Where(childReq => childReq != null)
-            .ToList()
-            .ForEach(childReq => CollectAllTests(childReq!, rootSection, allTests));
+            .Where(childReq => childReq != null))
+        {
+            CollectAllTests(childReq!, rootSection, allTests);
+        }
     }
 
     /// <summary>
@@ -417,16 +418,16 @@ public class TraceMatrix
         var testNames = new HashSet<string>();
 
         // Collect tests from requirements in this section
-        section.Requirements
-            .SelectMany(requirement => requirement.Tests)
-            .ToList()
-            .ForEach(test => testNames.Add(test));
+        foreach (var test in section.Requirements.SelectMany(requirement => requirement.Tests))
+        {
+            testNames.Add(test);
+        }
 
         // Recursively collect tests from child sections
-        section.Sections
-            .Select(childSection => CollectTestNames(childSection))
-            .ToList()
-            .ForEach(childTests => testNames.UnionWith(childTests));
+        foreach (var childTests in section.Sections.Select(childSection => CollectTestNames(childSection)))
+        {
+            testNames.UnionWith(childTests);
+        }
 
         return testNames;
     }

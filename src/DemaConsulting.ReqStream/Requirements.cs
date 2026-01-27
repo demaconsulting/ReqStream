@@ -216,10 +216,10 @@ public class Requirements : Section
         if (document.Includes != null)
         {
             // Process each included file by resolving paths and recursively reading
-            document.Includes
-                .Select(include => Path.Combine(baseDirectory, include))
-                .ToList()
-                .ForEach(includePath => ReadFile(includePath));
+            foreach (var includePath in document.Includes.Select(include => Path.Combine(baseDirectory, include)))
+            {
+                ReadFile(includePath);
+            }
         }
     }
 
