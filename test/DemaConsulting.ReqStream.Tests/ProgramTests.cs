@@ -57,7 +57,7 @@ public class ProgramTests
     public void Program_Run_WithVersionFlag_PrintsVersion()
     {
         var originalOut = Console.Out;
-        var output = new StringWriter();
+        using var output = new StringWriter();
         Console.SetOut(output);
 
         try
@@ -84,7 +84,7 @@ public class ProgramTests
     public void Program_Run_WithHelpFlag_PrintsHelp()
     {
         var originalOut = Console.Out;
-        var output = new StringWriter();
+        using var output = new StringWriter();
         Console.SetOut(output);
 
         try
@@ -349,7 +349,7 @@ sections:
     public void Program_Run_WithVersionAndHelp_ProcessesVersionFirst()
     {
         var originalOut = Console.Out;
-        var output = new StringWriter();
+        using var output = new StringWriter();
         Console.SetOut(output);
 
         try
@@ -376,7 +376,7 @@ sections:
     public void Program_Run_WithHelpAndValidate_ProcessesHelpFirst()
     {
         var originalOut = Console.Out;
-        var output = new StringWriter();
+        using var output = new StringWriter();
         Console.SetOut(output);
 
         try
@@ -484,7 +484,7 @@ sections:
         // Save current directory and change to test directory
         var originalDir = Directory.GetCurrentDirectory();
         var originalOut = Console.Out;
-        var output = new StringWriter();
+        using var output = new StringWriter();
         Console.SetOut(output);
 
         try

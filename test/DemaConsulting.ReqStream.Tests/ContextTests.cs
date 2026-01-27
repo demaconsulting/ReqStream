@@ -391,7 +391,7 @@ public class ContextTests
     public void Context_WriteLine_NormalMode_WritesToConsole()
     {
         var originalOut = Console.Out;
-        var output = new StringWriter();
+        using var output = new StringWriter();
         Console.SetOut(output);
 
         try
@@ -414,7 +414,7 @@ public class ContextTests
     public void Context_WriteLine_SilentMode_DoesNotWriteToConsole()
     {
         var originalOut = Console.Out;
-        var output = new StringWriter();
+        using var output = new StringWriter();
         Console.SetOut(output);
 
         try
@@ -437,7 +437,7 @@ public class ContextTests
     public void Context_WriteError_NormalMode_WritesToConsole()
     {
         var originalOut = Console.Out;
-        var output = new StringWriter();
+        using var output = new StringWriter();
         Console.SetOut(output);
 
         try
@@ -461,7 +461,7 @@ public class ContextTests
     public void Context_WriteError_SilentMode_DoesNotWriteToConsole()
     {
         var originalOut = Console.Out;
-        var output = new StringWriter();
+        using var output = new StringWriter();
         Console.SetOut(output);
 
         try
@@ -505,7 +505,7 @@ public class ContextTests
     public void Context_Create_WithLogFileAndSilent_WritesToLogOnly()
     {
         var originalOut = Console.Out;
-        var output = new StringWriter();
+        using var output = new StringWriter();
         Console.SetOut(output);
 
         try
@@ -654,8 +654,14 @@ public class ContextTests
         var logPath = Path.Combine(_testDirectory, "test.log");
 
         var context = Context.Create(["--log", logPath, "--silent"]);
-        context.WriteLine("Test message");
-        context.Dispose();
+        try
+        {
+            context.WriteLine("Test message");
+        }
+        finally
+        {
+            context.Dispose();
+        }
 
         // Should be able to delete the file after dispose
         File.Delete(logPath);
