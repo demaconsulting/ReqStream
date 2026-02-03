@@ -323,9 +323,9 @@ ReqStream is built with the help of these amazing open-source projects:
 
 For information about reporting security vulnerabilities, please see our [Security Policy][security].
 
-[forks-shield]: https://img.shields.io/github/forks/demaconsulting/ReqStream
+[forks-shield]: https://img.shields.io/github/forks/demaconsulting/ReqStream?style=plastic
 [forks-url]: https://github.com/demaconsulting/ReqStream/network/members
-[stars-shield]: https://img.shields.io/github/stars/demaconsulting/ReqStream
+[stars-shield]: https://img.shields.io/github/stars/demaconsulting/ReqStream?style=plastic
 [stars-url]: https://github.com/demaconsulting/ReqStream/stargazers
 [contributors-shield]: https://img.shields.io/github/contributors/demaconsulting/ReqStream
 [contributors-url]: https://github.com/demaconsulting/ReqStream/graphs/contributors
