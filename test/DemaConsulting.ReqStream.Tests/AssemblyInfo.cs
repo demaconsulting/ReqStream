@@ -20,8 +20,6 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-/// <summary>
-/// Configure test parallelization for the test assembly.
-/// Tests are configured to run sequentially to avoid conflicts with console output capturing.
-/// </summary>
+// Configure test parallelization for the test assembly.
+// Tests are configured to run sequentially to avoid conflicts with console output capturing.
 [assembly: DoNotParallelize]
