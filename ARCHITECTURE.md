@@ -432,6 +432,12 @@ Test results are aggregated across multiple result files:
 ```csharp
 foreach (var result in testResults.Results)
 {
+    // Skip non-executed tests (e.g., filtered by OS/Runtime conditions)
+    if (!result.Outcome.IsExecuted())
+    {
+        continue;
+    }
+
     var matchingTestNames = FindAllMatchingTestNames(requiredTests, result.Name, fileBaseName);
     foreach (var matchingTestName in matchingTestNames)
     {
@@ -441,7 +447,7 @@ foreach (var result in testResults.Results)
             _testResults[matchingTestName] = entry;
         }
         entry.Executed++;
-        if (result.Outcome == TestOutcome.Passed)
+        if (result.Outcome.IsPassed())
         {
             entry.Passed++;
         }
@@ -451,8 +457,9 @@ foreach (var result in testResults.Results)
 
 **Key Points**:
 
-- Each test result increments the execution count
-- Passing tests increment both `Executed` and `Passed`
+- Non-executed tests are skipped using the `IsExecuted()` extension method
+- Each executed test result increments the execution count
+- Passing tests (checked via `IsPassed()`) increment both `Executed` and `Passed`
 - Failing tests increment only `Executed`
 - Source-specific tests are tracked separately from plain tests
 

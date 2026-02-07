@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.TestResults;
 using DemaConsulting.TestResults.IO;
 
 namespace DemaConsulting.ReqStream;
@@ -484,6 +485,12 @@ public class TraceMatrix
         // Process each test result
         foreach (var result in testResults.Results)
         {
+            // Skip non-executed tests (e.g., filtered by OS/Runtime conditions)
+            if (!result.Outcome.IsExecuted())
+            {
+                continue;
+            }
+
             // Find all required tests that match this result
             var matchingTestNames = FindAllMatchingTestNames(requiredTests, result.Name, fileBaseName);
             if (matchingTestNames.Count == 0)
@@ -504,7 +511,7 @@ public class TraceMatrix
                 // Update execution counts
                 entry.Executed++;
                 
-                if (result.Outcome == DemaConsulting.TestResults.TestOutcome.Passed)
+                if (result.Outcome.IsPassed())
                 {
                     entry.Passed++;
                 }

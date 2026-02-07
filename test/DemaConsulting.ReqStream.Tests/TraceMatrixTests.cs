@@ -515,4 +515,200 @@ sections:
         Assert.AreEqual(2, satisfied, "Both requirements should be satisfied");
         Assert.AreEqual(2, total);
     }
+
+    /// <summary>
+    ///     Test that non-executed tests are ignored and don't affect execution counts.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_WithNotExecutedTests_IgnoresNonExecutedTests()
+    {
+        // Create requirements with test references
+        var reqYaml = @"---
+sections:
+  - title: ""Test Requirements""
+    requirements:
+      - id: ""REQ-001""
+        title: ""Test requirement""
+        tests:
+          - ""Test_ExecutedTest""
+          - ""Test_NotExecutedTest""
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var requirements = Requirements.Read(reqPath);
+
+        // Create test results with one executed and one not-executed test
+        var testResults = new TestResults.TestResults { Name = "TestRun" };
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_ExecutedTest",
+            ClassName = "Tests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_NotExecutedTest",
+            ClassName = "Tests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.NotExecuted,
+            Duration = TimeSpan.Zero
+        });
+        var testPath = Path.Combine(_testDirectory, "test-results.trx");
+        File.WriteAllText(testPath, TrxSerializer.Serialize(testResults));
+
+        // Create TraceMatrix
+        var matrix = new TraceMatrix(requirements, testPath);
+
+        // Verify executed test is tracked
+        var executedResult = matrix.GetTestResult("Test_ExecutedTest");
+        Assert.IsNotNull(executedResult, "Executed test should be tracked");
+        Assert.AreEqual(1, executedResult.Executed);
+        Assert.AreEqual(1, executedResult.Passed);
+
+        // Verify not-executed test is NOT tracked
+        var notExecutedResult = matrix.GetTestResult("Test_NotExecutedTest");
+        Assert.IsNull(notExecutedResult, "Not-executed test should not be tracked");
+
+        // Verify requirement is not satisfied (has a test reference without execution)
+        var (satisfied, total) = matrix.CalculateSatisfiedRequirements();
+        Assert.AreEqual(0, satisfied, "Requirement should not be satisfied when a referenced test is not executed");
+        Assert.AreEqual(1, total);
+    }
+
+    /// <summary>
+    ///     Test that requirements with only non-executed tests are treated as having no test coverage.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_WithOnlyNotExecutedTests_TreatsAsNoTests()
+    {
+        // Create requirements with test references
+        var reqYaml = @"---
+sections:
+  - title: ""Test Requirements""
+    requirements:
+      - id: ""REQ-001""
+        title: ""Requirement with only not-executed tests""
+        tests:
+          - ""Test_NotExecuted1""
+          - ""Test_NotExecuted2""
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var requirements = Requirements.Read(reqPath);
+
+        // Create test results with only not-executed tests
+        var testResults = new TestResults.TestResults { Name = "TestRun" };
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_NotExecuted1",
+            ClassName = "Tests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.NotExecuted,
+            Duration = TimeSpan.Zero
+        });
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_NotExecuted2",
+            ClassName = "Tests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.NotExecuted,
+            Duration = TimeSpan.Zero
+        });
+        var testPath = Path.Combine(_testDirectory, "test-results.trx");
+        File.WriteAllText(testPath, TrxSerializer.Serialize(testResults));
+
+        // Create TraceMatrix
+        var matrix = new TraceMatrix(requirements, testPath);
+
+        // Verify no tests are tracked
+        var result1 = matrix.GetTestResult("Test_NotExecuted1");
+        Assert.IsNull(result1, "Not-executed test should not be tracked");
+        
+        var result2 = matrix.GetTestResult("Test_NotExecuted2");
+        Assert.IsNull(result2, "Not-executed test should not be tracked");
+
+        // Verify requirement is not satisfied (has no executed tests)
+        var (satisfied, total) = matrix.CalculateSatisfiedRequirements();
+        Assert.AreEqual(0, satisfied, "Requirement should not be satisfied when all tests are not executed");
+        Assert.AreEqual(1, total);
+    }
+
+    /// <summary>
+    ///     Test that non-executed tests are properly handled in mixed outcome scenarios.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_WithMixedOutcomes_OnlyCountsExecutedTests()
+    {
+        // Create requirements with test references
+        var reqYaml = @"---
+sections:
+  - title: ""Test Requirements""
+    requirements:
+      - id: ""REQ-001""
+        title: ""Test requirement with mixed outcomes""
+        tests:
+          - ""Test_Passed""
+          - ""Test_Failed""
+          - ""Test_NotExecuted""
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var requirements = Requirements.Read(reqPath);
+
+        // Create test results with passed, failed, and not-executed tests
+        var testResults = new TestResults.TestResults { Name = "TestRun" };
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_Passed",
+            ClassName = "Tests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_Failed",
+            ClassName = "Tests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Failed,
+            Duration = TimeSpan.FromSeconds(1),
+            ErrorMessage = "Test failed"
+        });
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Test_NotExecuted",
+            ClassName = "Tests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.NotExecuted,
+            Duration = TimeSpan.Zero
+        });
+        var testPath = Path.Combine(_testDirectory, "test-results.trx");
+        File.WriteAllText(testPath, TrxSerializer.Serialize(testResults));
+
+        // Create TraceMatrix
+        var matrix = new TraceMatrix(requirements, testPath);
+
+        // Verify passed test is tracked
+        var passedResult = matrix.GetTestResult("Test_Passed");
+        Assert.IsNotNull(passedResult);
+        Assert.AreEqual(1, passedResult.Executed);
+        Assert.AreEqual(1, passedResult.Passed);
+
+        // Verify failed test is tracked
+        var failedResult = matrix.GetTestResult("Test_Failed");
+        Assert.IsNotNull(failedResult);
+        Assert.AreEqual(1, failedResult.Executed);
+        Assert.AreEqual(0, failedResult.Passed);
+
+        // Verify not-executed test is NOT tracked
+        var notExecutedResult = matrix.GetTestResult("Test_NotExecuted");
+        Assert.IsNull(notExecutedResult, "Not-executed test should not be tracked");
+
+        // Verify requirement is not satisfied (has a failed test)
+        var (satisfied, total) = matrix.CalculateSatisfiedRequirements();
+        Assert.AreEqual(0, satisfied, "Requirement should not be satisfied when a test fails");
+        Assert.AreEqual(1, total);
+    }
 }
