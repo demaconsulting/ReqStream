@@ -484,6 +484,12 @@ public class TraceMatrix
         // Process each test result
         foreach (var result in testResults.Results)
         {
+            // Skip non-executed tests (e.g., filtered by OS/Runtime conditions)
+            if (result.Outcome == DemaConsulting.TestResults.TestOutcome.NotExecuted)
+            {
+                continue;
+            }
+
             // Find all required tests that match this result
             var matchingTestNames = FindAllMatchingTestNames(requiredTests, result.Name, fileBaseName);
             if (matchingTestNames.Count == 0)
