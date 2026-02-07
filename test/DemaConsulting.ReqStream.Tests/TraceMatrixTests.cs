@@ -571,14 +571,14 @@ sections:
         var notExecutedResult = matrix.GetTestResult("Test_NotExecutedTest");
         Assert.IsNull(notExecutedResult, "Not-executed test should not be tracked");
 
-        // Verify requirement is not satisfied (has a test that wasn't executed)
+        // Verify requirement is not satisfied (has a test reference without execution)
         var (satisfied, total) = matrix.CalculateSatisfiedRequirements();
-        Assert.AreEqual(0, satisfied, "Requirement should not be satisfied when a test is not executed");
+        Assert.AreEqual(0, satisfied, "Requirement should not be satisfied when a referenced test is not executed");
         Assert.AreEqual(1, total);
     }
 
     /// <summary>
-    ///     Test that non-executed tests don't negatively impact satisfied requirements.
+    ///     Test that requirements with only non-executed tests are treated as having no test coverage.
     /// </summary>
     [TestMethod]
     public void TraceMatrix_WithOnlyNotExecutedTests_TreatsAsNoTests()
