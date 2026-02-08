@@ -533,23 +533,15 @@ public class TraceMatrix
         // Read the file content
         var content = File.ReadAllText(filePath);
 
-        // Try to parse as TRX first, then JUnit
+        // Deserialize test results (automatically detects TRX or JUnit format)
         DemaConsulting.TestResults.TestResults testResults;
         try
         {
-            testResults = TrxSerializer.Deserialize(content);
+            testResults = Serializer.Deserialize(content);
         }
-        catch
+        catch (Exception ex)
         {
-            // If TRX parsing fails, try JUnit
-            try
-            {
-                testResults = JUnitSerializer.Deserialize(content);
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"Failed to parse test result file as TRX or JUnit format: {filePath}", ex);
-            }
+            throw new InvalidOperationException($"Failed to parse test result file: {filePath}", ex);
         }
 
         // Aggregate test results by test name (collapse duplicate results from different classes)
