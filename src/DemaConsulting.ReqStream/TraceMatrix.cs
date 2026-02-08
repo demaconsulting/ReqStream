@@ -73,8 +73,8 @@ public class TraceMatrix
         }
 
         // Aggregate executions into a single result entry
-        var totalPasses = executions.Sum(e => e.Passes);
-        var totalFails = executions.Sum(e => e.Fails);
+        var totalPasses = executions.Sum(e => e.Metrics.Passes);
+        var totalFails = executions.Sum(e => e.Metrics.Fails);
         return new TestResultEntry
         {
             Executed = totalPasses + totalFails,
@@ -560,7 +560,7 @@ public class TraceMatrix
         // Create TestExecution records and add to the dictionary
         foreach (var (testName, (passes, fails)) in testAggregates)
         {
-            var execution = new TestExecution(fileBaseName, testName, passes, fails);
+            var execution = new TestExecution(fileBaseName, testName, new TestMetrics(passes, fails));
 
             // Add to the executions dictionary
             if (!_testExecutions.TryGetValue(testName, out var executions))

@@ -37,10 +37,16 @@ public class TestResultEntry
 }
 
 /// <summary>
+///     Represents test metrics for a single test execution.
+/// </summary>
+/// <param name="Passes">Number of passes in the file matching the test name.</param>
+/// <param name="Fails">Number of fails in the file matching the test name.</param>
+public record TestMetrics(int Passes, int Fails);
+
+/// <summary>
 ///     Represents a single test execution from a specific test result file.
 /// </summary>
 /// <param name="FileBaseName">The base name of the test file (without extension).</param>
 /// <param name="Name">The test name.</param>
-/// <param name="Passes">Number of passes in the file matching the test name.</param>
-/// <param name="Fails">Number of fails in the file matching the test name.</param>
-public record TestExecution(string FileBaseName, string Name, int Passes, int Fails);
+/// <param name="Metrics">The test metrics (passes and fails).</param>
+public record TestExecution(string FileBaseName, string Name, TestMetrics Metrics);

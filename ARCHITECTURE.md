@@ -181,6 +181,21 @@ public class TestResultEntry
 - Aggregates results from multiple test result files
 - A test is considered "passing" only if `Passed == Executed`
 
+### TestMetrics
+
+**Location**: `TestResultEntry.cs`
+
+Represents test metrics for a single test execution.
+
+```csharp
+public record TestMetrics(int Passes, int Fails);
+```
+
+**Key Characteristics**:
+
+- Immutable record type capturing passes and fails
+- Can be aggregated across multiple executions
+
 ### TestExecution
 
 **Location**: `TestResultEntry.cs`
@@ -188,7 +203,7 @@ public class TestResultEntry
 Represents a single test execution from a specific test result file.
 
 ```csharp
-public record TestExecution(string FileBaseName, string Name, int Passes, int Fails);
+public record TestExecution(string FileBaseName, string Name, TestMetrics Metrics);
 ```
 
 **Key Characteristics**:
@@ -196,7 +211,7 @@ public record TestExecution(string FileBaseName, string Name, int Passes, int Fa
 - Immutable record type capturing test results from one file
 - `FileBaseName` is used for source-specific test matching
 - `Name` is the actual test name without any source filter prefix
-- `Passes` and `Fails` are aggregated from potentially multiple test results with the same name in one file
+- `Metrics` contains passes and fails aggregated from potentially multiple test results with the same name in one file
   (e.g., test results from different test classes)
 
 ### Context
@@ -499,8 +514,7 @@ For each test result file:
 6. Create a `TestExecution` record for each unique test name containing:
    - FileBaseName: The base name of the test result file
    - Name: The actual test name
-   - Passes: Count of passing executions in this file
-   - Fails: Count of failing executions in this file
+   - Metrics: A `TestMetrics` record with passes and fails counts
 
 **Step 2: Store in Dictionary Structure**
 
@@ -513,11 +527,11 @@ Store test executions in a `Dictionary<string, List<TestExecution>>` where:
 ```text
 _testExecutions = {
   "Test_Platform": [
-    TestExecution("test-results-windows-latest", "Test_Platform", 1, 0),
-    TestExecution("test-results-ubuntu-latest", "Test_Platform", 1, 0)
+    TestExecution("test-results-windows-latest", "Test_Platform", new TestMetrics(1, 0)),
+    TestExecution("test-results-ubuntu-latest", "Test_Platform", new TestMetrics(1, 0))
   ],
   "Test_Auth": [
-    TestExecution("test-results-windows-latest", "Test_Auth", 2, 1)
+    TestExecution("test-results-windows-latest", "Test_Auth", new TestMetrics(2, 1))
   ]
 }
 ```
