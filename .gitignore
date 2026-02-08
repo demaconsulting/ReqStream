@@ -116,6 +116,7 @@ Desktop.ini
 
 # Node.js
 node_modules/
+package-lock.json
 
 # Generated documentation
 docs/guide/*.html
