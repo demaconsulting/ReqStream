@@ -119,8 +119,8 @@ public class TraceMatrix
     private readonly Requirements _requirements;
     
     public TraceMatrix(Requirements requirements, params string[] testResultFiles);
-    public TestResultEntry? GetTestResult(string testName);
-    public IReadOnlyDictionary<string, TestResultEntry> GetAllTestResults();
+    public TestMetrics GetTestResult(string testName);
+    public IReadOnlyDictionary<string, TestMetrics> GetAllTestResults();
     public (int satisfied, int total) CalculateSatisfiedRequirements();
     public List<string> GetUnsatisfiedRequirements();
     public void Export(string filePath, int depth = 1);
@@ -133,6 +133,7 @@ public class TraceMatrix
 - Aggregate test executions from multiple result files by test name
 - Match test names to requirements (plain names vs source-specific `filepart@testname`)
 - Provide fast lookup of test executions with optional source filtering
+- Return `TestMetrics` for queried tests (returns 0/0 if not found)
 - Calculate requirement satisfaction (must have tests, all must pass)
 - Consider child requirement tests transitively
 - Export trace matrix reports to Markdown
@@ -162,39 +163,27 @@ This design optimizes for the common case where the number of unique test names 
 number of test result files, making test name lookup O(1) with optional O(n) filtering where n is the
 number of files containing that test.
 
-### TestResultEntry
-
-**Location**: `TraceMatrix.cs`
-
-Tracks test execution counts for a specific test.
-
-```csharp
-public class TestResultEntry
-{
-    public int Executed { get; set; }   // Total executions across all result files
-    public int Passed { get; set; }     // Number of passing executions
-}
-```
-
-**Key Characteristics**:
-
-- Aggregates results from multiple test result files
-- A test is considered "passing" only if `Passed == Executed`
-
 ### TestMetrics
 
 **Location**: `TraceMatrix.cs`
 
-Represents test metrics for a single test execution.
+Represents test metrics for test executions.
 
 ```csharp
-public record TestMetrics(int Passes, int Fails);
+public record TestMetrics(int Passes, int Fails)
+{
+    public int Executed => Passes + Fails;
+    public bool AllPassed => Fails == 0 && Executed > 0;
+};
 ```
 
 **Key Characteristics**:
 
 - Immutable record type capturing passes and fails
 - Can be aggregated across multiple executions
+- `Executed` property returns total number of executions (Passes + Fails)
+- `AllPassed` property indicates if all executions passed (no failures and at least one execution)
+- Used as return type for `GetTestResult` (returns `TestMetrics(0, 0)` if test not found)
 
 ### TestExecution
 

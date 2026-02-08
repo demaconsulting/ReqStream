@@ -111,13 +111,13 @@ sections:
         var windowsResult = matrix.GetTestResult("windows-latest@Test_PlatformBasic");
         Assert.IsNotNull(windowsResult);
         Assert.AreEqual(1, windowsResult.Executed);
-        Assert.AreEqual(1, windowsResult.Passed);
+        Assert.AreEqual(1, windowsResult.Passes);
 
         // Verify Linux test is tracked separately
         var linuxResult = matrix.GetTestResult("ubuntu-latest@Test_PlatformBasic");
         Assert.IsNotNull(linuxResult);
         Assert.AreEqual(1, linuxResult.Executed);
-        Assert.AreEqual(1, linuxResult.Passed);
+        Assert.AreEqual(1, linuxResult.Passes);
 
         // Verify only 2 test results are tracked (not aggregated)
         var allResults = matrix.GetAllTestResults();
@@ -162,7 +162,7 @@ sections:
 
         // Verify Windows-specific test is not tracked from Linux file
         var result = matrix.GetTestResult("windows@Test_WindowsOnly");
-        Assert.IsNull(result);
+        Assert.AreEqual(0, result.Executed);
     }
 
     /// <summary>
@@ -218,7 +218,7 @@ sections:
         var result = matrix.GetTestResult("Test_CrossPlatform");
         Assert.IsNotNull(result);
         Assert.AreEqual(2, result.Executed, "Should aggregate from both sources");
-        Assert.AreEqual(2, result.Passed);
+        Assert.AreEqual(2, result.Passes);
     }
 
     /// <summary>
@@ -292,19 +292,19 @@ sections:
         var commonResult = matrix.GetTestResult("Test_Common");
         Assert.IsNotNull(commonResult);
         Assert.AreEqual(2, commonResult.Executed);
-        Assert.AreEqual(2, commonResult.Passed);
+        Assert.AreEqual(2, commonResult.Passes);
 
         // Verify Windows-specific test
         var windowsResult = matrix.GetTestResult("windows@Test_WindowsSpecific");
         Assert.IsNotNull(windowsResult);
         Assert.AreEqual(1, windowsResult.Executed);
-        Assert.AreEqual(1, windowsResult.Passed);
+        Assert.AreEqual(1, windowsResult.Passes);
 
         // Verify Linux-specific test
         var linuxResult = matrix.GetTestResult("linux@Test_LinuxSpecific");
         Assert.IsNotNull(linuxResult);
         Assert.AreEqual(1, linuxResult.Executed);
-        Assert.AreEqual(1, linuxResult.Passed);
+        Assert.AreEqual(1, linuxResult.Passes);
 
         // Verify total number of tracked tests
         var allResults = matrix.GetAllTestResults();
@@ -351,7 +351,7 @@ sections:
         var result = matrix.GetTestResult("windows@Test_CaseSensitive");
         Assert.IsNotNull(result);
         Assert.AreEqual(1, result.Executed);
-        Assert.AreEqual(1, result.Passed);
+        Assert.AreEqual(1, result.Passes);
     }
 
     /// <summary>
@@ -394,7 +394,7 @@ sections:
         var result = matrix.GetTestResult("ubuntu@Test_Partial");
         Assert.IsNotNull(result);
         Assert.AreEqual(1, result.Executed);
-        Assert.AreEqual(1, result.Passed);
+        Assert.AreEqual(1, result.Passes);
     }
 
     /// <summary>
@@ -442,12 +442,12 @@ sections:
         var windowsResult = matrix.GetTestResult("windows@Test_Platform");
         Assert.IsNotNull(windowsResult);
         Assert.AreEqual(1, windowsResult.Executed);
-        Assert.AreEqual(1, windowsResult.Passed);
+        Assert.AreEqual(1, windowsResult.Passes);
 
         var dotnet8Result = matrix.GetTestResult("dotnet8.x@Test_Platform");
         Assert.IsNotNull(dotnet8Result);
         Assert.AreEqual(1, dotnet8Result.Executed);
-        Assert.AreEqual(1, dotnet8Result.Passed);
+        Assert.AreEqual(1, dotnet8Result.Passes);
 
         // Verify both requirements would be satisfied
         var (satisfied, total) = matrix.CalculateSatisfiedRequirements();
@@ -502,13 +502,13 @@ sections:
         var sourceSpecificResult = matrix.GetTestResult("windows@Test_SharedTest");
         Assert.IsNotNull(sourceSpecificResult, "Source-specific test should be tracked");
         Assert.AreEqual(1, sourceSpecificResult.Executed);
-        Assert.AreEqual(1, sourceSpecificResult.Passed);
+        Assert.AreEqual(1, sourceSpecificResult.Passes);
 
         // Verify the plain test is ALSO tracked (this is the bug - it won't be tracked)
         var plainResult = matrix.GetTestResult("Test_SharedTest");
         Assert.IsNotNull(plainResult, "Plain test name should also be tracked from the same file");
         Assert.AreEqual(1, plainResult.Executed);
-        Assert.AreEqual(1, plainResult.Passed);
+        Assert.AreEqual(1, plainResult.Passes);
 
         // Verify both requirements are satisfied
         var (satisfied, total) = matrix.CalculateSatisfiedRequirements();
@@ -565,11 +565,11 @@ sections:
         var executedResult = matrix.GetTestResult("Test_ExecutedTest");
         Assert.IsNotNull(executedResult, "Executed test should be tracked");
         Assert.AreEqual(1, executedResult.Executed);
-        Assert.AreEqual(1, executedResult.Passed);
+        Assert.AreEqual(1, executedResult.Passes);
 
         // Verify not-executed test is NOT tracked
         var notExecutedResult = matrix.GetTestResult("Test_NotExecutedTest");
-        Assert.IsNull(notExecutedResult, "Not-executed test should not be tracked");
+        Assert.AreEqual(0, notExecutedResult.Executed, "Not-executed test should not be tracked");
 
         // Verify requirement is not satisfied (has a test reference without execution)
         var (satisfied, total) = matrix.CalculateSatisfiedRequirements();
@@ -624,10 +624,10 @@ sections:
 
         // Verify no tests are tracked
         var result1 = matrix.GetTestResult("Test_NotExecuted1");
-        Assert.IsNull(result1, "Not-executed test should not be tracked");
+        Assert.AreEqual(0, result1.Executed, "Not-executed test should not be tracked");
         
         var result2 = matrix.GetTestResult("Test_NotExecuted2");
-        Assert.IsNull(result2, "Not-executed test should not be tracked");
+        Assert.AreEqual(0, result2.Executed, "Not-executed test should not be tracked");
 
         // Verify requirement is not satisfied (has no executed tests)
         var (satisfied, total) = matrix.CalculateSatisfiedRequirements();
@@ -694,17 +694,17 @@ sections:
         var passedResult = matrix.GetTestResult("Test_Passed");
         Assert.IsNotNull(passedResult);
         Assert.AreEqual(1, passedResult.Executed);
-        Assert.AreEqual(1, passedResult.Passed);
+        Assert.AreEqual(1, passedResult.Passes);
 
         // Verify failed test is tracked
         var failedResult = matrix.GetTestResult("Test_Failed");
         Assert.IsNotNull(failedResult);
         Assert.AreEqual(1, failedResult.Executed);
-        Assert.AreEqual(0, failedResult.Passed);
+        Assert.AreEqual(0, failedResult.Passes);
 
         // Verify not-executed test is NOT tracked
         var notExecutedResult = matrix.GetTestResult("Test_NotExecuted");
-        Assert.IsNull(notExecutedResult, "Not-executed test should not be tracked");
+        Assert.AreEqual(0, notExecutedResult.Executed, "Not-executed test should not be tracked");
 
         // Verify requirement is not satisfied (has a failed test)
         var (satisfied, total) = matrix.CalculateSatisfiedRequirements();

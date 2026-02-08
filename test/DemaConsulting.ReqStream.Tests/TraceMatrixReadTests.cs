@@ -104,12 +104,12 @@ sections:
         var result1 = matrix.GetTestResult("Test_Credentials_Valid");
         Assert.IsNotNull(result1);
         Assert.AreEqual(1, result1.Executed);
-        Assert.AreEqual(1, result1.Passed);
+        Assert.AreEqual(1, result1.Passes);
 
         var result2 = matrix.GetTestResult("Test_Credentials_Invalid");
         Assert.IsNotNull(result2);
         Assert.AreEqual(1, result2.Executed);
-        Assert.AreEqual(1, result2.Passed);
+        Assert.AreEqual(1, result2.Passes);
     }
 
     /// <summary>
@@ -179,7 +179,7 @@ sections:
         var result = matrix.GetTestResult("Test_PlatformBasic");
         Assert.IsNotNull(result);
         Assert.AreEqual(3, result.Executed, "Test should have been executed 3 times");
-        Assert.AreEqual(2, result.Passed, "Test should have passed 2 times");
+        Assert.AreEqual(2, result.Passes, "Test should have passed 2 times");
     }
 
     /// <summary>
@@ -239,18 +239,18 @@ sections:
         var result1 = matrix.GetTestResult("Test_Auth_Valid");
         Assert.IsNotNull(result1);
         Assert.AreEqual(1, result1.Executed);
-        Assert.AreEqual(1, result1.Passed);
+        Assert.AreEqual(1, result1.Passes);
 
         // Extra tests are now tracked (all tests captured)
         var result2 = matrix.GetTestResult("Test_ExtraNotInRequirements");
         Assert.IsNotNull(result2);
         Assert.AreEqual(1, result2.Executed);
-        Assert.AreEqual(1, result2.Passed);
+        Assert.AreEqual(1, result2.Passes);
 
         var result3 = matrix.GetTestResult("Test_AnotherExtra");
         Assert.IsNotNull(result3);
         Assert.AreEqual(1, result3.Executed);
-        Assert.AreEqual(1, result3.Passed);
+        Assert.AreEqual(1, result3.Passes);
 
         // GetAllTestResults only returns tests referenced in requirements
         var allResults = matrix.GetAllTestResults();
@@ -361,13 +361,13 @@ sections:
         var result1 = matrix.GetTestResult("Test_Passing");
         Assert.IsNotNull(result1);
         Assert.AreEqual(1, result1.Executed);
-        Assert.AreEqual(1, result1.Passed);
+        Assert.AreEqual(1, result1.Passes);
 
         // Verify failing test
         var result2 = matrix.GetTestResult("Test_Failing");
         Assert.IsNotNull(result2);
         Assert.AreEqual(1, result2.Executed);
-        Assert.AreEqual(0, result2.Passed, "Failed test should have 0 passes");
+        Assert.AreEqual(0, result2.Passes, "Failed test should have 0 passes");
     }
 
     /// <summary>
@@ -398,7 +398,7 @@ sections:
         Assert.IsEmpty(allResults);
 
         var result = matrix.GetTestResult("SomeTest");
-        Assert.IsNull(result);
+        Assert.AreEqual(0, result.Executed);
     }
 
     /// <summary>
@@ -451,12 +451,12 @@ sections:
         var result1 = matrix.GetTestResult("Test_ValidData");
         Assert.IsNotNull(result1);
         Assert.AreEqual(1, result1.Executed);
-        Assert.AreEqual(1, result1.Passed);
+        Assert.AreEqual(1, result1.Passes);
 
         var result2 = matrix.GetTestResult("Test_InvalidData");
         Assert.IsNotNull(result2);
         Assert.AreEqual(1, result2.Executed);
-        Assert.AreEqual(1, result2.Passed);
+        Assert.AreEqual(1, result2.Passes);
     }
 
     /// <summary>
@@ -513,13 +513,13 @@ sections:
         var result1 = matrix.GetTestResult("Test_TrxFormat");
         Assert.IsNotNull(result1);
         Assert.AreEqual(1, result1.Executed);
-        Assert.AreEqual(1, result1.Passed);
+        Assert.AreEqual(1, result1.Passes);
 
         // Verify results from JUnit
         var result2 = matrix.GetTestResult("Test_JUnitFormat");
         Assert.IsNotNull(result2);
         Assert.AreEqual(1, result2.Executed);
-        Assert.AreEqual(1, result2.Passed);
+        Assert.AreEqual(1, result2.Passes);
     }
 
     /// <summary>
@@ -573,12 +573,12 @@ sections:
         var result1 = matrix.GetTestResult("Test_JUnit_Passing");
         Assert.IsNotNull(result1);
         Assert.AreEqual(1, result1.Executed);
-        Assert.AreEqual(1, result1.Passed);
+        Assert.AreEqual(1, result1.Passes);
 
         // Verify failing test
         var result2 = matrix.GetTestResult("Test_JUnit_Failing");
         Assert.IsNotNull(result2);
         Assert.AreEqual(1, result2.Executed);
-        Assert.AreEqual(0, result2.Passed, "Failed test should have 0 passes");
+        Assert.AreEqual(0, result2.Passes, "Failed test should have 0 passes");
     }
 }

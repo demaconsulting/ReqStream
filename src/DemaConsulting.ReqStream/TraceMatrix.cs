@@ -24,27 +24,22 @@ using DemaConsulting.TestResults.IO;
 namespace DemaConsulting.ReqStream;
 
 /// <summary>
-///     Represents test execution results for a specific test, tracking total executions and passed executions.
-/// </summary>
-public class TestResultEntry
-{
-    /// <summary>
-    ///     Gets or sets the total number of times this test was executed.
-    /// </summary>
-    public int Executed { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the number of times this test passed.
-    /// </summary>
-    public int Passed { get; set; }
-}
-
-/// <summary>
 ///     Represents test metrics for a single test execution.
 /// </summary>
 /// <param name="Passes">Number of passes in the file matching the test name.</param>
 /// <param name="Fails">Number of fails in the file matching the test name.</param>
-public record TestMetrics(int Passes, int Fails);
+public record TestMetrics(int Passes, int Fails)
+{
+    /// <summary>
+    ///     Gets the total number of executions (passes + fails).
+    /// </summary>
+    public int Executed => Passes + Fails;
+
+    /// <summary>
+    ///     Gets a value indicating whether all executions passed (no failures).
+    /// </summary>
+    public bool AllPassed => Fails == 0 && Executed > 0;
+};
 
 /// <summary>
 ///     Represents a single test execution from a specific test result file.
@@ -91,43 +86,40 @@ public class TraceMatrix
     }
 
     /// <summary>
-    ///     Gets the test result entry for a specific test name.
+    ///     Gets the test metrics for a specific test name.
     /// </summary>
     /// <param name="testName">The name of the test (may include source filter as "source@testname").</param>
-    /// <returns>The TestResultEntry for the test, or null if the test was not found.</returns>
-    public TestResultEntry? GetTestResult(string testName)
+    /// <returns>The TestMetrics for the test (returns 0/0 if the test was not found).</returns>
+    public TestMetrics GetTestResult(string testName)
     {
         var executions = FindTestExecutions(testName);
         if (executions.Count == 0)
         {
-            return null;
+            return new TestMetrics(0, 0);
         }
 
-        // Aggregate executions into a single result entry
+        // Aggregate executions into a single metrics
         var totalPasses = executions.Sum(e => e.Metrics.Passes);
         var totalFails = executions.Sum(e => e.Metrics.Fails);
-        return new TestResultEntry
-        {
-            Executed = totalPasses + totalFails,
-            Passed = totalPasses
-        };
+        return new TestMetrics(totalPasses, totalFails);
     }
 
     /// <summary>
-    ///     Gets all test result entries for tests referenced in requirements.
+    ///     Gets all test metrics for tests referenced in requirements.
     /// </summary>
-    /// <returns>A read-only dictionary of test names to their result entries.</returns>
-    public IReadOnlyDictionary<string, TestResultEntry> GetAllTestResults()
+    /// <returns>A read-only dictionary of test names to their metrics.</returns>
+    public IReadOnlyDictionary<string, TestMetrics> GetAllTestResults()
     {
         // Build dictionary of all test results from required tests in the requirements
-        var results = new Dictionary<string, TestResultEntry>();
+        var results = new Dictionary<string, TestMetrics>();
         var requiredTests = new HashSet<string>();
         CollectRequiredTestNames(_requirements, requiredTests);
         
         foreach (var testName in requiredTests)
         {
             var result = GetTestResult(testName);
-            if (result != null)
+            // Only include tests that have been executed
+            if (result.Executed > 0)
             {
                 results[testName] = result;
             }
@@ -328,7 +320,7 @@ public class TraceMatrix
         // All tests must have been executed and passed
         return allTests
             .Select(testName => GetTestResult(testName))
-            .All(result => result != null && result.Executed > 0 && result.Passed == result.Executed);
+            .All(result => result.AllPassed);
     }
 
     /// <summary>
@@ -442,11 +434,11 @@ public class TraceMatrix
 
         foreach (var result in requirement.Tests.Select(testName => GetTestResult(testName)))
         {
-            if (result == null || result.Executed == 0)
+            if (result.Executed == 0)
             {
                 notExecuted++;
             }
-            else if (result.Executed - result.Passed > 0)
+            else if (result.Fails > 0)
             {
                 failed++;
             }
@@ -482,8 +474,8 @@ public class TraceMatrix
         foreach (var (testName, requirementIds) in testToRequirements.OrderBy(kvp => kvp.Key))
         {
             var result = GetTestResult(testName);
-            var passed = result?.Passed ?? 0;
-            var failed = result != null ? result.Executed - result.Passed : 0;
+            var passed = result.Passes;
+            var failed = result.Fails;
 
             foreach (var reqId in requirementIds.OrderBy(id => id))
             {
