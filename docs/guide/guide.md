@@ -653,12 +653,16 @@ The justifications report includes:
 ```markdown
 # System Security
 
-## SYS-SEC-001: The system shall support credentials authentication.
+## SYS-SEC-001
+
+**The system shall support credentials authentication.**
 
 Authentication is critical to ensure only authorized users can access the system.
 This requirement establishes the foundation for our security posture.
 
-## AUTH-001: All requests shall have their credentials authenticated before being processed.
+## AUTH-001
+
+**All requests shall have their credentials authenticated before being processed.**
 
 Prevents unauthorized access to system resources and ensures compliance with
 security standards. Each request must be verified to maintain system integrity.

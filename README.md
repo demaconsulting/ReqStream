@@ -303,7 +303,9 @@ The exported justifications document would look like:
 ```markdown
 # Security
 
-## SEC-001: The system shall encrypt all data at rest.
+## SEC-001
+
+**The system shall encrypt all data at rest.**
 
 Data encryption at rest protects sensitive information from unauthorized access
 in case of physical storage theft or unauthorized access to storage media.

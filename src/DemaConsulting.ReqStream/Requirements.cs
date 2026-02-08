@@ -174,9 +174,13 @@ public class Requirements : Section
         // Write each requirement with justification
         foreach (var requirement in section.Requirements)
         {
-            // Write requirement ID and title as a subheader
+            // Write requirement ID as a subheader
             var reqHeaderPrefix = new string('#', depth + 1);
-            writer.WriteLine($"{reqHeaderPrefix} {requirement.Id}: {requirement.Title}");
+            writer.WriteLine($"{reqHeaderPrefix} {requirement.Id}");
+            writer.WriteLine();
+
+            // Write requirement title in bold
+            writer.WriteLine($"**{requirement.Title}**");
             writer.WriteLine();
 
             // Write justification if present

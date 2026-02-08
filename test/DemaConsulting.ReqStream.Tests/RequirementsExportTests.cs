@@ -304,9 +304,11 @@ sections:
         Assert.IsTrue(File.Exists(mdPath));
         var content = File.ReadAllText(mdPath);
         Assert.Contains("# System Security", content);
-        Assert.Contains("## SYS-SEC-001: The system shall support credentials authentication.", content);
+        Assert.Contains("## SYS-SEC-001", content);
+        Assert.Contains("**The system shall support credentials authentication.**", content);
         Assert.Contains("authorized users", content);
-        Assert.Contains("## SYS-SEC-002: The system shall enforce password complexity.", content);
+        Assert.Contains("## SYS-SEC-002", content);
+        Assert.Contains("**The system shall enforce password complexity.**", content);
         Assert.Contains("brute force", content);
     }
 
@@ -333,7 +335,8 @@ sections:
 
         var content = File.ReadAllText(mdPath);
         Assert.Contains("## System Security", content);
-        Assert.Contains("### SYS-SEC-001: The system shall support credentials authentication.", content);
+        Assert.Contains("### SYS-SEC-001", content);
+        Assert.Contains("**The system shall support credentials authentication.**", content);
     }
 
     /// <summary>
@@ -359,20 +362,27 @@ sections:
         Assert.IsTrue(File.Exists(mdPath));
         var content = File.ReadAllText(mdPath);
         Assert.Contains("# System Security", content);
-        Assert.Contains("## SYS-SEC-001: The system shall support credentials authentication.", content);
-        // Verify no paragraph text appears after the requirement header (only headers and blank lines)
+        Assert.Contains("## SYS-SEC-001", content);
+        Assert.Contains("**The system shall support credentials authentication.**", content);
+        // Verify no paragraph text appears after the requirement title (only headers, bold text, and blank lines)
         var lines = content.Split('\n');
         var foundReqHeader = false;
+        var foundTitle = false;
         foreach (var line in lines)
         {
-            if (line.Contains("## SYS-SEC-001:"))
+            if (line.Contains("## SYS-SEC-001"))
             {
                 foundReqHeader = true;
                 continue;
             }
-            if (foundReqHeader && !string.IsNullOrWhiteSpace(line) && !line.StartsWith('#'))
+            if (foundReqHeader && line.Contains("**The system shall"))
             {
-                Assert.Fail("Expected no justification text after requirement header, but found: " + line);
+                foundTitle = true;
+                continue;
+            }
+            if (foundTitle && !string.IsNullOrWhiteSpace(line) && !line.StartsWith('#') && !line.StartsWith("**"))
+            {
+                Assert.Fail("Expected no justification text after requirement title, but found: " + line);
             }
         }
     }
@@ -403,7 +413,8 @@ sections:
         var content = File.ReadAllText(mdPath);
         Assert.Contains("# Data Management", content);
         Assert.Contains("## User Authentication", content);
-        Assert.Contains("### AUTH-001: All requests shall be authenticated.", content);
+        Assert.Contains("### AUTH-001", content);
+        Assert.Contains("**All requests shall be authenticated.**", content);
         Assert.Contains("unauthorized access", content);
     }
 }
