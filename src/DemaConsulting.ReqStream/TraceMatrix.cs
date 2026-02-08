@@ -24,15 +24,41 @@ using DemaConsulting.TestResults.IO;
 namespace DemaConsulting.ReqStream;
 
 /// <summary>
+///     Represents test metrics for a single test execution.
+/// </summary>
+/// <param name="Passes">Number of passes in the file matching the test name.</param>
+/// <param name="Fails">Number of fails in the file matching the test name.</param>
+public record TestMetrics(int Passes, int Fails)
+{
+    /// <summary>
+    ///     Gets the total number of executions (passes + fails).
+    /// </summary>
+    public int Executed => Passes + Fails;
+
+    /// <summary>
+    ///     Gets a value indicating whether all executions passed (no failures).
+    /// </summary>
+    public bool AllPassed => Fails == 0 && Executed > 0;
+}
+
+/// <summary>
+///     Represents a single test execution from a specific test result file.
+/// </summary>
+/// <param name="FileBaseName">The base name of the test file (without extension).</param>
+/// <param name="Name">The test name.</param>
+/// <param name="Metrics">The test metrics (passes and fails).</param>
+public record TestExecution(string FileBaseName, string Name, TestMetrics Metrics);
+
+/// <summary>
 ///     Represents a traceability matrix that maps test results to requirements.
 ///     Supports TRX and JUnit test result formats.
 /// </summary>
 public class TraceMatrix
 {
     /// <summary>
-    ///     Dictionary mapping test names to their execution results.
+    ///     Dictionary mapping test names to their list of executions from different files.
     /// </summary>
-    private readonly Dictionary<string, TestResultEntry> _testResults = [];
+    private readonly Dictionary<string, List<TestExecution>> _testExecutions = [];
 
     /// <summary>
     ///     The requirements object used to build this trace matrix.
@@ -52,33 +78,102 @@ public class TraceMatrix
 
         _requirements = requirements;
 
-        // Collect all test names from requirements
-        var requiredTests = CollectTestNames(requirements);
-
         // Process each test result file
         foreach (var filePath in testResultFiles)
         {
-            ProcessTestResultFile(filePath, requiredTests);
+            ProcessTestResultFile(filePath);
         }
     }
 
     /// <summary>
-    ///     Gets the test result entry for a specific test name.
+    ///     Gets the test metrics for a specific test name.
     /// </summary>
-    /// <param name="testName">The name of the test.</param>
-    /// <returns>The TestResultEntry for the test, or null if the test was not found.</returns>
-    public TestResultEntry? GetTestResult(string testName)
+    /// <param name="testName">The name of the test (may include source filter as "source@testname").</param>
+    /// <returns>The TestMetrics for the test (returns 0/0 if the test was not found).</returns>
+    public TestMetrics GetTestResult(string testName)
     {
-        return _testResults.TryGetValue(testName, out var result) ? result : null;
+        var executions = FindTestExecutions(testName);
+        if (executions.Count == 0)
+        {
+            return new TestMetrics(0, 0);
+        }
+
+        // Aggregate executions into a single metrics
+        var totalPasses = executions.Sum(e => e.Metrics.Passes);
+        var totalFails = executions.Sum(e => e.Metrics.Fails);
+        return new TestMetrics(totalPasses, totalFails);
     }
 
     /// <summary>
-    ///     Gets all test result entries.
+    ///     Gets all test metrics for tests referenced in requirements.
     /// </summary>
-    /// <returns>A read-only dictionary of test names to their result entries.</returns>
-    public IReadOnlyDictionary<string, TestResultEntry> GetAllTestResults()
+    /// <returns>A read-only dictionary of test names to their metrics.</returns>
+    public IReadOnlyDictionary<string, TestMetrics> GetAllTestResults()
     {
-        return _testResults;
+        // Build dictionary of all test results from required tests in the requirements
+        var results = new Dictionary<string, TestMetrics>();
+        var requiredTests = new HashSet<string>();
+        CollectRequiredTestNames(_requirements, requiredTests);
+        
+        foreach (var testName in requiredTests)
+        {
+            var result = GetTestResult(testName);
+            // Only include tests that have been executed
+            if (result.Executed > 0)
+            {
+                results[testName] = result;
+            }
+        }
+        
+        return results;
+    }
+
+    /// <summary>
+    ///     Collects all test names from the requirements tree.
+    /// </summary>
+    /// <param name="section">The section to search for tests.</param>
+    /// <param name="testNames">The set to add test names to.</param>
+    private static void CollectRequiredTestNames(Section section, HashSet<string> testNames)
+    {
+        // Collect tests from requirements in this section
+        foreach (var test in section.Requirements.SelectMany(requirement => requirement.Tests))
+        {
+            testNames.Add(test);
+        }
+
+        // Recursively collect tests from child sections
+        foreach (var childSection in section.Sections)
+        {
+            CollectRequiredTestNames(childSection, testNames);
+        }
+    }
+
+    /// <summary>
+    ///     Finds test executions for the given test name, optionally filtered by test source.
+    /// </summary>
+    /// <param name="testName">The test name (may include source filter as "source@testname").</param>
+    /// <returns>A list of matching test executions.</returns>
+    private List<TestExecution> FindTestExecutions(string testName)
+    {
+        // Parse test name to extract optional source filter
+        var (sourceFilter, actualTestName) = ParseTestName(testName);
+
+        // Look up test executions by actual test name
+        if (!_testExecutions.TryGetValue(actualTestName, out var executions))
+        {
+            return [];
+        }
+
+        // If no source filter, return all executions
+        if (sourceFilter == null)
+        {
+            return executions;
+        }
+
+        // Filter executions by source
+        return executions
+            .Where(e => e.FileBaseName.Contains(sourceFilter, StringComparison.OrdinalIgnoreCase))
+            .ToList();
     }
 
     /// <summary>
@@ -225,7 +320,7 @@ public class TraceMatrix
         // All tests must have been executed and passed
         return allTests
             .Select(testName => GetTestResult(testName))
-            .All(result => result != null && result.Executed > 0 && result.Passed == result.Executed);
+            .All(result => result.AllPassed);
     }
 
     /// <summary>
@@ -339,11 +434,11 @@ public class TraceMatrix
 
         foreach (var result in requirement.Tests.Select(testName => GetTestResult(testName)))
         {
-            if (result == null || result.Executed == 0)
+            if (result.Executed == 0)
             {
                 notExecuted++;
             }
-            else if (result.Executed - result.Passed > 0)
+            else if (result.Fails > 0)
             {
                 failed++;
             }
@@ -379,8 +474,8 @@ public class TraceMatrix
         foreach (var (testName, requirementIds) in testToRequirements.OrderBy(kvp => kvp.Key))
         {
             var result = GetTestResult(testName);
-            var passed = result?.Passed ?? 0;
-            var failed = result != null ? result.Executed - result.Passed : 0;
+            var passed = result.Passes;
+            var failed = result.Fails;
 
             foreach (var reqId in requirementIds.OrderBy(id => id))
             {
@@ -420,36 +515,11 @@ public class TraceMatrix
     }
 
     /// <summary>
-    ///     Collects all test names from the requirements tree.
-    /// </summary>
-    /// <param name="section">The section to search for tests.</param>
-    /// <returns>A hash set containing all unique test names.</returns>
-    private static HashSet<string> CollectTestNames(Section section)
-    {
-        var testNames = new HashSet<string>();
-
-        // Collect tests from requirements in this section
-        foreach (var test in section.Requirements.SelectMany(requirement => requirement.Tests))
-        {
-            testNames.Add(test);
-        }
-
-        // Recursively collect tests from child sections
-        foreach (var childTests in section.Sections.Select(childSection => CollectTestNames(childSection)))
-        {
-            testNames.UnionWith(childTests);
-        }
-
-        return testNames;
-    }
-
-    /// <summary>
     ///     Processes a test result file and updates test execution counts.
     /// </summary>
     /// <param name="filePath">Path to the test result file.</param>
-    /// <param name="requiredTests">Set of test names that are referenced in requirements.</param>
     /// <exception cref="FileNotFoundException">Thrown when the file does not exist.</exception>
-    private void ProcessTestResultFile(string filePath, HashSet<string> requiredTests)
+    private void ProcessTestResultFile(string filePath)
     {
         // Verify file exists
         if (!File.Exists(filePath))
@@ -463,26 +533,19 @@ public class TraceMatrix
         // Read the file content
         var content = File.ReadAllText(filePath);
 
-        // Try to parse as TRX first, then JUnit
+        // Deserialize test results (automatically detects TRX or JUnit format)
         DemaConsulting.TestResults.TestResults testResults;
         try
         {
-            testResults = TrxSerializer.Deserialize(content);
+            testResults = Serializer.Deserialize(content);
         }
-        catch
+        catch (Exception ex)
         {
-            // If TRX parsing fails, try JUnit
-            try
-            {
-                testResults = JUnitSerializer.Deserialize(content);
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"Failed to parse test result file as TRX or JUnit format: {filePath}", ex);
-            }
+            throw new InvalidOperationException($"Failed to parse test result file: {filePath}", ex);
         }
 
-        // Process each test result
+        // Aggregate test results by test name (collapse duplicate results from different classes)
+        var testAggregates = new Dictionary<string, (int passes, int fails)>();
         foreach (var result in testResults.Results)
         {
             // Skip non-executed tests (e.g., filtered by OS/Runtime conditions)
@@ -491,76 +554,37 @@ public class TraceMatrix
                 continue;
             }
 
-            // Find all required tests that match this result
-            var matchingTestNames = FindAllMatchingTestNames(requiredTests, result.Name, fileBaseName);
-            if (matchingTestNames.Count == 0)
+            // Aggregate by test name
+            if (!testAggregates.TryGetValue(result.Name, out var aggregate))
             {
-                continue;
+                aggregate = (0, 0);
             }
 
-            // Update counts for each matching required test
-            foreach (var matchingTestName in matchingTestNames)
+            if (result.Outcome.IsPassed())
             {
-                // Get or create the test result entry using the full test name from requirements
-                if (!_testResults.TryGetValue(matchingTestName, out var entry))
-                {
-                    entry = new TestResultEntry();
-                    _testResults[matchingTestName] = entry;
-                }
-
-                // Update execution counts
-                entry.Executed++;
-                
-                if (result.Outcome.IsPassed())
-                {
-                    entry.Passed++;
-                }
+                aggregate.passes++;
             }
+            else
+            {
+                aggregate.fails++;
+            }
+
+            testAggregates[result.Name] = aggregate;
         }
-    }
 
-    /// <summary>
-    ///     Finds all matching test names from the required tests set.
-    ///     Supports both plain test names and source-specific test names.
-    ///     Source-specific format: filepart@testname (where filepart matches part of the test result filename).
-    ///     A single test result can match multiple required test names, including both source-specific and plain names.
-    /// </summary>
-    /// <param name="requiredTests">Set of test names from requirements.</param>
-    /// <param name="actualTestName">The actual test name from the test result file.</param>
-    /// <param name="fileBaseName">The base name of the test result file (without extension).</param>
-    /// <returns>A list of matching test names from requirements.</returns>
-    private static List<string> FindAllMatchingTestNames(HashSet<string> requiredTests, string actualTestName, string fileBaseName)
-    {
-        var matches = new List<string>();
-
-        // Check all required tests for matches
-        // A test can match both source-specific formats and plain formats
-        // This is O(n) where n is the number of required tests, which is acceptable for typical use cases
-        foreach (var requiredTest in requiredTests)
+        // Create TestExecution records and add to the dictionary
+        foreach (var (testName, (passes, fails)) in testAggregates)
         {
-            var (filePart, testName) = ParseTestName(requiredTest);
-            
-            // Skip if test name doesn't match
-            if (testName != actualTestName)
-            {
-                continue;
-            }
+            var execution = new TestExecution(fileBaseName, testName, new TestMetrics(passes, fails));
 
-            // Match if it's a plain test name (no file part)
-            if (filePart == null)
+            // Add to the executions dictionary
+            if (!_testExecutions.TryGetValue(testName, out var executions))
             {
-                matches.Add(requiredTest);
-                continue;
+                executions = [];
+                _testExecutions[testName] = executions;
             }
-
-            // Match if it's a source-specific test and the file part matches
-            if (fileBaseName.Contains(filePart, StringComparison.OrdinalIgnoreCase))
-            {
-                matches.Add(requiredTest);
-            }
+            executions.Add(execution);
         }
-
-        return matches;
     }
 
     /// <summary>

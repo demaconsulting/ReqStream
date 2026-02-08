@@ -115,10 +115,12 @@ Maps test results to requirements and analyzes test coverage.
 ```csharp
 public class TraceMatrix
 {
-    private readonly Dictionary<string, TestResultEntry> _testResults;
+    private readonly Dictionary<string, List<TestExecution>> _testExecutions;
     private readonly Requirements _requirements;
     
     public TraceMatrix(Requirements requirements, params string[] testResultFiles);
+    public TestMetrics GetTestResult(string testName);
+    public IReadOnlyDictionary<string, TestMetrics> GetAllTestResults();
     public (int satisfied, int total) CalculateSatisfiedRequirements();
     public List<string> GetUnsatisfiedRequirements();
     public void Export(string filePath, int depth = 1);
@@ -128,30 +130,78 @@ public class TraceMatrix
 **Key Responsibilities**:
 
 - Parse test result files (TRX and JUnit formats)
+- Aggregate test executions from multiple result files by test name
 - Match test names to requirements (plain names vs source-specific `filepart@testname`)
-- Aggregate test execution counts across multiple result files
+- Provide fast lookup of test executions with optional source filtering
+- Return `TestMetrics` for queried tests (returns 0/0 if not found)
 - Calculate requirement satisfaction (must have tests, all must pass)
 - Consider child requirement tests transitively
 - Export trace matrix reports to Markdown
 
-### TestResultEntry
+**Internal Structure**:
 
-**Location**: `TestResultEntry.cs`
+The TraceMatrix uses a two-tier structure for efficient test result management:
 
-Tracks test execution counts for a specific test.
+1. **TestExecution Records**: Each test result file produces TestExecution records that capture:
+   - `FileBaseName`: The base name of the test result file (for source matching)
+   - `Name`: The actual test name (without source filter)
+   - `Passes`: Number of passing executions for this test in this file
+   - `Fails`: Number of failing executions for this test in this file
+
+2. **Dictionary by Test Name**: Test executions are organized in a `Dictionary<string, List<TestExecution>>` where:
+   - The key is the actual test name (e.g., "Test_Platform")
+   - The value is a list of all executions of that test across different files
+   - This enables efficient lookup and filtering by source
+
+3. **FindTestExecutions Method**: Given a test name (with or without source filter):
+   - Parses the test name to extract optional source filter (e.g., "windows@Test_Platform")
+   - Looks up test executions by actual test name
+   - Returns all executions if no source filter is specified
+   - Filters executions by matching file base name if source filter is specified
+
+This design optimizes for the common case where the number of unique test names is much larger than the
+number of test result files, making test name lookup O(1) with optional O(n) filtering where n is the
+number of files containing that test.
+
+### TestMetrics
+
+**Location**: `TraceMatrix.cs`
+
+Represents test metrics for test executions.
 
 ```csharp
-public class TestResultEntry
+public record TestMetrics(int Passes, int Fails)
 {
-    public int Executed { get; set; }   // Total executions across all result files
-    public int Passed { get; set; }     // Number of passing executions
-}
+    public int Executed => Passes + Fails;
+    public bool AllPassed => Fails == 0 && Executed > 0;
+};
 ```
 
 **Key Characteristics**:
 
-- Aggregates results from multiple test result files
-- A test is considered "passing" only if `Passed == Executed`
+- Immutable record type capturing passes and fails
+- Can be aggregated across multiple executions
+- `Executed` property returns total number of executions (Passes + Fails)
+- `AllPassed` property indicates if all executions passed (no failures and at least one execution)
+- Used as return type for `GetTestResult` (returns `TestMetrics(0, 0)` if test not found)
+
+### TestExecution
+
+**Location**: `TraceMatrix.cs`
+
+Represents a single test execution from a specific test result file.
+
+```csharp
+public record TestExecution(string FileBaseName, string Name, TestMetrics Metrics);
+```
+
+**Key Characteristics**:
+
+- Immutable record type capturing test results from one file
+- `FileBaseName` is used for source-specific test matching
+- `Name` is the actual test name without any source filter prefix
+- `Metrics` contains passes and fails aggregated from potentially multiple test results with the same name in one file
+  (e.g., test results from different test classes)
 
 ### Context
 
@@ -438,43 +488,87 @@ Requirement tests:
   - "TestAuth_Valid_Passes"                 ✓ Matches (plain name)
 ```
 
-### 3. Test Execution Count Aggregation
+### 3. Test Execution Aggregation and Storage
 
-Test results are aggregated across multiple result files:
+The TraceMatrix uses a simplified two-tier structure for efficient test result management:
 
-```csharp
-foreach (var result in testResults.Results)
-{
-    // Skip non-executed tests (e.g., filtered by OS/Runtime conditions)
-    if (!result.Outcome.IsExecuted())
-    {
-        continue;
-    }
+#### Step 1: Parse and Aggregate by File
 
-    var matchingTestNames = FindAllMatchingTestNames(requiredTests, result.Name, fileBaseName);
-    foreach (var matchingTestName in matchingTestNames)
-    {
-        if (!_testResults.TryGetValue(matchingTestName, out var entry))
-        {
-            entry = new TestResultEntry();
-            _testResults[matchingTestName] = entry;
-        }
-        entry.Executed++;
-        if (result.Outcome.IsPassed())
-        {
-            entry.Passed++;
-        }
-    }
+For each test result file:
+
+1. Extract the file base name (without extension) for source matching
+2. Parse the file as TRX or JUnit format
+3. Skip non-executed tests (using `IsExecuted()` extension method)
+4. **Capture ALL executed tests** (no filtering by requirements)
+5. Aggregate test results by test name within the file (collapsing duplicate results from different test classes)
+6. Create a `TestExecution` record for each unique test name containing:
+   - FileBaseName: The base name of the test result file
+   - Name: The actual test name
+   - Metrics: A `TestMetrics` record with passes and fails counts
+
+#### Step 2: Store in Dictionary Structure
+
+Store test executions in a `Dictionary<string, List<TestExecution>>` where:
+
+- Key: The actual test name (e.g., "Test_Platform")
+- Value: List of all TestExecution records for that test from different files
+
+**Example Internal Structure**:
+
+```text
+_testExecutions = {
+  "Test_Platform": [
+    TestExecution("test-results-windows-latest", "Test_Platform", new TestMetrics(1, 0)),
+    TestExecution("test-results-ubuntu-latest", "Test_Platform", new TestMetrics(1, 0))
+  ],
+  "Test_Auth": [
+    TestExecution("test-results-windows-latest", "Test_Auth", new TestMetrics(2, 1))
+  ]
 }
 ```
 
-**Key Points**:
+#### Step 3: Query with FindTestExecutions
 
-- Non-executed tests are skipped using the `IsExecuted()` extension method
-- Each executed test result increments the execution count
-- Passing tests (checked via `IsPassed()`) increment both `Executed` and `Passed`
-- Failing tests increment only `Executed`
-- Source-specific tests are tracked separately from plain tests
+When querying for test results (via `GetTestResult`):
+
+1. Parse the requested test name to extract optional source filter (e.g., "windows@Test_Platform")
+2. Look up test executions by the actual test name in the dictionary
+3. If no source filter: Return all executions for that test name
+4. If source filter present: Filter to executions where FileBaseName contains the source filter (case-insensitive)
+5. Aggregate the filtered executions into a single TestResultEntry
+
+`GetAllTestResults()` returns only tests referenced in requirements by:
+
+1. Collecting all test names from the requirements tree
+2. Calling `GetTestResult()` for each referenced test
+3. Returning only those that have execution data
+
+**Key Benefits**:
+
+- **Efficient Lookup**: O(1) dictionary lookup by test name
+- **Complete Data Capture**: All test executions are captured, not just those in requirements
+- **Flexible Querying**: Can query any test, but GetAllTestResults filters to requirements
+- **Source-Specific Filtering**: Filters at query time, not storage time
+- **Clear Structure**: TestExecution records explicitly capture what was tested in each file
+- **Optimized for Scale**: Works best when number of unique test names >> number of test files (typical case)
+
+**Example Query Behavior**:
+
+```text
+Query: "windows@Test_Platform"
+  → Parse: sourceFilter="windows", actualTestName="Test_Platform"
+  → Lookup: Find executions for "Test_Platform"
+  → Filter: Keep only executions where FileBaseName contains "windows"
+  → Result: TestExecution("test-results-windows-latest", "Test_Platform", 1, 0)
+  → Aggregate: TestResultEntry(Executed=1, Passed=1)
+
+Query: "Test_Platform" (no source filter)
+  → Parse: sourceFilter=null, actualTestName="Test_Platform"
+  → Lookup: Find executions for "Test_Platform"
+  → Filter: None (return all)
+  → Result: Both windows and ubuntu executions
+  → Aggregate: TestResultEntry(Executed=2, Passed=2)
+```
 
 ### 4. Requirement Satisfaction Calculation
 

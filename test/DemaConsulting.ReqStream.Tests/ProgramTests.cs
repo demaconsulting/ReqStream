@@ -305,14 +305,18 @@ sections:
           - TestMethod1
 ");
 
-        // Create a test TRX file
+        // Create a test TRX file using TestResults library
+        var testResults = new DemaConsulting.TestResults.TestResults { Name = "TestRun" };
+        testResults.Results.Add(new DemaConsulting.TestResults.TestResult
+        {
+            Name = "TestMethod1",
+            ClassName = "TestClass",
+            CodeBase = "Tests.dll",
+            Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
         var trxFile = Path.Combine(_testDirectory, "tests.trx");
-        File.WriteAllText(trxFile, @"<?xml version=""1.0"" encoding=""utf-8""?>
-<TestRun xmlns=""http://microsoft.com/schemas/VisualStudio/TeamTest/2010"">
-  <Results>
-    <UnitTestResult testName=""TestMethod1"" outcome=""Passed"" />
-  </Results>
-</TestRun>");
+        File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
 
         var matrixFile = Path.Combine(_testDirectory, "matrix.md");
 
