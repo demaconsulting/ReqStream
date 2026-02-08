@@ -118,34 +118,34 @@ with sections, requirements, test mappings, and file includes.
 
 # Requirement sections 
 sections:
-  - title: "System Security"
+  - title: System Security
     requirements:
-      - id: "SYS-SEC-001"
-        title: "The system shall support credentials authentication."
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
         justification: |
           Authentication is critical to ensure only authorized users can access the system.
           This requirement establishes the foundation for our security posture.
         children: # Support linking to child requirements
-          - "AUTH-001"
+          - AUTH-001
 
-  - title: "Data Management"
+  - title: Data Management
     sections:
-      - title: "User Authentication"
+      - title: User Authentication
         requirements:
-          - id: "AUTH-001"
-            title: "All requests shall have their credentials authenticated before being processed."
+          - id: AUTH-001
+            title: All requests shall have their credentials authenticated before being processed.
             justification: |
               Prevents unauthorized access to system resources and ensures compliance with
               security standards. Each request must be verified to maintain system integrity.
             tests: # Support test-mapping inline with requirements
-              - "Credentials_Valid_Allowed"
-              - "Credentials_Invalid_Refused"
-              - "Credentials_Missing_Refused"
+              - Credentials_Valid_Allowed
+              - Credentials_Invalid_Refused
+              - Credentials_Missing_Refused
 
-      - title: "Logging"
+      - title: Logging
         requirements:
-          - id: "DATA-001"
-            title: "All requests shall be logged."
+          - id: DATA-001
+            title: All requests shall be logged.
 
 # Include other requirement files - may contain requirements and/or test mappings
 includes:
@@ -154,10 +154,10 @@ includes:
 
 # Test mappings support defining tests separate from requirements
 mappings:
-  - id: "DATA-001"
+  - id: DATA-001
     tests:
-      - "Logging_ValidRequest_Logged"
-      - "Logging_InvalidRequest_Logged"
+      - Logging_ValidRequest_Logged
+      - Logging_InvalidRequest_Logged
 ```
 
 ### Key Features
@@ -191,20 +191,20 @@ Test source linking allows requirements to specify which test results should com
 
 ```yaml
 requirements:
-  - id: "PLAT-001"
-    title: "Shall support Windows"
+  - id: PLAT-001
+    title: Shall support Windows
     tests:
-      - "windows-latest@Test_PlatformFeature"  # Matches only from files containing "windows-latest"
+      - windows-latest@Test_PlatformFeature  # Matches only from files containing "windows-latest"
   
-  - id: "PLAT-002"
-    title: "Shall support Linux"
+  - id: PLAT-002
+    title: Shall support Linux
     tests:
-      - "ubuntu-latest@Test_PlatformFeature"   # Matches only from files containing "ubuntu-latest"
+      - ubuntu-latest@Test_PlatformFeature   # Matches only from files containing "ubuntu-latest"
   
-  - id: "PLAT-003"
-    title: "Shall support cross-platform features"
+  - id: PLAT-003
+    title: Shall support cross-platform features
     tests:
-      - "Test_CrossPlatformFeature"             # Aggregates from all test result files
+      - Test_CrossPlatformFeature             # Aggregates from all test result files
 ```
 
 **Key behaviors**:
@@ -289,10 +289,10 @@ Given requirements with justifications:
 
 ```yaml
 sections:
-  - title: "Security"
+  - title: Security
     requirements:
-      - id: "SEC-001"
-        title: "The system shall encrypt all data at rest."
+      - id: SEC-001
+        title: The system shall encrypt all data at rest.
         justification: |
           Data encryption at rest protects sensitive information from unauthorized access
           in case of physical storage theft or unauthorized access to storage media.
