@@ -297,7 +297,8 @@ public class Requirements : Section
         var requirement = new Requirement
         {
             Id = req.Id,
-            Title = req.Title
+            Title = req.Title,
+            Justification = req.Justification
         };
 
         // Add any inline tests
@@ -394,6 +395,11 @@ public class Requirements : Section
         ///     Gets or sets the requirement title.
         /// </summary>
         public string Title { get; set; } = string.Empty;
+
+        /// <summary>
+        ///     Gets or sets the optional justification.
+        /// </summary>
+        public string? Justification { get; set; }
 
         /// <summary>
         ///     Gets or sets the list of tests.

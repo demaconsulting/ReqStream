@@ -137,6 +137,36 @@ sections:
     }
 
     /// <summary>
+    /// Test reading a requirement with justification.
+    /// </summary>
+    [TestMethod]
+    public void Requirements_Read_RequirementWithJustification_ParsesJustificationCorrectly()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+        justification: |
+          This requirement is necessary to ensure that only authorized users
+          can access the system and to maintain data security and integrity.
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        var requirements = Requirements.Read(filePath);
+
+        Assert.IsNotNull(requirements);
+        var req = requirements.Sections[0].Requirements[0];
+        Assert.AreEqual("SYS-SEC-001", req.Id);
+        Assert.AreEqual("The system shall support credentials authentication.", req.Title);
+        Assert.IsNotNull(req.Justification);
+        Assert.Contains("authorized users", req.Justification);
+        Assert.Contains("data security", req.Justification);
+    }
+
+    /// <summary>
     /// Test reading nested sections.
     /// </summary>
     [TestMethod]
