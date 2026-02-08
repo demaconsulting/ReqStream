@@ -39,7 +39,7 @@ public record TestMetrics(int Passes, int Fails)
     ///     Gets a value indicating whether all executions passed (no failures).
     /// </summary>
     public bool AllPassed => Fails == 0 && Executed > 0;
-};
+}
 
 /// <summary>
 ///     Represents a single test execution from a specific test result file.
