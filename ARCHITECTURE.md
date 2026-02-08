@@ -494,8 +494,9 @@ For each test result file:
 1. Extract the file base name (without extension) for source matching
 2. Parse the file as TRX or JUnit format
 3. Skip non-executed tests (using `IsExecuted()` extension method)
-4. Aggregate test results by test name within the file (collapsing duplicate results from different test classes)
-5. Create a `TestExecution` record for each unique test name containing:
+4. **Capture ALL executed tests** (no filtering by requirements)
+5. Aggregate test results by test name within the file (collapsing duplicate results from different test classes)
+6. Create a `TestExecution` record for each unique test name containing:
    - FileBaseName: The base name of the test result file
    - Name: The actual test name
    - Passes: Count of passing executions in this file
@@ -530,10 +531,17 @@ When querying for test results (via `GetTestResult`):
 4. If source filter present: Filter to executions where FileBaseName contains the source filter (case-insensitive)
 5. Aggregate the filtered executions into a single TestResultEntry
 
+`GetAllTestResults()` returns only tests referenced in requirements by:
+1. Collecting all test names from the requirements tree
+2. Calling `GetTestResult()` for each referenced test
+3. Returning only those that have execution data
+
 **Key Benefits**:
 
 - **Efficient Lookup**: O(1) dictionary lookup by test name
-- **Flexible Filtering**: Source-specific tests filter at query time, not storage time
+- **Complete Data Capture**: All test executions are captured, not just those in requirements
+- **Flexible Querying**: Can query any test, but GetAllTestResults filters to requirements
+- **Source-Specific Filtering**: Filters at query time, not storage time
 - **Clear Structure**: TestExecution records explicitly capture what was tested in each file
 - **Optimized for Scale**: Works best when number of unique test names >> number of test files (typical case)
 
