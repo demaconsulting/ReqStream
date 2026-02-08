@@ -142,6 +142,9 @@ internal static class Program
         context.WriteLine("  --requirements <pattern>   Requirements files glob pattern");
         context.WriteLine("  --report <file>            Export requirements to markdown file");
         context.WriteLine("  --report-depth <depth>     Markdown header depth for requirements report (default: 1)");
+        context.WriteLine("  --justifications <file>    Export justifications to markdown file");
+        context.WriteLine("  --justifications-depth <depth>");
+        context.WriteLine("                             Markdown header depth for justifications (default: 1)");
         context.WriteLine("  --tests <pattern>          Test result files glob pattern (TRX or JUnit)");
         context.WriteLine("  --matrix <file>            Export trace matrix to markdown file");
         context.WriteLine("  --matrix-depth <depth>     Markdown header depth for trace matrix (default: 1)");
@@ -172,6 +175,14 @@ internal static class Program
             context.WriteLine($"Exporting requirements to {context.RequirementsReport}...");
             requirements.Export(context.RequirementsReport, context.ReportDepth);
             context.WriteLine("Requirements report generated successfully.");
+        }
+
+        // Export justifications if requested
+        if (context.JustificationsFile != null)
+        {
+            context.WriteLine($"Exporting justifications to {context.JustificationsFile}...");
+            requirements.ExportJustifications(context.JustificationsFile, context.JustificationsDepth);
+            context.WriteLine("Justifications report generated successfully.");
         }
 
         // Create trace matrix if test files are specified

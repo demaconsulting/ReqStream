@@ -144,10 +144,10 @@ sections:
     {
         var yamlContent = @"---
 sections:
-  - title: ""System Security""
+  - title: System Security
     requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
         justification: |
           This requirement is necessary to ensure that only authorized users
           can access the system and to maintain data security and integrity.
