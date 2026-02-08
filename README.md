@@ -194,17 +194,17 @@ requirements:
   - id: PLAT-001
     title: Shall support Windows
     tests:
-      - windows-latest@Test_PlatformFeature  # Matches only from files containing "windows-latest"
+      - windows@Test_PlatformFeature  # Matches only from files containing "windows"
   
   - id: PLAT-002
     title: Shall support Linux
     tests:
-      - ubuntu-latest@Test_PlatformFeature   # Matches only from files containing "ubuntu-latest"
+      - ubuntu@Test_PlatformFeature   # Matches only from files containing "ubuntu"
   
   - id: PLAT-003
     title: Shall support cross-platform features
     tests:
-      - Test_CrossPlatformFeature             # Aggregates from all test result files
+      - Test_CrossPlatformFeature     # Aggregates from all test result files
 ```
 
 **Key behaviors**:
