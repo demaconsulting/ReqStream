@@ -164,7 +164,7 @@ number of files containing that test.
 
 ### TestResultEntry
 
-**Location**: `TestResultEntry.cs`
+**Location**: `TraceMatrix.cs`
 
 Tracks test execution counts for a specific test.
 
@@ -183,7 +183,7 @@ public class TestResultEntry
 
 ### TestMetrics
 
-**Location**: `TestResultEntry.cs`
+**Location**: `TraceMatrix.cs`
 
 Represents test metrics for a single test execution.
 
@@ -198,7 +198,7 @@ public record TestMetrics(int Passes, int Fails);
 
 ### TestExecution
 
-**Location**: `TestResultEntry.cs`
+**Location**: `TraceMatrix.cs`
 
 Represents a single test execution from a specific test result file.
 

@@ -24,6 +24,37 @@ using DemaConsulting.TestResults.IO;
 namespace DemaConsulting.ReqStream;
 
 /// <summary>
+///     Represents test execution results for a specific test, tracking total executions and passed executions.
+/// </summary>
+public class TestResultEntry
+{
+    /// <summary>
+    ///     Gets or sets the total number of times this test was executed.
+    /// </summary>
+    public int Executed { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the number of times this test passed.
+    /// </summary>
+    public int Passed { get; set; }
+}
+
+/// <summary>
+///     Represents test metrics for a single test execution.
+/// </summary>
+/// <param name="Passes">Number of passes in the file matching the test name.</param>
+/// <param name="Fails">Number of fails in the file matching the test name.</param>
+public record TestMetrics(int Passes, int Fails);
+
+/// <summary>
+///     Represents a single test execution from a specific test result file.
+/// </summary>
+/// <param name="FileBaseName">The base name of the test file (without extension).</param>
+/// <param name="Name">The test name.</param>
+/// <param name="Metrics">The test metrics (passes and fails).</param>
+public record TestExecution(string FileBaseName, string Name, TestMetrics Metrics);
+
+/// <summary>
 ///     Represents a traceability matrix that maps test results to requirements.
 ///     Supports TRX and JUnit test result formats.
 /// </summary>
