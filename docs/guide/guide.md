@@ -16,6 +16,7 @@
   - [Sections and Subsections](#sections-and-subsections)
   - [Requirements](#requirements)
   - [Test Mappings](#test-mappings)
+  - [Test Source Linking](#test-source-linking)
   - [File Includes](#file-includes)
   - [Section Merging](#section-merging)
   - [Complete Example](#complete-example)
@@ -26,6 +27,7 @@
 - [Exporting](#exporting)
   - [Requirements Reports](#requirements-reports)
   - [Trace Matrix](#trace-matrix)
+  - [Justifications Export](#justifications-export)
   - [Export Options](#export-options)
 - [FAQ](#faq)
 
@@ -44,9 +46,10 @@ to be treated as code, stored in source control, and integrated into CI/CD pipel
 - **Multi-Platform** - Works on Windows, Linux, and macOS with .NET 8, 9, and 10
 - **Hierarchical Structure** - Organize requirements with sections and subsections for better organization
 - **Test Mapping** - Link requirements to test cases for traceability and verification
+- **Justifications** - Document the rationale behind each requirement for better understanding
 - **File Includes** - Modularize requirements across multiple YAML files for better maintainability
 - **Validation** - Built-in validation ensures requirement structure and references are correct
-- **Export Capabilities** - Generate markdown reports for requirements and test trace matrices
+- **Export Capabilities** - Generate markdown reports for requirements, justifications, and test trace matrices
 
 ### Use Cases
 
@@ -147,10 +150,10 @@ A requirements YAML file has a top-level `sections` array:
 ```yaml
 ---
 sections:
-  - title: "My Section"
+  - title: My Section
     requirements:
-      - id: "REQ-001"
-        title: "My first requirement"
+      - id: REQ-001
+        title: My first requirement
 ```
 
 ### Sections and Subsections
@@ -160,21 +163,21 @@ Sections provide hierarchical organization. Sections can contain requirements an
 ```yaml
 ---
 sections:
-  - title: "System Requirements"
+  - title: System Requirements
     requirements:
-      - id: "SYS-001"
-        title: "Top-level system requirement"
+      - id: SYS-001
+        title: Top-level system requirement
     
     sections:
-      - title: "Security"
+      - title: Security
         requirements:
-          - id: "SEC-001"
-            title: "Security requirement"
+          - id: SEC-001
+            title: Security requirement
       
-      - title: "Performance"
+      - title: Performance
         requirements:
-          - id: "PERF-001"
-            title: "Performance requirement"
+          - id: PERF-001
+            title: Performance requirement
 ```
 
 You can nest sections as deeply as needed to organize your requirements logically.
@@ -190,16 +193,20 @@ Requirements can optionally include:
 
 - **tests** - Array of test names that verify this requirement
 - **children** - Array of requirement IDs that are children of this requirement
+- **justification** - Explanation of why the requirement exists (recommended for better understanding)
 
 Example:
 
 ```yaml
 requirements:
-  - id: "SYS-SEC-001"
-    title: "The system shall support credentials authentication."
+  - id: SYS-SEC-001
+    title: The system shall support credentials authentication.
+    justification: |
+      Authentication is critical to ensure only authorized users can access the system.
+      This requirement establishes the foundation for our security posture.
     children:
-      - "AUTH-001"
-      - "AUTH-002"
+      - AUTH-001
+      - AUTH-002
 ```
 
 ### Test Mappings
@@ -210,28 +217,28 @@ Tests can be mapped to requirements in two ways:
 
 ```yaml
 requirements:
-  - id: "AUTH-001"
-    title: "All requests shall have their credentials authenticated before being processed."
+  - id: AUTH-001
+    title: All requests shall have their credentials authenticated before being processed.
     tests:
-      - "Credentials_Valid_Allowed"
-      - "Credentials_Invalid_Refused"
-      - "Credentials_Missing_Refused"
+      - Credentials_Valid_Allowed
+      - Credentials_Invalid_Refused
+      - Credentials_Missing_Refused
 ```
 
 **Separate mappings section:**
 
 ```yaml
 sections:
-  - title: "Logging"
+  - title: Logging
     requirements:
-      - id: "DATA-001"
-        title: "All requests shall be logged."
+      - id: DATA-001
+        title: All requests shall be logged.
 
 mappings:
-  - id: "DATA-001"
+  - id: DATA-001
     tests:
-      - "Logging_ValidRequest_Logged"
-      - "Logging_InvalidRequest_Logged"
+      - Logging_ValidRequest_Logged
+      - Logging_InvalidRequest_Logged
 ```
 
 The separate `mappings` section is useful when test mappings are maintained by a different team or in a different
@@ -251,22 +258,22 @@ from different sources. This is particularly useful for matrix testing scenarios
 
 ```yaml
 requirements:
-  - id: "PLAT-001"
-    title: "Shall support Windows operating systems"
+  - id: PLAT-001
+    title: Shall support Windows operating systems
     tests:
       - "windows-latest@Test_PlatformBasic"
       - "windows-latest@Test_FileSystem"
   
-  - id: "PLAT-002"
-    title: "Shall support Linux operating systems"
+  - id: PLAT-002
+    title: Shall support Linux operating systems
     tests:
       - "ubuntu-latest@Test_PlatformBasic"
       - "ubuntu-latest@Test_FileSystem"
   
-  - id: "PLAT-003"
-    title: "Shall support cross-platform APIs"
+  - id: PLAT-003
+    title: Shall support cross-platform APIs
     tests:
-      - "Test_CrossPlatformAPI"  # Aggregates from all platforms
+      - Test_CrossPlatformAPI  # Aggregates from all platforms
 ```
 
 With test result files:
@@ -292,10 +299,10 @@ Large projects can be split across multiple YAML files using the `includes` sect
 ```yaml
 ---
 sections:
-  - title: "Core Requirements"
+  - title: Core Requirements
     requirements:
-      - id: "CORE-001"
-        title: "Core requirement"
+      - id: CORE-001
+        title: Core requirement
 
 includes:
   - security_requirements.yaml
@@ -321,12 +328,12 @@ allows included files to add requirements to existing sections.
 ```yaml
 ---
 sections:
-  - title: "System Requirements"
+  - title: System Requirements
     sections:
-      - title: "Security"
+      - title: Security
         requirements:
-          - id: "SEC-001"
-            title: "Authentication required"
+          - id: SEC-001
+            title: Authentication required
 ```
 
 **additional_requirements.yaml:**
@@ -334,12 +341,12 @@ sections:
 ```yaml
 ---
 sections:
-  - title: "System Requirements"
+  - title: System Requirements
     sections:
-      - title: "Security"
+      - title: Security
         requirements:
-          - id: "SEC-002"
-            title: "Authorization required"
+          - id: SEC-002
+            title: Authorization required
 ```
 
 When both files are loaded, the "Security" section will contain both SEC-001 and SEC-002.
@@ -353,37 +360,37 @@ Here's a comprehensive example showing all features:
 # Main requirements file
 
 sections:
-  - title: "System Security"
+  - title: System Security
     requirements:
-      - id: "SYS-SEC-001"
-        title: "The system shall support credentials authentication."
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
         children:
           - "AUTH-001"
           - "AUTH-002"
 
-  - title: "Data Management"
+  - title: Data Management
     sections:
-      - title: "User Authentication"
+      - title: User Authentication
         requirements:
-          - id: "AUTH-001"
-            title: "All requests shall have their credentials authenticated before being processed."
+          - id: AUTH-001
+            title: All requests shall have their credentials authenticated before being processed.
             tests:
-              - "Credentials_Valid_Allowed"
-              - "Credentials_Invalid_Refused"
-              - "Credentials_Missing_Refused"
+              - Credentials_Valid_Allowed
+              - Credentials_Invalid_Refused
+              - Credentials_Missing_Refused
           
-          - id: "AUTH-002"
-            title: "Failed authentication attempts shall be logged."
+          - id: AUTH-002
+            title: Failed authentication attempts shall be logged.
             tests:
-              - "Authentication_Failed_Logged"
+              - Authentication_Failed_Logged
 
-      - title: "Logging"
+      - title: Logging
         requirements:
-          - id: "DATA-001"
-            title: "All requests shall be logged with timestamp and user information."
+          - id: DATA-001
+            title: All requests shall be logged with timestamp and user information.
           
-          - id: "DATA-002"
-            title: "Logs shall be retained for at least 90 days."
+          - id: DATA-002
+            title: Logs shall be retained for at least 90 days.
 
 # Include additional requirements from other files
 includes:
@@ -392,17 +399,17 @@ includes:
 
 # Test mappings separate from requirements
 mappings:
-  - id: "DATA-001"
+  - id: DATA-001
     tests:
-      - "Logging_ValidRequest_Logged"
-      - "Logging_InvalidRequest_Logged"
-      - "Logging_ContainsTimestamp"
-      - "Logging_ContainsUserInfo"
+      - Logging_ValidRequest_Logged
+      - Logging_InvalidRequest_Logged
+      - Logging_ContainsTimestamp
+      - Logging_ContainsUserInfo
   
-  - id: "DATA-002"
+  - id: DATA-002
     tests:
-      - "LogRetention_OldLogs_Retained"
-      - "LogRetention_VeryOldLogs_Deleted"
+      - LogRetention_OldLogs_Retained
+      - LogRetention_VeryOldLogs_Deleted
 ```
 
 ## Command-Line Interface
@@ -445,6 +452,8 @@ ReqStream supports the following command-line options:
 | `--tests <pattern>` | Glob pattern for test result files (TRX or JUnit format) |
 | `--matrix <file>` | Export trace matrix to markdown file |
 | `--matrix-depth <depth>` | Starting header depth for trace matrix (default: 1) |
+| `--justifications <file>` | Export justifications to markdown file |
+| `--justifications-depth <depth>` | Starting header depth for justifications (default: 1) |
 | `--enforce` | Fail if requirements are not fully tested |
 
 ### Examples
@@ -620,11 +629,57 @@ Tests:
 Coverage: 3 tests mapped
 ```
 
+### Justifications Export
+
+A justifications report documents the rationale behind each requirement, helping developers and stakeholders
+understand why requirements exist. This is especially valuable for onboarding new team members and providing
+context for decision-making.
+
+**Generate a justifications report:**
+
+```bash
+reqstream --requirements "docs/**/*.yaml" \
+          --justifications justifications.md
+```
+
+The justifications report includes:
+
+- Each requirement's ID and title as a header
+- The justification text explaining why the requirement exists
+- Preserves the hierarchical section structure
+
+**Example justifications output:**
+
+```markdown
+# System Security
+
+## SYS-SEC-001: The system shall support credentials authentication.
+
+Authentication is critical to ensure only authorized users can access the system.
+This requirement establishes the foundation for our security posture.
+
+## AUTH-001: All requests shall have their credentials authenticated before being processed.
+
+Prevents unauthorized access to system resources and ensures compliance with
+security standards. Each request must be verified to maintain system integrity.
+```
+
+**Control justifications header depth:**
+
+Use the `--justifications-depth` option to control the starting markdown header level:
+
+```bash
+# Start justifications sections with ## (level 2)
+reqstream --requirements "docs/**/*.yaml" \
+          --justifications justifications.md \
+          --justifications-depth 2
+```
+
 ### Export Options
 
 **Control header depth:**
 
-The `--report-depth` and `--matrix-depth` options control the starting markdown header level:
+The `--report-depth`, `--matrix-depth`, and `--justifications-depth` options control the starting markdown header level:
 
 ```bash
 # Start requirements with ## (level 2) instead of # (level 1)
@@ -637,6 +692,11 @@ reqstream --requirements "docs/**/*.yaml" \
           --tests "test-results/**/*.trx" \
           --matrix matrix.md \
           --matrix-depth 3
+
+# Start justifications sections with ## (level 2)
+reqstream --requirements "docs/**/*.yaml" \
+          --justifications justifications.md \
+          --justifications-depth 2
 ```
 
 This is useful when embedding generated reports into larger documents.
@@ -704,24 +764,24 @@ For a requirement to be satisfied:
 
 ```yaml
 sections:
-  - title: "System Security"
+  - title: System Security
     requirements:
-      - id: "SYS-SEC-001"
-        title: "The system shall support authentication."
+      - id: SYS-SEC-001
+        title: The system shall support authentication.
         children:
           - "AUTH-001"
           - "AUTH-002"
       
-      - id: "AUTH-001"
-        title: "Users shall authenticate with username and password."
+      - id: AUTH-001
+        title: Users shall authenticate with username and password.
         tests:
-          - "Test_UsernamePassword_Valid"
-          - "Test_UsernamePassword_Invalid"
+          - Test_UsernamePassword_Valid
+          - Test_UsernamePassword_Invalid
       
-      - id: "AUTH-002"
-        title: "Failed authentication attempts shall be logged."
+      - id: AUTH-002
+        title: Failed authentication attempts shall be logged.
         tests:
-          - "Test_FailedAuth_Logged"
+          - Test_FailedAuth_Logged
 ```
 
 In this example:
@@ -903,18 +963,18 @@ tests if they're satisfied through child requirements:
 
 ```yaml
 requirements:
-  - id: "HIGH-LEVEL-001"
-    title: "System shall be secure"
+  - id: HIGH-LEVEL-001
+    title: System shall be secure
     children:
       - "SEC-001"
       - "SEC-002"
       - "SEC-003"
   
   # Children have direct tests
-  - id: "SEC-001"
-    title: "Authentication required"
+  - id: SEC-001
+    title: Authentication required
     tests:
-      - "Test_Auth_Required"
+      - Test_Auth_Required
 ```
 
 ### Troubleshooting Enforcement
@@ -956,15 +1016,15 @@ Ensure parent requirements reference their children via the `children` field:
 
 ```yaml
 requirements:
-  - id: "PARENT-001"
-    title: "Parent requirement"
+  - id: PARENT-001
+    title: Parent requirement
     children:
       - "CHILD-001"  # Add child references
   
-  - id: "CHILD-001"
-    title: "Child requirement"
+  - id: CHILD-001
+    title: Child requirement
     tests:
-      - "Test_Child"
+      - Test_Child
 ```
 
 ## FAQ
@@ -1063,13 +1123,13 @@ matches the base filename (without extension) of the test result file. For examp
 
 ```yaml
 requirements:
-  - id: "WIN-001"
-    title: "Shall support Windows"
+  - id: WIN-001
+    title: Shall support Windows
     tests:
       - "windows-latest@Test_PlatformFeature"  # Matches only from files containing "windows-latest"
   
-  - id: "LIN-001"
-    title: "Shall support Linux"
+  - id: LIN-001
+    title: Shall support Linux
     tests:
       - "ubuntu-latest@Test_PlatformFeature"   # Matches only from files containing "ubuntu-latest"
 ```
