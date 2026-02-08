@@ -360,8 +360,21 @@ sections:
         var content = File.ReadAllText(mdPath);
         Assert.Contains("# System Security", content);
         Assert.Contains("## SYS-SEC-001: The system shall support credentials authentication.", content);
-        // No justification text should be present
-        Assert.IsFalse(content.Contains("authorized") || content.Contains("security"));
+        // Verify no paragraph text appears after the requirement header (only headers and blank lines)
+        var lines = content.Split('\n');
+        var foundReqHeader = false;
+        foreach (var line in lines)
+        {
+            if (line.Contains("## SYS-SEC-001:"))
+            {
+                foundReqHeader = true;
+                continue;
+            }
+            if (foundReqHeader && !string.IsNullOrWhiteSpace(line) && !line.StartsWith('#'))
+            {
+                Assert.Fail("Expected no justification text after requirement header, but found: " + line);
+            }
+        }
     }
 
     /// <summary>
