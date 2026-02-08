@@ -492,9 +492,10 @@ Requirement tests:
 
 The TraceMatrix uses a simplified two-tier structure for efficient test result management:
 
-**Step 1: Parse and Aggregate by File**
+#### Step 1: Parse and Aggregate by File
 
 For each test result file:
+
 1. Extract the file base name (without extension) for source matching
 2. Parse the file as TRX or JUnit format
 3. Skip non-executed tests (using `IsExecuted()` extension method)
@@ -505,9 +506,10 @@ For each test result file:
    - Name: The actual test name
    - Metrics: A `TestMetrics` record with passes and fails counts
 
-**Step 2: Store in Dictionary Structure**
+#### Step 2: Store in Dictionary Structure
 
 Store test executions in a `Dictionary<string, List<TestExecution>>` where:
+
 - Key: The actual test name (e.g., "Test_Platform")
 - Value: List of all TestExecution records for that test from different files
 
@@ -525,9 +527,10 @@ _testExecutions = {
 }
 ```
 
-**Step 3: Query with FindTestExecutions**
+#### Step 3: Query with FindTestExecutions
 
 When querying for test results (via `GetTestResult`):
+
 1. Parse the requested test name to extract optional source filter (e.g., "windows@Test_Platform")
 2. Look up test executions by the actual test name in the dictionary
 3. If no source filter: Return all executions for that test name
@@ -535,6 +538,7 @@ When querying for test results (via `GetTestResult`):
 5. Aggregate the filtered executions into a single TestResultEntry
 
 `GetAllTestResults()` returns only tests referenced in requirements by:
+
 1. Collecting all test names from the requirements tree
 2. Calling `GetTestResult()` for each referenced test
 3. Returning only those that have execution data
