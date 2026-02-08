@@ -30,9 +30,9 @@ namespace DemaConsulting.ReqStream;
 public class TraceMatrix
 {
     /// <summary>
-    ///     Dictionary mapping test names to their execution results.
+    ///     Dictionary mapping test names to their list of executions from different files.
     /// </summary>
-    private readonly Dictionary<string, TestResultEntry> _testResults = [];
+    private readonly Dictionary<string, List<TestExecution>> _testExecutions = [];
 
     /// <summary>
     ///     The requirements object used to build this trace matrix.
@@ -65,11 +65,24 @@ public class TraceMatrix
     /// <summary>
     ///     Gets the test result entry for a specific test name.
     /// </summary>
-    /// <param name="testName">The name of the test.</param>
+    /// <param name="testName">The name of the test (may include source filter as "source@testname").</param>
     /// <returns>The TestResultEntry for the test, or null if the test was not found.</returns>
     public TestResultEntry? GetTestResult(string testName)
     {
-        return _testResults.TryGetValue(testName, out var result) ? result : null;
+        var executions = FindTestExecutions(testName);
+        if (executions.Count == 0)
+        {
+            return null;
+        }
+
+        // Aggregate executions into a single result entry
+        var totalPasses = executions.Sum(e => e.Passes);
+        var totalFails = executions.Sum(e => e.Fails);
+        return new TestResultEntry
+        {
+            Executed = totalPasses + totalFails,
+            Passed = totalPasses
+        };
     }
 
     /// <summary>
@@ -78,7 +91,48 @@ public class TraceMatrix
     /// <returns>A read-only dictionary of test names to their result entries.</returns>
     public IReadOnlyDictionary<string, TestResultEntry> GetAllTestResults()
     {
-        return _testResults;
+        // Build dictionary of all test results from required tests in the requirements
+        var results = new Dictionary<string, TestResultEntry>();
+        var requiredTests = CollectTestNames(_requirements);
+        
+        foreach (var testName in requiredTests)
+        {
+            var result = GetTestResult(testName);
+            if (result != null)
+            {
+                results[testName] = result;
+            }
+        }
+        
+        return results;
+    }
+
+    /// <summary>
+    ///     Finds test executions for the given test name, optionally filtered by test source.
+    /// </summary>
+    /// <param name="testName">The test name (may include source filter as "source@testname").</param>
+    /// <returns>A list of matching test executions.</returns>
+    private List<TestExecution> FindTestExecutions(string testName)
+    {
+        // Parse test name to extract optional source filter
+        var (sourceFilter, actualTestName) = ParseTestName(testName);
+
+        // Look up test executions by actual test name
+        if (!_testExecutions.TryGetValue(actualTestName, out var executions))
+        {
+            return [];
+        }
+
+        // If no source filter, return all executions
+        if (sourceFilter == null)
+        {
+            return executions;
+        }
+
+        // Filter executions by source
+        return executions
+            .Where(e => e.FileBaseName.Contains(sourceFilter, StringComparison.OrdinalIgnoreCase))
+            .ToList();
     }
 
     /// <summary>
@@ -482,7 +536,8 @@ public class TraceMatrix
             }
         }
 
-        // Process each test result
+        // Aggregate test results by test name (collapse duplicate results from different classes)
+        var testAggregates = new Dictionary<string, (int passes, int fails)>();
         foreach (var result in testResults.Results)
         {
             // Skip non-executed tests (e.g., filtered by OS/Runtime conditions)
@@ -491,76 +546,49 @@ public class TraceMatrix
                 continue;
             }
 
-            // Find all required tests that match this result
-            var matchingTestNames = FindAllMatchingTestNames(requiredTests, result.Name, fileBaseName);
-            if (matchingTestNames.Count == 0)
+            // Check if any required test (plain or source-specific) matches this result
+            var isRequired = requiredTests.Any(reqTest =>
+            {
+                var (_, testName) = ParseTestName(reqTest);
+                return testName == result.Name; // Match if test name matches (regardless of source filter)
+            });
+
+            if (!isRequired)
             {
                 continue;
             }
 
-            // Update counts for each matching required test
-            foreach (var matchingTestName in matchingTestNames)
+            // Aggregate by test name
+            if (!testAggregates.TryGetValue(result.Name, out var aggregate))
             {
-                // Get or create the test result entry using the full test name from requirements
-                if (!_testResults.TryGetValue(matchingTestName, out var entry))
-                {
-                    entry = new TestResultEntry();
-                    _testResults[matchingTestName] = entry;
-                }
-
-                // Update execution counts
-                entry.Executed++;
-                
-                if (result.Outcome.IsPassed())
-                {
-                    entry.Passed++;
-                }
+                aggregate = (0, 0);
             }
+
+            if (result.Outcome.IsPassed())
+            {
+                aggregate.passes++;
+            }
+            else
+            {
+                aggregate.fails++;
+            }
+
+            testAggregates[result.Name] = aggregate;
         }
-    }
 
-    /// <summary>
-    ///     Finds all matching test names from the required tests set.
-    ///     Supports both plain test names and source-specific test names.
-    ///     Source-specific format: filepart@testname (where filepart matches part of the test result filename).
-    ///     A single test result can match multiple required test names, including both source-specific and plain names.
-    /// </summary>
-    /// <param name="requiredTests">Set of test names from requirements.</param>
-    /// <param name="actualTestName">The actual test name from the test result file.</param>
-    /// <param name="fileBaseName">The base name of the test result file (without extension).</param>
-    /// <returns>A list of matching test names from requirements.</returns>
-    private static List<string> FindAllMatchingTestNames(HashSet<string> requiredTests, string actualTestName, string fileBaseName)
-    {
-        var matches = new List<string>();
-
-        // Check all required tests for matches
-        // A test can match both source-specific formats and plain formats
-        // This is O(n) where n is the number of required tests, which is acceptable for typical use cases
-        foreach (var requiredTest in requiredTests)
+        // Create TestExecution records and add to the dictionary
+        foreach (var (testName, (passes, fails)) in testAggregates)
         {
-            var (filePart, testName) = ParseTestName(requiredTest);
-            
-            // Skip if test name doesn't match
-            if (testName != actualTestName)
-            {
-                continue;
-            }
+            var execution = new TestExecution(fileBaseName, testName, passes, fails);
 
-            // Match if it's a plain test name (no file part)
-            if (filePart == null)
+            // Add to the executions dictionary
+            if (!_testExecutions.TryGetValue(testName, out var executions))
             {
-                matches.Add(requiredTest);
-                continue;
+                executions = [];
+                _testExecutions[testName] = executions;
             }
-
-            // Match if it's a source-specific test and the file part matches
-            if (fileBaseName.Contains(filePart, StringComparison.OrdinalIgnoreCase))
-            {
-                matches.Add(requiredTest);
-            }
+            executions.Add(execution);
         }
-
-        return matches;
     }
 
     /// <summary>

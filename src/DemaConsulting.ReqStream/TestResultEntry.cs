@@ -35,3 +35,12 @@ public class TestResultEntry
     /// </summary>
     public int Passed { get; set; }
 }
+
+/// <summary>
+///     Represents a single test execution from a specific test result file.
+/// </summary>
+/// <param name="FileBaseName">The base name of the test file (without extension).</param>
+/// <param name="Name">The test name.</param>
+/// <param name="Passes">Number of passes in the file matching the test name.</param>
+/// <param name="Fails">Number of fails in the file matching the test name.</param>
+public record TestExecution(string FileBaseName, string Name, int Passes, int Fails);
