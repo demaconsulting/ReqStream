@@ -312,6 +312,12 @@ jobs:
           --matrix docs/tracematrix/tracematrix.md
           --enforce
 
+      - name: Generate Requirements Justifications
+        run: >
+          reqstream
+          --requirements requirements.yaml
+          --justifications docs/justifications/justifications.md
+
       - name: Generate HTML with Pandoc
         run: >
           dotnet pandoc
@@ -351,6 +357,19 @@ jobs:
           --pdf-variant pdf/a-3u
           docs/tracematrix/tracematrix.html
           "docs/ReqStream Trace Matrix.pdf"
+
+      - name: Generate Justifications HTML with Pandoc
+        run: >
+          dotnet pandoc
+          --defaults docs/justifications/definition.yaml
+          --output docs/justifications/justifications.html
+
+      - name: Generate Justifications PDF with Weasyprint
+        run: >
+          dotnet weasyprint
+          --pdf-variant pdf/a-3u
+          docs/justifications/justifications.html
+          "docs/ReqStream Requirements Justifications.pdf"
 
       - name: Generate CodeQL Quality Report with SarifMark
         shell: pwsh
