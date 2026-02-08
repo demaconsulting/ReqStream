@@ -303,20 +303,15 @@ jobs:
           echo "Installing ReqStream version ${{ inputs.version }} from build..."
           dotnet tool install --global --add-source packages --version ${{ inputs.version }} DemaConsulting.ReqStream
 
-      - name: Generate Requirements Report and Trace Matrix
+      - name: Generate Requirements Documentation
         run: >
           reqstream
           --requirements requirements.yaml
           --tests "test-results/**/*.trx"
           --report docs/requirements/requirements.md
           --matrix docs/tracematrix/tracematrix.md
-          --enforce
-
-      - name: Generate Requirements Justifications
-        run: >
-          reqstream
-          --requirements requirements.yaml
           --justifications docs/justifications/justifications.md
+          --enforce
 
       - name: Generate HTML with Pandoc
         run: >
