@@ -52,13 +52,10 @@ public class TraceMatrix
 
         _requirements = requirements;
 
-        // Collect all test names from requirements
-        var requiredTests = CollectTestNames(requirements);
-
         // Process each test result file
         foreach (var filePath in testResultFiles)
         {
-            ProcessTestResultFile(filePath, requiredTests);
+            ProcessTestResultFile(filePath);
         }
     }
 
@@ -86,14 +83,15 @@ public class TraceMatrix
     }
 
     /// <summary>
-    ///     Gets all test result entries.
+    ///     Gets all test result entries for tests referenced in requirements.
     /// </summary>
     /// <returns>A read-only dictionary of test names to their result entries.</returns>
     public IReadOnlyDictionary<string, TestResultEntry> GetAllTestResults()
     {
         // Build dictionary of all test results from required tests in the requirements
         var results = new Dictionary<string, TestResultEntry>();
-        var requiredTests = CollectTestNames(_requirements);
+        var requiredTests = new HashSet<string>();
+        CollectRequiredTestNames(_requirements, requiredTests);
         
         foreach (var testName in requiredTests)
         {
@@ -105,6 +103,26 @@ public class TraceMatrix
         }
         
         return results;
+    }
+
+    /// <summary>
+    ///     Collects all test names from the requirements tree.
+    /// </summary>
+    /// <param name="section">The section to search for tests.</param>
+    /// <param name="testNames">The set to add test names to.</param>
+    private static void CollectRequiredTestNames(Section section, HashSet<string> testNames)
+    {
+        // Collect tests from requirements in this section
+        foreach (var test in section.Requirements.SelectMany(requirement => requirement.Tests))
+        {
+            testNames.Add(test);
+        }
+
+        // Recursively collect tests from child sections
+        foreach (var childSection in section.Sections)
+        {
+            CollectRequiredTestNames(childSection, testNames);
+        }
     }
 
     /// <summary>
@@ -474,36 +492,11 @@ public class TraceMatrix
     }
 
     /// <summary>
-    ///     Collects all test names from the requirements tree.
-    /// </summary>
-    /// <param name="section">The section to search for tests.</param>
-    /// <returns>A hash set containing all unique test names.</returns>
-    private static HashSet<string> CollectTestNames(Section section)
-    {
-        var testNames = new HashSet<string>();
-
-        // Collect tests from requirements in this section
-        foreach (var test in section.Requirements.SelectMany(requirement => requirement.Tests))
-        {
-            testNames.Add(test);
-        }
-
-        // Recursively collect tests from child sections
-        foreach (var childTests in section.Sections.Select(childSection => CollectTestNames(childSection)))
-        {
-            testNames.UnionWith(childTests);
-        }
-
-        return testNames;
-    }
-
-    /// <summary>
     ///     Processes a test result file and updates test execution counts.
     /// </summary>
     /// <param name="filePath">Path to the test result file.</param>
-    /// <param name="requiredTests">Set of test names that are referenced in requirements.</param>
     /// <exception cref="FileNotFoundException">Thrown when the file does not exist.</exception>
-    private void ProcessTestResultFile(string filePath, HashSet<string> requiredTests)
+    private void ProcessTestResultFile(string filePath)
     {
         // Verify file exists
         if (!File.Exists(filePath))
@@ -542,18 +535,6 @@ public class TraceMatrix
         {
             // Skip non-executed tests (e.g., filtered by OS/Runtime conditions)
             if (!result.Outcome.IsExecuted())
-            {
-                continue;
-            }
-
-            // Check if any required test (plain or source-specific) matches this result
-            var isRequired = requiredTests.Any(reqTest =>
-            {
-                var (_, testName) = ParseTestName(reqTest);
-                return testName == result.Name; // Match if test name matches (regardless of source filter)
-            });
-
-            if (!isRequired)
             {
                 continue;
             }

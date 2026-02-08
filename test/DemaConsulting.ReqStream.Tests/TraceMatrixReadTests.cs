@@ -241,17 +241,23 @@ sections:
         Assert.AreEqual(1, result1.Executed);
         Assert.AreEqual(1, result1.Passed);
 
-        // Extra tests should not be tracked
+        // Extra tests are now tracked (all tests captured)
         var result2 = matrix.GetTestResult("Test_ExtraNotInRequirements");
-        Assert.IsNull(result2);
+        Assert.IsNotNull(result2);
+        Assert.AreEqual(1, result2.Executed);
+        Assert.AreEqual(1, result2.Passed);
 
         var result3 = matrix.GetTestResult("Test_AnotherExtra");
-        Assert.IsNull(result3);
+        Assert.IsNotNull(result3);
+        Assert.AreEqual(1, result3.Executed);
+        Assert.AreEqual(1, result3.Passed);
 
-        // Verify all results only contains the one tracked test
+        // GetAllTestResults only returns tests referenced in requirements
         var allResults = matrix.GetAllTestResults();
         Assert.HasCount(1, allResults);
         Assert.IsTrue(allResults.ContainsKey("Test_Auth_Valid"));
+        Assert.IsFalse(allResults.ContainsKey("Test_ExtraNotInRequirements"));
+        Assert.IsFalse(allResults.ContainsKey("Test_AnotherExtra"));
     }
 
     /// <summary>
