@@ -272,4 +272,149 @@ sections:
         var content = File.ReadAllText(mdPath);
         Assert.AreEqual(string.Empty, content);
     }
+
+    /// <summary>
+    /// Test exporting justifications for requirements with justification field.
+    /// </summary>
+    [TestMethod]
+    public void Requirements_ExportJustifications_WithJustifications_CreatesMarkdownFile()
+    {
+        var yamlContent = @"---
+sections:
+  - title: System Security
+    requirements:
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
+        justification: |
+          This requirement ensures that only authorized users can access
+          the system, maintaining data security and integrity.
+      - id: SYS-SEC-002
+        title: The system shall enforce password complexity.
+        justification: |
+          Strong passwords reduce the risk of unauthorized access through
+          brute force or dictionary attacks.
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, yamlContent);
+        var requirements = Requirements.Read(reqPath);
+
+        var mdPath = Path.Combine(_testDirectory, "justifications.md");
+        requirements.ExportJustifications(mdPath);
+
+        Assert.IsTrue(File.Exists(mdPath));
+        var content = File.ReadAllText(mdPath);
+        Assert.Contains("# System Security", content);
+        Assert.Contains("## SYS-SEC-001", content);
+        Assert.Contains("**The system shall support credentials authentication.**", content);
+        Assert.Contains("authorized users", content);
+        Assert.Contains("## SYS-SEC-002", content);
+        Assert.Contains("**The system shall enforce password complexity.**", content);
+        Assert.Contains("brute force", content);
+    }
+
+    /// <summary>
+    /// Test exporting justifications with custom depth.
+    /// </summary>
+    [TestMethod]
+    public void Requirements_ExportJustifications_WithCustomDepth_UsesCorrectHeaderLevel()
+    {
+        var yamlContent = @"---
+sections:
+  - title: System Security
+    requirements:
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
+        justification: This ensures data security.
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, yamlContent);
+        var requirements = Requirements.Read(reqPath);
+
+        var mdPath = Path.Combine(_testDirectory, "justifications.md");
+        requirements.ExportJustifications(mdPath, depth: 2);
+
+        var content = File.ReadAllText(mdPath);
+        Assert.Contains("## System Security", content);
+        Assert.Contains("### SYS-SEC-001", content);
+        Assert.Contains("**The system shall support credentials authentication.**", content);
+    }
+
+    /// <summary>
+    /// Test exporting justifications for requirements without justification field.
+    /// </summary>
+    [TestMethod]
+    public void Requirements_ExportJustifications_WithoutJustifications_CreatesHeadersOnly()
+    {
+        var yamlContent = @"---
+sections:
+  - title: System Security
+    requirements:
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, yamlContent);
+        var requirements = Requirements.Read(reqPath);
+
+        var mdPath = Path.Combine(_testDirectory, "justifications.md");
+        requirements.ExportJustifications(mdPath);
+
+        Assert.IsTrue(File.Exists(mdPath));
+        var content = File.ReadAllText(mdPath);
+        Assert.Contains("# System Security", content);
+        Assert.Contains("## SYS-SEC-001", content);
+        Assert.Contains("**The system shall support credentials authentication.**", content);
+        // Verify no paragraph text appears after the requirement title (only headers, bold text, and blank lines)
+        var lines = content.Split('\n');
+        var foundReqHeader = false;
+        var foundTitle = false;
+        foreach (var line in lines)
+        {
+            if (line.Contains("## SYS-SEC-001"))
+            {
+                foundReqHeader = true;
+                continue;
+            }
+            if (foundReqHeader && line.Contains("**The system shall"))
+            {
+                foundTitle = true;
+                continue;
+            }
+            if (foundTitle && !string.IsNullOrWhiteSpace(line) && !line.StartsWith('#') && !line.StartsWith("**"))
+            {
+                Assert.Fail("Expected no justification text after requirement title, but found: " + line);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Test exporting justifications with nested sections.
+    /// </summary>
+    [TestMethod]
+    public void Requirements_ExportJustifications_NestedSections_CreatesHierarchy()
+    {
+        var yamlContent = @"---
+sections:
+  - title: Data Management
+    sections:
+      - title: User Authentication
+        requirements:
+          - id: AUTH-001
+            title: All requests shall be authenticated.
+            justification: Protects against unauthorized access.
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, yamlContent);
+        var requirements = Requirements.Read(reqPath);
+
+        var mdPath = Path.Combine(_testDirectory, "justifications.md");
+        requirements.ExportJustifications(mdPath);
+
+        var content = File.ReadAllText(mdPath);
+        Assert.Contains("# Data Management", content);
+        Assert.Contains("## User Authentication", content);
+        Assert.Contains("### AUTH-001", content);
+        Assert.Contains("**All requests shall be authenticated.**", content);
+        Assert.Contains("unauthorized access", content);
+    }
 }

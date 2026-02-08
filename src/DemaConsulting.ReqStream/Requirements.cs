@@ -132,6 +132,73 @@ public class Requirements : Section
     }
 
     /// <summary>
+    ///     Exports requirements justifications to a Markdown file.
+    /// </summary>
+    /// <param name="filePath">The path to the output file.</param>
+    /// <param name="depth">The starting depth for Markdown headers (default is 1).</param>
+    /// <exception cref="ArgumentException">Thrown when the file path is null or empty.</exception>
+    public void ExportJustifications(string filePath, int depth = 1)
+    {
+        // Validate file path
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            throw new ArgumentException("File path cannot be null or empty", nameof(filePath));
+        }
+
+        // Create a string builder to build the markdown content
+        using var writer = new StringWriter();
+
+        // Export all sections
+        foreach (var section in Sections)
+        {
+            ExportJustificationsSection(writer, section, depth);
+        }
+
+        // Write the content to the file
+        File.WriteAllText(filePath, writer.ToString());
+    }
+
+    /// <summary>
+    ///     Exports a section's justifications to the markdown writer.
+    /// </summary>
+    /// <param name="writer">The text writer to write to.</param>
+    /// <param name="section">The section to export.</param>
+    /// <param name="depth">The current depth for Markdown headers.</param>
+    private static void ExportJustificationsSection(TextWriter writer, Section section, int depth)
+    {
+        // Write section header
+        var headerPrefix = new string('#', depth);
+        writer.WriteLine($"{headerPrefix} {section.Title}");
+        writer.WriteLine();
+
+        // Write each requirement with justification
+        foreach (var requirement in section.Requirements)
+        {
+            // Write requirement ID as a subheader
+            var reqHeaderPrefix = new string('#', depth + 1);
+            writer.WriteLine($"{reqHeaderPrefix} {requirement.Id}");
+            writer.WriteLine();
+
+            // Write requirement title in bold
+            writer.WriteLine($"**{requirement.Title}**");
+            writer.WriteLine();
+
+            // Write justification if present
+            if (!string.IsNullOrWhiteSpace(requirement.Justification))
+            {
+                writer.WriteLine(requirement.Justification);
+                writer.WriteLine();
+            }
+        }
+
+        // Recursively export child sections
+        foreach (var childSection in section.Sections)
+        {
+            ExportJustificationsSection(writer, childSection, depth + 1);
+        }
+    }
+
+    /// <summary>
     ///     Reads and processes a YAML file, including any referenced include files.
     /// </summary>
     /// <param name="path">The path to the YAML file to read.</param>
@@ -297,7 +364,8 @@ public class Requirements : Section
         var requirement = new Requirement
         {
             Id = req.Id,
-            Title = req.Title
+            Title = req.Title,
+            Justification = req.Justification
         };
 
         // Add any inline tests
@@ -394,6 +462,11 @@ public class Requirements : Section
         ///     Gets or sets the requirement title.
         /// </summary>
         public string Title { get; set; } = string.Empty;
+
+        /// <summary>
+        ///     Gets or sets the optional justification.
+        /// </summary>
+        public string? Justification { get; set; }
 
         /// <summary>
         ///     Gets or sets the list of tests.

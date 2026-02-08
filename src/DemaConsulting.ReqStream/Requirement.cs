@@ -36,6 +36,11 @@ public class Requirement
     public string Title { get; set; } = string.Empty;
 
     /// <summary>
+    ///     Gets or sets the optional justification explaining why this requirement exists.
+    /// </summary>
+    public string? Justification { get; set; }
+
+    /// <summary>
     ///     Gets the list of test identifiers associated with this requirement.
     /// </summary>
     public List<string> Tests { get; } = [];

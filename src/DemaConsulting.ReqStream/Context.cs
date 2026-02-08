@@ -99,6 +99,16 @@ public sealed class Context : IDisposable
     public int MatrixDepth { get; private init; } = 1;
 
     /// <summary>
+    ///     Gets the justifications export output file path.
+    /// </summary>
+    public string? JustificationsFile { get; private init; }
+
+    /// <summary>
+    ///     Gets the justifications markdown depth.
+    /// </summary>
+    public int JustificationsDepth { get; private init; } = 1;
+
+    /// <summary>
     ///     Gets the proposed exit code for the application (0 for success, 1 for errors).
     /// </summary>
     public int ExitCode => _hasErrors ? 1 : 0;
@@ -134,6 +144,8 @@ public sealed class Context : IDisposable
         var reportDepth = 1;
         string? matrix = null;
         var matrixDepth = 1;
+        string? justificationsFile = null;
+        var justificationsDepth = 1;
         string? logFile = null;
         string? resultsFile = null;
 
@@ -259,6 +271,31 @@ public sealed class Context : IDisposable
 
                     break;
 
+                case "--justifications":
+                    // Ensure argument has a value
+                    if (i >= args.Length)
+                    {
+                        throw new ArgumentException($"{arg} requires a filename argument", nameof(args));
+                    }
+
+                    justificationsFile = args[i++];
+                    break;
+
+                case "--justifications-depth":
+                    // Ensure argument has a value
+                    if (i >= args.Length)
+                    {
+                        throw new ArgumentException($"{arg} requires a depth argument", nameof(args));
+                    }
+
+                    // Parse and validate depth value
+                    if (!int.TryParse(args[i++], out justificationsDepth) || justificationsDepth < 1)
+                    {
+                        throw new ArgumentException($"{arg} requires a positive integer", nameof(args));
+                    }
+
+                    break;
+
                 default:
                     throw new ArgumentException($"Unsupported argument '{arg}'", nameof(args));
             }
@@ -278,7 +315,9 @@ public sealed class Context : IDisposable
             RequirementsReport = requirementsReport,
             ReportDepth = reportDepth,
             Matrix = matrix,
-            MatrixDepth = matrixDepth
+            MatrixDepth = matrixDepth,
+            JustificationsFile = justificationsFile,
+            JustificationsDepth = justificationsDepth
         };
 
         // Open log file if specified

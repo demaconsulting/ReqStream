@@ -25,6 +25,7 @@ create, validate, and manage requirement documents in a structured and maintaina
 - 🧪 **Test Mapping** - Link requirements to test cases for traceability
 - 📦 **File Includes** - Modularize requirements across multiple YAML files
 - ✅ **Validation** - Built-in validation for requirement structure and references
+- 📋 **Justifications** - Document the rationale behind each requirement
 
 ## Installation
 
@@ -87,19 +88,21 @@ This will display:
 Usage: reqstream [options]
 
 Options:
-  -v, --version              Display version information
-  -?, -h, --help             Display this help message
-  --silent                   Suppress console output
-  --validate                 Run self-validation
-  --results <file>           Write validation results to file (TRX or JUnit format)
-  --log <file>               Write output to log file
-  --requirements <pattern>   Requirements files glob pattern
-  --report <file>            Export requirements to markdown file
-  --report-depth <depth>     Markdown header depth for requirements report (default: 1)
-  --tests <pattern>          Test result files glob pattern (TRX or JUnit)
-  --matrix <file>            Export trace matrix to markdown file
-  --matrix-depth <depth>     Markdown header depth for trace matrix (default: 1)
-  --enforce                  Fail if requirements are not fully tested
+  -v, --version                    Display version information
+  -?, -h, --help                   Display this help message
+  --silent                         Suppress console output
+  --validate                       Run self-validation
+  --results <file>                 Write validation results to file (TRX or JUnit format)
+  --log <file>                     Write output to log file
+  --requirements <pattern>         Requirements files glob pattern
+  --report <file>                  Export requirements to markdown file
+  --report-depth <depth>           Markdown header depth for requirements report (default: 1)
+  --tests <pattern>                Test result files glob pattern (TRX or JUnit)
+  --matrix <file>                  Export trace matrix to markdown file
+  --matrix-depth <depth>           Markdown header depth for trace matrix (default: 1)
+  --justifications <file>          Export requirement justifications to markdown file
+  --justifications-depth <depth>   Markdown header depth for justifications (default: 1)
+  --enforce                        Fail if requirements are not fully tested
 ```
 
 ## YAML Format
@@ -115,28 +118,34 @@ with sections, requirements, test mappings, and file includes.
 
 # Requirement sections 
 sections:
-  - title: "System Security"
+  - title: System Security
     requirements:
-      - id: "SYS-SEC-001"
-        title: "The system shall support credentials authentication."
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
+        justification: |
+          Authentication is critical to ensure only authorized users can access the system.
+          This requirement establishes the foundation for our security posture.
         children: # Support linking to child requirements
-          - "AUTH-001"
+          - AUTH-001
 
-  - title: "Data Management"
+  - title: Data Management
     sections:
-      - title: "User Authentication"
+      - title: User Authentication
         requirements:
-          - id: "AUTH-001"
-            title: "All requests shall have their credentials authenticated before being processed."
+          - id: AUTH-001
+            title: All requests shall have their credentials authenticated before being processed.
+            justification: |
+              Prevents unauthorized access to system resources and ensures compliance with
+              security standards. Each request must be verified to maintain system integrity.
             tests: # Support test-mapping inline with requirements
-              - "Credentials_Valid_Allowed"
-              - "Credentials_Invalid_Refused"
-              - "Credentials_Missing_Refused"
+              - Credentials_Valid_Allowed
+              - Credentials_Invalid_Refused
+              - Credentials_Missing_Refused
 
-      - title: "Logging"
+      - title: Logging
         requirements:
-          - id: "DATA-001"
-            title: "All requests shall be logged."
+          - id: DATA-001
+            title: All requests shall be logged.
 
 # Include other requirement files - may contain requirements and/or test mappings
 includes:
@@ -145,10 +154,10 @@ includes:
 
 # Test mappings support defining tests separate from requirements
 mappings:
-  - id: "DATA-001"
+  - id: DATA-001
     tests:
-      - "Logging_ValidRequest_Logged"
-      - "Logging_InvalidRequest_Logged"
+      - Logging_ValidRequest_Logged
+      - Logging_InvalidRequest_Logged
 ```
 
 ### Key Features
@@ -157,6 +166,8 @@ mappings:
 - **Section Merging**: Identical sections (where the full hierarchy is identical) are automatically merged,
   allowing included files to add more sections or requirements to existing sections
 - **Child Requirements**: Requirements can reference other requirements as children using the `children` field
+- **Justifications**: Requirements can include an optional `justification` field to document the rationale behind
+  the requirement, explaining why it exists and its purpose
 - **Test Mappings**: Tests can be mapped to requirements either inline (within the requirement definition) or
   separately (using the `mappings` section)
 - **Test Source Linking**: Support for source-specific test matching using the `[filepart@]testname` pattern,
@@ -180,20 +191,20 @@ Test source linking allows requirements to specify which test results should com
 
 ```yaml
 requirements:
-  - id: "PLAT-001"
-    title: "Shall support Windows"
+  - id: PLAT-001
+    title: Shall support Windows
     tests:
-      - "windows-latest@Test_PlatformFeature"  # Matches only from files containing "windows-latest"
+      - windows@Test_PlatformFeature  # Matches only from files containing "windows"
   
-  - id: "PLAT-002"
-    title: "Shall support Linux"
+  - id: PLAT-002
+    title: Shall support Linux
     tests:
-      - "ubuntu-latest@Test_PlatformFeature"   # Matches only from files containing "ubuntu-latest"
+      - ubuntu@Test_PlatformFeature   # Matches only from files containing "ubuntu"
   
-  - id: "PLAT-003"
-    title: "Shall support cross-platform features"
+  - id: PLAT-003
+    title: Shall support cross-platform features
     tests:
-      - "Test_CrossPlatformFeature"             # Aggregates from all test result files
+      - Test_CrossPlatformFeature     # Aggregates from all test result files
 ```
 
 **Key behaviors**:
@@ -253,6 +264,63 @@ And exit with code 1, failing the build.
 - Generate the trace matrix (`--matrix`) alongside enforcement to review coverage details
 - Start without enforcement initially, then enable it once baseline coverage is established
 - Use transitive coverage through child requirements for high-level requirements that don't have direct tests
+
+## Justifications Export
+
+ReqStream can export a markdown document that shows each requirement's ID, title, and justification. This is useful
+for documentation, compliance audits, and communicating the rationale behind requirements to stakeholders.
+
+### Exporting Justifications
+
+Use the `--justifications` flag to export a justifications document:
+
+```bash
+reqstream --requirements "**/*.yaml" --justifications justifications.md
+```
+
+This generates a markdown file organized by sections, with each requirement showing:
+
+- Requirement ID and title as a header
+- The justification text (if provided)
+
+### Example Output
+
+Given requirements with justifications:
+
+```yaml
+sections:
+  - title: Security
+    requirements:
+      - id: SEC-001
+        title: The system shall encrypt all data at rest.
+        justification: |
+          Data encryption at rest protects sensitive information from unauthorized access
+          in case of physical storage theft or unauthorized access to storage media.
+```
+
+The exported justifications document would look like:
+
+```markdown
+# Security
+
+## SEC-001
+
+**The system shall encrypt all data at rest.**
+
+Data encryption at rest protects sensitive information from unauthorized access
+in case of physical storage theft or unauthorized access to storage media.
+```
+
+### Configuring Header Depth
+
+Use the `--justifications-depth` option to control the markdown header depth (default: 1):
+
+```bash
+reqstream --requirements "**/*.yaml" --justifications justifications.md --justifications-depth 2
+```
+
+This adjusts the header levels in the output, useful when embedding the justifications document in larger
+documentation structures.
 
 ## Development
 

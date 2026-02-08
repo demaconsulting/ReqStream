@@ -303,13 +303,14 @@ jobs:
           echo "Installing ReqStream version ${{ inputs.version }} from build..."
           dotnet tool install --global --add-source packages --version ${{ inputs.version }} DemaConsulting.ReqStream
 
-      - name: Generate Requirements Report and Trace Matrix
+      - name: Generate Requirements Documentation
         run: >
           reqstream
           --requirements requirements.yaml
           --tests "test-results/**/*.trx"
           --report docs/requirements/requirements.md
           --matrix docs/tracematrix/tracematrix.md
+          --justifications docs/justifications/justifications.md
           --enforce
 
       - name: Generate HTML with Pandoc
@@ -351,6 +352,19 @@ jobs:
           --pdf-variant pdf/a-3u
           docs/tracematrix/tracematrix.html
           "docs/ReqStream Trace Matrix.pdf"
+
+      - name: Generate Justifications HTML with Pandoc
+        run: >
+          dotnet pandoc
+          --defaults docs/justifications/definition.yaml
+          --output docs/justifications/justifications.html
+
+      - name: Generate Justifications PDF with Weasyprint
+        run: >
+          dotnet weasyprint
+          --pdf-variant pdf/a-3u
+          docs/justifications/justifications.html
+          "docs/ReqStream Requirements Justifications.pdf"
 
       - name: Generate CodeQL Quality Report with SarifMark
         shell: pwsh

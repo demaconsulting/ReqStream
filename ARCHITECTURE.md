@@ -43,6 +43,7 @@ public class Requirement
 {
     public string Id { get; set; }          // Unique identifier (e.g., "SYS-SEC-001")
     public string Title { get; set; }       // Human-readable description
+    public string? Justification { get; set; } // Optional rationale for the requirement
     public List<string> Tests { get; }      // Test identifiers linked to this requirement
     public List<string> Children { get; }   // Child requirement IDs for hierarchical requirements
 }
@@ -52,6 +53,7 @@ public class Requirement
 
 - `Id` must be unique across all requirements files
 - `Title` must not be blank
+- `Justification` is optional and explains why the requirement exists
 - `Tests` can be added inline in YAML or through separate mappings
 - `Children` enables hierarchical requirements where high-level requirements are satisfied by child requirements
 
@@ -90,6 +92,7 @@ public class Requirements : Section
     
     public static Requirements Read(params string[] paths);
     public void Export(string filePath, int depth = 1);
+    public void ExportJustifications(string filePath, int depth = 1);
 }
 ```
 
@@ -101,6 +104,7 @@ public class Requirements : Section
 - Process file includes recursively with loop prevention
 - Apply test mappings to requirements
 - Export requirements to Markdown reports
+- Export justifications to Markdown documents
 
 ### TraceMatrix
 
@@ -165,6 +169,12 @@ public sealed class Context : IDisposable
     public bool Enforce { get; }
     public List<string> RequirementsFiles { get; }
     public List<string> TestFiles { get; }
+    public string? RequirementsReport { get; }
+    public int ReportDepth { get; }
+    public string? Matrix { get; }
+    public int MatrixDepth { get; }
+    public string? JustificationsFile { get; }
+    public int JustificationsDepth { get; }
     public int ExitCode { get; }
     
     public static Context Create(string[] args);
@@ -196,6 +206,9 @@ sections:
     requirements:
       - id: "SYS-SEC-001"
         title: "The system shall support credentials authentication."
+        justification: |
+          Authentication is critical to ensure only authorized users can access the system.
+          This requirement establishes the foundation for our security posture.
         tests:
           - "AuthTest_ValidCredentials_Allowed"
         children:
@@ -714,10 +727,28 @@ ReqStream uses different exception types for different error scenarios:
 Reports are generated in order:
 
 1. **Requirements Report** (`--report`): Markdown table of requirements by section
-2. **Trace Matrix Report** (`--matrix`): Three sections:
+2. **Justifications Report** (`--justifications`): Markdown document showing requirement IDs, titles, and
+   justifications organized by section
+3. **Trace Matrix Report** (`--matrix`): Three sections:
    - Summary: Satisfied vs total requirements
    - Requirements: Test statistics per requirement
    - Testing: Test-to-requirement mappings
+
+**Example Justifications Report Structure**:
+
+```markdown
+# Security
+
+## SEC-001: The system shall encrypt all data at rest.
+
+Data encryption at rest protects sensitive information from unauthorized access
+in case of physical storage theft or unauthorized access to storage media.
+
+## SEC-002: The system shall use TLS 1.3 for network communications.
+
+TLS 1.3 provides modern cryptographic security and eliminates known vulnerabilities
+present in earlier TLS versions.
+```
 
 **Example Trace Matrix Structure**:
 
