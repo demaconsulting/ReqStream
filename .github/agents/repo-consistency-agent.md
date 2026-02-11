@@ -5,19 +5,16 @@ description: Ensures downstream repositories remain consistent with the Template
 
 # Repo Consistency Agent - ReqStream
 
-Maintain consistency between downstream projects and the TemplateDotNetTool template at <https://github.com/demaconsulting/TemplateDotNetTool>.
+Maintain consistency between ReqStream and the TemplateDotNetTool template at <https://github.com/demaconsulting/TemplateDotNetTool>.
 
 ## When to Invoke This Agent
 
 Invoke the repo-consistency-agent for:
 
-- Periodic reviews of downstream repositories based on this template
-- Checking if downstream projects follow the latest template patterns
+- Periodic reviews of ReqStream based on this template
+- Checking if ReqStream follows the latest template patterns
 - Identifying drift from template standards
 - Recommending updates to bring projects back in sync with template
-
-**Note**: This agent should NOT be invoked for the TemplateDotNetTool repository itself (<https://github.com/demaconsulting/TemplateDotNetTool>),
-as that would try to ensure the repository is consistent with itself (implicitly a no-op).
 
 ## Responsibilities
 
