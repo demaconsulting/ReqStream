@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 DEMA Consulting
+// Copyright (c) 2026 DEMA Consulting
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,10 +52,10 @@ internal static class Program
         {
             // Create context from arguments
             using var context = Context.Create(args);
-            
+
             // Run the program logic
             Run(context);
-            
+
             // Return the exit code from the context
             return context.ExitCode;
         }

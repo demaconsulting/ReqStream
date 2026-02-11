@@ -33,7 +33,8 @@
     "CodeQL",
     "SonarMark",
     "SarifMark",
-    "buildnotes"
+    "buildnotes",
+    "slnx"
   ],
   "ignorePaths": [
     "node_modules",
@@ -43,7 +44,14 @@
     "*.min.css",
     ".git",
     "package-lock.json",
+    "yarn.lock",
     "*.csproj",
-    "*.sln"
+    "*.sln",
+    "*.slnx",
+    "*.dll",
+    "*.exe",
+    "*.trx",
+    "*.spdx.json",
+    "AGENT_REPORT_*.md"
   ]
 }

@@ -17,7 +17,8 @@ bld/
 .vs/
 
 # Visual Studio Code directory
-.vscode/
+.vscode/*
+!.vscode/tasks.json
 
 # Rider directory
 .idea/
@@ -125,3 +126,6 @@ docs/requirements/requirements.md
 docs/tracematrix/*.html
 docs/tracematrix/tracematrix.md
 docs/*.pdf
+
+# Agent-generated reports (should not be committed)
+AGENT_REPORT_*.md

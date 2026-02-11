@@ -625,7 +625,7 @@ sections:
         // Verify no tests are tracked
         var result1 = matrix.GetTestResult("Test_NotExecuted1");
         Assert.AreEqual(0, result1.Executed, "Not-executed test should not be tracked");
-        
+
         var result2 = matrix.GetTestResult("Test_NotExecuted2");
         Assert.AreEqual(0, result2.Executed, "Not-executed test should not be tracked");
 

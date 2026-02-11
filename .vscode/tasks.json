@@ -1,0 +1,126 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/DemaConsulting.ReqStream.slnx",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary;ForceNoAlign"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "test",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "test",
+        "${workspaceFolder}/DemaConsulting.ReqStream.slnx",
+        "--no-build",
+        "--verbosity",
+        "normal"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "dependsOn": "build"
+    },
+    {
+      "label": "clean",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "clean",
+        "${workspaceFolder}/DemaConsulting.ReqStream.slnx"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "restore",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "restore",
+        "${workspaceFolder}/DemaConsulting.ReqStream.slnx"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "format",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "format",
+        "${workspaceFolder}/DemaConsulting.ReqStream.slnx"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "lint",
+      "command": "bash",
+      "type": "shell",
+      "args": [
+        "${workspaceFolder}/lint.sh"
+      ],
+      "windows": {
+        "command": "${workspaceFolder}/lint.bat"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "validate",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "run",
+        "--project",
+        "${workspaceFolder}/src/DemaConsulting.ReqStream/DemaConsulting.ReqStream.csproj",
+        "--no-build",
+        "--",
+        "--validate"
+      ],
+      "problemMatcher": [],
+      "dependsOn": "build"
+    },
+    {
+      "label": "verify-requirements",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "run",
+        "--project",
+        "${workspaceFolder}/src/DemaConsulting.ReqStream/DemaConsulting.ReqStream.csproj",
+        "--no-build",
+        "--",
+        "--requirements",
+        "${workspaceFolder}/requirements.yaml",
+        "--tests",
+        "${workspaceFolder}/test/**/TestResults/*.trx",
+        "--enforce"
+      ],
+      "problemMatcher": [],
+      "dependsOn": "test"
+    },
+    {
+      "label": "build-all",
+      "dependsOn": [
+        "restore",
+        "build",
+        "test",
+        "format",
+        "lint"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}

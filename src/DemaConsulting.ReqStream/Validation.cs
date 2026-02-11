@@ -134,8 +134,8 @@ public static class Validation
                 {
                     // Verify log contains expected output (read after context is disposed to ensure log is flushed)
                     var logContent = File.ReadAllText(logFile);
-                    
-                    if (logContent.Contains("Reading 1 requirements file(s)") && 
+
+                    if (logContent.Contains("Reading 1 requirements file(s)") &&
                         logContent.Contains("Requirements loaded successfully"))
                     {
                         test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
@@ -207,7 +207,7 @@ public static class Validation
             {
                 // Run the program with trace matrix (using relative paths)
                 int exitCode;
-                using (var testContext = Context.Create(["--silent", "--log", "matrix-test.log", "--requirements", "*-requirements.yaml", 
+                using (var testContext = Context.Create(["--silent", "--log", "matrix-test.log", "--requirements", "*-requirements.yaml",
                                                           "--tests", "*.trx", "--matrix", "matrix.md"]))
                 {
                     Program.Run(testContext);
@@ -234,8 +234,8 @@ public static class Validation
                 else
                 {
                     test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
-                    test.ErrorMessage = exitCode != 0 
-                        ? $"Program exited with code {exitCode}" 
+                    test.ErrorMessage = exitCode != 0
+                        ? $"Program exited with code {exitCode}"
                         : "Matrix file not created";
                     context.WriteError($"✗ Trace Matrix Test - FAILED: {test.ErrorMessage}");
                 }
@@ -277,7 +277,7 @@ public static class Validation
             {
                 // Run the program with report export (using relative paths)
                 int exitCode;
-                using (var testContext = Context.Create(["--silent", "--log", "export-test.log", "--requirements", "*-requirements.yaml", 
+                using (var testContext = Context.Create(["--silent", "--log", "export-test.log", "--requirements", "*-requirements.yaml",
                                                           "--report", "report.md"]))
                 {
                     Program.Run(testContext);
@@ -304,8 +304,8 @@ public static class Validation
                 else
                 {
                     test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
-                    test.ErrorMessage = exitCode != 0 
-                        ? $"Program exited with code {exitCode}" 
+                    test.ErrorMessage = exitCode != 0
+                        ? $"Program exited with code {exitCode}"
                         : "Report file not created";
                     context.WriteError($"✗ Report Export Test - FAILED: {test.ErrorMessage}");
                 }
