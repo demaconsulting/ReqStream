@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src\DemaConsulting.ReqStream\DemaConsulting.ReqStream.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test\DemaConsulting.ReqStream.Tests\DemaConsulting.ReqStream.Tests.csproj" />
+  </Folder>
+  <Properties>
+    <Configuration Name="Debug|Any CPU" />
+    <Configuration Name="Release|Any CPU" />
+  </Properties>
+</Solution>

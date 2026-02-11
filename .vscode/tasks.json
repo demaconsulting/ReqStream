@@ -7,7 +7,7 @@
       "type": "process",
       "args": [
         "build",
-        "${workspaceFolder}/DemaConsulting.ReqStream.sln",
+        "${workspaceFolder}/DemaConsulting.ReqStream.slnx",
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary;ForceNoAlign"
       ],
@@ -23,7 +23,7 @@
       "type": "process",
       "args": [
         "test",
-        "${workspaceFolder}/DemaConsulting.ReqStream.sln",
+        "${workspaceFolder}/DemaConsulting.ReqStream.slnx",
         "--no-build",
         "--verbosity",
         "normal"
@@ -41,7 +41,7 @@
       "type": "process",
       "args": [
         "clean",
-        "${workspaceFolder}/DemaConsulting.ReqStream.sln"
+        "${workspaceFolder}/DemaConsulting.ReqStream.slnx"
       ],
       "problemMatcher": "$msCompile"
     },
@@ -51,7 +51,7 @@
       "type": "process",
       "args": [
         "restore",
-        "${workspaceFolder}/DemaConsulting.ReqStream.sln"
+        "${workspaceFolder}/DemaConsulting.ReqStream.slnx"
       ],
       "problemMatcher": "$msCompile"
     },
@@ -61,7 +61,7 @@
       "type": "process",
       "args": [
         "format",
-        "${workspaceFolder}/DemaConsulting.ReqStream.sln"
+        "${workspaceFolder}/DemaConsulting.ReqStream.slnx"
       ],
       "problemMatcher": []
     },

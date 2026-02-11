@@ -46,6 +46,7 @@
     "yarn.lock",
     "*.csproj",
     "*.sln",
+    "*.slnx",
     "*.dll",
     "*.exe",
     "*.trx",

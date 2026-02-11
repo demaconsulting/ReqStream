@@ -55,7 +55,7 @@ ReqStream/
 - **`.cspell.json`**: Contains spell-checking configuration and custom dictionary
 - **`.markdownlint.json`**: Markdown linting rules
 - **`.yamllint.yaml`**: YAML linting rules
-- **`DemaConsulting.ReqStream.sln`**: Solution file containing all projects
+- **`DemaConsulting.ReqStream.slnx`**: Solution file containing all projects (XML format)
 - **`ARCHITECTURE.md`**: Comprehensive guide to the tool's architecture and internal design
 
 ## Testing Guidelines
