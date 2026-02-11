@@ -271,13 +271,6 @@ jobs:
           pattern: '*test-results*'
         continue-on-error: true
 
-      - name: Download integration test results
-        uses: actions/download-artifact@v7
-        with:
-          path: test-results
-          pattern: 'integration-test-results-*'
-        continue-on-error: true
-
       - name: Download package
         uses: actions/download-artifact@v7
         with:

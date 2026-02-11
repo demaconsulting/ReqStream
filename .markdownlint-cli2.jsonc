@@ -9,12 +9,6 @@
   },
   "ignores": [
     "node_modules/**",
-    "**/node_modules/**",
-    "AGENT_REPORT_*.md",
-    "*-review-report.md",
-    "CODE_QUALITY_REPORT.md",
-    "DOCUMENTATION_REVIEW.md",
-    "matrix.md",
-    "tracematrix.md"
+    "AGENT_REPORT_*.md"
   ]
 }

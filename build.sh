@@ -1,39 +1,15 @@
-#!/bin/bash
-# Build, test, and package the ReqStream project
+#!/usr/bin/env bash
+# Build and test ReqStream
 
-set -e
+set -e  # Exit on error
 
-echo "=== ReqStream Build Script ==="
-echo ""
+echo "🔧 Building ReqStream..."
+dotnet build --configuration Release
 
-# Restore dotnet tools
-echo "Restoring dotnet tools..."
-dotnet tool restore || { echo "✗ Failed to restore dotnet tools"; exit 1; }
-echo "✓ Dotnet tools restored"
-echo ""
+echo "🧪 Running unit tests..."
+dotnet test --configuration Release
 
-# Restore dependencies
-echo "Restoring dependencies..."
-dotnet restore || { echo "✗ Failed to restore dependencies"; exit 1; }
-echo "✓ Dependencies restored"
-echo ""
+echo "✅ Running self-validation..."
+dotnet run --project src/DemaConsulting.ReqStream --configuration Release --framework net10.0 --no-build -- --validate
 
-# Build
-echo "Building..."
-dotnet build --no-restore --configuration Release || { echo "✗ Build failed"; exit 1; }
-echo "✓ Build succeeded"
-echo ""
-
-# Test
-echo "Running tests..."
-dotnet test --no-build --configuration Release --verbosity normal || { echo "✗ Tests failed"; exit 1; }
-echo "✓ Tests passed"
-echo ""
-
-# Package
-echo "Packaging..."
-dotnet pack --no-build --configuration Release || { echo "✗ Packaging failed"; exit 1; }
-echo "✓ Packaging succeeded"
-echo ""
-
-echo "=== Build Complete ==="
+echo "✨ Build, tests, and validation completed successfully!"
