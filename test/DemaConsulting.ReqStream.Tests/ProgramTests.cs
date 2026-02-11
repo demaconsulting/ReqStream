@@ -111,7 +111,7 @@ public class ProgramTests
     public void Program_Run_WithValidateFlag_RunsValidation()
     {
         var logFile = Path.Combine(_testDirectory, "validation.log");
-        
+
         // Run validation with silent and log flags
         using (var context = Context.Create(["--validate", "--silent", "--log", logFile]))
         {
@@ -142,7 +142,7 @@ public class ProgramTests
     {
         var logFile = Path.Combine(_testDirectory, "validation.log");
         var resultsFile = Path.Combine(_testDirectory, "validation-results.trx");
-        
+
         // Run validation with results file
         using (var context = Context.Create(["--validate", "--silent", "--log", logFile, "--results", resultsFile]))
         {
@@ -176,7 +176,7 @@ public class ProgramTests
     {
         var logFile = Path.Combine(_testDirectory, "validation.log");
         var resultsFile = Path.Combine(_testDirectory, "validation-results.xml");
-        
+
         // Run validation with JUnit results file
         using (var context = Context.Create(["--validate", "--silent", "--log", logFile, "--results", resultsFile]))
         {
@@ -503,7 +503,7 @@ sections:
             Program.Run(context);
 
             Assert.AreEqual(1, context.ExitCode);
-            
+
             // Verify error message includes the unsatisfied requirement
             var outputText = output.ToString();
             Assert.Contains("Only 1 of 2 requirements are satisfied", outputText);

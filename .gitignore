@@ -125,3 +125,11 @@ docs/requirements/requirements.md
 docs/tracematrix/*.html
 docs/tracematrix/tracematrix.md
 docs/*.pdf
+
+# Agent-generated reports (should not be committed)
+AGENT_REPORT_*.md
+*-review-report.md
+CODE_QUALITY_REPORT.md
+DOCUMENTATION_REVIEW.md
+matrix.md
+tracematrix.md

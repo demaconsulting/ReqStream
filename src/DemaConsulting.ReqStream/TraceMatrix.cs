@@ -114,7 +114,7 @@ public class TraceMatrix
         var results = new Dictionary<string, TestMetrics>();
         var requiredTests = new HashSet<string>();
         CollectRequiredTestNames(_requirements, requiredTests);
-        
+
         foreach (var testName in requiredTests)
         {
             var result = GetTestResult(testName);
@@ -124,7 +124,7 @@ public class TraceMatrix
                 results[testName] = result;
             }
         }
-        
+
         return results;
     }
 
