@@ -33,7 +33,8 @@
     "CodeQL",
     "SonarMark",
     "SarifMark",
-    "buildnotes"
+    "buildnotes",
+    "slnx"
   ],
   "ignorePaths": [
     "node_modules",
