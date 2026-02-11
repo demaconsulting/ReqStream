@@ -200,7 +200,8 @@ internal static class Program
             if (context.Matrix != null)
             {
                 context.WriteLine($"Exporting trace matrix to {context.Matrix}...");
-                traceMatrix.Export(context.Matrix, context.MatrixDepth);
+                var filterTags = context.FilterTags.Count > 0 ? context.FilterTags : null;
+                traceMatrix.Export(context.Matrix, context.MatrixDepth, filterTags);
                 context.WriteLine("Trace matrix report generated successfully.");
             }
         }
@@ -225,10 +226,11 @@ internal static class Program
             return;
         }
 
-        var (satisfied, total) = traceMatrix.CalculateSatisfiedRequirements();
+        var filterTags = context.FilterTags.Count > 0 ? context.FilterTags : null;
+        var (satisfied, total) = traceMatrix.CalculateSatisfiedRequirements(filterTags);
         if (satisfied < total)
         {
-            var unsatisfied = traceMatrix.GetUnsatisfiedRequirements();
+            var unsatisfied = traceMatrix.GetUnsatisfiedRequirements(filterTags);
             context.WriteError($"Error: Only {satisfied} of {total} requirements are satisfied with tests.");
             context.WriteError("Unsatisfied requirements:");
             foreach (var reqId in unsatisfied)
