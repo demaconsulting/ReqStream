@@ -32,7 +32,8 @@
     "hotspots",
     "CodeQL",
     "SonarMark",
-    "SarifMark"
+    "SarifMark",
+    "buildnotes"
   ],
   "ignorePaths": [
     "node_modules",

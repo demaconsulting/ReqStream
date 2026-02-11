@@ -195,11 +195,17 @@ These patterns emerged from code review feedback and should be followed:
 The following custom agents are configured for this repository. Each agent file contains detailed guidelines,
 responsibilities, and project-specific conventions.
 
-- **Documentation Writer** (`.github/agents/documentation-writer.md`) - Expert agent for creating, updating, and
-  maintaining project documentation
-- **Project Maintainer** (`.github/agents/project-maintainer.md`) - Expert agent for overall project management,
-  dependency updates, CI/CD maintenance, and release coordination
-- **Software Quality Enforcer** (`.github/agents/software-quality-enforcer.md`) - Expert agent for code quality,
-  testing standards, code reviews, and security analysis
+- **Requirements Agent** (`.github/agents/requirements-agent.md`) - Develops requirements and ensures appropriate test
+  coverage - knows which requirements need unit/integration/self-validation tests
+- **Technical Writer** (`.github/agents/technical-writer.md`) - Ensures documentation is accurate and complete -
+  knowledgeable about regulatory documentation and special document types
+- **Repo Consistency Agent** (`.github/agents/repo-consistency-agent.md`) - Ensures downstream repositories remain
+  consistent with the TemplateDotNetTool template patterns and best practices
+- **Code Quality Agent** (`.github/agents/code-quality-agent.md`) - Ensures code quality through linting and static
+  analysis - responsible for security, maintainability, and correctness
+- **Software Developer** (`.github/agents/software-developer.md`) - Writes production code and self-validation tests -
+  targets design-for-testability and literate programming style
+- **Test Developer** (`.github/agents/test-developer.md`) - Writes unit and integration tests following AAA pattern -
+  clear documentation of what's tested and proved
 
 [architecture]: ARCHITECTURE.md
