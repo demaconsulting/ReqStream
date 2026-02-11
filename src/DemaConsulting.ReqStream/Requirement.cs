@@ -49,4 +49,9 @@ public class Requirement
     ///     Gets the list of child requirement identifiers.
     /// </summary>
     public List<string> Children { get; } = [];
+
+    /// <summary>
+    ///     Gets the list of tags associated with this requirement.
+    /// </summary>
+    public List<string> Tags { get; } = [];
 }

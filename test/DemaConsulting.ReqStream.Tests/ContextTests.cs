@@ -681,4 +681,63 @@ public class ContextTests
             Assert.Contains("Failed to open log file", ex.Message);
         }
     }
+
+    /// <summary>
+    /// Test creating a context with filter argument.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_FilterArgument_ParsesTagsCorrectly()
+    {
+        using var context = Context.Create(["--filter", "security,critical"]);
+
+        Assert.HasCount(2, context.FilterTags);
+        Assert.Contains("security", context.FilterTags);
+        Assert.Contains("critical", context.FilterTags);
+        Assert.AreEqual(0, context.ExitCode);
+    }
+
+    /// <summary>
+    /// Test creating a context with filter argument with spaces.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_FilterArgumentWithSpaces_TrimsAndParsesTagsCorrectly()
+    {
+        using var context = Context.Create(["--filter", "security, critical, data-integrity"]);
+
+        Assert.HasCount(3, context.FilterTags);
+        Assert.Contains("security", context.FilterTags);
+        Assert.Contains("critical", context.FilterTags);
+        Assert.Contains("data-integrity", context.FilterTags);
+        Assert.AreEqual(0, context.ExitCode);
+    }
+
+    /// <summary>
+    /// Test creating a context with filter argument missing value.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_FilterArgumentMissingValue_ThrowsArgumentException()
+    {
+        try
+        {
+            Context.Create(["--filter"]);
+            Assert.Fail("Expected ArgumentException was not thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            Assert.Contains("--filter requires a comma-separated list of tags", ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Test creating a context with single tag filter.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_FilterSingleTag_ParsesCorrectly()
+    {
+        using var context = Context.Create(["--filter", "security"]);
+
+        Assert.HasCount(1, context.FilterTags);
+        Assert.Contains("security", context.FilterTags);
+        Assert.AreEqual(0, context.ExitCode);
+    }
 }

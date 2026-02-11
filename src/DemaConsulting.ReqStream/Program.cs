@@ -142,6 +142,7 @@ internal static class Program
         context.WriteLine("  --requirements <pattern>   Requirements files glob pattern");
         context.WriteLine("  --report <file>            Export requirements to markdown file");
         context.WriteLine("  --report-depth <depth>     Markdown header depth for requirements report (default: 1)");
+        context.WriteLine("  --filter <tags>            Filter requirements by comma-separated tags");
         context.WriteLine("  --justifications <file>    Export justifications to markdown file");
         context.WriteLine("  --justifications-depth <depth>");
         context.WriteLine("                             Markdown header depth for justifications (default: 1)");
@@ -173,7 +174,8 @@ internal static class Program
         if (context.RequirementsReport != null)
         {
             context.WriteLine($"Exporting requirements to {context.RequirementsReport}...");
-            requirements.Export(context.RequirementsReport, context.ReportDepth);
+            var filterTags = context.FilterTags.Count > 0 ? context.FilterTags : null;
+            requirements.Export(context.RequirementsReport, context.ReportDepth, filterTags);
             context.WriteLine("Requirements report generated successfully.");
         }
 
@@ -181,7 +183,8 @@ internal static class Program
         if (context.JustificationsFile != null)
         {
             context.WriteLine($"Exporting justifications to {context.JustificationsFile}...");
-            requirements.ExportJustifications(context.JustificationsFile, context.JustificationsDepth);
+            var filterTags = context.FilterTags.Count > 0 ? context.FilterTags : null;
+            requirements.ExportJustifications(context.JustificationsFile, context.JustificationsDepth, filterTags);
             context.WriteLine("Justifications report generated successfully.");
         }
 

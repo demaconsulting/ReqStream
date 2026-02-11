@@ -875,4 +875,66 @@ sections:
             Assert.Contains(file2Path, ex.Message);
         }
     }
+
+    /// <summary>
+    ///     Test reading a requirement with tags.
+    /// </summary>
+    [TestMethod]
+    public void Requirements_Read_RequirementWithTags_ParsesTagsCorrectly()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+        tags:
+          - ""security""
+          - ""critical""
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        var requirements = Requirements.Read(filePath);
+
+        Assert.IsNotNull(requirements);
+        var req = requirements.Sections[0].Requirements[0];
+        Assert.AreEqual("SYS-SEC-001", req.Id);
+        Assert.HasCount(2, req.Tags);
+        Assert.AreEqual("security", req.Tags[0]);
+        Assert.AreEqual("critical", req.Tags[1]);
+    }
+
+    /// <summary>
+    ///     Test that blank tag name throws an exception with file location.
+    /// </summary>
+    [TestMethod]
+    public void Requirements_Read_BlankTagName_ThrowsExceptionWithFileLocation()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+        tags:
+          - ""security""
+          - """"
+          - ""critical""
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        try
+        {
+            Requirements.Read(filePath);
+            Assert.Fail("Expected InvalidOperationException was not thrown");
+        }
+        catch (InvalidOperationException ex)
+        {
+            Assert.Contains("Tag name cannot be blank", ex.Message);
+            Assert.Contains("SYS-SEC-001", ex.Message);
+            Assert.Contains(filePath, ex.Message);
+        }
+    }
 }

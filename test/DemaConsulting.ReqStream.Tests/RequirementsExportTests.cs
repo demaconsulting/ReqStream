@@ -417,4 +417,219 @@ sections:
         Assert.Contains("**All requests shall be authenticated.**", content);
         Assert.Contains("unauthorized access", content);
     }
+
+    /// <summary>
+    /// Test exporting requirements with filter tags.
+    /// </summary>
+    [TestMethod]
+    public void Requirements_Export_WithFilterTags_ExportsOnlyMatchingRequirements()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+        tags:
+          - ""security""
+          - ""critical""
+      - id: ""SYS-SEC-002""
+        title: ""The system shall enforce password complexity.""
+        tags:
+          - ""security""
+      - id: ""SYS-PERF-001""
+        title: ""The system shall respond within 100ms.""
+        tags:
+          - ""performance""
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, yamlContent);
+        var requirements = Requirements.Read(reqPath);
+
+        var mdPath = Path.Combine(_testDirectory, "requirements.md");
+        var filterTags = new HashSet<string> { "security" };
+        requirements.Export(mdPath, filterTags: filterTags);
+
+        Assert.IsTrue(File.Exists(mdPath));
+        var content = File.ReadAllText(mdPath);
+        Assert.Contains("# System Security", content);
+        Assert.Contains("| SYS-SEC-001 | The system shall support credentials authentication. |", content);
+        Assert.Contains("| SYS-SEC-002 | The system shall enforce password complexity. |", content);
+        Assert.DoesNotContain("SYS-PERF-001", content);
+        Assert.DoesNotContain("respond within 100ms", content);
+    }
+
+    /// <summary>
+    /// Test exporting requirements with multiple filter tags.
+    /// </summary>
+    [TestMethod]
+    public void Requirements_Export_WithMultipleFilterTags_ExportsRequirementsMatchingAnyTag()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+        tags:
+          - ""security""
+      - id: ""SYS-PERF-001""
+        title: ""The system shall respond within 100ms.""
+        tags:
+          - ""performance""
+      - id: ""SYS-DATA-001""
+        title: ""The system shall maintain data integrity.""
+        tags:
+          - ""data-integrity""
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, yamlContent);
+        var requirements = Requirements.Read(reqPath);
+
+        var mdPath = Path.Combine(_testDirectory, "requirements.md");
+        var filterTags = new HashSet<string> { "security", "data-integrity" };
+        requirements.Export(mdPath, filterTags: filterTags);
+
+        Assert.IsTrue(File.Exists(mdPath));
+        var content = File.ReadAllText(mdPath);
+        Assert.Contains("| SYS-SEC-001 | The system shall support credentials authentication. |", content);
+        Assert.Contains("| SYS-DATA-001 | The system shall maintain data integrity. |", content);
+        Assert.DoesNotContain("SYS-PERF-001", content);
+    }
+
+    /// <summary>
+    /// Test exporting requirements with filter that matches no requirements.
+    /// </summary>
+    [TestMethod]
+    public void Requirements_Export_WithFilterMatchingNoRequirements_ExportsEmptyFile()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+        tags:
+          - ""security""
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, yamlContent);
+        var requirements = Requirements.Read(reqPath);
+
+        var mdPath = Path.Combine(_testDirectory, "requirements.md");
+        var filterTags = new HashSet<string> { "performance" };
+        requirements.Export(mdPath, filterTags: filterTags);
+
+        Assert.IsTrue(File.Exists(mdPath));
+        var content = File.ReadAllText(mdPath);
+        Assert.DoesNotContain("System Security", content);
+        Assert.DoesNotContain("SYS-SEC-001", content);
+    }
+
+    /// <summary>
+    /// Test exporting requirements without filter exports all requirements.
+    /// </summary>
+    [TestMethod]
+    public void Requirements_Export_WithoutFilter_ExportsAllRequirements()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+        tags:
+          - ""security""
+      - id: ""SYS-PERF-001""
+        title: ""The system shall respond within 100ms.""
+        tags:
+          - ""performance""
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, yamlContent);
+        var requirements = Requirements.Read(reqPath);
+
+        var mdPath = Path.Combine(_testDirectory, "requirements.md");
+        requirements.Export(mdPath);
+
+        Assert.IsTrue(File.Exists(mdPath));
+        var content = File.ReadAllText(mdPath);
+        Assert.Contains("| SYS-SEC-001 | The system shall support credentials authentication. |", content);
+        Assert.Contains("| SYS-PERF-001 | The system shall respond within 100ms. |", content);
+    }
+
+    /// <summary>
+    /// Test exporting justifications with filter tags.
+    /// </summary>
+    [TestMethod]
+    public void Requirements_ExportJustifications_WithFilterTags_ExportsOnlyMatchingRequirements()
+    {
+        var yamlContent = @"---
+sections:
+  - title: System Security
+    requirements:
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
+        justification: Authentication is critical for security.
+        tags:
+          - security
+          - critical
+      - id: SYS-PERF-001
+        title: The system shall respond within 100ms.
+        justification: Performance is important for user experience.
+        tags:
+          - performance
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, yamlContent);
+        var requirements = Requirements.Read(reqPath);
+
+        var mdPath = Path.Combine(_testDirectory, "justifications.md");
+        var filterTags = new HashSet<string> { "security" };
+        requirements.ExportJustifications(mdPath, filterTags: filterTags);
+
+        var content = File.ReadAllText(mdPath);
+        Assert.Contains("# System Security", content);
+        Assert.Contains("## SYS-SEC-001", content);
+        Assert.Contains("Authentication is critical for security.", content);
+        Assert.DoesNotContain("SYS-PERF-001", content);
+        Assert.DoesNotContain("Performance is important", content);
+    }
+
+    /// <summary>
+    /// Test exporting with filter excludes sections with no matching requirements.
+    /// </summary>
+    [TestMethod]
+    public void Requirements_Export_WithFilterExcludesEmptySections_OnlyShowsSectionsWithMatchingRequirements()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+        tags:
+          - ""security""
+  - title: ""Performance""
+    requirements:
+      - id: ""SYS-PERF-001""
+        title: ""The system shall respond within 100ms.""
+        tags:
+          - ""performance""
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, yamlContent);
+        var requirements = Requirements.Read(reqPath);
+
+        var mdPath = Path.Combine(_testDirectory, "requirements.md");
+        var filterTags = new HashSet<string> { "security" };
+        requirements.Export(mdPath, filterTags: filterTags);
+
+        Assert.IsTrue(File.Exists(mdPath));
+        var content = File.ReadAllText(mdPath);
+        Assert.Contains("# System Security", content);
+        Assert.Contains("| SYS-SEC-001 |", content);
+        Assert.DoesNotContain("Performance", content);
+        Assert.DoesNotContain("SYS-PERF-001", content);
+    }
 }

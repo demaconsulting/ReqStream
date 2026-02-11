@@ -73,8 +73,9 @@ public class Requirements : Section
     /// </summary>
     /// <param name="filePath">The path to the output Markdown file.</param>
     /// <param name="depth">The starting depth for Markdown headers (default: 1).</param>
+    /// <param name="filterTags">Optional set of tags to filter requirements. If provided, only requirements with matching tags are exported.</param>
     /// <exception cref="ArgumentException">Thrown when filePath is null or empty.</exception>
-    public void Export(string filePath, int depth = 1)
+    public void Export(string filePath, int depth = 1, HashSet<string>? filterTags = null)
     {
         // Validate file path
         if (string.IsNullOrWhiteSpace(filePath))
@@ -88,7 +89,7 @@ public class Requirements : Section
         // Export all sections
         foreach (var section in Sections)
         {
-            ExportSection(writer, section, depth);
+            ExportSection(writer, section, depth, filterTags);
         }
 
         // Write the content to the file
@@ -101,22 +102,32 @@ public class Requirements : Section
     /// <param name="writer">The text writer to write to.</param>
     /// <param name="section">The section to export.</param>
     /// <param name="depth">The current depth for Markdown headers.</param>
-    private static void ExportSection(TextWriter writer, Section section, int depth)
+    /// <param name="filterTags">Optional set of tags to filter requirements.</param>
+    private static void ExportSection(TextWriter writer, Section section, int depth, HashSet<string>? filterTags)
     {
+        // Filter requirements if filter tags are provided
+        var filteredRequirements = FilterRequirements(section.Requirements, filterTags);
+
+        // Check if section has any content (filtered requirements or child sections with content)
+        if (filteredRequirements.Count == 0 && !HasFilteredContent(section, filterTags))
+        {
+            return;
+        }
+
         // Write section header
         var headerPrefix = new string('#', depth);
         writer.WriteLine($"{headerPrefix} {section.Title}");
         writer.WriteLine();
 
         // If there are requirements, write them as a table
-        if (section.Requirements.Count > 0)
+        if (filteredRequirements.Count > 0)
         {
             // Write table header
             writer.WriteLine("| ID | Title |");
             writer.WriteLine("| :- | :---- |");
 
             // Write each requirement
-            foreach (var requirement in section.Requirements)
+            foreach (var requirement in filteredRequirements)
             {
                 writer.WriteLine($"| {requirement.Id} | {requirement.Title} |");
             }
@@ -127,7 +138,7 @@ public class Requirements : Section
         // Recursively export child sections
         foreach (var childSection in section.Sections)
         {
-            ExportSection(writer, childSection, depth + 1);
+            ExportSection(writer, childSection, depth + 1, filterTags);
         }
     }
 
@@ -136,8 +147,9 @@ public class Requirements : Section
     /// </summary>
     /// <param name="filePath">The path to the output file.</param>
     /// <param name="depth">The starting depth for Markdown headers (default is 1).</param>
+    /// <param name="filterTags">Optional set of tags to filter requirements. If provided, only requirements with matching tags are exported.</param>
     /// <exception cref="ArgumentException">Thrown when the file path is null or empty.</exception>
-    public void ExportJustifications(string filePath, int depth = 1)
+    public void ExportJustifications(string filePath, int depth = 1, HashSet<string>? filterTags = null)
     {
         // Validate file path
         if (string.IsNullOrWhiteSpace(filePath))
@@ -151,7 +163,7 @@ public class Requirements : Section
         // Export all sections
         foreach (var section in Sections)
         {
-            ExportJustificationsSection(writer, section, depth);
+            ExportJustificationsSection(writer, section, depth, filterTags);
         }
 
         // Write the content to the file
@@ -164,15 +176,25 @@ public class Requirements : Section
     /// <param name="writer">The text writer to write to.</param>
     /// <param name="section">The section to export.</param>
     /// <param name="depth">The current depth for Markdown headers.</param>
-    private static void ExportJustificationsSection(TextWriter writer, Section section, int depth)
+    /// <param name="filterTags">Optional set of tags to filter requirements.</param>
+    private static void ExportJustificationsSection(TextWriter writer, Section section, int depth, HashSet<string>? filterTags)
     {
+        // Filter requirements if filter tags are provided
+        var filteredRequirements = FilterRequirements(section.Requirements, filterTags);
+
+        // Check if section has any content (filtered requirements or child sections with content)
+        if (filteredRequirements.Count == 0 && !HasFilteredContent(section, filterTags))
+        {
+            return;
+        }
+
         // Write section header
         var headerPrefix = new string('#', depth);
         writer.WriteLine($"{headerPrefix} {section.Title}");
         writer.WriteLine();
 
         // Write each requirement with justification
-        foreach (var requirement in section.Requirements)
+        foreach (var requirement in filteredRequirements)
         {
             // Write requirement ID as a subheader
             var reqHeaderPrefix = new string('#', depth + 1);
@@ -194,7 +216,7 @@ public class Requirements : Section
         // Recursively export child sections
         foreach (var childSection in section.Sections)
         {
-            ExportJustificationsSection(writer, childSection, depth + 1);
+            ExportJustificationsSection(writer, childSection, depth + 1, filterTags);
         }
     }
 
@@ -387,6 +409,19 @@ public class Requirements : Section
             requirement.Children.AddRange(req.Children);
         }
 
+        // Add any tags
+        if (req.Tags != null)
+        {
+            // Validate no tag names are blank
+            if (req.Tags.Any(string.IsNullOrWhiteSpace))
+            {
+                throw new InvalidOperationException(
+                    $"Tag name cannot be blank for requirement '{req.Id}' in file: {filePath}");
+            }
+
+            requirement.Tags.AddRange(req.Tags);
+        }
+
         // Check for duplicate requirement IDs and register the requirement
         if (!_allRequirements.TryAdd(requirement.Id, requirement))
         {
@@ -395,6 +430,45 @@ public class Requirements : Section
         }
 
         return requirement;
+    }
+
+    /// <summary>
+    ///     Filters requirements based on tags.
+    /// </summary>
+    /// <param name="requirements">The list of requirements to filter.</param>
+    /// <param name="filterTags">The set of filter tags. If null or empty, all requirements are returned.</param>
+    /// <returns>A filtered list of requirements.</returns>
+    private static List<Requirement> FilterRequirements(List<Requirement> requirements, HashSet<string>? filterTags)
+    {
+        // If no filter tags specified, return all requirements
+        if (filterTags == null || filterTags.Count == 0)
+        {
+            return requirements;
+        }
+
+        // Return requirements that have at least one matching tag
+        return requirements.Where(req => req.Tags.Any(tag => filterTags.Contains(tag))).ToList();
+    }
+
+    /// <summary>
+    ///     Checks if a section has any filtered content (requirements or child sections with content).
+    /// </summary>
+    /// <param name="section">The section to check.</param>
+    /// <param name="filterTags">The set of filter tags.</param>
+    /// <returns>True if the section has filtered content, false otherwise.</returns>
+    private static bool HasFilteredContent(Section section, HashSet<string>? filterTags)
+    {
+        // Check if any child section has filtered content
+        foreach (var childSection in section.Sections)
+        {
+            var filteredRequirements = FilterRequirements(childSection.Requirements, filterTags);
+            if (filteredRequirements.Count > 0 || HasFilteredContent(childSection, filterTags))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -477,6 +551,11 @@ public class Requirements : Section
         ///     Gets or sets the list of child requirement IDs.
         /// </summary>
         public List<string>? Children { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the list of tags.
+        /// </summary>
+        public List<string>? Tags { get; set; }
     }
 
     /// <summary>
