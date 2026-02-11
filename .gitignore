@@ -17,7 +17,8 @@ bld/
 .vs/
 
 # Visual Studio Code directory
-.vscode/
+.vscode/*
+!.vscode/tasks.json
 
 # Rider directory
 .idea/
