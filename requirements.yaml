@@ -264,6 +264,22 @@ sections:
               - Context_Create_MatrixDepth_SetsMatrixDepthProperty
               - Requirements_Export_WithCustomDepth_UsesCorrectHeaderLevel
 
+          - id: RPT-005
+            title: The tool shall support filtering requirements by tags.
+            justification: |
+              Tag-based filtering enables selective export of requirement subsets for focused reports,
+              security audits, compliance documentation, and targeted reviews.
+            tests:
+              - Context_Create_FilterArgument_ParsesTagsCorrectly
+              - Context_Create_FilterArgumentWithSpaces_TrimsAndParsesTagsCorrectly
+              - Context_Create_FilterSingleTag_ParsesCorrectly
+              - Requirements_Export_WithFilterTags_ExportsOnlyMatchingRequirements
+              - Requirements_Export_WithMultipleFilterTags_ExportsRequirementsMatchingAnyTag
+              - Requirements_ExportJustifications_WithFilterTags_ExportsOnlyMatchingRequirements
+              - TraceMatrix_Export_WithFilterTags_ExportsOnlyMatchingRequirements
+              - TraceMatrix_CalculateSatisfiedRequirements_WithFilterTags_CountsOnlyMatchingRequirements
+              - TraceMatrix_GetUnsatisfiedRequirements_WithFilterTags_ReturnsOnlyMatchingRequirements
+
       - title: Logging
         requirements:
           - id: LOG-001
@@ -294,46 +310,61 @@ sections:
             justification: |
               Windows support is essential for .NET developers who primarily work in Windows environments
               and use Visual Studio.
+            tags:
+              - platform
             tests:
-              - "windows-latest@RequirementsProcessing"
-              - "windows-latest@TraceMatrix"
-              - "windows-latest@ReportExport"
+              - "windows-latest@ReqStream_RequirementsProcessing"
+              - "windows-latest@ReqStream_TraceMatrix"
+              - "windows-latest@ReqStream_ReportExport"
+              - "windows-latest@ReqStream_TagsFiltering"
 
           - id: PLT-002
             title: The tool shall run on Linux operating systems.
             justification: |
               Linux support enables use in containerized CI/CD environments and cloud-based build systems
               that typically use Linux.
+            tags:
+              - platform
             tests:
-              - "ubuntu-latest@RequirementsProcessing"
-              - "ubuntu-latest@TraceMatrix"
-              - "ubuntu-latest@ReportExport"
+              - "ubuntu-latest@ReqStream_RequirementsProcessing"
+              - "ubuntu-latest@ReqStream_TraceMatrix"
+              - "ubuntu-latest@ReqStream_ReportExport"
+              - "ubuntu-latest@ReqStream_TagsFiltering"
 
           - id: PLT-004
             title: The tool shall support .NET 8.0 runtime.
             justification: |
               .NET 8.0 is an LTS release, providing long-term stability and support for enterprise users.
+            tags:
+              - platform
             tests:
-              - "dotnet8.x@RequirementsProcessing"
-              - "dotnet8.x@TraceMatrix"
-              - "dotnet8.x@ReportExport"
+              - "dotnet8.x@ReqStream_RequirementsProcessing"
+              - "dotnet8.x@ReqStream_TraceMatrix"
+              - "dotnet8.x@ReqStream_ReportExport"
+              - "dotnet8.x@ReqStream_TagsFiltering"
 
           - id: PLT-005
             title: The tool shall support .NET 9.0 runtime.
             justification: |
               .NET 9.0 support enables users to leverage the latest .NET features and performance
               improvements.
+            tags:
+              - platform
             tests:
-              - "dotnet9.x@RequirementsProcessing"
-              - "dotnet9.x@TraceMatrix"
-              - "dotnet9.x@ReportExport"
+              - "dotnet9.x@ReqStream_RequirementsProcessing"
+              - "dotnet9.x@ReqStream_TraceMatrix"
+              - "dotnet9.x@ReqStream_ReportExport"
+              - "dotnet9.x@ReqStream_TagsFiltering"
 
           - id: PLT-006
             title: The tool shall support .NET 10.0 runtime.
             justification: |
               .NET 10.0 support ensures the tool remains compatible with the latest .NET ecosystem and
               future-proofs the project.
+            tags:
+              - platform
             tests:
-              - "dotnet10.x@RequirementsProcessing"
-              - "dotnet10.x@TraceMatrix"
-              - "dotnet10.x@ReportExport"
+              - "dotnet10.x@ReqStream_RequirementsProcessing"
+              - "dotnet10.x@ReqStream_TraceMatrix"
+              - "dotnet10.x@ReqStream_ReportExport"
+              - "dotnet10.x@ReqStream_TagsFiltering"

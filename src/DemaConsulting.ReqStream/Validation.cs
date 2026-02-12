@@ -46,6 +46,7 @@ public static class Validation
         RunRequirementsProcessingTest(context, testResults);
         RunTraceMatrixTest(context, testResults);
         RunReportExportTest(context, testResults);
+        RunTagsFilteringTest(context, testResults);
 
         // Calculate totals
         var totalTests = testResults.Results.Count;
@@ -98,7 +99,7 @@ public static class Validation
     private static void RunRequirementsProcessingTest(Context context, DemaConsulting.TestResults.TestResults testResults)
     {
         var startTime = DateTime.UtcNow;
-        var test = CreateTestResult("RequirementsProcessing");
+        var test = CreateTestResult("ReqStream_RequirementsProcessing");
 
         try
         {
@@ -172,7 +173,7 @@ public static class Validation
     private static void RunTraceMatrixTest(Context context, DemaConsulting.TestResults.TestResults testResults)
     {
         var startTime = DateTime.UtcNow;
-        var test = CreateTestResult("TraceMatrix");
+        var test = CreateTestResult("ReqStream_TraceMatrix");
 
         try
         {
@@ -257,7 +258,7 @@ public static class Validation
     private static void RunReportExportTest(Context context, DemaConsulting.TestResults.TestResults testResults)
     {
         var startTime = DateTime.UtcNow;
-        var test = CreateTestResult("ReportExport");
+        var test = CreateTestResult("ReqStream_ReportExport");
 
         try
         {
@@ -314,6 +315,79 @@ public static class Validation
         catch (Exception ex)
         {
             HandleTestException(test, context, "Report Export Test", ex);
+        }
+
+        FinalizeTestResult(test, startTime, testResults);
+    }
+
+    /// <summary>
+    ///     Runs a test for requirement tags filtering functionality.
+    /// </summary>
+    /// <param name="context">The context for output.</param>
+    /// <param name="testResults">The test results collection.</param>
+    private static void RunTagsFilteringTest(Context context, DemaConsulting.TestResults.TestResults testResults)
+    {
+        var startTime = DateTime.UtcNow;
+        var test = CreateTestResult("ReqStream_TagsFiltering");
+
+        try
+        {
+            using var tempDir = new TemporaryDirectory();
+
+            // Create requirements file with tagged requirements
+            var reqFile = Path.Combine(tempDir.DirectoryPath, "requirements.yaml");
+            var reqYaml = @"sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Tagged requirement
+        tags:
+          - test-tag
+      - id: REQ-002
+        title: Untagged requirement
+";
+            File.WriteAllText(reqFile, reqYaml);
+
+            using (new DirectorySwitch(tempDir.DirectoryPath))
+            {
+                // Test filtering with --filter argument
+                int exitCode;
+                using (var testContext = Context.Create(
+                    ["--silent", "--log", "filter-test.log", "--requirements", "*.yaml", "--filter", "test-tag", "--report", "filtered.md"]))
+                {
+                    Program.Run(testContext);
+                    exitCode = testContext.ExitCode;
+                }
+
+                // Check if execution succeeded and filtered report was created
+                if (exitCode == 0 && File.Exists("filtered.md"))
+                {
+                    var reportContent = File.ReadAllText("filtered.md");
+                    
+                    // Verify filtered report contains only tagged requirement
+                    if (reportContent.Contains("REQ-001") && !reportContent.Contains("REQ-002"))
+                    {
+                        test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
+                        context.WriteLine("✓ Tags Filtering Test - PASSED");
+                    }
+                    else
+                    {
+                        test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
+                        test.ErrorMessage = "Filtered report did not contain expected requirements";
+                        context.WriteError("✗ Tags Filtering Test - FAILED: Filtering not working correctly");
+                    }
+                }
+                else
+                {
+                    test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
+                    test.ErrorMessage = $"Program exited with code {exitCode} or report file not created";
+                    context.WriteError($"✗ Tags Filtering Test - FAILED: {test.ErrorMessage}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            HandleTestException(test, context, "Tags Filtering Test", ex);
         }
 
         FinalizeTestResult(test, startTime, testResults);

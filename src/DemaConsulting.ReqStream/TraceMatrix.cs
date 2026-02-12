@@ -181,8 +181,9 @@ public class TraceMatrix
     /// </summary>
     /// <param name="filePath">The path to the output Markdown file.</param>
     /// <param name="depth">The starting depth for Markdown headers (default: 1).</param>
+    /// <param name="filterTags">Optional set of tags to filter requirements. If provided, only requirements with matching tags are included.</param>
     /// <exception cref="ArgumentException">Thrown when filePath is null or empty.</exception>
-    public void Export(string filePath, int depth = 1)
+    public void Export(string filePath, int depth = 1, HashSet<string>? filterTags = null)
     {
         // Validate file path
         if (string.IsNullOrWhiteSpace(filePath))
@@ -194,13 +195,13 @@ public class TraceMatrix
         using var writer = new StringWriter();
 
         // Export Summary section
-        ExportSummary(writer, depth);
+        ExportSummary(writer, depth, filterTags);
 
         // Export Requirements section
-        ExportRequirements(writer, depth);
+        ExportRequirements(writer, depth, filterTags);
 
         // Export Testing section
-        ExportTesting(writer, depth);
+        ExportTesting(writer, depth, filterTags);
 
         // Write the content to the file
         File.WriteAllText(filePath, writer.ToString());
@@ -211,14 +212,15 @@ public class TraceMatrix
     /// </summary>
     /// <param name="writer">The text writer to write to.</param>
     /// <param name="depth">The current depth for Markdown headers.</param>
-    private void ExportSummary(TextWriter writer, int depth)
+    /// <param name="filterTags">Optional set of tags to filter requirements.</param>
+    private void ExportSummary(TextWriter writer, int depth, HashSet<string>? filterTags)
     {
         var headerPrefix = new string('#', depth);
         writer.WriteLine($"{headerPrefix} Summary");
         writer.WriteLine();
 
         // Calculate satisfied requirements
-        var (satisfied, total) = CalculateSatisfiedRequirements(_requirements);
+        var (satisfied, total) = CalculateSatisfiedRequirements(_requirements, filterTags);
 
         writer.WriteLine($"{satisfied} of {total} requirements are satisfied with tests.");
         writer.WriteLine();
@@ -228,21 +230,23 @@ public class TraceMatrix
     ///     Calculates how many requirements are satisfied.
     ///     A requirement is satisfied if it has at least one test and all tests have passed.
     /// </summary>
+    /// <param name="filterTags">Optional set of tags to filter requirements. If provided, only requirements with matching tags are counted.</param>
     /// <returns>A tuple of (satisfied count, total count).</returns>
-    public (int satisfied, int total) CalculateSatisfiedRequirements()
+    public (int satisfied, int total) CalculateSatisfiedRequirements(HashSet<string>? filterTags = null)
     {
-        return CalculateSatisfiedRequirements(_requirements);
+        return CalculateSatisfiedRequirements(_requirements, filterTags);
     }
 
     /// <summary>
     ///     Gets a list of requirement IDs that are not satisfied.
     ///     A requirement is not satisfied if it has no tests or any of its tests have not been executed or have failed.
     /// </summary>
+    /// <param name="filterTags">Optional set of tags to filter requirements. If provided, only requirements with matching tags are checked.</param>
     /// <returns>A list of unsatisfied requirement IDs.</returns>
-    public List<string> GetUnsatisfiedRequirements()
+    public List<string> GetUnsatisfiedRequirements(HashSet<string>? filterTags = null)
     {
         var unsatisfied = new List<string>();
-        CollectUnsatisfiedRequirements(_requirements, unsatisfied);
+        CollectUnsatisfiedRequirements(_requirements, unsatisfied, filterTags);
         return unsatisfied;
     }
 
@@ -251,18 +255,28 @@ public class TraceMatrix
     /// </summary>
     /// <param name="section">The section to analyze.</param>
     /// <param name="unsatisfied">The list to add unsatisfied requirement IDs to.</param>
-    private void CollectUnsatisfiedRequirements(Section section, List<string> unsatisfied)
+    /// <param name="filterTags">Optional set of tags to filter requirements.</param>
+    private void CollectUnsatisfiedRequirements(Section section, List<string> unsatisfied, HashSet<string>? filterTags)
     {
+        // Filter requirements if tags are specified
+        var requirementsToCheck = section.Requirements;
+        if (filterTags != null && filterTags.Count > 0)
+        {
+            requirementsToCheck = section.Requirements
+                .Where(req => req.Tags.Any(tag => filterTags.Contains(tag)))
+                .ToList();
+        }
+
         // Check requirements in this section using LINQ Where
         unsatisfied.AddRange(
-            section.Requirements
+            requirementsToCheck
                 .Where(requirement => !IsRequirementSatisfied(requirement, _requirements))
                 .Select(requirement => requirement.Id));
 
         // Recursively check child sections
         foreach (var childSection in section.Sections)
         {
-            CollectUnsatisfiedRequirements(childSection, unsatisfied);
+            CollectUnsatisfiedRequirements(childSection, unsatisfied, filterTags);
         }
     }
 
@@ -271,14 +285,24 @@ public class TraceMatrix
     ///     A requirement is satisfied if it has at least one test and all tests have passed.
     /// </summary>
     /// <param name="section">The section to analyze.</param>
+    /// <param name="filterTags">Optional set of tags to filter requirements.</param>
     /// <returns>A tuple of (satisfied count, total count).</returns>
-    private (int satisfied, int total) CalculateSatisfiedRequirements(Section section)
+    private (int satisfied, int total) CalculateSatisfiedRequirements(Section section, HashSet<string>? filterTags)
     {
         var satisfied = 0;
         var total = 0;
 
+        // Filter requirements if tags are specified
+        var requirementsToCheck = section.Requirements;
+        if (filterTags != null && filterTags.Count > 0)
+        {
+            requirementsToCheck = section.Requirements
+                .Where(req => req.Tags.Any(tag => filterTags.Contains(tag)))
+                .ToList();
+        }
+
         // Check requirements in this section
-        foreach (var requirement in section.Requirements)
+        foreach (var requirement in requirementsToCheck)
         {
             total++;
             if (IsRequirementSatisfied(requirement, _requirements))
@@ -290,7 +314,7 @@ public class TraceMatrix
         // Recursively check child sections
         foreach (var childSection in section.Sections)
         {
-            var (childSatisfied, childTotal) = CalculateSatisfiedRequirements(childSection);
+            var (childSatisfied, childTotal) = CalculateSatisfiedRequirements(childSection, filterTags);
             satisfied += childSatisfied;
             total += childTotal;
         }
@@ -370,7 +394,8 @@ public class TraceMatrix
     /// </summary>
     /// <param name="writer">The text writer to write to.</param>
     /// <param name="depth">The current depth for Markdown headers.</param>
-    private void ExportRequirements(TextWriter writer, int depth)
+    /// <param name="filterTags">Optional set of tags to filter requirements.</param>
+    private void ExportRequirements(TextWriter writer, int depth, HashSet<string>? filterTags)
     {
         var headerPrefix = new string('#', depth);
         writer.WriteLine($"{headerPrefix} Requirements");
@@ -379,7 +404,7 @@ public class TraceMatrix
         // Export all sections
         foreach (var section in _requirements.Sections)
         {
-            ExportRequirementSection(writer, section, depth + 1);
+            ExportRequirementSection(writer, section, depth + 1, filterTags);
         }
     }
 
@@ -389,22 +414,46 @@ public class TraceMatrix
     /// <param name="writer">The text writer to write to.</param>
     /// <param name="section">The section to export.</param>
     /// <param name="depth">The current depth for Markdown headers.</param>
-    private void ExportRequirementSection(TextWriter writer, Section section, int depth)
+    /// <param name="filterTags">Optional set of tags to filter requirements.</param>
+    private void ExportRequirementSection(TextWriter writer, Section section, int depth, HashSet<string>? filterTags)
     {
+        // Filter requirements if tags are specified
+        var requirementsToExport = section.Requirements;
+        if (filterTags != null && filterTags.Count > 0)
+        {
+            requirementsToExport = section.Requirements
+                .Where(req => req.Tags.Any(tag => filterTags.Contains(tag)))
+                .ToList();
+        }
+
+        // Check if section has any content to export
+        var hasContent = requirementsToExport.Count > 0;
+        if (!hasContent)
+        {
+            // Check if any child sections have content
+            hasContent = section.Sections.Any(childSection => SectionHasFilteredContent(childSection, filterTags));
+        }
+
+        // Skip section if no content
+        if (!hasContent)
+        {
+            return;
+        }
+
         // Write section header
         var headerPrefix = new string('#', depth);
         writer.WriteLine($"{headerPrefix} {section.Title}");
         writer.WriteLine();
 
         // If there are requirements, write them as a table
-        if (section.Requirements.Count > 0)
+        if (requirementsToExport.Count > 0)
         {
             // Write table header
             writer.WriteLine("| ID | Tests Linked | Passed | Failed | Not Executed |");
             writer.WriteLine("| :- | -----------: | :-: | :-: | :-: |");
 
             // Write each requirement
-            foreach (var requirement in section.Requirements)
+            foreach (var requirement in requirementsToExport)
             {
                 var (testsLinked, passed, failed, notExecuted) = GetRequirementTestStats(requirement);
                 writer.WriteLine($"| {requirement.Id} | {testsLinked} | {passed} | {failed} | {notExecuted} |");
@@ -416,8 +465,36 @@ public class TraceMatrix
         // Recursively export child sections
         foreach (var childSection in section.Sections)
         {
-            ExportRequirementSection(writer, childSection, depth + 1);
+            ExportRequirementSection(writer, childSection, depth + 1, filterTags);
         }
+    }
+
+    /// <summary>
+    ///     Checks if a section has any filtered content (requirements or child sections with content).
+    /// </summary>
+    /// <param name="section">The section to check.</param>
+    /// <param name="filterTags">The set of filter tags.</param>
+    /// <returns>True if the section has filtered content, false otherwise.</returns>
+    private bool SectionHasFilteredContent(Section section, HashSet<string>? filterTags)
+    {
+        // Check if section has any matching requirements
+        if (filterTags == null || filterTags.Count == 0)
+        {
+            if (section.Requirements.Count > 0)
+            {
+                return true;
+            }
+        }
+        else
+        {
+            if (section.Requirements.Any(req => req.Tags.Any(tag => filterTags.Contains(tag))))
+            {
+                return true;
+            }
+        }
+
+        // Check if any child section has filtered content
+        return section.Sections.Any(childSection => SectionHasFilteredContent(childSection, filterTags));
     }
 
     /// <summary>
@@ -456,7 +533,8 @@ public class TraceMatrix
     /// </summary>
     /// <param name="writer">The text writer to write to.</param>
     /// <param name="depth">The current depth for Markdown headers.</param>
-    private void ExportTesting(TextWriter writer, int depth)
+    /// <param name="filterTags">Optional set of tags to filter requirements.</param>
+    private void ExportTesting(TextWriter writer, int depth, HashSet<string>? filterTags)
     {
         var headerPrefix = new string('#', depth);
         writer.WriteLine($"{headerPrefix} Testing");
@@ -464,7 +542,7 @@ public class TraceMatrix
 
         // Build a mapping of test names to requirements
         var testToRequirements = new Dictionary<string, List<string>>();
-        BuildTestToRequirementsMap(_requirements, testToRequirements);
+        BuildTestToRequirementsMap(_requirements, testToRequirements, filterTags);
 
         // Write table header
         writer.WriteLine("| Test | Requirement | Passed | Failed |");
@@ -491,10 +569,20 @@ public class TraceMatrix
     /// </summary>
     /// <param name="section">The section to scan.</param>
     /// <param name="testToRequirements">The dictionary to populate.</param>
-    private static void BuildTestToRequirementsMap(Section section, Dictionary<string, List<string>> testToRequirements)
+    /// <param name="filterTags">Optional set of tags to filter requirements.</param>
+    private static void BuildTestToRequirementsMap(Section section, Dictionary<string, List<string>> testToRequirements, HashSet<string>? filterTags)
     {
+        // Filter requirements if tags are specified
+        var requirementsToProcess = section.Requirements;
+        if (filterTags != null && filterTags.Count > 0)
+        {
+            requirementsToProcess = section.Requirements
+                .Where(req => req.Tags.Any(tag => filterTags.Contains(tag)))
+                .ToList();
+        }
+
         // Process requirements in this section
-        foreach (var requirement in section.Requirements)
+        foreach (var requirement in requirementsToProcess)
         {
             foreach (var testName in requirement.Tests)
             {
@@ -510,7 +598,7 @@ public class TraceMatrix
         // Recursively process child sections
         foreach (var childSection in section.Sections)
         {
-            BuildTestToRequirementsMap(childSection, testToRequirements);
+            BuildTestToRequirementsMap(childSection, testToRequirements, filterTags);
         }
     }
 

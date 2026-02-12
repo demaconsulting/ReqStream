@@ -69,6 +69,12 @@ public sealed class Context : IDisposable
     public bool Enforce { get; private init; }
 
     /// <summary>
+    ///     Gets the set of filter tags for filtering requirements during export.
+    ///     Returns null if no filter tags are specified.
+    /// </summary>
+    public HashSet<string>? FilterTags { get; private init; }
+
+    /// <summary>
     ///     Gets the list of requirements files found from the --requirements glob pattern.
     /// </summary>
     public List<string> RequirementsFiles { get; private init; } = [];
@@ -138,6 +144,7 @@ public sealed class Context : IDisposable
         // Initialize collection variables
         var requirementsFiles = new List<string>();
         var testFiles = new List<string>();
+        HashSet<string>? filterTags = null;
 
         // Initialize optional parameters
         string? requirementsReport = null;
@@ -189,6 +196,23 @@ public sealed class Context : IDisposable
 
                 case "--enforce":
                     enforce = true;
+                    break;
+
+                case "--filter":
+                    // Ensure argument has a value
+                    if (i >= args.Length)
+                    {
+                        throw new ArgumentException($"{arg} requires a comma-separated list of tags", nameof(args));
+                    }
+
+                    // Split comma-separated tags and add to the filter set
+                    var tags = args[i++].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    filterTags ??= [];
+                    foreach (var tag in tags)
+                    {
+                        filterTags.Add(tag);
+                    }
+
                     break;
 
                 case "--log":
@@ -310,6 +334,7 @@ public sealed class Context : IDisposable
             Validate = validate,
             ResultsFile = resultsFile,
             Enforce = enforce,
+            FilterTags = filterTags,
             RequirementsFiles = requirementsFiles,
             TestFiles = testFiles,
             RequirementsReport = requirementsReport,

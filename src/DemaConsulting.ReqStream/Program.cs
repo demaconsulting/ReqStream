@@ -142,6 +142,7 @@ internal static class Program
         context.WriteLine("  --requirements <pattern>   Requirements files glob pattern");
         context.WriteLine("  --report <file>            Export requirements to markdown file");
         context.WriteLine("  --report-depth <depth>     Markdown header depth for requirements report (default: 1)");
+        context.WriteLine("  --filter <tags>            Filter requirements by comma-separated tags");
         context.WriteLine("  --justifications <file>    Export justifications to markdown file");
         context.WriteLine("  --justifications-depth <depth>");
         context.WriteLine("                             Markdown header depth for justifications (default: 1)");
@@ -173,7 +174,7 @@ internal static class Program
         if (context.RequirementsReport != null)
         {
             context.WriteLine($"Exporting requirements to {context.RequirementsReport}...");
-            requirements.Export(context.RequirementsReport, context.ReportDepth);
+            requirements.Export(context.RequirementsReport, context.ReportDepth, context.FilterTags);
             context.WriteLine("Requirements report generated successfully.");
         }
 
@@ -181,7 +182,7 @@ internal static class Program
         if (context.JustificationsFile != null)
         {
             context.WriteLine($"Exporting justifications to {context.JustificationsFile}...");
-            requirements.ExportJustifications(context.JustificationsFile, context.JustificationsDepth);
+            requirements.ExportJustifications(context.JustificationsFile, context.JustificationsDepth, context.FilterTags);
             context.WriteLine("Justifications report generated successfully.");
         }
 
@@ -197,7 +198,7 @@ internal static class Program
             if (context.Matrix != null)
             {
                 context.WriteLine($"Exporting trace matrix to {context.Matrix}...");
-                traceMatrix.Export(context.Matrix, context.MatrixDepth);
+                traceMatrix.Export(context.Matrix, context.MatrixDepth, context.FilterTags);
                 context.WriteLine("Trace matrix report generated successfully.");
             }
         }
@@ -222,10 +223,10 @@ internal static class Program
             return;
         }
 
-        var (satisfied, total) = traceMatrix.CalculateSatisfiedRequirements();
+        var (satisfied, total) = traceMatrix.CalculateSatisfiedRequirements(context.FilterTags);
         if (satisfied < total)
         {
-            var unsatisfied = traceMatrix.GetUnsatisfiedRequirements();
+            var unsatisfied = traceMatrix.GetUnsatisfiedRequirements(context.FilterTags);
             context.WriteError($"Error: Only {satisfied} of {total} requirements are satisfied with tests.");
             context.WriteError("Unsatisfied requirements:");
             foreach (var reqId in unsatisfied)

@@ -25,6 +25,7 @@ create, validate, and manage requirement documents in a structured and maintaina
 - 🧪 **Test Mapping** - Link requirements to test cases for traceability
 - 📦 **File Includes** - Modularize requirements across multiple YAML files
 - ✅ **Validation** - Built-in validation for requirement structure and references
+- 🏷️ **Tag Filtering** - Categorize and filter requirements using tags
 - 📋 **Justifications** - Document the rationale behind each requirement
 
 ## Installation
@@ -102,6 +103,7 @@ Options:
   --matrix-depth <depth>           Markdown header depth for trace matrix (default: 1)
   --justifications <file>          Export requirement justifications to markdown file
   --justifications-depth <depth>   Markdown header depth for justifications (default: 1)
+  --filter <tags>                  Comma-separated list of tags to filter requirements
   --enforce                        Fail if requirements are not fully tested
 ```
 
@@ -168,6 +170,8 @@ mappings:
 - **Child Requirements**: Requirements can reference other requirements as children using the `children` field
 - **Justifications**: Requirements can include an optional `justification` field to document the rationale behind
   the requirement, explaining why it exists and its purpose
+- **Tags**: Requirements can include an optional `tags` field with a list of tag identifiers for categorization
+  and filtering
 - **Test Mappings**: Tests can be mapped to requirements either inline (within the requirement definition) or
   separately (using the `mappings` section)
 - **Test Source Linking**: Support for source-specific test matching using the `[filepart@]testname` pattern,
@@ -213,6 +217,109 @@ requirements:
 - Tests without source specifiers aggregate results from all test result files
 - File part matching is case-insensitive and supports partial filename matching
 - Both plain and source-specific test names can be mixed in the same requirement
+
+## Tag Filtering
+
+ReqStream supports tagging requirements for categorization and filtering. Tags enable you to organize requirements by
+themes (e.g., security, performance, compliance) and selectively export subsets of requirements based on your needs.
+
+### Adding Tags to Requirements
+
+Tags are defined as an optional list in the requirement definition:
+
+```yaml
+sections:
+  - title: System Security
+    requirements:
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
+        tags:
+          - security
+          - critical
+      
+      - id: SYS-SEC-002
+        title: The system shall log all authentication attempts.
+        tags:
+          - security
+          - audit
+  
+  - title: Performance
+    requirements:
+      - id: PERF-001
+        title: The system shall respond within 100ms.
+        tags:
+          - performance
+          - critical
+```
+
+**Key points**:
+
+- Tags are optional - requirements without tags are always included when no filter is specified
+- Tag identifiers can be any string value
+- A requirement can have multiple tags
+- Tag matching is case-sensitive
+
+### Filtering by Tags
+
+Use the `--filter` option to export only requirements with specific tags:
+
+```bash
+# Export only security-related requirements
+reqstream --requirements "**/*.yaml" --filter security --report security_report.md
+
+# Export requirements with multiple tags (OR logic - matches any tag)
+reqstream --requirements "**/*.yaml" --filter security,critical --report critical_report.md
+```
+
+**Filtering applies to**:
+
+- **Requirements Reports** (`--report`): Only requirements with matching tags are included
+- **Trace Matrix** (`--matrix`): Only requirements with matching tags appear in the matrix. Summary counts
+  (satisfied/total) reflect only the filtered requirements
+- **Justifications** (`--justifications`): Only justifications for requirements with matching tags are exported
+- **Enforcement** (`--enforce`): Only requirements with matching tags are checked for test coverage
+
+**Filter behavior**:
+
+- Multiple tags are comma-separated and use OR logic (requirement matches if it has ANY of the specified tags)
+- If no `--filter` is specified, all requirements are included (default behavior)
+- Requirements without any tags are excluded when a filter is active
+- Empty tag filters (`--filter ""`) are treated as no filter (all requirements included)
+
+### Use Cases
+
+**Security Audit**:
+
+```bash
+# Export only security requirements and their trace matrix
+reqstream \
+  --requirements "docs/**/*.yaml" \
+  --tests "test-results/**/*.trx" \
+  --filter security \
+  --report security_requirements.md \
+  --matrix security_trace_matrix.md
+```
+
+**Critical Requirements Enforcement**:
+
+```bash
+# Enforce test coverage only for critical requirements
+reqstream \
+  --requirements "docs/**/*.yaml" \
+  --tests "test-results/**/*.trx" \
+  --filter critical \
+  --enforce
+```
+
+**Compliance Documentation**:
+
+```bash
+# Export justifications for compliance-related requirements
+reqstream \
+  --requirements "docs/**/*.yaml" \
+  --filter compliance,regulatory \
+  --justifications compliance_justifications.md
+```
 
 ## Requirements Enforcement
 

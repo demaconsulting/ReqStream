@@ -17,6 +17,7 @@
   - [Requirements](#requirements)
   - [Test Mappings](#test-mappings)
   - [Test Source Linking](#test-source-linking)
+  - [Tag Filtering](#tag-filtering)
   - [File Includes](#file-includes)
   - [Section Merging](#section-merging)
   - [Complete Example](#complete-example)
@@ -194,6 +195,7 @@ Requirements can optionally include:
 - **tests** - Array of test names that verify this requirement
 - **children** - Array of requirement IDs that are children of this requirement
 - **justification** - Explanation of why the requirement exists (recommended for better understanding)
+- **tags** - Array of tag identifiers for categorizing and filtering requirements
 
 Example:
 
@@ -204,6 +206,9 @@ requirements:
     justification: |
       Authentication is critical to ensure only authorized users can access the system.
       This requirement establishes the foundation for our security posture.
+    tags:
+      - security
+      - critical
     children:
       - AUTH-001
       - AUTH-002
@@ -291,6 +296,78 @@ files.
 - Case-insensitive matching: `windows@Test` matches `test-results-WINDOWS-latest.trx`
 - Partial matching: `ubuntu@Test` matches `test-results-ubuntu-22.04-latest.trx`
 - Plain test names: Tests without `filepart@` prefix aggregate results from all test result files
+
+### Tag Filtering
+
+Requirements can be tagged for categorization and selective filtering. This is useful for organizing requirements by
+themes (e.g., security, performance, compliance) and generating focused reports for specific requirement categories.
+
+**Adding tags to requirements:**
+
+```yaml
+sections:
+  - title: System Requirements
+    requirements:
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
+        tags:
+          - security
+          - critical
+      - id: SYS-PERF-001
+        title: The system shall respond within 100ms.
+        tags:
+          - performance
+      - id: SYS-SEC-002
+        title: The system shall encrypt data at rest.
+        tags:
+          - security
+          - compliance
+```
+
+**Filtering by tags:**
+
+Use the `--filter` option with comma-separated tags to export only requirements that match at least one of the
+specified tags:
+
+```bash
+# Export only security-tagged requirements
+reqstream --requirements "docs/**/*.yaml" \
+          --filter security \
+          --report security_requirements.md
+
+# Export requirements tagged with either security or compliance
+reqstream --requirements "docs/**/*.yaml" \
+          --filter security,compliance \
+          --report compliance_report.md
+```
+
+**Filtering behavior:**
+
+- Requirements match if they have **any** of the filter tags (OR logic)
+- Requirements without tags are excluded when filtering is active
+- When no filter is specified, all requirements are exported (default behavior)
+- Filtering applies to all exports: requirements reports, justifications, and trace matrices
+- Summary counts (satisfied/total requirements) reflect only the filtered requirements
+
+**Example use cases:**
+
+1. **Security audits** - Export only security-related requirements for security reviews
+2. **Compliance documentation** - Generate compliance-focused documentation for auditors
+3. **Critical requirements** - Filter and enforce test coverage for critical requirements only
+
+```bash
+# Generate trace matrix for critical requirements only
+reqstream --requirements "docs/**/*.yaml" \
+          --tests "test-results/**/*.trx" \
+          --filter critical \
+          --matrix critical_trace_matrix.md
+
+# Enforce test coverage for security requirements
+reqstream --requirements "docs/**/*.yaml" \
+          --tests "test-results/**/*.trx" \
+          --filter security \
+          --enforce
+```
 
 ### File Includes
 
@@ -449,6 +526,7 @@ ReqStream supports the following command-line options:
 | `--requirements <pattern>` | Glob pattern for requirements YAML files |
 | `--report <file>` | Export requirements to markdown file |
 | `--report-depth <depth>` | Starting header depth for requirements report (default: 1) |
+| `--filter <tags>` | Comma-separated list of tags to filter requirements by |
 | `--tests <pattern>` | Glob pattern for test result files (TRX or JUnit format) |
 | `--matrix <file>` | Export trace matrix to markdown file |
 | `--matrix-depth <depth>` | Starting header depth for trace matrix (default: 1) |
@@ -545,6 +623,32 @@ reqstream --requirements "**/*.yaml" \
           --report requirements.md \
           --matrix trace-matrix.md \
           --enforce
+```
+
+**Tag filtering for focused reports:**
+
+```bash
+# Export only security-tagged requirements
+reqstream --requirements "docs/**/*.yaml" \
+          --filter security \
+          --report security_requirements.md
+
+# Generate trace matrix for critical requirements only
+reqstream --requirements "docs/**/*.yaml" \
+          --tests "test-results/**/*.trx" \
+          --filter critical \
+          --matrix critical_trace_matrix.md
+
+# Enforce test coverage for security requirements
+reqstream --requirements "docs/**/*.yaml" \
+          --tests "test-results/**/*.trx" \
+          --filter security \
+          --enforce
+
+# Export multiple tags (OR logic - matches any tag)
+reqstream --requirements "docs/**/*.yaml" \
+          --filter security,compliance \
+          --report security_and_compliance.md
 ```
 
 ## Exporting
