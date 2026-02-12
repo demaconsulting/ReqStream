@@ -310,6 +310,8 @@ sections:
             justification: |
               Windows support is essential for .NET developers who primarily work in Windows environments
               and use Visual Studio.
+            tags:
+              - platform
             tests:
               - "windows-latest@ReqStream_RequirementsProcessing"
               - "windows-latest@ReqStream_TraceMatrix"
@@ -321,6 +323,8 @@ sections:
             justification: |
               Linux support enables use in containerized CI/CD environments and cloud-based build systems
               that typically use Linux.
+            tags:
+              - platform
             tests:
               - "ubuntu-latest@ReqStream_RequirementsProcessing"
               - "ubuntu-latest@ReqStream_TraceMatrix"
@@ -331,6 +335,8 @@ sections:
             title: The tool shall support .NET 8.0 runtime.
             justification: |
               .NET 8.0 is an LTS release, providing long-term stability and support for enterprise users.
+            tags:
+              - platform
             tests:
               - "dotnet8.x@ReqStream_RequirementsProcessing"
               - "dotnet8.x@ReqStream_TraceMatrix"
@@ -342,6 +348,8 @@ sections:
             justification: |
               .NET 9.0 support enables users to leverage the latest .NET features and performance
               improvements.
+            tags:
+              - platform
             tests:
               - "dotnet9.x@ReqStream_RequirementsProcessing"
               - "dotnet9.x@ReqStream_TraceMatrix"
@@ -353,6 +361,8 @@ sections:
             justification: |
               .NET 10.0 support ensures the tool remains compatible with the latest .NET ecosystem and
               future-proofs the project.
+            tags:
+              - platform
             tests:
               - "dotnet10.x@ReqStream_RequirementsProcessing"
               - "dotnet10.x@ReqStream_TraceMatrix"
