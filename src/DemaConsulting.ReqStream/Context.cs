@@ -70,8 +70,9 @@ public sealed class Context : IDisposable
 
     /// <summary>
     ///     Gets the set of filter tags for filtering requirements during export.
+    ///     Returns null if no filter tags are specified.
     /// </summary>
-    public HashSet<string> FilterTags { get; private init; } = [];
+    public HashSet<string>? FilterTags { get; private init; }
 
     /// <summary>
     ///     Gets the list of requirements files found from the --requirements glob pattern.
@@ -143,7 +144,7 @@ public sealed class Context : IDisposable
         // Initialize collection variables
         var requirementsFiles = new List<string>();
         var testFiles = new List<string>();
-        var filterTags = new HashSet<string>();
+        HashSet<string>? filterTags = null;
 
         // Initialize optional parameters
         string? requirementsReport = null;
@@ -206,6 +207,7 @@ public sealed class Context : IDisposable
 
                     // Split comma-separated tags and add to the filter set
                     var tags = args[i++].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    filterTags ??= [];
                     foreach (var tag in tags)
                     {
                         filterTags.Add(tag);

@@ -335,106 +335,37 @@ public static class Validation
             using var tempDir = new TemporaryDirectory();
 
             // Create requirements file with tagged requirements
-            var reqFile = Path.Combine(tempDir.DirectoryPath, "filter-requirements.yaml");
+            var reqFile = Path.Combine(tempDir.DirectoryPath, "requirements.yaml");
             var reqYaml = @"sections:
-  - title: Filter Test
+  - title: Test Section
     requirements:
-      - id: FLT-001
-        title: Security requirement
+      - id: REQ-001
+        title: Tagged requirement
         tags:
-          - security
-        tests:
-          - Test_Security
-      - id: FLT-002
-        title: Performance requirement
-        tags:
-          - performance
-        tests:
-          - Test_Performance
-      - id: FLT-003
-        title: Multi-tagged requirement
-        tags:
-          - security
-          - critical
+          - test-tag
+      - id: REQ-002
+        title: Untagged requirement
 ";
             File.WriteAllText(reqFile, reqYaml);
 
-            // Create test results
-            var trxFile = Path.Combine(tempDir.DirectoryPath, "test-results.trx");
-            var testData = new DemaConsulting.TestResults.TestResults { Name = "FilterTests" };
-            testData.Results.Add(new DemaConsulting.TestResults.TestResult
-            {
-                Name = "Test_Security",
-                ClassName = "SecurityTests",
-                CodeBase = "Tests.dll",
-                Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
-                Duration = TimeSpan.FromSeconds(1)
-            });
-            testData.Results.Add(new DemaConsulting.TestResults.TestResult
-            {
-                Name = "Test_Performance",
-                ClassName = "PerformanceTests",
-                CodeBase = "Tests.dll",
-                Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
-                Duration = TimeSpan.FromSeconds(1)
-            });
-            File.WriteAllText(trxFile, TrxSerializer.Serialize(testData));
-
             using (new DirectorySwitch(tempDir.DirectoryPath))
             {
-                // Test 1: Filter requirements report by tag
-                int exitCode1;
+                // Test filtering with --filter argument
+                int exitCode;
                 using (var testContext = Context.Create(
-                    ["--silent", "--log", "filter-test.log", "--requirements", "*.yaml", "--filter", "security", "--report", "filtered-report.md"]))
+                    ["--silent", "--log", "filter-test.log", "--requirements", "*.yaml", "--filter", "test-tag", "--report", "filtered.md"]))
                 {
                     Program.Run(testContext);
-                    exitCode1 = testContext.ExitCode;
+                    exitCode = testContext.ExitCode;
                 }
 
-                // Test 2: Filter trace matrix by tag
-                int exitCode2;
-                using (var testContext = Context.Create(
-                    ["--silent", "--log", "filter-matrix-test.log", "--requirements", "*.yaml", "--tests", "*.trx", "--filter", "security", "--matrix", "filtered-matrix.md"]))
+                // Check if execution succeeded and filtered report was created
+                if (exitCode == 0 && File.Exists("filtered.md"))
                 {
-                    Program.Run(testContext);
-                    exitCode2 = testContext.ExitCode;
-                }
-
-                // Test 3: Filter enforcement by tag (should fail - FLT-003 has no tests)
-                int exitCode3;
-                using (var testContext = Context.Create(
-                    ["--silent", "--log", "filter-enforce-test.log", "--requirements", "*.yaml", "--tests", "*.trx", "--filter", "security", "--enforce"]))
-                {
-                    Program.Run(testContext);
-                    exitCode3 = testContext.ExitCode;
-                }
-
-                // Validate results
-                var reportFile = Path.Combine(tempDir.DirectoryPath, "filtered-report.md");
-                var matrixFile = Path.Combine(tempDir.DirectoryPath, "filtered-matrix.md");
-
-                if (exitCode1 == 0 && exitCode2 == 0 && exitCode3 != 0 &&
-                    File.Exists(reportFile) && File.Exists(matrixFile))
-                {
-                    var reportContent = File.ReadAllText(reportFile);
-                    var matrixContent = File.ReadAllText(matrixFile);
-
-                    // Verify filtered report contains security-tagged requirements
-                    var reportValid = reportContent.Contains("FLT-001") &&
-                                      reportContent.Contains("FLT-003") &&
-                                      !reportContent.Contains("FLT-002"); // Performance req should be filtered out
-
-                    // Verify filtered matrix contains security-tagged requirements
-                    var matrixValid = matrixContent.Contains("FLT-001") &&
-                                      matrixContent.Contains("FLT-003") &&
-                                      !matrixContent.Contains("FLT-002");
-
-                    // Verify enforcement correctly identified unsatisfied requirement
-                    var enforceLog = File.ReadAllText(Path.Combine(tempDir.DirectoryPath, "filter-enforce-test.log"));
-                    var enforceValid = enforceLog.Contains("FLT-003") && // Unsatisfied requirement
-                                       enforceLog.Contains("1 of 2 requirements"); // Should count only 2 security requirements
-
-                    if (reportValid && matrixValid && enforceValid)
+                    var reportContent = File.ReadAllText("filtered.md");
+                    
+                    // Verify filtered report contains only tagged requirement
+                    if (reportContent.Contains("REQ-001") && !reportContent.Contains("REQ-002"))
                     {
                         test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
                         context.WriteLine("✓ Tags Filtering Test - PASSED");
@@ -442,14 +373,14 @@ public static class Validation
                     else
                     {
                         test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
-                        test.ErrorMessage = "Filtered output missing expected content or incorrect counts";
-                        context.WriteError("✗ Tags Filtering Test - FAILED: Filtered output incorrect");
+                        test.ErrorMessage = "Filtered report did not contain expected requirements";
+                        context.WriteError("✗ Tags Filtering Test - FAILED: Filtering not working correctly");
                     }
                 }
                 else
                 {
                     test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
-                    test.ErrorMessage = $"Unexpected exit codes or missing files (exitCode1={exitCode1}, exitCode2={exitCode2}, exitCode3={exitCode3})";
+                    test.ErrorMessage = $"Program exited with code {exitCode} or report file not created";
                     context.WriteError($"✗ Tags Filtering Test - FAILED: {test.ErrorMessage}");
                 }
             }

@@ -535,4 +535,174 @@ sections:
         var testCredentialsCount = content.Split(SplitDelimiter, StringSplitOptions.None).Length - 1;
         Assert.AreEqual(2, testCredentialsCount, "Test_Credentials should appear twice in the testing section");
     }
+
+    /// <summary>
+    /// Test exporting trace matrix with filter tags.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_Export_WithFilterTags_ExportsOnlyMatchingRequirements()
+    {
+        var yamlContent = @"sections:
+  - title: System Requirements
+    requirements:
+      - id: REQ-001
+        title: Security requirement
+        tags:
+          - security
+        tests:
+          - Test_Security
+      - id: REQ-002
+        title: Performance requirement
+        tags:
+          - performance
+        tests:
+          - Test_Performance
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, yamlContent);
+        var requirements = Requirements.Read(reqPath);
+
+        // Create test results
+        var testResults = new DemaConsulting.TestResults.TestResults { Name = "TestRun" };
+        testResults.Results.Add(new DemaConsulting.TestResults.TestResult
+        {
+            Name = "Test_Security",
+            ClassName = "SecurityTests",
+            CodeBase = "Tests.dll",
+            Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+        testResults.Results.Add(new DemaConsulting.TestResults.TestResult
+        {
+            Name = "Test_Performance",
+            ClassName = "PerformanceTests",
+            CodeBase = "Tests.dll",
+            Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+
+        var trxPath = Path.Combine(_testDirectory, "results.trx");
+        File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
+
+        // Create TraceMatrix and export with filter
+        var matrix = new TraceMatrix(requirements, trxPath);
+        var mdPath = Path.Combine(_testDirectory, "tracematrix.md");
+        var filterTags = new HashSet<string> { "security" };
+        matrix.Export(mdPath, filterTags: filterTags);
+
+        var content = File.ReadAllText(mdPath);
+        
+        // Should show 1 of 1 requirements (only security-tagged requirement)
+        Assert.Contains("1 of 1 requirements are satisfied with tests.", content);
+        
+        // Should contain security requirement but not performance requirement
+        Assert.Contains("REQ-001", content);
+        Assert.DoesNotContain("REQ-002", content);
+        Assert.Contains("Test_Security", content);
+        Assert.DoesNotContain("Test_Performance", content);
+    }
+
+    /// <summary>
+    /// Test that trace matrix filtering affects satisfied requirements count.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_CalculateSatisfiedRequirements_WithFilterTags_CountsOnlyMatchingRequirements()
+    {
+        var yamlContent = @"sections:
+  - title: System Requirements
+    requirements:
+      - id: REQ-001
+        title: Security requirement with tests
+        tags:
+          - security
+        tests:
+          - Test_Security
+      - id: REQ-002
+        title: Security requirement without tests
+        tags:
+          - security
+      - id: REQ-003
+        title: Performance requirement with tests
+        tags:
+          - performance
+        tests:
+          - Test_Performance
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, yamlContent);
+        var requirements = Requirements.Read(reqPath);
+
+        // Create test results
+        var testResults = new DemaConsulting.TestResults.TestResults { Name = "TestRun" };
+        testResults.Results.Add(new DemaConsulting.TestResults.TestResult
+        {
+            Name = "Test_Security",
+            ClassName = "SecurityTests",
+            CodeBase = "Tests.dll",
+            Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+        testResults.Results.Add(new DemaConsulting.TestResults.TestResult
+        {
+            Name = "Test_Performance",
+            ClassName = "PerformanceTests",
+            CodeBase = "Tests.dll",
+            Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+
+        var trxPath = Path.Combine(_testDirectory, "results.trx");
+        File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
+
+        var matrix = new TraceMatrix(requirements, trxPath);
+
+        // Without filter: should count all 3 requirements (2 satisfied, 1 unsatisfied)
+        var (satisfiedAll, totalAll) = matrix.CalculateSatisfiedRequirements();
+        Assert.AreEqual(2, satisfiedAll);
+        Assert.AreEqual(3, totalAll);
+
+        // With security filter: should count only 2 security requirements (1 satisfied, 1 unsatisfied)
+        var filterTags = new HashSet<string> { "security" };
+        var (satisfiedFiltered, totalFiltered) = matrix.CalculateSatisfiedRequirements(filterTags);
+        Assert.AreEqual(1, satisfiedFiltered);
+        Assert.AreEqual(2, totalFiltered);
+    }
+
+    /// <summary>
+    /// Test that trace matrix filtering affects unsatisfied requirements list.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_GetUnsatisfiedRequirements_WithFilterTags_ReturnsOnlyMatchingRequirements()
+    {
+        var yamlContent = @"sections:
+  - title: System Requirements
+    requirements:
+      - id: REQ-001
+        title: Security requirement without tests
+        tags:
+          - security
+      - id: REQ-002
+        title: Performance requirement without tests
+        tags:
+          - performance
+";
+        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqPath, yamlContent);
+        var requirements = Requirements.Read(reqPath);
+
+        var matrix = new TraceMatrix(requirements);
+
+        // Without filter: should return both unsatisfied requirements
+        var unsatisfiedAll = matrix.GetUnsatisfiedRequirements();
+        Assert.HasCount(2, unsatisfiedAll);
+        Assert.Contains("REQ-001", unsatisfiedAll);
+        Assert.Contains("REQ-002", unsatisfiedAll);
+
+        // With security filter: should return only security requirement
+        var filterTags = new HashSet<string> { "security" };
+        var unsatisfiedFiltered = matrix.GetUnsatisfiedRequirements(filterTags);
+        Assert.HasCount(1, unsatisfiedFiltered);
+        Assert.Contains("REQ-001", unsatisfiedFiltered);
+        Assert.DoesNotContain("REQ-002", unsatisfiedFiltered);
+    }
 }

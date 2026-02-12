@@ -58,12 +58,12 @@ public class RequirementsExportTests
     {
         var yamlContent = @"---
 sections:
-  - title: ""System Security""
+  - title: System Security
     requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
-      - id: ""SYS-SEC-002""
-        title: ""The system shall enforce password complexity.""
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
+      - id: SYS-SEC-002
+        title: The system shall enforce password complexity.
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
@@ -88,10 +88,10 @@ sections:
     {
         var yamlContent = @"---
 sections:
-  - title: ""System Security""
+  - title: System Security
     requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
@@ -112,16 +112,16 @@ sections:
     {
         var yamlContent = @"---
 sections:
-  - title: ""Data Management""
+  - title: Data Management
     sections:
-      - title: ""User Authentication""
+      - title: User Authentication
         requirements:
-          - id: ""AUTH-001""
-            title: ""All requests shall be authenticated.""
-      - title: ""Logging""
+          - id: AUTH-001
+            title: All requests shall be authenticated.
+      - title: Logging
         requirements:
-          - id: ""LOG-001""
-            title: ""All requests shall be logged.""
+          - id: LOG-001
+            title: All requests shall be logged.
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
@@ -146,12 +146,12 @@ sections:
     {
         var yamlContent = @"---
 sections:
-  - title: ""Parent Section""
+  - title: Parent Section
     sections:
-      - title: ""Child Section""
+      - title: Child Section
         requirements:
-          - id: ""CHILD-001""
-            title: ""Child requirement.""
+          - id: CHILD-001
+            title: Child requirement.
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
@@ -174,10 +174,10 @@ sections:
     {
         var yamlContent = @"---
 sections:
-  - title: ""System Security""
+  - title: System Security
     requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
@@ -202,10 +202,10 @@ sections:
     {
         var yamlContent = @"---
 sections:
-  - title: ""System Security""
+  - title: System Security
     requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
@@ -230,14 +230,14 @@ sections:
     {
         var yamlContent = @"---
 sections:
-  - title: ""System Security""
+  - title: System Security
     requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
-  - title: ""Data Management""
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
+  - title: Data Management
     requirements:
-      - id: ""DATA-001""
-        title: ""All requests shall be logged.""
+      - id: DATA-001
+        title: All requests shall be logged.
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
@@ -426,21 +426,21 @@ sections:
     {
         var yamlContent = @"---
 sections:
-  - title: ""System Security""
+  - title: System Security
     requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
         tags:
-          - ""security""
-          - ""critical""
-      - id: ""SYS-SEC-002""
-        title: ""The system shall enforce password complexity.""
+          - security
+          - critical
+      - id: SYS-SEC-002
+        title: The system shall enforce password complexity.
         tags:
-          - ""security""
-      - id: ""SYS-PERF-001""
-        title: ""The system shall respond within 100ms.""
+          - security
+      - id: SYS-PERF-001
+        title: The system shall respond within 100ms.
         tags:
-          - ""performance""
+          - performance
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
@@ -467,20 +467,20 @@ sections:
     {
         var yamlContent = @"---
 sections:
-  - title: ""System Security""
+  - title: System Security
     requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
         tags:
-          - ""security""
-      - id: ""SYS-PERF-001""
-        title: ""The system shall respond within 100ms.""
+          - security
+      - id: SYS-PERF-001
+        title: The system shall respond within 100ms.
         tags:
-          - ""performance""
-      - id: ""SYS-DATA-001""
-        title: ""The system shall maintain data integrity.""
+          - performance
+      - id: SYS-DATA-001
+        title: The system shall maintain data integrity.
         tags:
-          - ""data-integrity""
+          - data-integrity
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
@@ -505,12 +505,12 @@ sections:
     {
         var yamlContent = @"---
 sections:
-  - title: ""System Security""
+  - title: System Security
     requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
         tags:
-          - ""security""
+          - security
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
@@ -534,16 +534,16 @@ sections:
     {
         var yamlContent = @"---
 sections:
-  - title: ""System Security""
+  - title: System Security
     requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
         tags:
-          - ""security""
-      - id: ""SYS-PERF-001""
-        title: ""The system shall respond within 100ms.""
+          - security
+      - id: SYS-PERF-001
+        title: The system shall respond within 100ms.
         tags:
-          - ""performance""
+          - performance
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
@@ -604,18 +604,18 @@ sections:
     {
         var yamlContent = @"---
 sections:
-  - title: ""System Security""
+  - title: System Security
     requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
+      - id: SYS-SEC-001
+        title: The system shall support credentials authentication.
         tags:
-          - ""security""
-  - title: ""Performance""
+          - security
+  - title: Performance
     requirements:
-      - id: ""SYS-PERF-001""
-        title: ""The system shall respond within 100ms.""
+      - id: SYS-PERF-001
+        title: The system shall respond within 100ms.
         tags:
-          - ""performance""
+          - performance
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);

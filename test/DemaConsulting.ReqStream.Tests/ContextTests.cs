@@ -64,6 +64,7 @@ public class ContextTests
         Assert.IsFalse(context.Validate);
         Assert.IsEmpty(context.RequirementsFiles);
         Assert.IsEmpty(context.TestFiles);
+        Assert.IsNull(context.FilterTags);
         Assert.IsNull(context.RequirementsReport);
         Assert.AreEqual(1, context.ReportDepth);
         Assert.IsNull(context.Matrix);
@@ -690,6 +691,7 @@ public class ContextTests
     {
         using var context = Context.Create(["--filter", "security,critical"]);
 
+        Assert.IsNotNull(context.FilterTags);
         Assert.HasCount(2, context.FilterTags);
         Assert.Contains("security", context.FilterTags);
         Assert.Contains("critical", context.FilterTags);
@@ -704,6 +706,7 @@ public class ContextTests
     {
         using var context = Context.Create(["--filter", "security, critical, data-integrity"]);
 
+        Assert.IsNotNull(context.FilterTags);
         Assert.HasCount(3, context.FilterTags);
         Assert.Contains("security", context.FilterTags);
         Assert.Contains("critical", context.FilterTags);
@@ -736,6 +739,7 @@ public class ContextTests
     {
         using var context = Context.Create(["--filter", "security"]);
 
+        Assert.IsNotNull(context.FilterTags);
         Assert.HasCount(1, context.FilterTags);
         Assert.Contains("security", context.FilterTags);
         Assert.AreEqual(0, context.ExitCode);

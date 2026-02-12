@@ -174,8 +174,7 @@ internal static class Program
         if (context.RequirementsReport != null)
         {
             context.WriteLine($"Exporting requirements to {context.RequirementsReport}...");
-            var filterTags = context.FilterTags.Count > 0 ? context.FilterTags : null;
-            requirements.Export(context.RequirementsReport, context.ReportDepth, filterTags);
+            requirements.Export(context.RequirementsReport, context.ReportDepth, context.FilterTags);
             context.WriteLine("Requirements report generated successfully.");
         }
 
@@ -183,8 +182,7 @@ internal static class Program
         if (context.JustificationsFile != null)
         {
             context.WriteLine($"Exporting justifications to {context.JustificationsFile}...");
-            var filterTags = context.FilterTags.Count > 0 ? context.FilterTags : null;
-            requirements.ExportJustifications(context.JustificationsFile, context.JustificationsDepth, filterTags);
+            requirements.ExportJustifications(context.JustificationsFile, context.JustificationsDepth, context.FilterTags);
             context.WriteLine("Justifications report generated successfully.");
         }
 
@@ -200,8 +198,7 @@ internal static class Program
             if (context.Matrix != null)
             {
                 context.WriteLine($"Exporting trace matrix to {context.Matrix}...");
-                var filterTags = context.FilterTags.Count > 0 ? context.FilterTags : null;
-                traceMatrix.Export(context.Matrix, context.MatrixDepth, filterTags);
+                traceMatrix.Export(context.Matrix, context.MatrixDepth, context.FilterTags);
                 context.WriteLine("Trace matrix report generated successfully.");
             }
         }
@@ -226,11 +223,10 @@ internal static class Program
             return;
         }
 
-        var filterTags = context.FilterTags.Count > 0 ? context.FilterTags : null;
-        var (satisfied, total) = traceMatrix.CalculateSatisfiedRequirements(filterTags);
+        var (satisfied, total) = traceMatrix.CalculateSatisfiedRequirements(context.FilterTags);
         if (satisfied < total)
         {
-            var unsatisfied = traceMatrix.GetUnsatisfiedRequirements(filterTags);
+            var unsatisfied = traceMatrix.GetUnsatisfiedRequirements(context.FilterTags);
             context.WriteError($"Error: Only {satisfied} of {total} requirements are satisfied with tests.");
             context.WriteError("Unsatisfied requirements:");
             foreach (var reqId in unsatisfied)
