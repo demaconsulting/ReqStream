@@ -99,7 +99,7 @@ public static class Validation
     private static void RunRequirementsProcessingTest(Context context, DemaConsulting.TestResults.TestResults testResults)
     {
         var startTime = DateTime.UtcNow;
-        var test = CreateTestResult("RequirementsProcessing");
+        var test = CreateTestResult("ReqStream_RequirementsProcessing");
 
         try
         {
@@ -173,7 +173,7 @@ public static class Validation
     private static void RunTraceMatrixTest(Context context, DemaConsulting.TestResults.TestResults testResults)
     {
         var startTime = DateTime.UtcNow;
-        var test = CreateTestResult("TraceMatrix");
+        var test = CreateTestResult("ReqStream_TraceMatrix");
 
         try
         {
@@ -258,7 +258,7 @@ public static class Validation
     private static void RunReportExportTest(Context context, DemaConsulting.TestResults.TestResults testResults)
     {
         var startTime = DateTime.UtcNow;
-        var test = CreateTestResult("ReportExport");
+        var test = CreateTestResult("ReqStream_ReportExport");
 
         try
         {
@@ -328,7 +328,7 @@ public static class Validation
     private static void RunTagsFilteringTest(Context context, DemaConsulting.TestResults.TestResults testResults)
     {
         var startTime = DateTime.UtcNow;
-        var test = CreateTestResult("TagsFiltering");
+        var test = CreateTestResult("ReqStream_TagsFiltering");
 
         try
         {
