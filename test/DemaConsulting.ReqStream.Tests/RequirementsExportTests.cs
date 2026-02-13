@@ -183,7 +183,7 @@ sections:
         File.WriteAllText(reqPath, yamlContent);
         var requirements = Requirements.Read(reqPath);
 
-        var ex = Assert.ThrowsException<ArgumentException>(() => requirements.Export(null!));
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => requirements.Export(null!));
         Assert.Contains("File path cannot be null or empty", ex.Message);
     }
 
@@ -204,7 +204,7 @@ sections:
         File.WriteAllText(reqPath, yamlContent);
         var requirements = Requirements.Read(reqPath);
 
-        var ex = Assert.ThrowsException<ArgumentException>(() => requirements.Export(string.Empty));
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => requirements.Export(string.Empty));
         Assert.Contains("File path cannot be null or empty", ex.Message);
     }
 

@@ -358,7 +358,7 @@ sections:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements);
 
-        var ex = Assert.ThrowsException<ArgumentException>(() => matrix.Export(null!));
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => matrix.Export(null!));
         Assert.Contains("File path cannot be null or empty", ex.Message);
     }
 
@@ -385,7 +385,7 @@ sections:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements);
 
-        var ex = Assert.ThrowsException<ArgumentException>(() => matrix.Export(string.Empty));
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => matrix.Export(string.Empty));
         Assert.Contains("File path cannot be null or empty", ex.Message);
     }
 

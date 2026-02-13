@@ -148,7 +148,7 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_MissingResultsFilename_ThrowsException()
     {
-        var ex = Assert.ThrowsException<ArgumentException>(() => Context.Create(["--results"]));
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--results"]));
         Assert.Contains("--results requires a filename argument", ex.Message);
     }
 
@@ -218,7 +218,7 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_UnsupportedArgument_ThrowsException()
     {
-        var ex = Assert.ThrowsException<ArgumentException>(() => Context.Create(["--unsupported"]));
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--unsupported"]));
         Assert.Contains("Unsupported argument '--unsupported'", ex.Message);
     }
 
@@ -228,7 +228,7 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_MissingLogFilename_ThrowsException()
     {
-        var ex = Assert.ThrowsException<ArgumentException>(() => Context.Create(["--log"]));
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--log"]));
         Assert.Contains("--log requires a filename argument", ex.Message);
     }
 
@@ -238,9 +238,8 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_MissingReportFilename_ThrowsException()
     {
-        var ex = Assert.ThrowsException<ArgumentException>(() => Context.Create(["--report"]));
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--report"]));
         Assert.Contains("--report requires a filename argument", ex.Message);
-        }
     }
 
     /// <summary>
@@ -249,7 +248,7 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_MissingMatrixFilename_ThrowsException()
     {
-        var ex = Assert.ThrowsException<ArgumentException>(() => Context.Create(["--matrix"]));
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--matrix"]));
         Assert.Contains("--matrix requires a filename argument", ex.Message);
     }
 
@@ -259,7 +258,7 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_MissingReportDepth_ThrowsException()
     {
-        var ex = Assert.ThrowsException<ArgumentException>(() => Context.Create(["--report-depth"]));
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--report-depth"]));
         Assert.Contains("--report-depth requires a depth argument", ex.Message);
     }
 
@@ -269,7 +268,7 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_MissingMatrixDepth_ThrowsException()
     {
-        var ex = Assert.ThrowsException<ArgumentException>(() => Context.Create(["--matrix-depth"]));
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--matrix-depth"]));
         Assert.Contains("--matrix-depth requires a depth argument", ex.Message);
     }
 
@@ -279,13 +278,13 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_InvalidReportDepth_ThrowsException()
     {
-        var ex1 = Assert.ThrowsException<ArgumentException>(() => Context.Create(["--report-depth", "invalid"]));
+        var ex1 = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--report-depth", "invalid"]));
         Assert.Contains("--report-depth requires a positive integer", ex1.Message);
 
-        var ex2 = Assert.ThrowsException<ArgumentException>(() => Context.Create(["--report-depth", "0"]));
+        var ex2 = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--report-depth", "0"]));
         Assert.Contains("--report-depth requires a positive integer", ex2.Message);
 
-        var ex3 = Assert.ThrowsException<ArgumentException>(() => Context.Create(["--report-depth", "-1"]));
+        var ex3 = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--report-depth", "-1"]));
         Assert.Contains("--report-depth requires a positive integer", ex3.Message);
     }
 
@@ -295,10 +294,10 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_InvalidMatrixDepth_ThrowsException()
     {
-        var ex1 = Assert.ThrowsException<ArgumentException>(() => Context.Create(["--matrix-depth", "invalid"]));
+        var ex1 = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--matrix-depth", "invalid"]));
         Assert.Contains("--matrix-depth requires a positive integer", ex1.Message);
 
-        var ex2 = Assert.ThrowsException<ArgumentException>(() => Context.Create(["--matrix-depth", "0"]));
+        var ex2 = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--matrix-depth", "0"]));
         Assert.Contains("--matrix-depth requires a positive integer", ex2.Message);
     }
 
@@ -517,7 +516,7 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_MissingRequirementsPattern_ThrowsException()
     {
-        var ex = Assert.ThrowsException<ArgumentException>(() => Context.Create(["--requirements"]));
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--requirements"]));
         Assert.Contains("--requirements requires a pattern argument", ex.Message);
     }
 
@@ -527,7 +526,7 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_MissingTestsPattern_ThrowsException()
     {
-        var ex = Assert.ThrowsException<ArgumentException>(() => Context.Create(["--tests"]));
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--tests"]));
         Assert.Contains("--tests requires a pattern argument", ex.Message);
     }
 
@@ -575,7 +574,7 @@ public class ContextTests
     {
         var invalidPath = Path.Combine(_testDirectory, "nonexistent", "test.log");
 
-        var ex = Assert.ThrowsException<ArgumentException>(() => Context.Create(["--log", invalidPath]));
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--log", invalidPath]));
         Assert.Contains("Failed to open log file", ex.Message);
     }
 
@@ -616,7 +615,7 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_FilterArgumentMissingValue_ThrowsArgumentException()
     {
-        var ex = Assert.ThrowsException<ArgumentException>(() => Context.Create(["--filter"]));
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--filter"]));
         Assert.Contains("--filter requires a comma-separated list of tags", ex.Message);
     }
 
