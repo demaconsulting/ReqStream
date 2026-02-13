@@ -469,8 +469,8 @@ public class ContextTests
             using var context = Context.Create(["--requirements", "*.yaml"]);
 
             Assert.HasCount(2, context.RequirementsFiles);
-            Assert.AreEqual(1, context.RequirementsFiles.Count(f => f.EndsWith("req1.yaml")));
-            Assert.AreEqual(1, context.RequirementsFiles.Count(f => f.EndsWith("req2.yaml")));
+            Assert.ContainsSingle(f => f.EndsWith("req1.yaml"), context.RequirementsFiles);
+            Assert.ContainsSingle(f => f.EndsWith("req2.yaml"), context.RequirementsFiles);
             Assert.AreEqual(0, context.ExitCode);
         }
         finally
@@ -500,8 +500,8 @@ public class ContextTests
             using var context = Context.Create(["--tests", "*.trx"]);
 
             Assert.HasCount(2, context.TestFiles);
-            Assert.AreEqual(1, context.TestFiles.Count(f => f.EndsWith("test1.trx")));
-            Assert.AreEqual(1, context.TestFiles.Count(f => f.EndsWith("test2.trx")));
+            Assert.ContainsSingle(f => f.EndsWith("test1.trx"), context.TestFiles);
+            Assert.ContainsSingle(f => f.EndsWith("test2.trx"), context.TestFiles);
             Assert.AreEqual(0, context.ExitCode);
         }
         finally
