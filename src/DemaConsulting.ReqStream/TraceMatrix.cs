@@ -475,7 +475,7 @@ public class TraceMatrix
     /// <param name="section">The section to check.</param>
     /// <param name="filterTags">The set of filter tags.</param>
     /// <returns>True if the section has filtered content, false otherwise.</returns>
-    private bool SectionHasFilteredContent(Section section, HashSet<string>? filterTags)
+    private static bool SectionHasFilteredContent(Section section, HashSet<string>? filterTags)
     {
         // Check if section has any matching requirements
         if (filterTags == null || filterTags.Count == 0)

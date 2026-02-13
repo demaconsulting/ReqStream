@@ -266,15 +266,8 @@ sections:
     [TestMethod]
     public void TraceMatrix_NullRequirements_ThrowsArgumentNullException()
     {
-        try
-        {
-            _ = new TraceMatrix(null!, Array.Empty<string>());
-            Assert.Fail("Expected ArgumentNullException was not thrown");
-        }
-        catch (ArgumentNullException ex)
-        {
-            Assert.Contains("requirements", ex.Message);
-        }
+        var ex = Assert.ThrowsExactly<ArgumentNullException>(() => _ = new TraceMatrix(null!, Array.Empty<string>()));
+        Assert.Contains("requirements", ex.Message);
     }
 
     /// <summary>
@@ -299,15 +292,8 @@ sections:
 
         var nonExistentPath = Path.Combine(_testDirectory, "nonexistent.trx");
 
-        try
-        {
-            _ = new TraceMatrix(requirements, nonExistentPath);
-            Assert.Fail("Expected FileNotFoundException was not thrown");
-        }
-        catch (FileNotFoundException ex)
-        {
-            Assert.Contains("Test result file not found", ex.Message);
-        }
+        var ex = Assert.ThrowsExactly<FileNotFoundException>(() => _ = new TraceMatrix(requirements, nonExistentPath));
+        Assert.Contains("Test result file not found", ex.Message);
     }
 
     /// <summary>

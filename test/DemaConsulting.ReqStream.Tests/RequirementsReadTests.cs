@@ -326,16 +326,9 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        try
-        {
-            Requirements.Read(filePath);
-            Assert.Fail("Expected InvalidOperationException was not thrown");
-        }
-        catch (InvalidOperationException ex)
-        {
-            Assert.Contains("SYS-SEC-001", ex.Message);
-            Assert.Contains("Duplicate requirement ID", ex.Message);
-        }
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
+        Assert.Contains("SYS-SEC-001", ex.Message);
+        Assert.Contains("Duplicate requirement ID", ex.Message);
     }
 
     /// <summary>
@@ -383,15 +376,8 @@ includes:
     {
         var nonExistentPath = Path.Combine(_testDirectory, "nonexistent.yaml");
 
-        try
-        {
-            Requirements.Read(nonExistentPath);
-            Assert.Fail("Expected FileNotFoundException was not thrown");
-        }
-        catch (FileNotFoundException ex)
-        {
-            Assert.Contains("Requirements file not found", ex.Message);
-        }
+        var ex = Assert.ThrowsExactly<FileNotFoundException>(() => Requirements.Read(nonExistentPath));
+        Assert.Contains("Requirements file not found", ex.Message);
     }
 
     /// <summary>
@@ -496,17 +482,10 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        try
-        {
-            Requirements.Read(filePath);
-            Assert.Fail("Expected InvalidOperationException was not thrown");
-        }
-        catch (InvalidOperationException ex)
-        {
-            Assert.Contains("Requirement ID cannot be blank", ex.Message);
-            Assert.Contains("System Security", ex.Message);
-            Assert.Contains(filePath, ex.Message);
-        }
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
+        Assert.Contains("Requirement ID cannot be blank", ex.Message);
+        Assert.Contains("System Security", ex.Message);
+        Assert.Contains(filePath, ex.Message);
     }
 
     /// <summary>
@@ -525,17 +504,10 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        try
-        {
-            Requirements.Read(filePath);
-            Assert.Fail("Expected InvalidOperationException was not thrown");
-        }
-        catch (InvalidOperationException ex)
-        {
-            Assert.Contains("Requirement title cannot be blank", ex.Message);
-            Assert.Contains("SYS-SEC-001", ex.Message);
-            Assert.Contains(filePath, ex.Message);
-        }
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
+        Assert.Contains("Requirement title cannot be blank", ex.Message);
+        Assert.Contains("SYS-SEC-001", ex.Message);
+        Assert.Contains(filePath, ex.Message);
     }
 
     /// <summary>
@@ -554,16 +526,9 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        try
-        {
-            Requirements.Read(filePath);
-            Assert.Fail("Expected InvalidOperationException was not thrown");
-        }
-        catch (InvalidOperationException ex)
-        {
-            Assert.Contains("Section title cannot be blank", ex.Message);
-            Assert.Contains(filePath, ex.Message);
-        }
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
+        Assert.Contains("Section title cannot be blank", ex.Message);
+        Assert.Contains(filePath, ex.Message);
     }
 
     /// <summary>
@@ -586,17 +551,10 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        try
-        {
-            Requirements.Read(filePath);
-            Assert.Fail("Expected InvalidOperationException was not thrown");
-        }
-        catch (InvalidOperationException ex)
-        {
-            Assert.Contains("Test name cannot be blank", ex.Message);
-            Assert.Contains("SYS-SEC-001", ex.Message);
-            Assert.Contains(filePath, ex.Message);
-        }
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
+        Assert.Contains("Test name cannot be blank", ex.Message);
+        Assert.Contains("SYS-SEC-001", ex.Message);
+        Assert.Contains(filePath, ex.Message);
     }
 
     /// <summary>
@@ -621,17 +579,10 @@ mappings:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        try
-        {
-            Requirements.Read(filePath);
-            Assert.Fail("Expected InvalidOperationException was not thrown");
-        }
-        catch (InvalidOperationException ex)
-        {
-            Assert.Contains("Test name cannot be blank", ex.Message);
-            Assert.Contains("SYS-SEC-001", ex.Message);
-            Assert.Contains(filePath, ex.Message);
-        }
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
+        Assert.Contains("Test name cannot be blank", ex.Message);
+        Assert.Contains("SYS-SEC-001", ex.Message);
+        Assert.Contains(filePath, ex.Message);
     }
 
     /// <summary>
@@ -655,16 +606,9 @@ mappings:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        try
-        {
-            Requirements.Read(filePath);
-            Assert.Fail("Expected InvalidOperationException was not thrown");
-        }
-        catch (InvalidOperationException ex)
-        {
-            Assert.Contains("Mapping requirement ID cannot be blank", ex.Message);
-            Assert.Contains(filePath, ex.Message);
-        }
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
+        Assert.Contains("Mapping requirement ID cannot be blank", ex.Message);
+        Assert.Contains(filePath, ex.Message);
     }
 
     /// <summary>
@@ -685,17 +629,10 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        try
-        {
-            Requirements.Read(filePath);
-            Assert.Fail("Expected InvalidOperationException was not thrown");
-        }
-        catch (InvalidOperationException ex)
-        {
-            Assert.Contains("SYS-SEC-001", ex.Message);
-            Assert.Contains("Duplicate requirement ID", ex.Message);
-            Assert.Contains(filePath, ex.Message);
-        }
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
+        Assert.Contains("SYS-SEC-001", ex.Message);
+        Assert.Contains("Duplicate requirement ID", ex.Message);
+        Assert.Contains(filePath, ex.Message);
     }
 
     /// <summary>
@@ -810,15 +747,8 @@ sections:
     [TestMethod]
     public void Requirements_Read_NoArguments_ThrowsArgumentException()
     {
-        try
-        {
-            Requirements.Read();
-            Assert.Fail("Expected ArgumentException was not thrown");
-        }
-        catch (ArgumentException ex)
-        {
-            Assert.Contains("At least one file path must be provided", ex.Message);
-        }
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Requirements.Read());
+        Assert.Contains("At least one file path must be provided", ex.Message);
     }
 
     /// <summary>
@@ -827,15 +757,8 @@ sections:
     [TestMethod]
     public void Requirements_Read_NullArgument_ThrowsArgumentException()
     {
-        try
-        {
-            Requirements.Read(null!);
-            Assert.Fail("Expected ArgumentException was not thrown");
-        }
-        catch (ArgumentException ex)
-        {
-            Assert.Contains("At least one file path must be provided", ex.Message);
-        }
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Requirements.Read(null!));
+        Assert.Contains("At least one file path must be provided", ex.Message);
     }
 
     /// <summary>
@@ -925,16 +848,9 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        try
-        {
-            Requirements.Read(filePath);
-            Assert.Fail("Expected InvalidOperationException was not thrown");
-        }
-        catch (InvalidOperationException ex)
-        {
-            Assert.Contains("Tag name cannot be blank", ex.Message);
-            Assert.Contains("SYS-SEC-001", ex.Message);
-            Assert.Contains(filePath, ex.Message);
-        }
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
+        Assert.Contains("Tag name cannot be blank", ex.Message);
+        Assert.Contains("SYS-SEC-001", ex.Message);
+        Assert.Contains(filePath, ex.Message);
     }
 }
