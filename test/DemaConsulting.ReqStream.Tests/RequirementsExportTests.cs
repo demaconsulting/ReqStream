@@ -183,15 +183,8 @@ sections:
         File.WriteAllText(reqPath, yamlContent);
         var requirements = Requirements.Read(reqPath);
 
-        try
-        {
-            requirements.Export(null!);
-            Assert.Fail("Expected ArgumentException was not thrown");
-        }
-        catch (ArgumentException ex)
-        {
-            Assert.Contains("File path cannot be null or empty", ex.Message);
-        }
+        var ex = Assert.ThrowsException<ArgumentException>(() => requirements.Export(null!));
+        Assert.Contains("File path cannot be null or empty", ex.Message);
     }
 
     /// <summary>
@@ -211,15 +204,8 @@ sections:
         File.WriteAllText(reqPath, yamlContent);
         var requirements = Requirements.Read(reqPath);
 
-        try
-        {
-            requirements.Export(string.Empty);
-            Assert.Fail("Expected ArgumentException was not thrown");
-        }
-        catch (ArgumentException ex)
-        {
-            Assert.Contains("File path cannot be null or empty", ex.Message);
-        }
+        var ex = Assert.ThrowsException<ArgumentException>(() => requirements.Export(string.Empty));
+        Assert.Contains("File path cannot be null or empty", ex.Message);
     }
 
     /// <summary>
