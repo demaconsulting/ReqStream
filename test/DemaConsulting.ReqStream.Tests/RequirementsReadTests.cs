@@ -786,17 +786,10 @@ sections:
         File.WriteAllText(file1Path, file1Yaml);
         File.WriteAllText(file2Path, file2Yaml);
 
-        try
-        {
-            Requirements.Read(file1Path, file2Path);
-            Assert.Fail("Expected InvalidOperationException was not thrown");
-        }
-        catch (InvalidOperationException ex)
-        {
-            Assert.Contains("SYS-SEC-001", ex.Message);
-            Assert.Contains("Duplicate requirement ID", ex.Message);
-            Assert.Contains(file2Path, ex.Message);
-        }
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(file1Path, file2Path));
+        Assert.Contains("SYS-SEC-001", ex.Message);
+        Assert.Contains("Duplicate requirement ID", ex.Message);
+        Assert.Contains(file2Path, ex.Message);
     }
 
     /// <summary>
