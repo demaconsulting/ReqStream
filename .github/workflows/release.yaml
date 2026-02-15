@@ -56,7 +56,7 @@ jobs:
       - name: Download documentation artifacts
         uses: actions/download-artifact@v7
         with:
-          name: documentation
+          name: documents
           path: artifacts
 
       - name: Move buildnotes.md to root
