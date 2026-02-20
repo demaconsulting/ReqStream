@@ -129,3 +129,4 @@ docs/*.pdf
 
 # Agent-generated reports (should not be committed)
 AGENT_REPORT_*.md
+test-results/
