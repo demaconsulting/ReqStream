@@ -1,46 +1,33 @@
-# ReqStream User Guide
+# Introduction
 
-## Table of Contents
+## Purpose
 
-- [Introduction](#introduction)
-  - [What is ReqStream](#what-is-reqstream)
-  - [Key Features](#key-features)
-  - [Use Cases](#use-cases)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-  - [Global Installation](#global-installation)
-  - [Local Installation](#local-installation)
-  - [Updating](#updating)
-- [Requirements File Format](#requirements-file-format)
-  - [Basic Structure](#basic-structure)
-  - [Sections and Subsections](#sections-and-subsections)
-  - [Requirements](#requirements)
-  - [Test Mappings](#test-mappings)
-  - [Test Source Linking](#test-source-linking)
-  - [Tag Filtering](#tag-filtering)
-  - [File Includes](#file-includes)
-  - [Section Merging](#section-merging)
-  - [Complete Example](#complete-example)
-- [Command-Line Interface](#command-line-interface)
-  - [Basic Usage](#basic-usage)
-  - [Command-Line Options](#command-line-options)
-  - [Examples](#examples)
-- [Exporting](#exporting)
-  - [Requirements Reports](#requirements-reports)
-  - [Trace Matrix](#trace-matrix)
-  - [Justifications Export](#justifications-export)
-  - [Export Options](#export-options)
-- [FAQ](#faq)
+This document serves as the comprehensive user guide for ReqStream, a .NET command-line tool for managing software
+requirements. It provides complete instructions for installing, configuring, and using ReqStream to manage
+requirements in a structured, version-controllable manner.
 
-## Introduction
+## Scope
 
-### What is ReqStream
+This guide covers the following topics:
+
+- Installing and updating ReqStream as a .NET tool
+- Understanding the YAML requirements file format and structure
+- Using the command-line interface to validate and process requirements
+- Mapping requirements to test cases for traceability
+- Exporting requirements reports, trace matrices, and justifications
+- Enforcing requirements coverage and test verification
+- Troubleshooting common issues and frequently asked questions
+
+This guide does not cover the internal implementation of ReqStream or advanced customization beyond the documented
+command-line options and YAML format.
+
+## What is ReqStream
 
 ReqStream is a .NET command-line tool designed to help teams manage software requirements in a structured,
 version-controllable, and maintainable way. By using YAML files to define requirements, ReqStream enables requirements
 to be treated as code, stored in source control, and integrated into CI/CD pipelines.
 
-### Key Features
+## Key Features
 
 - **YAML Format** - Manage requirements in human-readable YAML format that can be easily edited and reviewed
 - **Command-Line Interface** - Automate requirement management with CLI tools that integrate with build systems
@@ -52,7 +39,7 @@ to be treated as code, stored in source control, and integrated into CI/CD pipel
 - **Validation** - Built-in validation ensures requirement structure and references are correct
 - **Export Capabilities** - Generate markdown reports for requirements, justifications, and test trace matrices
 
-### Use Cases
+## Use Cases
 
 ReqStream is ideal for:
 
@@ -62,7 +49,7 @@ ReqStream is ideal for:
 - Organizations requiring compliance documentation
 - Agile teams wanting lightweight, maintainable requirements management
 
-## Prerequisites
+# Prerequisites
 
 To use ReqStream, you need:
 
@@ -79,12 +66,12 @@ dotnet --version
 
 This should display 8.0.x, 9.0.x, or 10.0.x.
 
-## Installation
+# Installation
 
 ReqStream is distributed as a .NET tool and can be installed globally for system-wide use or locally for specific
 projects.
 
-### Global Installation
+## Global Installation
 
 For individual use or when you want ReqStream available system-wide:
 
@@ -98,7 +85,7 @@ Verify the installation:
 reqstream --version
 ```
 
-### Local Installation
+## Local Installation
 
 For team projects where you want to ensure everyone uses the same version:
 
@@ -127,7 +114,7 @@ the exact version:
 dotnet tool restore
 ```
 
-### Updating
+## Updating
 
 To update to the latest version:
 
@@ -139,12 +126,12 @@ dotnet tool update -g DemaConsulting.ReqStream
 dotnet tool update DemaConsulting.ReqStream
 ```
 
-## Requirements File Format
+# Requirements File Format
 
 ReqStream uses YAML files to define requirements. The format is designed to be human-readable while providing
 structure for tooling.
 
-### Basic Structure
+## Basic Structure
 
 A requirements YAML file has a top-level `sections` array:
 
@@ -157,7 +144,7 @@ sections:
         title: My first requirement
 ```
 
-### Sections and Subsections
+## Sections and Subsections
 
 Sections provide hierarchical organization. Sections can contain requirements and/or nested subsections:
 
@@ -183,7 +170,7 @@ sections:
 
 You can nest sections as deeply as needed to organize your requirements logically.
 
-### Requirements
+## Requirements
 
 Each requirement must have:
 
@@ -214,7 +201,7 @@ requirements:
       - AUTH-002
 ```
 
-### Test Mappings
+## Test Mappings
 
 Tests can be mapped to requirements in two ways:
 
@@ -249,7 +236,7 @@ mappings:
 The separate `mappings` section is useful when test mappings are maintained by a different team or in a different
 file from the requirements.
 
-### Test Source Linking
+## Test Source Linking
 
 When testing requirements across multiple platforms or configurations, use test source linking to distinguish tests
 from different sources. This is particularly useful for matrix testing scenarios.
@@ -297,7 +284,7 @@ files.
 - Partial matching: `ubuntu@Test` matches `test-results-ubuntu-22.04-latest.trx`
 - Plain test names: Tests without `filepart@` prefix aggregate results from all test result files
 
-### Tag Filtering
+## Tag Filtering
 
 Requirements can be tagged for categorization and selective filtering. This is useful for organizing requirements by
 themes (e.g., security, performance, compliance) and generating focused reports for specific requirement categories.
@@ -369,7 +356,7 @@ reqstream --requirements "docs/**/*.yaml" \
           --enforce
 ```
 
-### File Includes
+## File Includes
 
 Large projects can be split across multiple YAML files using the `includes` section:
 
@@ -395,7 +382,7 @@ Included files can contain:
 
 File paths are relative to the including file.
 
-### Section Merging
+## Section Merging
 
 When multiple files define sections with the same full hierarchy path, ReqStream automatically merges them. This
 allows included files to add requirements to existing sections.
@@ -428,7 +415,7 @@ sections:
 
 When both files are loaded, the "Security" section will contain both SEC-001 and SEC-002.
 
-### Complete Example
+## Complete Example
 
 Here's a comprehensive example showing all features:
 
@@ -489,9 +476,9 @@ mappings:
       - LogRetention_VeryOldLogs_Deleted
 ```
 
-## Command-Line Interface
+# Command-Line Interface
 
-### Basic Usage
+## Basic Usage
 
 Display help information:
 
@@ -511,7 +498,7 @@ Process requirements files:
 reqstream --requirements "**/*.requirements.yaml"
 ```
 
-### Command-Line Options
+## Command-Line Options
 
 ReqStream supports the following command-line options:
 
@@ -534,9 +521,9 @@ ReqStream supports the following command-line options:
 | `--justifications-depth <depth>` | Starting header depth for justifications (default: 1) |
 | `--enforce` | Fail if requirements are not fully tested |
 
-### Examples
+## Examples
 
-#### Running Self-Validation
+### Running Self-Validation
 
 Run self-validation to verify core functionality:
 
@@ -556,7 +543,7 @@ Run self-validation and save results to a JUnit XML file:
 reqstream --validate --results validation-results.xml
 ```
 
-#### Requirements Processing
+### Requirements Processing
 
 **Process requirements and create a report:**
 
@@ -651,11 +638,11 @@ reqstream --requirements "docs/**/*.yaml" \
           --report security_and_compliance.md
 ```
 
-## Exporting
+# Exporting
 
 ReqStream can export requirements and test trace matrices to markdown format for documentation and review.
 
-### Requirements Reports
+## Requirements Reports
 
 A requirements report exports all requirements in a structured markdown format that follows your section hierarchy.
 
@@ -692,7 +679,7 @@ Tests:
 - Credentials_Missing_Refused
 ```
 
-### Trace Matrix
+## Trace Matrix
 
 A trace matrix shows the mapping between requirements and test cases, helping verify that all requirements have
 adequate test coverage.
@@ -733,7 +720,7 @@ Tests:
 Coverage: 3 tests mapped
 ```
 
-### Justifications Export
+## Justifications Export
 
 A justifications report documents the rationale behind each requirement, helping developers and stakeholders
 understand why requirements exist. This is especially valuable for onboarding new team members and providing
@@ -783,11 +770,12 @@ reqstream --requirements "docs/**/*.yaml" \
           --justifications-depth 2
 ```
 
-### Export Options
+## Export Options
 
 **Control header depth:**
 
-The `--report-depth`, `--matrix-depth`, and `--justifications-depth` options control the starting markdown header level:
+The `--report-depth`, `--matrix-depth`, and `--justifications-depth` options control the starting markdown header
+level:
 
 ```bash
 # Start requirements with ## (level 2) instead of # (level 1)
@@ -829,12 +817,12 @@ reqstream --silent \
           --report requirements.md
 ```
 
-## Requirements Enforcement
+# Requirements Enforcement
 
 ReqStream can enforce that all requirements have adequate test coverage, making it ideal for use in CI/CD pipelines
 as a quality gate to ensure requirements are properly verified.
 
-### Overview
+## Overview
 
 Requirements enforcement validates that:
 
@@ -845,7 +833,7 @@ Requirements enforcement validates that:
 If any requirement doesn't meet these criteria, the tool reports an error and exits with a non-zero status code,
 causing CI/CD builds to fail.
 
-### Usage
+## Usage
 
 Enable enforcement with the `--enforce` flag:
 
@@ -855,7 +843,7 @@ reqstream --requirements "**/*.yaml" \
           --enforce
 ```
 
-### How It Works
+## How It Works
 
 Requirements can be satisfied in two ways:
 
@@ -898,7 +886,7 @@ In this example:
 - `AUTH-002` is satisfied if its test passes
 - `SYS-SEC-001` is satisfied transitively through its children (if both `AUTH-001` and `AUTH-002` are satisfied)
 
-### Enforcement Output
+## Enforcement Output
 
 When enforcement mode is enabled, ReqStream processes normally and generates any requested reports. After all
 processing is complete, it checks requirement satisfaction.
@@ -925,7 +913,7 @@ Exit code: **1** (failure)
 The error message clearly indicates how many requirements are satisfied, making it easy to track progress toward
 full coverage.
 
-### CI/CD Integration
+## CI/CD Integration
 
 Requirements enforcement is designed for CI/CD pipelines. Here are examples for common platforms:
 
@@ -1011,7 +999,7 @@ validate-requirements:
       - trace-matrix.md
 ```
 
-### Best Practices
+## Best Practices
 
 **Start without enforcement:**
 
@@ -1085,9 +1073,9 @@ requirements:
       - Test_Auth_Required
 ```
 
-### Troubleshooting Enforcement
+## Troubleshooting Enforcement
 
-#### Error: Cannot enforce requirements without test results
+### Error: Cannot enforce requirements without test results
 
 This error occurs when `--enforce` is used without the `--tests` option. You must provide test result files to
 validate coverage:
@@ -1100,7 +1088,7 @@ reqstream --requirements "**/*.yaml" --enforce
 reqstream --requirements "**/*.yaml" --tests "**/*.trx" --enforce
 ```
 
-#### All requirements show as unsatisfied
+### All requirements show as unsatisfied
 
 If all or most requirements are showing as unsatisfied, check:
 
@@ -1109,7 +1097,7 @@ If all or most requirements are showing as unsatisfied, check:
 3. Tests are actually being executed (check test result file contents)
 4. Tests are passing (failing tests count as unsatisfied)
 
-#### Some tests don't match
+### Some tests don't match
 
 If specific tests aren't being recognized:
 
@@ -1118,7 +1106,7 @@ If specific tests aren't being recognized:
 3. If using source-specific tests (`filepart@testname`), verify the file part matches the test result filename
 4. Run without `--enforce` first and review the trace matrix to see which tests are found
 
-#### Requirements with no direct tests show as unsatisfied
+### Requirements with no direct tests show as unsatisfied
 
 Ensure parent requirements reference their children via the `children` field:
 
@@ -1135,9 +1123,9 @@ requirements:
       - Test_Child
 ```
 
-## FAQ
+# FAQ
 
-### General Questions
+## General Questions
 
 **Q: What file extensions should I use for requirements files?**
 
@@ -1167,7 +1155,7 @@ A: Install ReqStream as a local tool and add the commands to your build script. 
 A: No, every requirement must have a unique `id` field. The ID is essential for referencing, traceability, and
 generating reports.
 
-### YAML Format Questions
+## YAML Format Questions
 
 **Q: What format should requirement IDs follow?**
 
@@ -1199,7 +1187,7 @@ A: Avoid circular includes (A includes B, B includes A). ReqStream will detect t
 
 A: ReqStream will detect duplicate IDs and report an error during validation.
 
-### Test Mapping Questions
+## Test Mapping Questions
 
 **Q: What test result formats are supported?**
 
@@ -1250,7 +1238,7 @@ results from all test result files.
 A: Yes, you can mix both styles in the same requirement. Plain test names will aggregate results from all test result
 files, while source-specific test names will only match their specified sources.
 
-### Enforcement Questions
+## Enforcement Questions
 
 **Q: What does the --enforce flag do?**
 
@@ -1284,7 +1272,7 @@ detailed information about which requirements are not satisfied, making it easie
 A: Enforcement validates that requirements have passing tests, which requires test result files. If you use `--enforce`
 without `--tests`, the tool will report an error asking you to specify test result files.
 
-### Export Questions
+## Export Questions
 
 **Q: Can I customize the markdown format of reports?**
 
@@ -1306,7 +1294,7 @@ sections appear under the appropriate section headers.
 A: The trace matrix includes requirement IDs, titles, mapped test names, test status (from test results), and
 coverage information.
 
-### Troubleshooting
+## Troubleshooting
 
 **Q: I get an error "No requirements files specified". What's wrong?**
 
