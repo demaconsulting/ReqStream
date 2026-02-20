@@ -99,7 +99,7 @@ This project follows the coding standards defined in `.editorconfig`. Key conven
 - All new features must include tests
 - Tests should follow the AAA (Arrange, Act, Assert) pattern
 - Test method naming: `TestMethod_Scenario_ExpectedBehavior`
-- All tests must pass before submitting a PR
+- All unit tests must pass before submitting a PR
 - Aim for high code coverage (>80%)
 
 ### Commit Messages
@@ -130,6 +130,29 @@ Before submitting a pull request, ensure your code passes all quality checks:
 dotnet restore
 dotnet build --configuration Release
 dotnet test --configuration Release
+```
+
+### Running Tests
+
+#### Unit Tests
+
+```bash
+# Run all unit tests
+dotnet test --configuration Release
+
+# Run specific unit test
+dotnet test --filter "FullyQualifiedName~YourTestName"
+
+# Run with coverage
+dotnet test --collect "XPlat Code Coverage"
+```
+
+#### Self-Validation Tests
+
+```bash
+# Run self-validation tests
+dotnet run --project src/DemaConsulting.ReqStream \
+  --configuration Release --framework net10.0 --no-build -- --validate
 ```
 
 ### Linting
