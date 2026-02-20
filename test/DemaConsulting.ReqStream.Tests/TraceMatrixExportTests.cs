@@ -577,10 +577,10 @@ sections:
         matrix.Export(mdPath, filterTags: filterTags);
 
         var content = File.ReadAllText(mdPath);
-        
+
         // Should show 1 of 1 requirements (only security-tagged requirement)
         Assert.Contains("1 of 1 requirements are satisfied with tests.", content);
-        
+
         // Should contain security requirement but not performance requirement
         Assert.Contains("REQ-001", content);
         Assert.DoesNotContain("REQ-002", content);

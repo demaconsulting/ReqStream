@@ -280,6 +280,26 @@ sections:
               - TraceMatrix_CalculateSatisfiedRequirements_WithFilterTags_CountsOnlyMatchingRequirements
               - TraceMatrix_GetUnsatisfiedRequirements_WithFilterTags_ReturnsOnlyMatchingRequirements
 
+          - id: RPT-006
+            title: The tool shall export requirement justifications to markdown format.
+            justification: |
+              Justification export enables stakeholders to understand the rationale behind
+              requirements, supporting design reviews, audits, and compliance activities.
+            tests:
+              - Requirements_ExportJustifications_WithJustifications_CreatesMarkdownFile
+              - Requirements_ExportJustifications_WithoutJustifications_CreatesHeadersOnly
+              - Requirements_ExportJustifications_NestedSections_CreatesHierarchy
+
+          - id: RPT-007
+            title: >-
+              The tool shall support configurable markdown header depth for justification
+              reports.
+            justification: |
+              Configurable header depth allows justification reports to be embedded in larger
+              documents while maintaining proper document structure.
+            tests:
+              - Requirements_ExportJustifications_WithCustomDepth_UsesCorrectHeaderLevel
+
       - title: Logging
         requirements:
           - id: LOG-001
@@ -302,6 +322,20 @@ sections:
             tests:
               - Program_Run_WithValidateFlag_RunsValidation
               - Context_Create_ValidateFlag_SetsValidateProperty
+
+          - id: VAL-002
+            title: >-
+              The tool shall support enforcement mode to fail when requirements are
+              not fully tested.
+            justification: |
+              Enforcement mode enables CI/CD pipelines to block releases when requirements
+              lack test coverage, ensuring product quality and compliance.
+            tests:
+              - Context_Create_EnforceFlag_SetsEnforceProperty
+              - Program_Run_WithEnforcementAndFullySatisfiedRequirements_Succeeds
+              - Program_Run_WithEnforcementAndUnsatisfiedRequirements_Fails
+              - Program_Run_WithEnforcementAndNoTests_Fails
+              - Program_Run_WithEnforcementAndFailedTests_Fails
 
       - title: Platform Support
         requirements:

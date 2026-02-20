@@ -8,7 +8,7 @@
     "MD041": false
   },
   "ignores": [
-    "node_modules/**",
-    "AGENT_REPORT_*.md"
+    "node_modules",
+    "**/AGENT_REPORT_*.md"
   ]
 }
