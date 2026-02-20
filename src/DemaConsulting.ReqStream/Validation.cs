@@ -363,7 +363,7 @@ public static class Validation
                 if (exitCode == 0 && File.Exists("filtered.md"))
                 {
                     var reportContent = File.ReadAllText("filtered.md");
-                    
+
                     // Verify filtered report contains only tagged requirement
                     if (reportContent.Contains("REQ-001") && !reportContent.Contains("REQ-002"))
                     {

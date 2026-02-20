@@ -46,6 +46,7 @@ public class Requirement
     public string? Justification { get; set; } // Optional rationale for the requirement
     public List<string> Tests { get; }      // Test identifiers linked to this requirement
     public List<string> Children { get; }   // Child requirement IDs for hierarchical requirements
+    public List<string> Tags { get; }       // Tags for categorization and filtering
 }
 ```
 
@@ -56,6 +57,7 @@ public class Requirement
 - `Justification` is optional and explains why the requirement exists
 - `Tests` can be added inline in YAML or through separate mappings
 - `Children` enables hierarchical requirements where high-level requirements are satisfied by child requirements
+- `Tags` are optional labels used for categorization and selective filtering of requirements in reports
 
 ### Section
 
@@ -225,6 +227,7 @@ public sealed class Context : IDisposable
     public int MatrixDepth { get; }
     public string? JustificationsFile { get; }
     public int JustificationsDepth { get; }
+    public HashSet<string>? FilterTags { get; }
     public int ExitCode { get; }
     
     public static Context Create(string[] args);
@@ -237,6 +240,7 @@ public sealed class Context : IDisposable
 
 - Parse command-line arguments
 - Expand glob patterns for file matching
+- Parse `--filter` tags for requirements filtering
 - Manage console and log file output
 - Track error state for exit code determination
 
@@ -415,6 +419,42 @@ requirements:
 - When evaluating satisfaction, tests from all child requirements are included transitively
 - Child requirements can themselves have children (recursive traversal)
 - If a child requirement ID doesn't exist, it is ignored during satisfaction calculation
+
+### 7. Tag Filtering
+
+Requirements can be assigned tags for categorization and selective reporting using the `tags` field:
+
+```yaml
+requirements:
+  - id: "SEC-001"
+    title: "Encrypt data at rest"
+    tags:
+      - security
+      - compliance
+    tests:
+      - "TestEncrypt_Passes"
+
+  - id: "PERF-001"
+    title: "Response time under 100ms"
+    tags:
+      - performance
+    tests:
+      - "TestPerformance_Passes"
+```
+
+When the `--filter` option is specified (e.g., `--filter security,compliance`), only requirements with at least one
+matching tag are included in reports, trace matrices, and enforcement calculations. Requirements without any matching
+tags are excluded from all outputs.
+
+**Key Points**:
+
+- Tags are optional; requirements without tags are only included when no filter is active
+- Filter tags are parsed from a comma-separated string and trimmed of whitespace
+- Tag matching checks if the requirement has **any** of the specified filter tags (OR logic)
+- Tag filtering applies to requirements export, justifications export, trace matrix export, satisfaction calculation,
+  and enforcement
+- The `FilterTags` property on `Context` is `null` when no filter is specified, indicating all requirements should be
+  included
 
 ## Trace Matrix Construction and Analysis
 
@@ -752,9 +792,12 @@ The program follows a priority-based execution flow:
 5. Requirements Processing
    ├─> Read and merge requirements files
    ├─> Export requirements report (if --report specified)
+   ├─> Export justifications report (if --justifications specified)
    ├─> Parse test result files (if --tests specified)
    ├─> Export trace matrix (if --matrix specified)
    └─> Enforce coverage (if --enforce specified)
+
+Note: When --filter is specified, tag filtering is applied to all exports and enforcement.
 ```
 
 ### Error Handling Patterns

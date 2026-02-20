@@ -41,7 +41,7 @@ ReqStream/
 │   └── DemaConsulting.ReqStream.Tests/ # Test project
 ├── .cspell.json                  # Spell checking configuration
 ├── .editorconfig                 # Code style configuration
-├── .markdownlint.json            # Markdown linting rules
+├── .markdownlint-cli2.jsonc      # Markdown linting rules
 ├── .yamllint.yaml                # YAML linting rules
 ├── AGENTS.md                     # This file
 ├── ARCHITECTURE.md               # Architecture documentation
@@ -53,7 +53,7 @@ ReqStream/
 
 - **`.editorconfig`**: Defines code style rules, naming conventions, and formatting standards
 - **`.cspell.json`**: Contains spell-checking configuration and custom dictionary
-- **`.markdownlint.json`**: Markdown linting rules
+- **`.markdownlint-cli2.jsonc`**: Markdown linting rules
 - **`.yamllint.yaml`**: YAML linting rules
 - **`DemaConsulting.ReqStream.slnx`**: Solution file containing all projects (XML format)
 - **`ARCHITECTURE.md`**: Comprehensive guide to the tool's architecture and internal design
@@ -80,6 +80,23 @@ ReqStream/
 
 - **All tests must pass** before merging changes
 - **No warnings allowed** in test builds
+
+## Test Source Filters
+
+Test links in `requirements.yaml` can include a source filter prefix to restrict which test results count as
+evidence. This is critical for platform and framework requirements - **do not remove these filters**.
+
+- `windows@TestName` - proves the test passed on a Windows platform
+- `ubuntu@TestName` - proves the test passed on a Linux (Ubuntu) platform
+- `net8.0@TestName` - proves the test passed under the .NET 8 target framework
+- `net9.0@TestName` - proves the test passed under the .NET 9 target framework
+- `net10.0@TestName` - proves the test passed under the .NET 10 target framework
+- `dotnet8.x@TestName` - proves the self-validation test ran on a machine with .NET 8.x runtime
+- `dotnet9.x@TestName` - proves the self-validation test ran on a machine with .NET 9.x runtime
+- `dotnet10.x@TestName` - proves the self-validation test ran on a machine with .NET 10.x runtime
+
+Without the source filter, a test result from any platform/framework satisfies the requirement. Adding the filter
+ensures the CI evidence comes specifically from the required environment.
 
 ## Code Style and Conventions
 
@@ -128,6 +145,7 @@ ReqStream/
 - **Documentation**:
   - README.md uses absolute URLs (included in NuGet package)
   - Other markdown files use link references: `[text][ref]` with `[ref]: url` at end
+  - **CHANGELOG.md**: Not present - changes are captured in the auto-generated build notes
 - **Linting**:
   - **Markdown**: Must pass markdownlint (max line length: 120 chars)
     - Lists must be surrounded by blank lines (MD032)
@@ -136,6 +154,25 @@ ReqStream/
     - Add project-specific terms to the custom dictionary if needed
   - **YAML**: Must pass yamllint (2-space indentation, max line length: 120 chars)
   - **All linting must pass locally before committing** - CI will reject changes with linting errors
+
+## Markdown Link Style
+
+- **AI agent markdown files** (`.github/agents/*.md`): Use inline links `[text](url)` so URLs are visible in agent
+  context
+- **README.md**: Use absolute URLs (shipped in NuGet package)
+- **All other markdown files**: Use reference-style links `[text][ref]` with `[ref]: url` at document end
+
+## Agent Report Files
+
+When agents need to write report files to communicate with each other or the user, follow these guidelines:
+
+- **Naming Convention**: Use the pattern `AGENT_REPORT_xxxx.md` (e.g., `AGENT_REPORT_analysis.md`,
+  `AGENT_REPORT_results.md`)
+- **Purpose**: These files are for temporary inter-agent communication and should not be committed
+- **Exclusions**: Files matching `AGENT_REPORT_*.md` are automatically:
+  - Excluded from git (via .gitignore)
+  - Excluded from markdown linting
+  - Excluded from spell checking
 
 ## CI/CD Pipelines
 

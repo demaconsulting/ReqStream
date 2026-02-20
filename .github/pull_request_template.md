@@ -27,7 +27,10 @@ Before submitting this pull request, ensure you have completed the following:
 ### Build and Test
 
 - [ ] Code builds successfully: `dotnet build --configuration Release`
-- [ ] All tests pass: `dotnet test --configuration Release`
+- [ ] All unit tests pass: `dotnet test --configuration Release`
+- [ ] Self-validation tests pass:
+  `dotnet run --project src/DemaConsulting.ReqStream --configuration Release --framework net10.0`
+  `--no-build -- --validate`
 - [ ] Code produces zero warnings
 
 ### Code Quality
@@ -42,7 +45,7 @@ Please run the following checks before submitting:
 
 - [ ] **Spell checker passes**: `cspell "**/*.{md,cs}"`
 - [ ] **Markdown linter passes**: `markdownlint "**/*.md"`
-- [ ] **YAML linter passes**: `yamllint '**/*.{yml,yaml}'`
+- [ ] **YAML linter passes**: `yamllint .`
 
 ### Testing
 
