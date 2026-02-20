@@ -37,6 +37,8 @@ sections:
             justification: |
               A CLI interface enables automation in CI/CD pipelines and allows integration with scripts
               and build processes. This is essential for the tool's primary use case.
+            tags:
+              - cli
             tests:
               - Context_Create_NoArguments_ReturnsDefaultContext
               - Context_Create_MultipleArguments_ParsesAllCorrectly
@@ -46,6 +48,8 @@ sections:
             justification: |
               Version information is critical for debugging, support, and ensuring compatibility with
               documentation and scripts.
+            tags:
+              - cli
             tests:
               - Program_Run_WithVersionFlag_PrintsVersion
               - Context_Create_VersionFlag_SetsVersionProperty
@@ -55,6 +59,8 @@ sections:
             justification: |
               Help information improves user experience and reduces the learning curve for new users by
               providing quick access to command-line options.
+            tags:
+              - cli
             tests:
               - Program_Run_WithHelpFlag_PrintsHelp
               - Context_Create_HelpFlags_SetsHelpProperty
@@ -66,6 +72,8 @@ sections:
             justification: |
               YAML provides a human-readable, version-control-friendly format for managing requirements.
               This makes requirements accessible to both technical and non-technical stakeholders.
+            tags:
+              - requirements
             tests:
               - Requirements_Read_SimpleRequirement_ParsesCorrectly
               - Program_Run_WithRequirementsFiles_ProcessesSuccessfully
@@ -76,6 +84,8 @@ sections:
             justification: |
               Glob patterns enable flexible file selection and reduce the need for explicit file listing,
               making the tool easier to use in various project structures.
+            tags:
+              - requirements
             tests:
               - Context_Create_WithRequirementsPattern_ExpandsGlobPattern
 
@@ -84,6 +94,8 @@ sections:
             justification: |
               Early validation prevents runtime errors and ensures requirements data integrity, catching
               issues before they impact downstream processes.
+            tags:
+              - requirements
             tests:
               - Requirements_Read_BlankSectionTitle_ThrowsExceptionWithFileLocation
               - Requirements_Read_BlankRequirementId_ThrowsExceptionWithFileLocation
@@ -96,6 +108,8 @@ sections:
             justification: |
               Hierarchical organization allows requirements to be grouped logically by system components,
               features, or concerns, improving maintainability and navigation.
+            tags:
+              - requirements
             tests:
               - Requirements_Read_NestedSections_ParsesHierarchyCorrectly
               - Requirements_Export_NestedSections_CreatesHierarchy
@@ -105,6 +119,8 @@ sections:
             justification: |
               File includes enable modular requirements management, allowing teams to organize requirements
               across multiple files and reducing merge conflicts in version control.
+            tags:
+              - requirements
             tests:
               - Requirements_Read_WithIncludes_MergesFilesCorrectly
               - Requirements_Read_MultipleFiles_MergesAllFiles
@@ -115,6 +131,8 @@ sections:
             justification: |
               Section merging allows multiple files to contribute to the same logical section, supporting
               distributed authoring and modular organization of requirements.
+            tags:
+              - requirements
             tests:
               - Requirements_Read_IdenticalSections_MergesCorrectly
               - Requirements_Read_MultipleFilesWithSameSections_MergesSections
@@ -126,6 +144,8 @@ sections:
             justification: |
               Unique identifiers enable unambiguous referencing of requirements in documentation, test
               mappings, and traceability reports.
+            tags:
+              - requirements
             tests:
               - Requirements_Read_DuplicateRequirementId_ThrowsException
               - Requirements_Read_BlankRequirementId_ThrowsExceptionWithFileLocation
@@ -136,6 +156,8 @@ sections:
             justification: |
               Titles provide human-readable descriptions of requirements, making them understandable to
               stakeholders without needing to reference external documentation.
+            tags:
+              - requirements
             tests:
               - Requirements_Read_BlankRequirementTitle_ThrowsExceptionWithFileLocation
 
@@ -144,6 +166,8 @@ sections:
             justification: |
               Parent-child relationships enable hierarchical requirement decomposition, allowing high-level
               requirements to be satisfied through lower-level requirements.
+            tags:
+              - requirements
             tests:
               - Requirements_Read_RequirementWithChildren_ParsesChildrenCorrectly
               - TraceMatrix_Export_WithChildRequirements_ConsidersChildTests
@@ -153,6 +177,8 @@ sections:
             justification: |
               Test mappings establish traceability between requirements and tests, enabling verification
               that requirements are adequately tested and satisfied.
+            tags:
+              - requirements
             tests:
               - Requirements_Read_RequirementWithTests_ParsesTestsCorrectly
               - Requirements_Read_BlankTestNameInRequirement_ThrowsExceptionWithFileLocation
@@ -167,6 +193,8 @@ sections:
             justification: |
               Processing test results enables automated verification of requirement satisfaction and
               integration with existing test infrastructure.
+            tags:
+              - testing
             tests:
               - TraceMatrix_WithNoFiles_CreatesEmptyMatrix
               - TraceMatrix_MissingFile_ThrowsFileNotFoundException
@@ -177,6 +205,8 @@ sections:
             justification: |
               TRX is the native test result format for .NET testing frameworks, enabling seamless
               integration with .NET projects.
+            tags:
+              - testing
             tests:
               - TraceMatrix_WithTrxFile_ParsesCorrectly
               - TraceMatrix_WithFailedTests_TracksFailures
@@ -186,6 +216,8 @@ sections:
             justification: |
               JUnit format is widely used across multiple programming ecosystems, enabling cross-platform
               test result integration.
+            tags:
+              - testing
             tests:
               - TraceMatrix_WithJUnitFile_ParsesCorrectly
               - TraceMatrix_WithJUnitFailedTests_TracksFailures
@@ -195,6 +227,8 @@ sections:
             justification: |
               Glob patterns simplify specification of multiple test result files and enable flexible
               file selection across different test runs and platforms.
+            tags:
+              - testing
             tests:
               - Context_Create_WithTestsPattern_ExpandsGlobPattern
               - TraceMatrix_WithMixedFormats_ProcessesBoth
@@ -204,16 +238,22 @@ sections:
             justification: |
               Source-specific matching enables requirements to reference tests from specific test runs
               or platforms, supporting platform-specific requirements validation.
+            tags:
+              - testing
             tests:
               - TraceMatrix_WithSourceSpecificTests_MatchesCorrectly
               - TraceMatrix_WithSourceSpecificTests_DoesNotMatchOtherSources
               - TraceMatrix_WithMultipleSourceSpecifiers_MatchesAllRequirements
 
           - id: TEST-006
-            title: The tool shall perform case-insensitive matching of file parts in source-specific test names.
+            title: >-
+              The tool shall perform case-insensitive matching of file parts in source-specific
+              test names.
             justification: |
               Case-insensitive matching reduces errors and improves usability by allowing flexible
               specification of file part identifiers.
+            tags:
+              - testing
             tests:
               - TraceMatrix_WithSourceSpecificTests_IsCaseInsensitive
 
@@ -222,6 +262,8 @@ sections:
             justification: |
               Partial matching simplifies test specification by allowing short, memorable identifiers
               rather than requiring full filename matches.
+            tags:
+              - testing
             tests:
               - TraceMatrix_WithSourceSpecificTests_MatchesPartialFilename
 
@@ -230,22 +272,32 @@ sections:
             justification: |
               Plain test names enable requirements to aggregate test results across all platforms and
               test runs without specifying each source explicitly.
+            tags:
+              - testing
             tests:
               - TraceMatrix_WithPlainTestNames_MatchesAllSources
 
           - id: TEST-009
-            title: The tool shall support mixing plain and source-specific test names in the same requirement.
+            title: >-
+              The tool shall support mixing plain and source-specific test names in the same
+              requirement.
             justification: |
               Mixing test name types provides flexibility for requirements that need both platform-specific
               and cross-platform test coverage.
+            tags:
+              - testing
             tests:
               - TraceMatrix_WithMixedTestNames_MatchesAppropriately
 
           - id: TEST-010
-            title: The tool shall match tests to multiple requirements with mixed filter references.
+            title: >-
+              The tool shall match tests to multiple requirements with mixed filter
+              references.
             justification: |
               Supporting multiple requirements with mixed references enables efficient test reuse and
               accurate traceability across different requirement types.
+            tags:
+              - testing
             tests:
               - TraceMatrix_WithMixedFilterAndPlainReferences_MatchesBoth
 
@@ -256,6 +308,8 @@ sections:
             justification: |
               Markdown export enables requirements to be included in documentation, wikis, and other
               human-readable formats for stakeholder communication.
+            tags:
+              - reporting
             tests:
               - Program_Run_WithRequirementsExport_GeneratesReport
               - Requirements_Export_SimpleRequirements_CreatesMarkdownFile
@@ -267,6 +321,8 @@ sections:
             justification: |
               Configurable header depth allows requirements reports to be embedded in larger documents
               while maintaining proper document structure.
+            tags:
+              - reporting
             tests:
               - Context_Create_ReportDepth_SetsReportDepthProperty
               - Requirements_Export_WithCustomDepth_UsesCorrectHeaderLevel
@@ -276,6 +332,8 @@ sections:
             justification: |
               Trace matrix export provides visibility into test coverage and requirement satisfaction,
               essential for quality assurance and compliance.
+            tags:
+              - reporting
             tests:
               - Program_Run_WithTraceMatrixExport_GeneratesMatrix
               - TraceMatrix_Export_SimpleTraceMatrix_CreatesMarkdownFile
@@ -288,6 +346,8 @@ sections:
             justification: |
               Configurable header depth allows trace matrices to be embedded in larger documents while
               maintaining proper document structure.
+            tags:
+              - reporting
             tests:
               - Context_Create_MatrixDepth_SetsMatrixDepthProperty
               - Requirements_Export_WithCustomDepth_UsesCorrectHeaderLevel
@@ -297,6 +357,8 @@ sections:
             justification: |
               Tag-based filtering enables selective export of requirement subsets for focused reports,
               security audits, compliance documentation, and targeted reviews.
+            tags:
+              - reporting
             tests:
               - Context_Create_FilterArgument_ParsesTagsCorrectly
               - Context_Create_FilterArgumentWithSpaces_TrimsAndParsesTagsCorrectly
@@ -313,6 +375,8 @@ sections:
             justification: |
               Justification export enables stakeholders to understand the rationale behind
               requirements, supporting design reviews, audits, and compliance activities.
+            tags:
+              - reporting
             tests:
               - Requirements_ExportJustifications_WithJustifications_CreatesMarkdownFile
               - Requirements_ExportJustifications_WithoutJustifications_CreatesHeadersOnly
@@ -325,6 +389,8 @@ sections:
             justification: |
               Configurable header depth allows justification reports to be embedded in larger
               documents while maintaining proper document structure.
+            tags:
+              - reporting
             tests:
               - Requirements_ExportJustifications_WithCustomDepth_UsesCorrectHeaderLevel
 
@@ -335,6 +401,8 @@ sections:
             justification: |
               Log file support enables capturing tool output for debugging, audit trails, and CI/CD
               integration where console output may be ephemeral.
+            tags:
+              - logging
             tests:
               - Context_Create_WithLogFile_WritesToLogFile
               - Context_Create_WithLogFileAndSilent_WritesToLogOnly
@@ -347,6 +415,8 @@ sections:
             justification: |
               Self-validation ensures the tool's own integrity and serves as a smoke test for
               installation and configuration issues.
+            tags:
+              - validation
             tests:
               - Program_Run_WithValidateFlag_RunsValidation
               - Context_Create_ValidateFlag_SetsValidateProperty
@@ -358,6 +428,8 @@ sections:
             justification: |
               Enforcement mode enables CI/CD pipelines to block releases when requirements
               lack test coverage, ensuring product quality and compliance.
+            tags:
+              - validation
             tests:
               - Context_Create_EnforceFlag_SetsEnforceProperty
               - Program_Run_WithEnforcementAndFullySatisfiedRequirements_Succeeds
@@ -375,10 +447,10 @@ sections:
             tags:
               - platform
             tests:
-              - "windows-latest@ReqStream_RequirementsProcessing"
-              - "windows-latest@ReqStream_TraceMatrix"
-              - "windows-latest@ReqStream_ReportExport"
-              - "windows-latest@ReqStream_TagsFiltering"
+              - "windows@ReqStream_RequirementsProcessing"
+              - "windows@ReqStream_TraceMatrix"
+              - "windows@ReqStream_ReportExport"
+              - "windows@ReqStream_TagsFiltering"
 
           - id: PLT-002
             title: The tool shall run on Linux operating systems.
@@ -388,10 +460,10 @@ sections:
             tags:
               - platform
             tests:
-              - "ubuntu-latest@ReqStream_RequirementsProcessing"
-              - "ubuntu-latest@ReqStream_TraceMatrix"
-              - "ubuntu-latest@ReqStream_ReportExport"
-              - "ubuntu-latest@ReqStream_TagsFiltering"
+              - "ubuntu@ReqStream_RequirementsProcessing"
+              - "ubuntu@ReqStream_TraceMatrix"
+              - "ubuntu@ReqStream_ReportExport"
+              - "ubuntu@ReqStream_TagsFiltering"
 
           - id: PLT-004
             title: The tool shall support .NET 8.0 runtime.
