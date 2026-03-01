@@ -134,6 +134,9 @@ public sealed class Context : IDisposable
     /// <exception cref="ArgumentException">Thrown when arguments are invalid.</exception>
     public static Context Create(string[] args)
     {
+        // Validate input
+        ArgumentNullException.ThrowIfNull(args);
+
         // Initialize flag variables
         var version = false;
         var help = false;

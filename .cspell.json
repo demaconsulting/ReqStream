@@ -34,7 +34,8 @@
     "SonarMark",
     "SarifMark",
     "buildnotes",
-    "slnx"
+    "slnx",
+    "Propagatable"
   ],
   "ignorePaths": [
     "node_modules",
