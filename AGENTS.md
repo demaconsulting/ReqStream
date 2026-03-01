@@ -70,6 +70,7 @@ ReqStream/
   - `Assert.HasCount(collection, expectedCount)` instead of `Assert.AreEqual(count, collection.Count)`
   - `Assert.IsEmpty(collection)` instead of `Assert.AreEqual(0, collection.Count)`
   - `Assert.DoesNotContain(item, collection)` for negative checks
+  - `Assert.StartsWith("prefix", value)` instead of `Assert.IsTrue(value.StartsWith("prefix"))`
 - **Console Testing**: Save and restore `Console.Out` in tests that modify console output:
 
   ```csharp
