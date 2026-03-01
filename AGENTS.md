@@ -1,86 +1,33 @@
-# GitHub Copilot Agents
+# Agent Quick Reference
 
-This document provides comprehensive guidance for GitHub Copilot agents working on the ReqStream project.
+Project-specific guidance for agents working on ReqStream - a .NET command-line tool for managing requirements
+written in YAML files.
 
-## Overview
+## Available Specialized Agents
 
-GitHub Copilot agents are AI-powered assistants that help with various development tasks. This document will be
-updated as agents are configured for this repository.
+- **Requirements Agent** - Develops requirements and ensures test coverage linkage
+- **Technical Writer** - Creates accurate documentation following regulatory best practices
+- **Software Developer** - Writes production code and self-validation tests in literate style
+- **Test Developer** - Creates unit and integration tests following AAA pattern
+- **Code Quality Agent** - Enforces linting, static analysis, and security standards
+- **Repo Consistency Agent** - Ensures downstream repositories remain consistent with template patterns
 
-## Project Overview
+## Tech Stack
 
-ReqStream is a .NET command-line tool for managing requirements written in YAML files. It provides functionality to
-create, validate, and manage requirement documents in a structured and maintainable way.
+- C# latest, .NET 8.0/9.0/10.0, dotnet CLI, NuGet
 
-For detailed information about the architecture and internal workings of ReqStream, see [ARCHITECTURE.md][architecture].
-This document provides comprehensive coverage of the data model, requirements processing flow, trace matrix
-construction, and test coverage enforcement mechanisms.
+## Key Files
 
-### Technology Stack
+- **`requirements.yaml`** - All requirements with test linkage (enforced via `dotnet reqstream --enforce`)
+- **`.editorconfig`** - Code style (file-scoped namespaces, 4-space indent, UTF-8+BOM, LF endings)
+- **`.cspell.json`, `.markdownlint-cli2.jsonc`, `.yamllint.yaml`** - Linting configs
 
-- **Language**: C# 12
-- **Framework**: .NET 8.0, 9.0, and 10.0
-- **Testing Framework**: MSTest
-- **Build System**: dotnet CLI
-- **Package Manager**: NuGet
-- **YAML Parser**: YamlDotNet
+## Requirements
 
-## Project Structure
-
-```text
-ReqStream/
-├── .config/                      # Dotnet tools configuration
-│   └── dotnet-tools.json         # Local tool manifest (SPDX Tool)
-├── .github/                      # GitHub Actions workflows
-│   └── workflows/
-│       ├── build.yaml            # Reusable build workflow
-│       └── build_on_push.yaml    # Main CI/CD pipeline
-├── src/                          # Source code
-│   └── DemaConsulting.ReqStream/ # Main application project
-├── test/                         # Test projects
-│   └── DemaConsulting.ReqStream.Tests/ # Test project
-├── .cspell.json                  # Spell checking configuration
-├── .editorconfig                 # Code style configuration
-├── .markdownlint-cli2.jsonc      # Markdown linting rules
-├── .yamllint.yaml                # YAML linting rules
-├── AGENTS.md                     # This file
-├── ARCHITECTURE.md               # Architecture documentation
-├── LICENSE                       # MIT License
-└── README.md                     # Project documentation
-```
-
-### Critical Files
-
-- **`.editorconfig`**: Defines code style rules, naming conventions, and formatting standards
-- **`.cspell.json`**: Contains spell-checking configuration and custom dictionary
-- **`.markdownlint-cli2.jsonc`**: Markdown linting rules
-- **`.yamllint.yaml`**: YAML linting rules
-- **`DemaConsulting.ReqStream.slnx`**: Solution file containing all projects (XML format)
-- **`ARCHITECTURE.md`**: Comprehensive guide to the tool's architecture and internal design
-
-## Testing Guidelines
-
-- **Test Framework**: MSTest v4 (Microsoft.VisualStudio.TestTools.UnitTesting)
-- **Test File Naming**: `[Component]Tests.cs` (e.g., `ContextTests.cs`, `ProgramTests.cs`)
-- **Test Method Naming**: `ClassName_MethodUnderTest_Scenario_ExpectedBehavior` format
-  - Example: `Context_Create_NoArguments_ReturnsDefaultContext` clearly indicates testing the `Context.Create` method
-  - Example: `Context_WriteLine_NormalMode_WritesToConsole` clearly indicates testing the `Context.WriteLine` method
-  - This pattern makes test intent clear for requirements traceability
-- **MSTest v4 APIs**: Use modern assertions:
-  - `Assert.HasCount(collection, expectedCount)` instead of `Assert.AreEqual(count, collection.Count)`
-  - `Assert.IsEmpty(collection)` instead of `Assert.AreEqual(0, collection.Count)`
-  - `Assert.DoesNotContain(item, collection)` for negative checks
-  - `Assert.StartsWith("prefix", value)` instead of `Assert.IsTrue(value.StartsWith("prefix"))`
-- **Console Testing**: Save and restore `Console.Out` in tests that modify console output:
-
-  ```csharp
-  var originalOut = Console.Out;
-  try { /* test code */ }
-  finally { Console.SetOut(originalOut); }
-  ```
-
-- **All tests must pass** before merging changes
-- **No warnings allowed** in test builds
+- All requirements MUST be linked to tests (prefer `ReqStream_*` self-validation tests)
+- Not all tests need to be linked to requirements (tests may exist for corner cases, design testing, failure-testing, etc.)
+- Enforced in CI: `dotnet reqstream --requirements requirements.yaml --tests "test-results/**/*.trx" --enforce`
+- When adding features: add requirement + link to test
 
 ## Test Source Filters
 
@@ -99,151 +46,88 @@ evidence. This is critical for platform and framework requirements - **do not re
 Without the source filter, a test result from any platform/framework satisfies the requirement. Adding the filter
 ensures the CI evidence comes specifically from the required environment.
 
-## Code Style and Conventions
+## Testing
 
-### Naming Conventions
+- **Test Naming**: `ReqStream_MethodUnderTest_Scenario` for self-validation tests
+- **Self-Validation**: All tests run via `--validate` flag and can output TRX/JUnit format
+- **Test Framework**: Uses DemaConsulting.TestResults library for test result generation
 
-- **Interfaces**: Must begin with `I` (e.g., `IRequirementParser`)
-- **Classes, Structs, Enums**: PascalCase
-- **Methods, Properties**: PascalCase
-- **Parameters, Local Variables**: camelCase
+## Code Style
 
-### Code Organization
+- **XML Docs**: On ALL members (public/internal/private) with spaces after `///` in summaries
+- **Errors**: `ArgumentException` for parsing, `InvalidOperationException` for runtime issues
+- **Namespace**: File-scoped namespaces only
+- **Using Statements**: Top of file only (no nested using declarations except for IDisposable)
+- **String Formatting**: Use interpolated strings ($"") for clarity
 
-- **Namespace Declarations**: Use file-scoped namespaces (C# 10+)
-- **Using Directives**: Sort system directives first
-- **Braces**: Required for all control statements
-- **Indentation**: 4 spaces for C#, 2 spaces for YAML/JSON/XML
-- **Encoding**: UTF-8 with BOM, LF line endings with final newline
+## Project Structure
 
-### Documentation and Comments
+- **Context.cs**: Handles command-line argument parsing, logging, and output
+- **Program.cs**: Main entry point with version/help/validation routing
+- **Validation.cs**: Self-validation tests with TRX/JUnit output support
 
-- **Copyright Headers**: All source files must include the MIT license header
-- **XML Documentation**: Use triple-slash comments (`///`) for all public, internal, and private members
-  - **IMPORTANT**: Summary blocks must be indented with spaces after `///`
+## Build and Test
 
-  ```csharp
-  /// <summary>
-  ///     This is the correct indentation format for summary blocks.
-  /// </summary>
-  ```
+```bash
+# Build the project
+dotnet build --configuration Release
 
-- **Error Handling Patterns**:
-  - Argument parsing: Throw `ArgumentException` with descriptive messages
-  - Runtime errors during execution: Use `InvalidOperationException`
-  - Write methods (WriteLine/WriteError) are for output AFTER successful parsing
-- **Code Reusability**: Create properties or methods to avoid code duplication (e.g., Version property)
+# Run unit tests
+dotnet test --configuration Release
 
-### Version and Banner Output
+# Run self-validation
+dotnet run --project src/DemaConsulting.ReqStream \
+  --configuration Release --framework net10.0 --no-build -- --validate
 
-- **Version Query**: When `--version` is specified, print ONLY the version string (no prefix text)
-- **Application Banner**: Print banner after version check but before help/validation/requirements processing
-  - Ensures consistent startup message across all operations except version query
+# Use convenience scripts
+./build.sh    # Linux/macOS
+build.bat     # Windows
+```
 
-## Quality Standards
+## Documentation
 
-- **Static Analysis**: Built-in .NET analyzers enforce code style, naming rules, and nullable reference types
-- **Documentation**:
-  - README.md uses absolute URLs (included in NuGet package)
-  - Other markdown files use link references: `[text][ref]` with `[ref]: url` at end
-  - **CHANGELOG.md**: Not present - changes are captured in the auto-generated build notes
-- **Linting**:
-  - **Markdown**: Must pass markdownlint (max line length: 120 chars)
-    - Lists must be surrounded by blank lines (MD032)
-    - Run locally: Check CI workflow for markdownlint-cli2-action usage
-  - **Spell Check**: Must pass cspell (custom dictionary in `.cspell.json`)
-    - Add project-specific terms to the custom dictionary if needed
-  - **YAML**: Must pass yamllint (2-space indentation, max line length: 120 chars)
-  - **All linting must pass locally before committing** - CI will reject changes with linting errors
+- **User Guide**: `docs/guide/guide.md`
+- **Requirements**: `requirements.yaml` -> auto-generated docs
+- **Build Notes**: Auto-generated via BuildMark
+- **Code Quality**: Auto-generated via CodeQL and SonarMark
+- **Trace Matrix**: Auto-generated via ReqStream
+- **CHANGELOG.md**: Not present - changes are captured in the auto-generated build notes
 
 ## Markdown Link Style
 
-- **AI agent markdown files** (`.github/agents/*.md`): Use inline links `[text](url)` so URLs are visible in agent
-  context
+- **AI agent markdown files** (`.github/agents/*.md`): Use inline links `[text](url)` so URLs are visible in agent context
 - **README.md**: Use absolute URLs (shipped in NuGet package)
 - **All other markdown files**: Use reference-style links `[text][ref]` with `[ref]: url` at document end
+
+## CI/CD
+
+- **Quality Checks**: Markdown lint, spell check, YAML lint
+- **Build**: Multi-platform (Windows/Linux)
+- **CodeQL**: Security scanning
+- **Integration Tests**: .NET 8/9/10 on Windows/Linux
+- **Documentation**: Auto-generated via Pandoc + Weasyprint
+
+## Common Tasks
+
+```bash
+# Format code
+dotnet format
+
+# Run all linters
+./lint.sh     # Linux/macOS
+lint.bat      # Windows
+
+# Pack as NuGet tool
+dotnet pack --configuration Release
+```
 
 ## Agent Report Files
 
 When agents need to write report files to communicate with each other or the user, follow these guidelines:
 
-- **Naming Convention**: Use the pattern `AGENT_REPORT_xxxx.md` (e.g., `AGENT_REPORT_analysis.md`,
-  `AGENT_REPORT_results.md`)
+- **Naming Convention**: Use the pattern `AGENT_REPORT_xxxx.md` (e.g., `AGENT_REPORT_analysis.md`, `AGENT_REPORT_results.md`)
 - **Purpose**: These files are for temporary inter-agent communication and should not be committed
 - **Exclusions**: Files matching `AGENT_REPORT_*.md` are automatically:
   - Excluded from git (via .gitignore)
   - Excluded from markdown linting
   - Excluded from spell checking
-
-## CI/CD Pipelines
-
-The project uses GitHub Actions workflows in `.github/workflows/`:
-
-- **build_on_push.yaml**: Runs quality checks, builds on Windows and Linux
-- **build.yaml**: Reusable workflow for restore, build, test, and package
-
-Build commands:
-
-```bash
-dotnet tool restore    # Restore dotnet tools
-dotnet restore         # Restore dependencies
-dotnet build --no-restore --configuration Release
-dotnet test --no-build --configuration Release --verbosity normal
-dotnet pack --no-build --configuration Release
-```
-
-## Pre-Finalization Quality Checks
-
-Before completing any task, you **MUST** perform these checks in order and ensure they all pass:
-
-1. **Build and Test**: Run `dotnet build --configuration Release && dotnet test --configuration Release` - all tests
-   must pass with zero warnings
-2. **Code Review**: Use `code_review` tool and address all valid concerns
-3. **Security Scanning**: Use `codeql_checker` tool after code review - must report zero vulnerabilities
-4. **Linting**: Run all linters locally and fix any issues before pushing changes:
-   - **Markdown**: Run markdownlint on all changed `.md` files - must pass with zero errors
-   - **Spell Check**: Run cspell on all changed files - must pass with zero errors
-   - **YAML**: Run yamllint on all changed `.yaml` or `.yml` files - must pass with zero errors
-   - These linters run in CI and will fail the build if not passing
-
-## Project-Specific Guidelines
-
-### Key Decisions from Recent Reviews
-
-These patterns emerged from code review feedback and should be followed:
-
-1. **XmlDoc Formatting**: Always indent summary content with spaces after `///`
-2. **Error Handling**: Throw exceptions during parsing; use Write methods only after successful parsing
-3. **Code Reuse**: Extract repeated code into properties or methods
-4. **Version Output**: Print plain version string only (no prefix text)
-5. **Console Testing**: Always save/restore `Console.Out` in try/finally blocks
-6. **Modern Test APIs**: Prefer MSTest v4 assertions (HasCount, IsEmpty, DoesNotContain)
-
-### What NOT to Do
-
-- Don't delete or modify working code unless fixing a security vulnerability
-- Don't remove or modify existing tests unless directly related to your changes
-- Don't commit build artifacts (`bin/`, `obj/`, `node_modules/`)
-- Don't use force push (`git reset`, `git rebase`)
-- Don't create temporary files in the repository (use `/tmp` instead)
-- Don't make changes to `.github/agents/` files (for other agents only)
-
-## Available Agents
-
-The following custom agents are configured for this repository. Each agent file contains detailed guidelines,
-responsibilities, and project-specific conventions.
-
-- **Requirements Agent** (`.github/agents/requirements-agent.md`) - Develops requirements and ensures appropriate test
-  coverage - knows which requirements need unit/integration/self-validation tests
-- **Technical Writer** (`.github/agents/technical-writer.md`) - Ensures documentation is accurate and complete -
-  knowledgeable about regulatory documentation and special document types
-- **Repo Consistency Agent** (`.github/agents/repo-consistency-agent.md`) - Ensures downstream repositories remain
-  consistent with the TemplateDotNetTool template patterns and best practices
-- **Code Quality Agent** (`.github/agents/code-quality-agent.md`) - Ensures code quality through linting and static
-  analysis - responsible for security, maintainability, and correctness
-- **Software Developer** (`.github/agents/software-developer.md`) - Writes production code and self-validation tests -
-  targets design-for-testability and literate programming style
-- **Test Developer** (`.github/agents/test-developer.md`) - Writes unit and integration tests following AAA pattern -
-  clear documentation of what's tested and proved
-
-[architecture]: ARCHITECTURE.md
