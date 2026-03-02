@@ -253,7 +253,7 @@ jobs:
             .config/dotnet-tools.json
 
       - name: Download package
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: packages-${{ matrix.os }}
           path: packages
@@ -341,26 +341,26 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Download all test results
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           path: test-results
           pattern: '*test-results*'
         continue-on-error: true
 
       - name: Download ReqStream package
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: packages-windows-latest
           path: packages
 
       - name: Download CodeQL SARIF
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: codeql-sarif
           path: codeql-results
 
       - name: Download all version captures
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           path: version-captures
           pattern: 'version-capture-*'
