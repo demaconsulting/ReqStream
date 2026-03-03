@@ -436,6 +436,7 @@ sections:
               - Program_Run_WithEnforcementAndUnsatisfiedRequirements_Fails
               - Program_Run_WithEnforcementAndNoTests_Fails
               - Program_Run_WithEnforcementAndFailedTests_Fails
+              - ReqStream_EnforcementMode
 
       - title: Platform Support
         requirements:
@@ -451,6 +452,7 @@ sections:
               - "windows@ReqStream_TraceMatrix"
               - "windows@ReqStream_ReportExport"
               - "windows@ReqStream_TagsFiltering"
+              - "windows@ReqStream_EnforcementMode"
 
           - id: PLT-002
             title: The tool shall run on Linux operating systems.
@@ -464,6 +466,7 @@ sections:
               - "ubuntu@ReqStream_TraceMatrix"
               - "ubuntu@ReqStream_ReportExport"
               - "ubuntu@ReqStream_TagsFiltering"
+              - "ubuntu@ReqStream_EnforcementMode"
 
           - id: PLT-004
             title: The tool shall support .NET 8.0 runtime.
@@ -476,6 +479,7 @@ sections:
               - "dotnet8.x@ReqStream_TraceMatrix"
               - "dotnet8.x@ReqStream_ReportExport"
               - "dotnet8.x@ReqStream_TagsFiltering"
+              - "dotnet8.x@ReqStream_EnforcementMode"
 
           - id: PLT-005
             title: The tool shall support .NET 9.0 runtime.
@@ -489,6 +493,7 @@ sections:
               - "dotnet9.x@ReqStream_TraceMatrix"
               - "dotnet9.x@ReqStream_ReportExport"
               - "dotnet9.x@ReqStream_TagsFiltering"
+              - "dotnet9.x@ReqStream_EnforcementMode"
 
           - id: PLT-006
             title: The tool shall support .NET 10.0 runtime.
@@ -502,3 +507,4 @@ sections:
               - "dotnet10.x@ReqStream_TraceMatrix"
               - "dotnet10.x@ReqStream_ReportExport"
               - "dotnet10.x@ReqStream_TagsFiltering"
+              - "dotnet10.x@ReqStream_EnforcementMode"

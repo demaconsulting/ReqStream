@@ -50,6 +50,7 @@ public static class Validation
         RunTraceMatrixTest(context, testResults);
         RunReportExportTest(context, testResults);
         RunTagsFilteringTest(context, testResults);
+        RunEnforcementModeTest(context, testResults);
 
         // Calculate totals
         var totalTests = testResults.Results.Count;
@@ -391,6 +392,106 @@ public static class Validation
         catch (Exception ex)
         {
             HandleTestException(test, context, "Tags Filtering Test", ex);
+        }
+
+        FinalizeTestResult(test, startTime, testResults);
+    }
+
+    /// <summary>
+    ///     Runs a test for enforcement mode functionality.
+    /// </summary>
+    /// <param name="context">The context for output.</param>
+    /// <param name="testResults">The test results collection.</param>
+    private static void RunEnforcementModeTest(Context context, DemaConsulting.TestResults.TestResults testResults)
+    {
+        var startTime = DateTime.UtcNow;
+        var test = CreateTestResult("ReqStream_EnforcementMode");
+
+        try
+        {
+            using var tempDir = new TemporaryDirectory();
+
+            // Create a requirements file with a requirement linked to a test
+            var reqFile = Path.Combine(tempDir.DirectoryPath, "enforce-requirements.yaml");
+            var reqYaml = @"sections:
+  - title: Enforce Test
+    requirements:
+      - id: ENF-001
+        title: Enforcement requirement
+        tests:
+          - Test_Enforce_Validation
+";
+            File.WriteAllText(reqFile, reqYaml);
+
+            // Create a TRX file with a passing test
+            var trxFile = Path.Combine(tempDir.DirectoryPath, "test-results.trx");
+            var testData = new DemaConsulting.TestResults.TestResults { Name = "EnforceTests" };
+            testData.Results.Add(new DemaConsulting.TestResults.TestResult
+            {
+                Name = "Test_Enforce_Validation",
+                ClassName = "EnforceTests",
+                CodeBase = "Tests.dll",
+                Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
+                Duration = TimeSpan.FromSeconds(1)
+            });
+            File.WriteAllText(trxFile, TrxSerializer.Serialize(testData));
+
+            using (new DirectorySwitch(tempDir.DirectoryPath))
+            {
+                // Verify that --enforce succeeds when all requirements are satisfied
+                int exitCode;
+                using (var testContext = Context.Create(["--silent", "--requirements", "*-requirements.yaml",
+                                                          "--tests", "*.trx", "--enforce"]))
+                {
+                    Program.Run(testContext);
+                    exitCode = testContext.ExitCode;
+                }
+
+                if (exitCode != 0)
+                {
+                    test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
+                    test.ErrorMessage = $"Enforcement with satisfied requirements should succeed, but exited with code {exitCode}";
+                    context.WriteError($"✗ Enforcement Mode Test - FAILED: {test.ErrorMessage}");
+                }
+                else
+                {
+                    // Create an unsatisfied requirements file for the second check
+                    var unsatisfiedReqFile = Path.Combine(tempDir.DirectoryPath, "unsatisfied-requirements.yaml");
+                    var unsatisfiedYaml = @"sections:
+  - title: Unsatisfied Test
+    requirements:
+      - id: UNS-001
+        title: Unsatisfied requirement
+        tests:
+          - Test_NonExistent
+";
+                    File.WriteAllText(unsatisfiedReqFile, unsatisfiedYaml);
+
+                    // Verify that --enforce fails when requirements are not satisfied
+                    using (var testContext = Context.Create(["--silent", "--requirements", "unsatisfied-requirements.yaml",
+                                                              "--tests", "*.trx", "--enforce"]))
+                    {
+                        Program.Run(testContext);
+                        exitCode = testContext.ExitCode;
+                    }
+
+                    if (exitCode == 0)
+                    {
+                        test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
+                        test.ErrorMessage = "Enforcement with unsatisfied requirements should fail, but succeeded";
+                        context.WriteError($"✗ Enforcement Mode Test - FAILED: {test.ErrorMessage}");
+                    }
+                    else
+                    {
+                        test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
+                        context.WriteLine("✓ Enforcement Mode Test - PASSED");
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            HandleTestException(test, context, "Enforcement Mode Test", ex);
         }
 
         FinalizeTestResult(test, startTime, testResults);
