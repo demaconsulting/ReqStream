@@ -495,16 +495,20 @@ sections:
         {
             Directory.SetCurrentDirectory(_testDirectory);
 
-            using var context = Context.Create([
+            int exitCode;
+            using (var context = Context.Create([
                 "--requirements", "*.yaml",
                 "--tests", "*.trx",
                 "--enforce",
                 "--silent",
                 "--log", logFile
-            ]);
-            Program.Run(context);
+            ]))
+            {
+                Program.Run(context);
+                exitCode = context.ExitCode;
+            }
 
-            Assert.AreEqual(1, context.ExitCode);
+            Assert.AreEqual(1, exitCode);
 
             // Verify error message includes the unsatisfied requirement via log file
             var logContent = File.ReadAllText(logFile);
