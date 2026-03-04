@@ -126,11 +126,11 @@ public class ProgramTests
         var logContent = File.ReadAllText(logFile);
         Assert.Contains("DEMA Consulting ReqStream", logContent);
         Assert.Contains("ReqStream Version", logContent);
-        Assert.Contains("Requirements Processing Test - PASSED", logContent);
-        Assert.Contains("Trace Matrix Test - PASSED", logContent);
-        Assert.Contains("Report Export Test - PASSED", logContent);
-        Assert.Contains("Tags Filtering Test - PASSED", logContent);
-        Assert.Contains("Enforcement Mode Test - PASSED", logContent);
+        Assert.Contains("ReqStream_RequirementsProcessing - Passed", logContent);
+        Assert.Contains("ReqStream_TraceMatrix - Passed", logContent);
+        Assert.Contains("ReqStream_ReportExport - Passed", logContent);
+        Assert.Contains("ReqStream_TagsFiltering - Passed", logContent);
+        Assert.Contains("ReqStream_EnforcementMode - Passed", logContent);
         Assert.Contains("Total Tests: 5", logContent);
         Assert.Contains("Passed: 5", logContent);
         Assert.Contains("Failed: 0", logContent);

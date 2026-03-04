@@ -523,7 +523,7 @@ ReqStream supports the following command-line options:
 
 ## Examples
 
-### Running Self-Validation
+### Running Validation
 
 Run self-validation to verify core functionality:
 
@@ -542,6 +542,45 @@ Run self-validation and save results to a JUnit XML file:
 ```bash
 reqstream --validate --results validation-results.xml
 ```
+
+### Validation Report
+
+The validation report contains the tool version, machine name, operating system version, .NET runtime version,
+timestamp, and test results.
+
+Example validation report:
+
+```text
+# DEMA Consulting ReqStream
+
+| Information         | Value                                              |
+| :------------------ | :------------------------------------------------- |
+| ReqStream Version   | 1.0.0                                              |
+| Machine Name        | BUILD-SERVER                                       |
+| OS Version          | Ubuntu 22.04.3 LTS                                 |
+| DotNet Runtime      | .NET 10.0.0                                        |
+| Time Stamp          | 2024-01-15 10:30:00 UTC                            |
+
+✓ ReqStream_RequirementsProcessing - Passed
+✓ ReqStream_TraceMatrix - Passed
+✓ ReqStream_ReportExport - Passed
+✓ ReqStream_TagsFiltering - Passed
+✓ ReqStream_EnforcementMode - Passed
+
+Total Tests: 5
+Passed: 5
+Failed: 0
+```
+
+### Validation Tests
+
+Each test proves specific functionality works correctly:
+
+- **`ReqStream_RequirementsProcessing`** - requirements YAML files are correctly loaded and processed.
+- **`ReqStream_TraceMatrix`** - trace matrix is correctly generated from requirements and test results.
+- **`ReqStream_ReportExport`** - requirements report is correctly exported to a markdown file.
+- **`ReqStream_TagsFiltering`** - requirements are correctly filtered by tags.
+- **`ReqStream_EnforcementMode`** - enforcement mode correctly validates requirement test coverage.
 
 ### Requirements Processing
 

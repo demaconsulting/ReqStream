@@ -107,6 +107,44 @@ Options:
   --enforce                        Fail if requirements are not fully tested
 ```
 
+## Self Validation
+
+Running self-validation produces a report containing the following information:
+
+```text
+# DEMA Consulting ReqStream
+
+| Information         | Value                                              |
+| :------------------ | :------------------------------------------------- |
+| ReqStream Version   | <version>                                          |
+| Machine Name        | <machine-name>                                     |
+| OS Version          | <os-version>                                       |
+| DotNet Runtime      | <dotnet-runtime-version>                           |
+| Time Stamp          | <timestamp> UTC                                    |
+
+✓ ReqStream_RequirementsProcessing - Passed
+✓ ReqStream_TraceMatrix - Passed
+✓ ReqStream_ReportExport - Passed
+✓ ReqStream_TagsFiltering - Passed
+✓ ReqStream_EnforcementMode - Passed
+
+Total Tests: 5
+Passed: 5
+Failed: 0
+```
+
+Each test in the report proves:
+
+- **`ReqStream_RequirementsProcessing`** - requirements YAML files are correctly loaded and processed.
+- **`ReqStream_TraceMatrix`** - trace matrix is correctly generated from requirements and test results.
+- **`ReqStream_ReportExport`** - requirements report is correctly exported to a markdown file.
+- **`ReqStream_TagsFiltering`** - requirements are correctly filtered by tags.
+- **`ReqStream_EnforcementMode`** - enforcement mode correctly validates requirement test coverage.
+
+See the [User Guide][link-guide] for more details on the self-validation tests.
+
+On validation failure the tool will exit with a non-zero exit code.
+
 ## YAML Format
 
 ReqStream uses YAML files to define and manage requirements. The YAML format supports a hierarchical structure
@@ -528,3 +566,4 @@ For information about reporting security vulnerabilities, please see our [Securi
 [mstest]: https://github.com/microsoft/testfx
 [github-actions]: https://github.com/features/actions
 [sonarcloud]: https://sonarcloud.io
+[link-guide]: https://github.com/demaconsulting/ReqStream/blob/main/docs/guide/guide.md

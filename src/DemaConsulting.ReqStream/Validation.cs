@@ -144,26 +144,26 @@ public static class Validation
                         logContent.Contains("Requirements loaded successfully"))
                     {
                         test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
-                        context.WriteLine("✓ Requirements Processing Test - PASSED");
+                        context.WriteLine("✓ ReqStream_RequirementsProcessing - Passed");
                     }
                     else
                     {
                         test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
                         test.ErrorMessage = "Expected output not found in log";
-                        context.WriteError("✗ Requirements Processing Test - FAILED: Expected output not found");
+                        context.WriteError("✗ ReqStream_RequirementsProcessing - Failed: Expected output not found");
                     }
                 }
                 else
                 {
                     test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
                     test.ErrorMessage = $"Program exited with code {exitCode}";
-                    context.WriteError($"✗ Requirements Processing Test - FAILED: Exit code {exitCode}");
+                    context.WriteError($"✗ ReqStream_RequirementsProcessing - Failed: Exit code {exitCode}");
                 }
             }
         }
         catch (Exception ex)
         {
-            HandleTestException(test, context, "Requirements Processing Test", ex);
+            HandleTestException(test, context, "ReqStream_RequirementsProcessing", ex);
         }
 
         FinalizeTestResult(test, startTime, testResults);
@@ -227,13 +227,13 @@ public static class Validation
                     if (matrixContent.Contains("MTX-001") && matrixContent.Contains("Test_Matrix_Validation"))
                     {
                         test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
-                        context.WriteLine("✓ Trace Matrix Test - PASSED");
+                        context.WriteLine("✓ ReqStream_TraceMatrix - Passed");
                     }
                     else
                     {
                         test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
                         test.ErrorMessage = "Matrix file missing expected content";
-                        context.WriteError("✗ Trace Matrix Test - FAILED: Matrix file missing expected content");
+                        context.WriteError("✗ ReqStream_TraceMatrix - Failed: Matrix file missing expected content");
                     }
                 }
                 else
@@ -242,13 +242,13 @@ public static class Validation
                     test.ErrorMessage = exitCode != 0
                         ? $"Program exited with code {exitCode}"
                         : "Matrix file not created";
-                    context.WriteError($"✗ Trace Matrix Test - FAILED: {test.ErrorMessage}");
+                    context.WriteError($"✗ ReqStream_TraceMatrix - Failed: {test.ErrorMessage}");
                 }
             }
         }
         catch (Exception ex)
         {
-            HandleTestException(test, context, "Trace Matrix Test", ex);
+            HandleTestException(test, context, "ReqStream_TraceMatrix", ex);
         }
 
         FinalizeTestResult(test, startTime, testResults);
@@ -297,13 +297,13 @@ public static class Validation
                     if (reportContent.Contains("EXP-001") && reportContent.Contains("Export requirement"))
                     {
                         test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
-                        context.WriteLine("✓ Report Export Test - PASSED");
+                        context.WriteLine("✓ ReqStream_ReportExport - Passed");
                     }
                     else
                     {
                         test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
                         test.ErrorMessage = "Report file missing expected content";
-                        context.WriteError("✗ Report Export Test - FAILED: Report file missing expected content");
+                        context.WriteError("✗ ReqStream_ReportExport - Failed: Report file missing expected content");
                     }
                 }
                 else
@@ -312,13 +312,13 @@ public static class Validation
                     test.ErrorMessage = exitCode != 0
                         ? $"Program exited with code {exitCode}"
                         : "Report file not created";
-                    context.WriteError($"✗ Report Export Test - FAILED: {test.ErrorMessage}");
+                    context.WriteError($"✗ ReqStream_ReportExport - Failed: {test.ErrorMessage}");
                 }
             }
         }
         catch (Exception ex)
         {
-            HandleTestException(test, context, "Report Export Test", ex);
+            HandleTestException(test, context, "ReqStream_ReportExport", ex);
         }
 
         FinalizeTestResult(test, startTime, testResults);
@@ -372,26 +372,26 @@ public static class Validation
                     if (reportContent.Contains("REQ-001") && !reportContent.Contains("REQ-002"))
                     {
                         test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
-                        context.WriteLine("✓ Tags Filtering Test - PASSED");
+                        context.WriteLine("✓ ReqStream_TagsFiltering - Passed");
                     }
                     else
                     {
                         test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
                         test.ErrorMessage = "Filtered report did not contain expected requirements";
-                        context.WriteError("✗ Tags Filtering Test - FAILED: Filtering not working correctly");
+                        context.WriteError("✗ ReqStream_TagsFiltering - Failed: Filtering not working correctly");
                     }
                 }
                 else
                 {
                     test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
                     test.ErrorMessage = $"Program exited with code {exitCode} or report file not created";
-                    context.WriteError($"✗ Tags Filtering Test - FAILED: {test.ErrorMessage}");
+                    context.WriteError($"✗ ReqStream_TagsFiltering - Failed: {test.ErrorMessage}");
                 }
             }
         }
         catch (Exception ex)
         {
-            HandleTestException(test, context, "Tags Filtering Test", ex);
+            HandleTestException(test, context, "ReqStream_TagsFiltering", ex);
         }
 
         FinalizeTestResult(test, startTime, testResults);
@@ -451,7 +451,7 @@ public static class Validation
                 {
                     test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
                     test.ErrorMessage = $"Enforcement with satisfied requirements should succeed, but exited with code {exitCode}";
-                    context.WriteError($"✗ Enforcement Mode Test - FAILED: {test.ErrorMessage}");
+                    context.WriteError($"✗ ReqStream_EnforcementMode - Failed: {test.ErrorMessage}");
                 }
                 else
                 {
@@ -479,19 +479,19 @@ public static class Validation
                     {
                         test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
                         test.ErrorMessage = "Enforcement with unsatisfied requirements should fail, but succeeded";
-                        context.WriteError($"✗ Enforcement Mode Test - FAILED: {test.ErrorMessage}");
+                        context.WriteError($"✗ ReqStream_EnforcementMode - Failed: {test.ErrorMessage}");
                     }
                     else
                     {
                         test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
-                        context.WriteLine("✓ Enforcement Mode Test - PASSED");
+                        context.WriteLine("✓ ReqStream_EnforcementMode - Passed");
                     }
                 }
             }
         }
         catch (Exception ex)
         {
-            HandleTestException(test, context, "Enforcement Mode Test", ex);
+            HandleTestException(test, context, "ReqStream_EnforcementMode", ex);
         }
 
         FinalizeTestResult(test, startTime, testResults);
@@ -583,7 +583,7 @@ public static class Validation
     {
         test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
         test.ErrorMessage = $"Exception: {ex.Message}";
-        context.WriteError($"✗ {testName} - FAILED: {ex.Message}");
+        context.WriteError($"✗ {testName} - Failed: {ex.Message}");
     }
 
     /// <summary>
