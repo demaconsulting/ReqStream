@@ -516,6 +516,8 @@ in this project you agree to abide by its terms.
 
 This project is licensed under the MIT License - see the [LICENSE][license] file for details.
 
+By contributing to this project, you agree that your contributions will be licensed under the MIT License.
+
 ## Support
 
 - 🐛 **[Report a Bug][bug-report]** - Found an issue? Let us know

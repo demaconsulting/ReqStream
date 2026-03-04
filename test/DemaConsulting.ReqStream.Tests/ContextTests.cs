@@ -353,9 +353,9 @@ public class ContextTests
     [TestMethod]
     public void Context_WriteError_NormalMode_WritesToConsole()
     {
-        var originalOut = Console.Out;
+        var originalError = Console.Error;
         using var output = new StringWriter();
-        Console.SetOut(output);
+        Console.SetError(output);
 
         try
         {
@@ -367,7 +367,7 @@ public class ContextTests
         }
         finally
         {
-            Console.SetOut(originalOut);
+            Console.SetError(originalError);
         }
     }
 
@@ -377,9 +377,9 @@ public class ContextTests
     [TestMethod]
     public void Context_WriteError_SilentMode_DoesNotWriteToConsole()
     {
-        var originalOut = Console.Out;
+        var originalError = Console.Error;
         using var output = new StringWriter();
-        Console.SetOut(output);
+        Console.SetError(output);
 
         try
         {
@@ -391,7 +391,7 @@ public class ContextTests
         }
         finally
         {
-            Console.SetOut(originalOut);
+            Console.SetError(originalError);
         }
     }
 

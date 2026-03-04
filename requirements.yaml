@@ -32,7 +32,7 @@ sections:
     sections:
       - title: Command-Line Interface
         requirements:
-          - id: CLI-001
+          - id: ReqStream-Cmd-Cli
             title: The tool shall provide a command-line interface.
             justification: |
               A CLI interface enables automation in CI/CD pipelines and allows integration with scripts
@@ -43,7 +43,7 @@ sections:
               - Context_Create_NoArguments_ReturnsDefaultContext
               - Context_Create_MultipleArguments_ParsesAllCorrectly
 
-          - id: CLI-002
+          - id: ReqStream-Cmd-Version
             title: The tool shall display version information when requested.
             justification: |
               Version information is critical for debugging, support, and ensuring compatibility with
@@ -54,7 +54,7 @@ sections:
               - Program_Run_WithVersionFlag_PrintsVersion
               - Context_Create_VersionFlag_SetsVersionProperty
 
-          - id: CLI-003
+          - id: ReqStream-Cmd-Help
             title: The tool shall display help information when requested.
             justification: |
               Help information improves user experience and reduces the learning curve for new users by
@@ -65,9 +65,41 @@ sections:
               - Program_Run_WithHelpFlag_PrintsHelp
               - Context_Create_HelpFlags_SetsHelpProperty
 
+          - id: ReqStream-Cmd-ErrorOutput
+            title: The tool shall write error messages to stderr.
+            justification: |
+              Error messages must be written to stderr so they remain visible to the user
+              without polluting stdout, which consumers may pipe or redirect for data capture.
+            tags:
+              - cli
+            tests:
+              - Context_WriteError_NormalMode_WritesToConsole
+
+          - id: ReqStream-Cmd-InvalidArgs
+            title: The tool shall reject unknown or malformed command-line arguments with a descriptive error.
+            justification: |
+              Providing clear feedback for invalid arguments helps users quickly correct
+              mistakes and prevents silent misconfiguration.
+            tags:
+              - cli
+            tests:
+              - Context_Create_UnsupportedArgument_ThrowsException
+              - Context_Create_MissingLogFilename_ThrowsException
+              - Context_Create_MissingResultsFilename_ThrowsException
+
+          - id: ReqStream-Cmd-ExitCode
+            title: The tool shall return a non-zero exit code on failure.
+            justification: |
+              Callers (scripts, CI/CD pipelines) must be able to detect failure conditions
+              programmatically via the process exit code.
+            tags:
+              - cli
+            tests:
+              - Context_WriteError_NormalMode_WritesToConsole
+
       - title: Requirements File Processing
         requirements:
-          - id: REQ-001
+          - id: ReqStream-Req-YamlProcessing
             title: The tool shall process YAML requirements files.
             justification: |
               YAML provides a human-readable, version-control-friendly format for managing requirements.
@@ -79,7 +111,7 @@ sections:
               - Program_Run_WithRequirementsFiles_ProcessesSuccessfully
               - Requirements_Read_ComplexStructure_ParsesCorrectly
 
-          - id: REQ-002
+          - id: ReqStream-Req-GlobPatterns
             title: The tool shall support glob patterns for requirements files.
             justification: |
               Glob patterns enable flexible file selection and reduce the need for explicit file listing,
@@ -89,7 +121,7 @@ sections:
             tests:
               - Context_Create_WithRequirementsPattern_ExpandsGlobPattern
 
-          - id: REQ-003
+          - id: ReqStream-Req-Validation
             title: The tool shall validate requirements file structure.
             justification: |
               Early validation prevents runtime errors and ensures requirements data integrity, catching
@@ -103,7 +135,7 @@ sections:
               - Requirements_Read_DuplicateRequirementId_ThrowsException
               - Requirements_Read_DuplicateRequirementId_ExceptionIncludesFileLocation
 
-          - id: REQ-004
+          - id: ReqStream-Req-Hierarchy
             title: The tool shall support hierarchical sections and subsections.
             justification: |
               Hierarchical organization allows requirements to be grouped logically by system components,
@@ -114,7 +146,7 @@ sections:
               - Requirements_Read_NestedSections_ParsesHierarchyCorrectly
               - Requirements_Export_NestedSections_CreatesHierarchy
 
-          - id: REQ-005
+          - id: ReqStream-Req-Includes
             title: The tool shall support file includes in requirements files.
             justification: |
               File includes enable modular requirements management, allowing teams to organize requirements
@@ -126,7 +158,7 @@ sections:
               - Requirements_Read_MultipleFiles_MergesAllFiles
               - Requirements_Read_IncludeLoop_DoesNotCauseInfiniteLoop
 
-          - id: REQ-006
+          - id: ReqStream-Req-SectionMerging
             title: The tool shall merge sections with the same hierarchy path.
             justification: |
               Section merging allows multiple files to contribute to the same logical section, supporting
@@ -139,7 +171,7 @@ sections:
 
       - title: Requirements Definition
         requirements:
-          - id: REQ-007
+          - id: ReqStream-Req-UniqueIds
             title: The tool shall require each requirement to have a unique identifier.
             justification: |
               Unique identifiers enable unambiguous referencing of requirements in documentation, test
@@ -151,7 +183,7 @@ sections:
               - Requirements_Read_BlankRequirementId_ThrowsExceptionWithFileLocation
               - Requirements_Read_MultipleFilesWithDuplicateIds_ThrowsException
 
-          - id: REQ-008
+          - id: ReqStream-Req-RequiredTitle
             title: The tool shall require each requirement to have a title.
             justification: |
               Titles provide human-readable descriptions of requirements, making them understandable to
@@ -161,7 +193,7 @@ sections:
             tests:
               - Requirements_Read_BlankRequirementTitle_ThrowsExceptionWithFileLocation
 
-          - id: REQ-009
+          - id: ReqStream-Req-ParentChild
             title: The tool shall support parent-child relationships between requirements.
             justification: |
               Parent-child relationships enable hierarchical requirement decomposition, allowing high-level
@@ -172,7 +204,7 @@ sections:
               - Requirements_Read_RequirementWithChildren_ParsesChildrenCorrectly
               - TraceMatrix_Export_WithChildRequirements_ConsidersChildTests
 
-          - id: REQ-010
+          - id: ReqStream-Req-TestMappings
             title: The tool shall support test mappings for requirements.
             justification: |
               Test mappings establish traceability between requirements and tests, enabling verification
@@ -188,7 +220,7 @@ sections:
 
       - title: Test Integration
         requirements:
-          - id: TEST-001
+          - id: ReqStream-Test-ResultFiles
             title: The tool shall support processing test result files.
             justification: |
               Processing test results enables automated verification of requirement satisfaction and
@@ -200,7 +232,7 @@ sections:
               - TraceMatrix_MissingFile_ThrowsFileNotFoundException
               - TraceMatrix_WithMultipleFiles_AggregatesResults
 
-          - id: TEST-002
+          - id: ReqStream-Test-TrxFormat
             title: The tool shall support TRX format test results.
             justification: |
               TRX is the native test result format for .NET testing frameworks, enabling seamless
@@ -211,7 +243,7 @@ sections:
               - TraceMatrix_WithTrxFile_ParsesCorrectly
               - TraceMatrix_WithFailedTests_TracksFailures
 
-          - id: TEST-003
+          - id: ReqStream-Test-JUnitFormat
             title: The tool shall support JUnit format test results.
             justification: |
               JUnit format is widely used across multiple programming ecosystems, enabling cross-platform
@@ -222,7 +254,7 @@ sections:
               - TraceMatrix_WithJUnitFile_ParsesCorrectly
               - TraceMatrix_WithJUnitFailedTests_TracksFailures
 
-          - id: TEST-004
+          - id: ReqStream-Test-GlobPatterns
             title: The tool shall support glob patterns for test result files.
             justification: |
               Glob patterns simplify specification of multiple test result files and enable flexible
@@ -233,7 +265,7 @@ sections:
               - Context_Create_WithTestsPattern_ExpandsGlobPattern
               - TraceMatrix_WithMixedFormats_ProcessesBoth
 
-          - id: TEST-005
+          - id: ReqStream-Test-SourceFiltering
             title: The tool shall support source-specific test matching using filepart@testname pattern.
             justification: |
               Source-specific matching enables requirements to reference tests from specific test runs
@@ -245,7 +277,7 @@ sections:
               - TraceMatrix_WithSourceSpecificTests_DoesNotMatchOtherSources
               - TraceMatrix_WithMultipleSourceSpecifiers_MatchesAllRequirements
 
-          - id: TEST-006
+          - id: ReqStream-Test-CaseInsensitive
             title: >-
               The tool shall perform case-insensitive matching of file parts in source-specific
               test names.
@@ -257,7 +289,7 @@ sections:
             tests:
               - TraceMatrix_WithSourceSpecificTests_IsCaseInsensitive
 
-          - id: TEST-007
+          - id: ReqStream-Test-PartialFilenames
             title: The tool shall support partial filename matching for source-specific tests.
             justification: |
               Partial matching simplifies test specification by allowing short, memorable identifiers
@@ -267,7 +299,7 @@ sections:
             tests:
               - TraceMatrix_WithSourceSpecificTests_MatchesPartialFilename
 
-          - id: TEST-008
+          - id: ReqStream-Test-PlainTestNames
             title: The tool shall support plain test names that aggregate from all sources.
             justification: |
               Plain test names enable requirements to aggregate test results across all platforms and
@@ -277,7 +309,7 @@ sections:
             tests:
               - TraceMatrix_WithPlainTestNames_MatchesAllSources
 
-          - id: TEST-009
+          - id: ReqStream-Test-MixedTestNames
             title: >-
               The tool shall support mixing plain and source-specific test names in the same
               requirement.
@@ -289,7 +321,7 @@ sections:
             tests:
               - TraceMatrix_WithMixedTestNames_MatchesAppropriately
 
-          - id: TEST-010
+          - id: ReqStream-Test-MultipleRequirements
             title: >-
               The tool shall match tests to multiple requirements with mixed filter
               references.
@@ -303,7 +335,7 @@ sections:
 
       - title: Reporting
         requirements:
-          - id: RPT-001
+          - id: ReqStream-Rpt-MarkdownExport
             title: The tool shall export requirements to markdown format.
             justification: |
               Markdown export enables requirements to be included in documentation, wikis, and other
@@ -316,7 +348,7 @@ sections:
               - Requirements_Export_MultipleSections_ExportsAll
               - Requirements_Export_EmptyRequirements_CreatesEmptyFile
 
-          - id: RPT-002
+          - id: ReqStream-Rpt-HeaderDepth
             title: The tool shall support configurable markdown header depth for requirements reports.
             justification: |
               Configurable header depth allows requirements reports to be embedded in larger documents
@@ -327,7 +359,7 @@ sections:
               - Context_Create_ReportDepth_SetsReportDepthProperty
               - Requirements_Export_WithCustomDepth_UsesCorrectHeaderLevel
 
-          - id: RPT-003
+          - id: ReqStream-Rpt-TraceMatrix
             title: The tool shall export trace matrices to markdown format.
             justification: |
               Trace matrix export provides visibility into test coverage and requirement satisfaction,
@@ -341,7 +373,7 @@ sections:
               - TraceMatrix_Export_WithNoTests_ShowsNotSatisfied
               - TraceMatrix_Export_WithNotExecutedTests_ShowsNotExecuted
 
-          - id: RPT-004
+          - id: ReqStream-Rpt-TraceMatrixDepth
             title: The tool shall support configurable markdown header depth for trace matrices.
             justification: |
               Configurable header depth allows trace matrices to be embedded in larger documents while
@@ -352,7 +384,7 @@ sections:
               - Context_Create_MatrixDepth_SetsMatrixDepthProperty
               - Requirements_Export_WithCustomDepth_UsesCorrectHeaderLevel
 
-          - id: RPT-005
+          - id: ReqStream-Rpt-TagFiltering
             title: The tool shall support filtering requirements by tags.
             justification: |
               Tag-based filtering enables selective export of requirement subsets for focused reports,
@@ -370,7 +402,7 @@ sections:
               - TraceMatrix_CalculateSatisfiedRequirements_WithFilterTags_CountsOnlyMatchingRequirements
               - TraceMatrix_GetUnsatisfiedRequirements_WithFilterTags_ReturnsOnlyMatchingRequirements
 
-          - id: RPT-006
+          - id: ReqStream-Rpt-Justifications
             title: The tool shall export requirement justifications to markdown format.
             justification: |
               Justification export enables stakeholders to understand the rationale behind
@@ -382,7 +414,7 @@ sections:
               - Requirements_ExportJustifications_WithoutJustifications_CreatesHeadersOnly
               - Requirements_ExportJustifications_NestedSections_CreatesHierarchy
 
-          - id: RPT-007
+          - id: ReqStream-Rpt-JustificationsDepth
             title: >-
               The tool shall support configurable markdown header depth for justification
               reports.
@@ -396,7 +428,7 @@ sections:
 
       - title: Logging
         requirements:
-          - id: LOG-001
+          - id: ReqStream-Log-FileOutput
             title: The tool shall support writing output to a log file.
             justification: |
               Log file support enables capturing tool output for debugging, audit trails, and CI/CD
@@ -410,7 +442,7 @@ sections:
 
       - title: Validation
         requirements:
-          - id: VAL-001
+          - id: ReqStream-Val-SelfValidation
             title: The tool shall support self-validation mode.
             justification: |
               Self-validation ensures the tool's own integrity and serves as a smoke test for
@@ -421,7 +453,7 @@ sections:
               - Program_Run_WithValidateFlag_RunsValidation
               - Context_Create_ValidateFlag_SetsValidateProperty
 
-          - id: VAL-002
+          - id: ReqStream-Val-EnforcementMode
             title: >-
               The tool shall support enforcement mode to fail when requirements are
               not fully tested.
@@ -440,7 +472,7 @@ sections:
 
       - title: Platform Support
         requirements:
-          - id: PLT-001
+          - id: ReqStream-Platform-Windows
             title: The tool shall run on Windows operating systems.
             justification: |
               Windows support is essential for .NET developers who primarily work in Windows environments
@@ -454,7 +486,7 @@ sections:
               - "windows@ReqStream_TagsFiltering"
               - "windows@ReqStream_EnforcementMode"
 
-          - id: PLT-002
+          - id: ReqStream-Platform-Linux
             title: The tool shall run on Linux operating systems.
             justification: |
               Linux support enables use in containerized CI/CD environments and cloud-based build systems
@@ -468,7 +500,7 @@ sections:
               - "ubuntu@ReqStream_TagsFiltering"
               - "ubuntu@ReqStream_EnforcementMode"
 
-          - id: PLT-004
+          - id: ReqStream-Platform-Net8
             title: The tool shall support .NET 8.0 runtime.
             justification: |
               .NET 8.0 is an LTS release, providing long-term stability and support for enterprise users.
@@ -481,7 +513,7 @@ sections:
               - "dotnet8.x@ReqStream_TagsFiltering"
               - "dotnet8.x@ReqStream_EnforcementMode"
 
-          - id: PLT-005
+          - id: ReqStream-Platform-Net9
             title: The tool shall support .NET 9.0 runtime.
             justification: |
               .NET 9.0 support enables users to leverage the latest .NET features and performance
@@ -495,7 +527,7 @@ sections:
               - "dotnet9.x@ReqStream_TagsFiltering"
               - "dotnet9.x@ReqStream_EnforcementMode"
 
-          - id: PLT-006
+          - id: ReqStream-Platform-Net10
             title: The tool shall support .NET 10.0 runtime.
             justification: |
               .NET 10.0 support ensures the tool remains compatible with the latest .NET ecosystem and

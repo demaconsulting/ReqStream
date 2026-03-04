@@ -489,9 +489,7 @@ sections:
 
         // Save current directory and change to test directory
         var originalDir = Directory.GetCurrentDirectory();
-        var originalOut = Console.Out;
-        using var output = new StringWriter();
-        Console.SetOut(output);
+        var logFile = Path.Combine(_testDirectory, "enforcement-test.log");
 
         try
         {
@@ -500,21 +498,22 @@ sections:
             using var context = Context.Create([
                 "--requirements", "*.yaml",
                 "--tests", "*.trx",
-                "--enforce"
+                "--enforce",
+                "--silent",
+                "--log", logFile
             ]);
             Program.Run(context);
 
             Assert.AreEqual(1, context.ExitCode);
 
-            // Verify error message includes the unsatisfied requirement
-            var outputText = output.ToString();
-            Assert.Contains("Only 1 of 2 requirements are satisfied", outputText);
-            Assert.Contains("Unsatisfied requirements:", outputText);
-            Assert.Contains("REQ-002", outputText);
+            // Verify error message includes the unsatisfied requirement via log file
+            var logContent = File.ReadAllText(logFile);
+            Assert.Contains("Only 1 of 2 requirements are satisfied", logContent);
+            Assert.Contains("Unsatisfied requirements:", logContent);
+            Assert.Contains("REQ-002", logContent);
         }
         finally
         {
-            Console.SetOut(originalOut);
             Directory.SetCurrentDirectory(originalDir);
         }
     }
