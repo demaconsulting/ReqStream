@@ -472,7 +472,7 @@ sections:
 
       - title: Platform Support
         requirements:
-          - id: ReqStream-Platform-Windows
+          - id: ReqStream-Plt-Windows
             title: The tool shall run on Windows operating systems.
             justification: |
               Windows support is essential for .NET developers who primarily work in Windows environments
@@ -486,7 +486,7 @@ sections:
               - "windows@ReqStream_TagsFiltering"
               - "windows@ReqStream_EnforcementMode"
 
-          - id: ReqStream-Platform-Linux
+          - id: ReqStream-Plt-Linux
             title: The tool shall run on Linux operating systems.
             justification: |
               Linux support enables use in containerized CI/CD environments and cloud-based build systems
@@ -500,7 +500,7 @@ sections:
               - "ubuntu@ReqStream_TagsFiltering"
               - "ubuntu@ReqStream_EnforcementMode"
 
-          - id: ReqStream-Platform-Net8
+          - id: ReqStream-Plt-Net8
             title: The tool shall support .NET 8.0 runtime.
             justification: |
               .NET 8.0 is an LTS release, providing long-term stability and support for enterprise users.
@@ -513,7 +513,7 @@ sections:
               - "dotnet8.x@ReqStream_TagsFiltering"
               - "dotnet8.x@ReqStream_EnforcementMode"
 
-          - id: ReqStream-Platform-Net9
+          - id: ReqStream-Plt-Net9
             title: The tool shall support .NET 9.0 runtime.
             justification: |
               .NET 9.0 support enables users to leverage the latest .NET features and performance
@@ -527,7 +527,7 @@ sections:
               - "dotnet9.x@ReqStream_TagsFiltering"
               - "dotnet9.x@ReqStream_EnforcementMode"
 
-          - id: ReqStream-Platform-Net10
+          - id: ReqStream-Plt-Net10
             title: The tool shall support .NET 10.0 runtime.
             justification: |
               .NET 10.0 support ensures the tool remains compatible with the latest .NET ecosystem and
