@@ -80,7 +80,7 @@ This project follows the coding standards defined in `.editorconfig`. Key conven
 
 - **Indentation**: 4 spaces for C#, 2 spaces for YAML/JSON/XML
 - **Line endings**: LF (Unix-style)
-- **Encoding**: UTF-8 with BOM
+- **Encoding**: UTF-8
 - **Braces**: Required for all control statements
 - **Naming**:
   - Interfaces: `IRequirementParser`

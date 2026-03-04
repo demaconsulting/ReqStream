@@ -353,7 +353,7 @@ public sealed class Context : IDisposable
         {
             try
             {
-                result._logWriter = new StreamWriter(logFile, append: false);
+                result._logWriter = new StreamWriter(logFile, append: false) { AutoFlush = true };
             }
             catch (Exception ex)
             {
@@ -415,7 +415,7 @@ public sealed class Context : IDisposable
         {
             var previousColor = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(message);
+            Console.Error.WriteLine(message);
             Console.ForegroundColor = previousColor;
         }
 
