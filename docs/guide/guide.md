@@ -37,6 +37,7 @@ to be treated as code, stored in source control, and integrated into CI/CD pipel
 - **Justifications** - Document the rationale behind each requirement for better understanding
 - **File Includes** - Modularize requirements across multiple YAML files for better maintainability
 - **Validation** - Built-in validation ensures requirement structure and references are correct
+- **Tag Filtering** - Categorize and filter requirements using tags for focused reporting and enforcement
 - **Export Capabilities** - Generate markdown reports for requirements, justifications, and test trace matrices
 
 ## Use Cases
@@ -48,6 +49,9 @@ ReqStream is ideal for:
 - Projects needing traceability between requirements and test cases
 - Organizations requiring compliance documentation
 - Agile teams wanting lightweight, maintainable requirements management
+
+ReqStream is a key component of the [Continuous Compliance][continuous-compliance] strategy by DEMA Consulting —
+integrating automated, evidence-based software quality enforcement into every CI/CD run.
 
 # Prerequisites
 
@@ -1381,3 +1385,4 @@ For support, please [open an issue][issues] or [start a discussion][discussions]
 [repo]: https://github.com/demaconsulting/ReqStream
 [issues]: https://github.com/demaconsulting/ReqStream/issues
 [discussions]: https://github.com/demaconsulting/ReqStream/discussions
+[continuous-compliance]: https://github.com/demaconsulting/ContinuousCompliance

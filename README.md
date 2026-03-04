@@ -16,6 +16,9 @@ Requirements Management Tool
 ReqStream is a .NET command-line tool for managing requirements written in YAML files. It provides functionality to
 create, validate, and manage requirement documents in a structured and maintainable way.
 
+ReqStream is a key component of the [Continuous Compliance][continuous-compliance] strategy by DEMA Consulting —
+integrating automated, evidence-based software quality enforcement into every CI/CD run.
+
 ## Features
 
 - 📝 **YAML Format** - Manage requirements in human-readable YAML format
@@ -569,3 +572,4 @@ For information about reporting security vulnerabilities, please see our [Securi
 [github-actions]: https://github.com/features/actions
 [sonarcloud]: https://sonarcloud.io
 [link-guide]: https://github.com/demaconsulting/ReqStream/blob/main/docs/guide/guide.md
+[continuous-compliance]: https://github.com/demaconsulting/ContinuousCompliance
