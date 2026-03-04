@@ -130,8 +130,9 @@ public class ProgramTests
         Assert.Contains("Trace Matrix Test - PASSED", logContent);
         Assert.Contains("Report Export Test - PASSED", logContent);
         Assert.Contains("Tags Filtering Test - PASSED", logContent);
-        Assert.Contains("Total Tests: 4", logContent);
-        Assert.Contains("Passed: 4", logContent);
+        Assert.Contains("Enforcement Mode Test - PASSED", logContent);
+        Assert.Contains("Total Tests: 5", logContent);
+        Assert.Contains("Passed: 5", logContent);
         Assert.Contains("Failed: 0", logContent);
     }
 
