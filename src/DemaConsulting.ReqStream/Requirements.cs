@@ -46,7 +46,7 @@ public class Requirements : Section
     /// <returns>A Requirements object containing the parsed requirements from all files.</returns>
     /// <exception cref="ArgumentException">Thrown when no paths are provided.</exception>
     /// <exception cref="FileNotFoundException">Thrown when a specified file does not exist.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when duplicate requirement IDs are found or validation fails.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when duplicate requirement IDs are found, cyclic requirement references are found, or validation fails.</exception>
     public static Requirements Read(params string[] paths)
     {
         // Validate that at least one path is provided
@@ -63,6 +63,9 @@ public class Requirements : Section
         {
             requirements.ReadFile(path);
         }
+
+        // Validate no cyclic requirement references exist
+        requirements.ValidateCycles();
 
         // Return the fully populated requirements tree
         return requirements;
@@ -356,6 +359,63 @@ public class Requirements : Section
                 MergeSection(existingSection, childSection, filePath);
             }
         }
+    }
+
+    /// <summary>
+    ///     Validates that there are no cyclic requirement references.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown when a cyclic requirement reference is detected.</exception>
+    private void ValidateCycles()
+    {
+        var visiting = new HashSet<string>();
+        var path = new List<string>();
+        var visited = new HashSet<string>();
+
+        foreach (var reqId in _allRequirements.Keys.Where(id => !visited.Contains(id)))
+        {
+            ValidateCyclesFromRequirement(reqId, visiting, path, visited);
+        }
+    }
+
+    /// <summary>
+    ///     Recursively validates that a requirement and its children have no cyclic references.
+    /// </summary>
+    /// <param name="reqId">The requirement ID to validate from.</param>
+    /// <param name="visiting">The set of requirement IDs currently on the DFS stack.</param>
+    /// <param name="path">The ordered DFS path used to reconstruct the cycle in error messages.</param>
+    /// <param name="visited">The set of requirement IDs already fully processed.</param>
+    /// <exception cref="InvalidOperationException">Thrown when a cyclic requirement reference is detected.</exception>
+    private void ValidateCyclesFromRequirement(string reqId, HashSet<string> visiting, List<string> path, HashSet<string> visited)
+    {
+        // Mark this requirement as currently being visited
+        visiting.Add(reqId);
+        path.Add(reqId);
+
+        // Check each child requirement for cycles
+        if (_allRequirements.TryGetValue(reqId, out var requirement))
+        {
+            // Detect any child that is already on the current DFS path (cycle)
+            var cycleId = requirement.Children.FirstOrDefault(visiting.Contains);
+            if (cycleId != null)
+            {
+                // Build a human-readable cycle path for the error message
+                var cycleStart = path.IndexOf(cycleId);
+                var cyclePath = string.Join(" -> ", path.Skip(cycleStart).Append(cycleId));
+                throw new InvalidOperationException(
+                    $"Circular requirement reference detected: {cyclePath}");
+            }
+
+            // Recurse into children not yet fully processed
+            foreach (var childId in requirement.Children.Where(id => !visited.Contains(id)))
+            {
+                ValidateCyclesFromRequirement(childId, visiting, path, visited);
+            }
+        }
+
+        // Mark this requirement as fully processed
+        visiting.Remove(reqId);
+        path.RemoveAt(path.Count - 1);
+        visited.Add(reqId);
     }
 
     /// <summary>
