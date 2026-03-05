@@ -27,6 +27,8 @@ create, validate, and manage requirement documents in a structured and maintaina
 - ✅ **Validation** - Built-in validation for requirement structure and references
 - 🏷️ **Tag Filtering** - Categorize and filter requirements using tags
 - 📋 **Justifications** - Document the rationale behind each requirement
+- 🔒 **Continuous Compliance** - Compliance evidence generated automatically on every CI run, following
+  the [Continuous Compliance][link-continuous-compliance] methodology
 
 ## Installation
 
@@ -569,3 +571,4 @@ For information about reporting security vulnerabilities, please see our [Securi
 [github-actions]: https://github.com/features/actions
 [sonarcloud]: https://sonarcloud.io
 [link-guide]: https://github.com/demaconsulting/ReqStream/blob/main/docs/guide/guide.md
+[link-continuous-compliance]: https://github.com/demaconsulting/ContinuousCompliance

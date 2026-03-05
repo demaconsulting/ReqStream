@@ -37,6 +37,7 @@ to be treated as code, stored in source control, and integrated into CI/CD pipel
 - **Justifications** - Document the rationale behind each requirement for better understanding
 - **File Includes** - Modularize requirements across multiple YAML files for better maintainability
 - **Validation** - Built-in validation ensures requirement structure and references are correct
+- **Tag Filtering** - Categorize and filter requirements using tags for focused reporting and enforcement
 - **Export Capabilities** - Generate markdown reports for requirements, justifications, and test trace matrices
 
 ## Use Cases
@@ -48,6 +49,22 @@ ReqStream is ideal for:
 - Projects needing traceability between requirements and test cases
 - Organizations requiring compliance documentation
 - Agile teams wanting lightweight, maintainable requirements management
+
+# Continuous Compliance
+
+ReqStream is a key component of the [Continuous Compliance][continuous-compliance] methodology by DEMA Consulting,
+which ensures compliance evidence is generated automatically on every CI run.
+
+## Key Practices
+
+- **Requirements Traceability**: Every requirement is linked to passing tests, and a trace matrix is
+  auto-generated on each CI run
+- **Tag-Based Filtering**: Requirements can be tagged to generate focused compliance reports for specific
+  categories (e.g., security, regulatory)
+- **Enforcement Mode**: CI/CD pipelines fail if requirements lack passing tests, ensuring coverage is
+  maintained on every commit
+- **Automated Audit Documentation**: Each release ships with generated requirements, justifications, and
+  trace matrix documents
 
 # Prerequisites
 
@@ -1377,7 +1394,9 @@ For more information, visit the [ReqStream GitHub repository][repo].
 
 For support, please [open an issue][issues] or [start a discussion][discussions].
 
+<!-- Link References -->
 [dotnet-sdk]: https://dotnet.microsoft.com/download
 [repo]: https://github.com/demaconsulting/ReqStream
 [issues]: https://github.com/demaconsulting/ReqStream/issues
 [discussions]: https://github.com/demaconsulting/ReqStream/discussions
+[continuous-compliance]: https://github.com/demaconsulting/ContinuousCompliance
