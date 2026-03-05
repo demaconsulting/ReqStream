@@ -330,12 +330,10 @@ public class TraceMatrix
     /// <param name="requirement">The requirement to check.</param>
     /// <param name="rootSection">The root section for looking up child requirements.</param>
     /// <returns>True if the requirement is satisfied, false otherwise.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when a circular requirement reference is detected.</exception>
     private bool IsRequirementSatisfied(Requirement requirement, Section rootSection)
     {
         var allTests = new HashSet<string>();
-        var visited = new HashSet<string>();
-        CollectAllTests(requirement, rootSection, allTests, visited);
+        CollectAllTests(requirement, rootSection, allTests);
 
         // Must have at least one test
         if (allTests.Count == 0)
@@ -355,17 +353,8 @@ public class TraceMatrix
     /// <param name="requirement">The requirement to collect tests from.</param>
     /// <param name="rootSection">The root section for looking up child requirements.</param>
     /// <param name="allTests">The set to add tests to.</param>
-    /// <param name="visited">The set of requirement IDs already visited to detect cycles.</param>
-    /// <exception cref="InvalidOperationException">Thrown when a circular requirement reference is detected.</exception>
-    private static void CollectAllTests(Requirement requirement, Section rootSection, HashSet<string> allTests, HashSet<string> visited)
+    private static void CollectAllTests(Requirement requirement, Section rootSection, HashSet<string> allTests)
     {
-        // Detect cycles
-        if (!visited.Add(requirement.Id))
-        {
-            throw new InvalidOperationException(
-                $"Circular requirement reference detected: requirement '{requirement.Id}' is part of a cycle.");
-        }
-
         // Add direct tests
         foreach (var test in requirement.Tests)
         {
@@ -375,11 +364,8 @@ public class TraceMatrix
         // Recursively add tests from children
         foreach (var childReq in requirement.Children.Select(childId => FindRequirement(rootSection, childId)).Where(childReq => childReq != null))
         {
-            CollectAllTests(childReq!, rootSection, allTests, visited);
+            CollectAllTests(childReq!, rootSection, allTests);
         }
-
-        // Remove from visited when backtracking (allows diamond dependencies)
-        visited.Remove(requirement.Id);
     }
 
     /// <summary>

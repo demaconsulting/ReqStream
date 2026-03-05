@@ -846,4 +846,55 @@ sections:
         Assert.Contains("SYS-SEC-001", ex.Message);
         Assert.Contains(filePath, ex.Message);
     }
+
+    /// <summary>
+    ///     Test that circular requirements (A -> B -> A) throw an exception at read time.
+    /// </summary>
+    [TestMethod]
+    public void Requirements_Read_CircularRequirements_ThrowsInvalidOperationException()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""Cyclic Section""
+    requirements:
+      - id: ""REQ-A""
+        title: ""Requirement A""
+        children:
+          - ""REQ-B""
+      - id: ""REQ-B""
+        title: ""Requirement B""
+        children:
+          - ""REQ-A""
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
+        Assert.Contains("Circular requirement reference detected", ex.Message);
+        Assert.Contains("REQ-A", ex.Message);
+        Assert.Contains("REQ-B", ex.Message);
+    }
+
+    /// <summary>
+    ///     Test that a self-referencing requirement (A -> A) throws an exception at read time.
+    /// </summary>
+    [TestMethod]
+    public void Requirements_Read_SelfReferencingRequirement_ThrowsInvalidOperationException()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""Cyclic Section""
+    requirements:
+      - id: ""REQ-A""
+        title: ""Requirement A""
+        children:
+          - ""REQ-A""
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
+        Assert.Contains("Circular requirement reference detected", ex.Message);
+        Assert.Contains("REQ-A", ex.Message);
+    }
 }
