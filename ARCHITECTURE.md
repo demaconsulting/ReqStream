@@ -93,8 +93,8 @@ public class Requirements : Section
     private readonly Dictionary<string, Requirement> _allRequirements;  // Duplicate detection
     
     public static Requirements Read(params string[] paths);
-    public void Export(string filePath, int depth = 1);
-    public void ExportJustifications(string filePath, int depth = 1);
+    public void Export(string filePath, int depth = 1, HashSet<string>? filterTags = null);
+    public void ExportJustifications(string filePath, int depth = 1, HashSet<string>? filterTags = null);
 }
 ```
 
@@ -123,9 +123,9 @@ public class TraceMatrix
     public TraceMatrix(Requirements requirements, params string[] testResultFiles);
     public TestMetrics GetTestResult(string testName);
     public IReadOnlyDictionary<string, TestMetrics> GetAllTestResults();
-    public (int satisfied, int total) CalculateSatisfiedRequirements();
-    public List<string> GetUnsatisfiedRequirements();
-    public void Export(string filePath, int depth = 1);
+    public (int satisfied, int total) CalculateSatisfiedRequirements(HashSet<string>? filterTags = null);
+    public List<string> GetUnsatisfiedRequirements(HashSet<string>? filterTags = null);
+    public void Export(string filePath, int depth = 1, HashSet<string>? filterTags = null);
 }
 ```
 
@@ -218,6 +218,7 @@ public sealed class Context : IDisposable
     public bool Help { get; }
     public bool Silent { get; }
     public bool Validate { get; }
+    public string? ResultsFile { get; }
     public bool Enforce { get; }
     public List<string> RequirementsFiles { get; }
     public List<string> TestFiles { get; }
@@ -959,6 +960,104 @@ private void ReadFile(string path)
 - If a file is encountered again, it is silently skipped
 - This prevents infinite recursion and stack overflow
 - The same file can be safely referenced by multiple parent files
+
+### How Circular Requirement References Are Prevented
+
+Child requirement references in `requirements.yaml` can form circular chains (e.g., `REQ-A` lists
+`REQ-B` as a child, `REQ-B` lists `REQ-C` as a child, and `REQ-C` lists `REQ-A` as a child).
+Without detection, these cycles would cause infinite recursion during satisfaction analysis —
+for example in `TraceMatrix.CollectAllTests()`, which recurses through child requirements to
+collect all associated tests.
+
+To prevent this, `Requirements.Read()` calls `ValidateCycles()` immediately after all files are
+parsed, before any analysis begins:
+
+```csharp
+// Validate no cyclic requirement references exist
+requirements.ValidateCycles();
+```
+
+`ValidateCycles()` uses a **depth-first search (DFS)** over every requirement in
+`_allRequirements`, tracking state with three data structures:
+
+- **`visiting`** (`HashSet<string>`): requirements on the current DFS stack — a node appearing
+  here while being recursed into means a cycle has been found
+- **`path`** (`List<string>`): the ordered sequence of IDs on the current DFS stack, used to
+  build a human-readable error message
+- **`visited`** (`HashSet<string>`): requirements whose entire sub-tree has been fully explored
+  and confirmed cycle-free; these are skipped on future encounters
+
+```csharp
+private void ValidateCycles()
+{
+    var visiting = new HashSet<string>();
+    var path = new List<string>();
+    var visited = new HashSet<string>();
+
+    foreach (var reqId in _allRequirements.Keys.Where(id => !visited.Contains(id)))
+    {
+        ValidateCyclesFromRequirement(reqId, visiting, path, visited);
+    }
+}
+
+private void ValidateCyclesFromRequirement(
+    string reqId, HashSet<string> visiting, List<string> path, HashSet<string> visited)
+{
+    visiting.Add(reqId);
+    path.Add(reqId);
+
+    if (_allRequirements.TryGetValue(reqId, out var requirement))
+    {
+        var cycleId = requirement.Children.FirstOrDefault(visiting.Contains);
+        if (cycleId != null)
+        {
+            var cycleStart = path.IndexOf(cycleId);
+            var cyclePath = string.Join(" -> ", path.Skip(cycleStart).Append(cycleId));
+            throw new InvalidOperationException(
+                $"Circular requirement reference detected: {cyclePath}");
+        }
+
+        foreach (var childId in requirement.Children.Where(id => !visited.Contains(id)))
+        {
+            ValidateCyclesFromRequirement(childId, visiting, path, visited);
+        }
+    }
+
+    visiting.Remove(reqId);
+    path.RemoveAt(path.Count - 1);
+    visited.Add(reqId);
+}
+```
+
+For example, given this cycle in `requirements.yaml`:
+
+```yaml
+- id: REQ-A
+  children: [REQ-B]
+- id: REQ-B
+  children: [REQ-C]
+- id: REQ-C
+  children: [REQ-A]
+```
+
+`ValidateCycles()` would throw:
+
+```text
+Circular requirement reference detected: REQ-A -> REQ-B -> REQ-C -> REQ-A
+```
+
+Because `ValidateCycles()` runs unconditionally during `Requirements.Read()`, all downstream
+consumers receive a cycle-free graph. `TraceMatrix.CollectAllTests()` therefore recurses through
+child requirements without its own cycle guard — the guarantee is already established at load
+time.
+
+**Key Points**:
+
+- DFS cycle detection runs once at load time, before any analysis
+- `visiting` detects the back-edge; `path` reconstructs the human-readable cycle for the error
+- `visited` prunes already-confirmed sub-trees, keeping the check O(n) over all requirements
+- A clear `InvalidOperationException` with the full cycle path is thrown on detection
+- `TraceMatrix.CollectAllTests()` relies on this guarantee and requires no independent guard
 
 ### Design Decisions for Maintainability
 
