@@ -160,7 +160,7 @@ intermediate types (`YamlDocument`, `YamlSection`, `YamlRequirement`, `YamlMappi
 
 - Files are read as text and deserialized; empty or null documents are silently skipped
 - File paths in `includes` are resolved relative to the current file's directory
-- Parsing errors surface the source file path for actionable error messages
+- Validation errors (e.g., missing fields or invalid structure) surface the source file path for actionable error messages
 
 ### 2. Section Merging
 
