@@ -32,6 +32,7 @@
     "hotspots",
     "CodeQL",
     "SonarMark",
+    "SARIF",
     "SarifMark",
     "buildnotes",
     "slnx",
