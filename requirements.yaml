@@ -19,6 +19,7 @@
 # Source filter prefixes:
 #   windows@TestName    - proves the test passed on a Windows platform
 #   ubuntu@TestName     - proves the test passed on a Linux (Ubuntu) platform
+#   macos@TestName      - proves the test passed on a macOS platform
 #   net8.0@TestName     - proves the test passed under the .NET 8 target framework
 #   net9.0@TestName     - proves the test passed under the .NET 9 target framework
 #   net10.0@TestName    - proves the test passed under the .NET 10 target framework
@@ -499,6 +500,20 @@ sections:
               - "ubuntu@ReqStream_ReportExport"
               - "ubuntu@ReqStream_TagsFiltering"
               - "ubuntu@ReqStream_EnforcementMode"
+
+          - id: ReqStream-Plt-MacOS
+            title: The tool shall run on macOS operating systems.
+            justification: |
+              macOS support is essential for developers using Apple platforms who need to run
+              ReqStream locally and in CI/CD pipelines on macOS agents.
+            tags:
+              - platform
+            tests:
+              - "macos@ReqStream_RequirementsProcessing"
+              - "macos@ReqStream_TraceMatrix"
+              - "macos@ReqStream_ReportExport"
+              - "macos@ReqStream_TagsFiltering"
+              - "macos@ReqStream_EnforcementMode"
 
           - id: ReqStream-Plt-Net8
             title: The tool shall support .NET 8.0 runtime.
