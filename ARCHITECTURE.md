@@ -39,11 +39,11 @@ flowchart TD
     yaml[YAML Files]
     tests[Test Result Files]
     args[CLI Arguments]
-    ctx[Context\noptions & output]
-    req[Requirements\nparsed tree]
-    tm[TraceMatrix\ncoverage analysis]
-    reports[Markdown Reports\nrequirements · justifications · trace matrix]
-    exit[Exit Code\n0 = pass · 1 = fail]
+    ctx[Context<br/>options & output]
+    req[Requirements<br/>parsed tree]
+    tm[TraceMatrix<br/>coverage analysis]
+    reports[Markdown Reports<br/>requirements · justifications · trace matrix]
+    exit[Exit Code<br/>0 = pass · 1 = fail]
 
     yaml --> req
     tests --> tm
