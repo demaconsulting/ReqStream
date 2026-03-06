@@ -1,22 +1,22 @@
 # ReqStream Architecture
 
-This document provides a comprehensive guide to the architecture and internal workings of ReqStream, a .NET
-command-line tool for managing requirements written in YAML files.
-
-**Note**: This is the authoritative source for understanding ReqStream's behavior and internal design.
+This document describes the high-level architecture of ReqStream — the main building blocks, why they
+exist, and how they relate to each other.
 
 ## Overview
 
-ReqStream is a .NET command-line tool designed to manage requirements written in YAML files. It provides three core
-capabilities:
+ReqStream is a .NET command-line tool designed to manage requirements written in YAML files. It provides
+three core capabilities:
 
-1. **Requirements Management**: Read, parse, and merge requirements from multiple YAML files into a hierarchical
-   structure
-2. **Trace Matrix Construction**: Map test results (TRX and JUnit formats) to requirements for traceability
-3. **Test Coverage Enforcement**: Ensure all requirements have adequate test coverage as part of CI/CD quality gates
+1. **Requirements Management**: Read, parse, and merge requirements from multiple YAML files into a
+   hierarchical structure
+2. **Trace Matrix Construction**: Map test results (TRX and JUnit formats) to requirements for
+   traceability
+3. **Test Coverage Enforcement**: Ensure all requirements have adequate test coverage as part of CI/CD
+   quality gates
 
-The tool is built with .NET 8.0+, uses YamlDotNet for YAML parsing, and follows a clear separation of concerns with
-distinct classes for each major responsibility.
+The tool is built with .NET 8.0+, uses YamlDotNet for YAML parsing, and follows a clear separation of
+concerns with distinct classes for each major responsibility.
 
 ### Components at a Glance
 
@@ -34,33 +34,25 @@ Two supporting value types live alongside `TraceMatrix`:
 
 ### How the Components Fit Together
 
-`Program.Main` creates a `Context` from the command-line arguments, which expands glob patterns into concrete file
-lists. `Requirements.Read()` then parses those YAML files into a section/requirement tree. `TraceMatrix` is built from
-the requirement tree plus test result files (TRX or JUnit), mapping every test result to the requirements that
-reference it. Finally, `Program` uses `Context`, `Requirements`, and `TraceMatrix` together to generate reports and
-enforce coverage.
-
 ```text
-CLI Arguments
-      │
-      ▼
-  Context.Create()          ← validates args, expands globs
-      │
-      ├──────────────────────────────────────────────────►  Reports
-      │                                                       (requirements, justifications)
-      ▼
-Requirements.Read()         ← parses & merges YAML files
-      │
-      ├──────────────────────────────────────────────────►  Reports
-      │                                                       (requirements report, justifications)
-      ▼
-TraceMatrix(requirements,   ← maps test results to requirements
-            testFiles)
-      │
-      ├──────────────────────────────────────────────────►  Reports
-      │                                                       (trace matrix)
-      └──────────────────────────────────────────────────►  Enforcement
-                                                             (--enforce exit code)
+  YAML Files          Test Result Files      CLI Arguments
+      │                       │                    │
+      └───────────┬───────────┘                    │
+                  │                                │
+                  ▼                                ▼
+           Requirements ◄────────────────── Context
+           (parsed tree)                   (options & output)
+                  │
+                  ▼
+            TraceMatrix
+          (coverage analysis)
+                  │
+        ┌─────────┴──────────┐
+        ▼                    ▼
+  Markdown Reports       Exit Code
+  (requirements,         (0 = pass,
+   justifications,        1 = fail)
+   trace matrix)
 ```
 
 ### Execution Flow at a Glance
@@ -75,49 +67,26 @@ Each step is described in detail in the [Program Execution Flow](#program-execut
 
 ## Core Data Model
 
-The data model consists of several key classes that represent requirements, sections, test results, and program state:
-
 ### Requirement
 
 **Location**: `Requirement.cs`
 
 Represents a single requirement with its metadata.
 
-```csharp
-public class Requirement
-{
-    public string Id { get; set; }          // Unique identifier (e.g., "SYS-SEC-001")
-    public string Title { get; set; }       // Human-readable description
-    public string? Justification { get; set; } // Optional rationale for the requirement
-    public List<string> Tests { get; }      // Test identifiers linked to this requirement
-    public List<string> Children { get; }   // Child requirement IDs for hierarchical requirements
-    public List<string> Tags { get; }       // Tags for categorization and filtering
-}
-```
-
 **Key Characteristics**:
 
 - `Id` must be unique across all requirements files
 - `Title` must not be blank
 - `Justification` is optional and explains why the requirement exists
-- `Tests` can be added inline in YAML or through separate mappings
-- `Children` enables hierarchical requirements where high-level requirements are satisfied by child requirements
-- `Tags` are optional labels used for categorization and selective filtering of requirements in reports
+- `Tests` lists test identifiers linked to this requirement (inline or via mappings)
+- `Children` holds IDs of child requirements for hierarchical decomposition
+- `Tags` are optional labels used for categorization and selective filtering
 
 ### Section
 
 **Location**: `Section.cs`
 
 Container for requirements and child sections, enabling hierarchical organization.
-
-```csharp
-public class Section
-{
-    public string Title { get; set; }           // Section title
-    public List<Requirement> Requirements { get; }  // Requirements in this section
-    public List<Section> Sections { get; }      // Child sections
-}
-```
 
 **Key Characteristics**:
 
@@ -129,29 +98,16 @@ public class Section
 
 **Location**: `Requirements.cs`
 
-Root class that extends Section and manages YAML file parsing.
-
-```csharp
-public class Requirements : Section
-{
-    private readonly HashSet<string> _includedFiles;        // Prevents infinite include loops
-    private readonly Dictionary<string, Requirement> _allRequirements;  // Duplicate detection
-    
-    public static Requirements Read(params string[] paths);
-    public void Export(string filePath, int depth = 1, HashSet<string>? filterTags = null);
-    public void ExportJustifications(string filePath, int depth = 1, HashSet<string>? filterTags = null);
-}
-```
+Root class that extends `Section` and manages YAML file loading and validation.
 
 **Key Responsibilities**:
 
-- Parse YAML files using YamlDotNet
-- Merge sections with identical hierarchy paths
-- Validate requirement IDs are unique
+- Parse YAML files using YamlDotNet with hyphenated naming conventions
+- Merge sections with identical hierarchy paths across multiple files
+- Validate requirement IDs are unique and titles are non-blank
 - Process file includes recursively with loop prevention
-- Apply test mappings to requirements
-- Export requirements to Markdown reports
-- Export justifications to Markdown documents
+- Apply separate test mappings to the matching requirements
+- Export requirements and justifications to Markdown reports
 
 ### TraceMatrix
 
@@ -159,210 +115,62 @@ public class Requirements : Section
 
 Maps test results to requirements and analyzes test coverage.
 
-```csharp
-public class TraceMatrix
-{
-    private readonly Dictionary<string, List<TestExecution>> _testExecutions;
-    private readonly Requirements _requirements;
-    
-    public TraceMatrix(Requirements requirements, params string[] testResultFiles);
-    public TestMetrics GetTestResult(string testName);
-    public IReadOnlyDictionary<string, TestMetrics> GetAllTestResults();
-    public (int satisfied, int total) CalculateSatisfiedRequirements(HashSet<string>? filterTags = null);
-    public List<string> GetUnsatisfiedRequirements(HashSet<string>? filterTags = null);
-    public void Export(string filePath, int depth = 1, HashSet<string>? filterTags = null);
-}
-```
-
 **Key Responsibilities**:
 
-- Parse test result files (TRX and JUnit formats)
+- Parse test result files in TRX and JUnit formats
 - Aggregate test executions from multiple result files by test name
-- Match test names to requirements (plain names vs source-specific `filepart@testname`)
-- Provide fast lookup of test executions with optional source filtering
-- Return `TestMetrics` for queried tests (returns 0/0 if not found)
-- Calculate requirement satisfaction (must have tests, all must pass)
-- Consider child requirement tests transitively
+- Match test names to requirements (plain names vs. source-specific `file@testname`)
+- Provide fast lookup of test metrics with optional source filtering
+- Calculate requirement satisfaction, considering child requirement tests transitively
 - Export trace matrix reports to Markdown
 
-**Internal Structure**:
-
-The TraceMatrix uses a two-tier structure for efficient test result management:
-
-1. **TestExecution Records**: Each test result file produces TestExecution records that capture:
-   - `FileBaseName`: The base name of the test result file (for source matching)
-   - `Name`: The actual test name (without source filter)
-   - `Passes`: Number of passing executions for this test in this file
-   - `Fails`: Number of failing executions for this test in this file
-
-2. **Dictionary by Test Name**: Test executions are organized in a `Dictionary<string, List<TestExecution>>` where:
-   - The key is the actual test name (e.g., "Test_Platform")
-   - The value is a list of all executions of that test across different files
-   - This enables efficient lookup and filtering by source
-
-3. **FindTestExecutions Method**: Given a test name (with or without source filter):
-   - Parses the test name to extract optional source filter (e.g., "windows@Test_Platform")
-   - Looks up test executions by actual test name
-   - Returns all executions if no source filter is specified
-   - Filters executions by matching file base name if source filter is specified
-
-This design optimizes for the common case where the number of unique test names is much larger than the
-number of test result files, making test name lookup O(1) with optional O(n) filtering where n is the
-number of files containing that test.
-
-### TestMetrics
+### TestMetrics and TestExecution
 
 **Location**: `TraceMatrix.cs`
 
-Represents test metrics for test executions.
-
-```csharp
-public record TestMetrics(int Passes, int Fails)
-{
-    public int Executed => Passes + Fails;
-    public bool AllPassed => Fails == 0 && Executed > 0;
-};
-```
+`TestMetrics` is an immutable record of aggregated pass/fail counts for one test name.
+`TestExecution` is an immutable record of results for one test name from one result file.
 
 **Key Characteristics**:
 
-- Immutable record type capturing passes and fails
-- Can be aggregated across multiple executions
-- `Executed` property returns total number of executions (Passes + Fails)
-- `AllPassed` property indicates if all executions passed (no failures and at least one execution)
-- Used as return type for `GetTestResult` (returns `TestMetrics(0, 0)` if test not found)
-
-### TestExecution
-
-**Location**: `TraceMatrix.cs`
-
-Represents a single test execution from a specific test result file.
-
-```csharp
-public record TestExecution(string FileBaseName, string Name, TestMetrics Metrics);
-```
-
-**Key Characteristics**:
-
-- Immutable record type capturing test results from one file
-- `FileBaseName` is used for source-specific test matching
-- `Name` is the actual test name without any source filter prefix
-- `Metrics` contains passes and fails aggregated from potentially multiple test results with the same name in one file
-  (e.g., test results from different test classes)
+- `TestMetrics(Passes, Fails)` exposes `Executed` (sum) and `AllPassed` (no failures, at least one run)
+- `TestExecution` captures the file base name alongside `TestMetrics`, enabling source-specific filtering
+- `GetTestResult` returns `TestMetrics(0, 0)` when the test name has no recorded executions
+- Both types are used only as read-only value objects — they are never mutated after construction
 
 ### Context
 
 **Location**: `Context.cs`
 
-Handles CLI arguments and program state.
-
-```csharp
-public sealed class Context : IDisposable
-{
-    public bool Version { get; }
-    public bool Help { get; }
-    public bool Silent { get; }
-    public bool Validate { get; }
-    public string? ResultsFile { get; }
-    public bool Enforce { get; }
-    public List<string> RequirementsFiles { get; }
-    public List<string> TestFiles { get; }
-    public string? RequirementsReport { get; }
-    public int ReportDepth { get; }
-    public string? Matrix { get; }
-    public int MatrixDepth { get; }
-    public string? JustificationsFile { get; }
-    public int JustificationsDepth { get; }
-    public HashSet<string>? FilterTags { get; }
-    public int ExitCode { get; }
-    
-    public static Context Create(string[] args);
-    public void WriteLine(string message);
-    public void WriteError(string message);
-}
-```
+Handles CLI argument parsing and owns all program-wide options and output.
 
 **Key Responsibilities**:
 
-- Parse command-line arguments
-- Expand glob patterns for file matching
-- Parse `--filter` tags for requirements filtering
-- Manage console and log file output
-- Track error state for exit code determination
+- Parse command-line arguments and validate their values
+- Expand glob patterns for requirements and test result files
+- Parse `--filter` tags into a set used by all downstream operations
+- Manage console and log file output through `WriteLine` / `WriteError`
+- Track error state and surface the appropriate process exit code
 
 ## Requirements Processing Flow
 
-The requirements processing flow handles YAML parsing, section merging, validation, test mappings, and file includes:
-
 ### 1. YAML File Parsing
 
-ReqStream uses **YamlDotNet** with the `HyphenatedNamingConvention` to parse YAML files. The YAML structure is
-deserialized into internal classes (`YamlDocument`, `YamlSection`, `YamlRequirement`, `YamlMapping`):
+ReqStream uses **YamlDotNet** with the `HyphenatedNamingConvention` to deserialize YAML into internal
+intermediate types (`YamlDocument`, `YamlSection`, `YamlRequirement`, `YamlMapping`).
 
-```yaml
----
-sections:
-  - title: "System Security"
-    requirements:
-      - id: "SYS-SEC-001"
-        title: "The system shall support credentials authentication."
-        justification: |
-          Authentication is critical to ensure only authorized users can access the system.
-          This requirement establishes the foundation for our security posture.
-        tests:
-          - "AuthTest_ValidCredentials_Allowed"
-        children:
-          - "AUTH-001"
-
-mappings:
-  - id: "SYS-SEC-001"
-    tests:
-      - "AuthTest_MultipleUsers_Allowed"
-
-includes:
-  - additional_requirements.yaml
-```
-
-**Key Points**:
-
-- Files are read as text and deserialized using YamlDotNet
-- Empty or null documents are silently skipped
-- File paths are resolved relative to the current file's directory
+- Files are read as text and deserialized; empty or null documents are silently skipped
+- File paths in `includes` are resolved relative to the current file's directory
+- Parsing errors surface the source file path for actionable error messages
 
 ### 2. Section Merging
 
-Sections with **identical titles at the same hierarchy level** are merged. This enables modular requirements where
-multiple files can contribute to the same section:
+Sections with **identical titles at the same hierarchy level** are merged across files, enabling
+modular requirements spread over many files.
 
-**Example**:
-
-File 1:
-
-```yaml
-sections:
-  - title: "Authentication"
-    requirements:
-      - id: "AUTH-001"
-        title: "User login required"
-```
-
-File 2:
-
-```yaml
-sections:
-  - title: "Authentication"
-    requirements:
-      - id: "AUTH-002"
-        title: "Password complexity required"
-```
-
-**Result**: Both requirements are in the same "Authentication" section.
-
-**Algorithm**:
-
-- When processing a section, search for an existing section with the same title
-- If found, merge requirements and recursively merge child sections
-- If not found, create a new section
+- When a section from a new file matches an existing section by title, their requirements are combined
+- Child sections are recursively merged by the same title-matching rule
+- This allows teams to contribute to the same logical section from separate files
 
 ### 3. Validation
 
@@ -377,385 +185,82 @@ Requirements are validated during parsing to ensure data integrity:
 | Test Names | Must not be blank | `Test name cannot be blank` |
 | Mapping ID | Must not be blank | `Mapping requirement ID cannot be blank` |
 
-**Error Handling**:
-
-- Validation errors throw `InvalidOperationException` with file path context
-- Errors are caught in `Program.Main` and reported to the user
+Validation errors throw `InvalidOperationException` with file path context; they are caught in
+`Program.Main` and reported to the user.
 
 ### 4. Test Mappings
 
-Tests can be mapped to requirements in two ways:
+Tests can be associated with requirements in two complementary ways:
 
-**Inline Tests** (defined with the requirement):
+- **Inline tests** — listed directly under the requirement in YAML
+- **Separate mappings** — listed in the file's `mappings` block and matched by requirement ID
 
-```yaml
-requirements:
-  - id: "REQ-001"
-    title: "Feature X shall work"
-    tests:
-      - "TestFeatureX_Valid_Passes"
-      - "TestFeatureX_Invalid_Fails"
-```
-
-**Separate Mappings** (defined in the `mappings` section):
-
-```yaml
-mappings:
-  - id: "REQ-001"
-    tests:
-      - "TestFeatureX_EdgeCase_Passes"
-```
-
-**Key Points**:
-
-- Both methods add tests to the same `Requirement.Tests` list
-- Mappings can be in the same file or included files
-- Mappings are applied after all sections are processed
-- If a mapping references a non-existent requirement ID, it is silently ignored
+Both methods add entries to the same `Requirement.Tests` list. Mappings are applied after all sections
+are processed. A mapping that references a non-existent requirement ID is silently ignored.
 
 ### 5. File Includes
 
-The `includes` section enables splitting requirements across multiple files:
+The `includes` section of a YAML file triggers recursive processing of additional files.
 
-```yaml
-includes:
-  - auth_requirements.yaml
-  - data_requirements.yaml
-  - test_mappings.yaml
-```
-
-**Include Processing**:
-
-- Include paths are resolved relative to the current file's directory
-- Files are processed recursively (includes can have includes)
-- Loop prevention: Each file's full path is tracked in `_includedFiles`
-- If a file is included multiple times, subsequent includes are skipped
-- If an included file doesn't exist, a `FileNotFoundException` is thrown
-
-**Loop Prevention Example**:
-
-```text
-File A includes File B
-File B includes File C
-File C includes File A  ← Detected and skipped
-```
+- Each file's absolute path is tracked; a file encountered a second time is silently skipped
+- This prevents infinite include loops regardless of how deeply nested the include graph is
+- Missing included files raise `FileNotFoundException`
 
 ### 6. Child Requirements
 
-Requirements can reference other requirements as children using the `children` field:
+A requirement may list other requirement IDs in its `children` field, forming a hierarchy.
 
-```yaml
-requirements:
-  - id: "HIGH-LEVEL-001"
-    title: "System shall be secure"
-    children:
-      - "AUTH-001"
-      - "ENCRYPT-001"
-      - "AUDIT-001"
-  
-  - id: "AUTH-001"
-    title: "Authentication required"
-    tests:
-      - "TestAuth_Valid_Passes"
-```
-
-**Key Points**:
-
-- Child requirement IDs are stored in `Requirement.Children`
-- When evaluating satisfaction, tests from all child requirements are included transitively
+- When evaluating satisfaction, tests from child requirements are collected transitively
 - Child requirements can themselves have children (recursive traversal)
-- If a child requirement ID doesn't exist, it is ignored during satisfaction calculation
+- Non-existent child IDs are ignored during satisfaction calculation
+- Circular references are detected and rejected at load time (see
+  [How Circular Requirement References Are Prevented](#how-circular-requirement-references-are-prevented))
 
 ### 7. Tag Filtering
 
-Requirements can be assigned tags for categorization and selective reporting using the `tags` field:
+Requirements can carry optional `tags` for categorization.
 
-```yaml
-requirements:
-  - id: "SEC-001"
-    title: "Encrypt data at rest"
-    tags:
-      - security
-      - compliance
-    tests:
-      - "TestEncrypt_Passes"
-
-  - id: "PERF-001"
-    title: "Response time under 100ms"
-    tags:
-      - performance
-    tests:
-      - "TestPerformance_Passes"
-```
-
-When the `--filter` option is specified (e.g., `--filter security,compliance`), only requirements with at least one
-matching tag are included in reports, trace matrices, and enforcement calculations. Requirements without any matching
-tags are excluded from all outputs.
-
-**Key Points**:
-
-- Tags are optional; requirements without tags are only included when no filter is active
-- Filter tags are parsed from a comma-separated string and trimmed of whitespace
-- Tag matching checks if the requirement has **any** of the specified filter tags (OR logic)
-- Tag filtering applies to requirements export, justifications export, trace matrix export, satisfaction calculation,
-  and enforcement
-- The `FilterTags` property on `Context` is `null` when no filter is specified, indicating all requirements should be
-  included
+- When `--filter` is specified, only requirements with at least one matching tag are included
+- Tag matching uses OR logic — any matching tag is sufficient to include the requirement
+- Filtering applies uniformly to requirements export, justifications export, trace matrix export,
+  satisfaction calculation, and enforcement
+- When no filter is active, `Context.FilterTags` is `null` and all requirements are included
 
 ## Trace Matrix Construction and Analysis
 
-The trace matrix maps test results to requirements and determines coverage satisfaction:
-
 ### 1. Test Result File Parsing
 
-ReqStream supports two test result formats:
+ReqStream supports two test result formats via the `DemaConsulting.TestResults.IO` library:
 
-- **TRX** (Visual Studio Test Results format)
-- **JUnit** (Java/XML test results format)
+- **TRX** — Visual Studio Test Results format
+- **JUnit** — Java/XML test results format
 
-**Parsing Algorithm**:
-
-```text
-For each test result file:
-  1. Read file content as text
-  2. Try to parse as TRX format
-  3. If TRX fails, try to parse as JUnit format
-  4. If both fail, throw InvalidOperationException
-  5. Extract test name and outcome from each result
-  6. Update test result entries
-```
-
-**Implementation**:
-
-- Uses `DemaConsulting.TestResults.IO` library for parsing
-- Parsing errors include the file path for debugging
-- Test outcomes are mapped to `Passed` or `Failed` states
+Each file is tried as TRX first; if that fails, JUnit is attempted. A file that cannot be parsed in
+either format raises `InvalidOperationException` including the file path.
 
 ### 2. Test Name Matching
 
-ReqStream supports two test name formats:
+ReqStream supports two test name formats, which determine how results are matched to requirements:
 
-**Plain Test Names** (aggregate results from all files):
-
-```yaml
-tests:
-  - "TestFeature_Valid_Passes"
-```
-
-**Source-Specific Test Names** (match results from specific files):
-
-```yaml
-tests:
-  - "windows-latest@TestPlatform_Windows_Passes"
-  - "ubuntu-latest@TestPlatform_Linux_Passes"
-```
-
-**Matching Algorithm**:
-
-1. Extract file base name (without extension) from test result file
-2. For each test result, parse test name to extract optional file part and actual test name
-3. Match source-specific tests first:
-   - If requirement test name contains `@`, split into `filepart@testname`
-   - Check if file base name contains the file part (case-insensitive)
-   - Check if actual test name matches
-4. If no source-specific match, match plain test names:
-   - Requirement test name has no `@`
-   - Actual test name matches
-
-**Example**:
+**Plain test names** — aggregate results from all result files:
 
 ```text
-Test result file: test-results-windows-latest.trx
-Contains test: "TestAuth_Valid_Passes"
-
-Requirement tests:
-  - "windows-latest@TestAuth_Valid_Passes"  ✓ Matches (source-specific)
-  - "ubuntu-latest@TestAuth_Valid_Passes"   ✗ No match (wrong source)
-  - "TestAuth_Valid_Passes"                 ✓ Matches (plain name)
+TestFeature_Valid_Passes
 ```
 
-### 3. Test Execution Aggregation and Storage
-
-The TraceMatrix uses a simplified two-tier structure for efficient test result management:
-
-#### Step 1: Parse and Aggregate by File
-
-For each test result file:
-
-1. Extract the file base name (without extension) for source matching
-2. Parse the file as TRX or JUnit format
-3. Skip non-executed tests (using `IsExecuted()` extension method)
-4. **Capture ALL executed tests** (no filtering by requirements)
-5. Aggregate test results by test name within the file (collapsing duplicate results from different test classes)
-6. Create a `TestExecution` record for each unique test name containing:
-   - FileBaseName: The base name of the test result file
-   - Name: The actual test name
-   - Metrics: A `TestMetrics` record with passes and fails counts
-
-#### Step 2: Store in Dictionary Structure
-
-Store test executions in a `Dictionary<string, List<TestExecution>>` where:
-
-- Key: The actual test name (e.g., "Test_Platform")
-- Value: List of all TestExecution records for that test from different files
-
-**Example Internal Structure**:
+**Source-specific test names** — restrict matching to files whose base name contains the source part:
 
 ```text
-_testExecutions = {
-  "Test_Platform": [
-    TestExecution("test-results-windows-latest", "Test_Platform", new TestMetrics(1, 0)),
-    TestExecution("test-results-ubuntu-latest", "Test_Platform", new TestMetrics(1, 0))
-  ],
-  "Test_Auth": [
-    TestExecution("test-results-windows-latest", "Test_Auth", new TestMetrics(2, 1))
-  ]
-}
+windows-latest@TestPlatform_Windows_Passes
+ubuntu-latest@TestPlatform_Linux_Passes
 ```
 
-#### Step 3: Query with FindTestExecutions
+The `source@testname` format is the mechanism that allows the same logical test to be run on multiple
+platforms and tracked independently per platform.
 
-When querying for test results (via `GetTestResult`):
+### 3. Requirement Satisfaction Calculation
 
-1. Parse the requested test name to extract optional source filter (e.g., "windows@Test_Platform")
-2. Look up test executions by the actual test name in the dictionary
-3. If no source filter: Return all executions for that test name
-4. If source filter present: Filter to executions where FileBaseName contains the source filter (case-insensitive)
-5. Aggregate the filtered executions into a single TestResultEntry
-
-`GetAllTestResults()` returns only tests referenced in requirements by:
-
-1. Collecting all test names from the requirements tree
-2. Calling `GetTestResult()` for each referenced test
-3. Returning only those that have execution data
-
-**Key Benefits**:
-
-- **Efficient Lookup**: O(1) dictionary lookup by test name
-- **Complete Data Capture**: All test executions are captured, not just those in requirements
-- **Flexible Querying**: Can query any test, but GetAllTestResults filters to requirements
-- **Source-Specific Filtering**: Filters at query time, not storage time
-- **Clear Structure**: TestExecution records explicitly capture what was tested in each file
-- **Optimized for Scale**: Works best when number of unique test names >> number of test files (typical case)
-
-**Example Query Behavior**:
-
-```text
-Query: "windows@Test_Platform"
-  → Parse: sourceFilter="windows", actualTestName="Test_Platform"
-  → Lookup: Find executions for "Test_Platform"
-  → Filter: Keep only executions where FileBaseName contains "windows"
-  → Result: TestExecution("test-results-windows-latest", "Test_Platform", 1, 0)
-  → Aggregate: TestResultEntry(Executed=1, Passed=1)
-
-Query: "Test_Platform" (no source filter)
-  → Parse: sourceFilter=null, actualTestName="Test_Platform"
-  → Lookup: Find executions for "Test_Platform"
-  → Filter: None (return all)
-  → Result: Both windows and ubuntu executions
-  → Aggregate: TestResultEntry(Executed=2, Passed=2)
-```
-
-### 4. Requirement Satisfaction Calculation
-
-A requirement is considered **satisfied** if:
-
-1. It has at least one test (including tests from child requirements)
-2. All tests have been executed (`Executed > 0`)
-3. All tests have passed (`Passed == Executed`)
-
-**Algorithm**:
-
-```text
-For each requirement:
-  1. Collect all tests from the requirement
-  2. Recursively collect tests from child requirements
-  3. If no tests found, requirement is unsatisfied
-  4. For each test:
-     - If test not found in results, requirement is unsatisfied
-     - If test not executed (Executed == 0), requirement is unsatisfied
-     - If test failed (Passed != Executed), requirement is unsatisfied
-  5. If all tests pass, requirement is satisfied
-```
-
-### 5. Child Requirement Test Consideration
-
-When calculating satisfaction, child requirement tests are considered transitively:
-
-**Example**:
-
-```yaml
-requirements:
-  - id: "PARENT-001"
-    title: "System shall be secure"
-    children:
-      - "CHILD-001"
-      - "CHILD-002"
-  
-  - id: "CHILD-001"
-    title: "Authentication required"
-    tests:
-      - "TestAuth_Passes"
-    children:
-      - "GRANDCHILD-001"
-  
-  - id: "CHILD-002"
-    title: "Encryption required"
-    tests:
-      - "TestEncrypt_Passes"
-  
-  - id: "GRANDCHILD-001"
-    title: "Password complexity required"
-    tests:
-      - "TestPasswordComplexity_Passes"
-```
-
-**Result**: `PARENT-001` is satisfied if all three tests pass:
-
-- `TestAuth_Passes`
-- `TestEncrypt_Passes`
-- `TestPasswordComplexity_Passes`
-
-## Test Coverage Enforcement
-
-Test coverage enforcement ensures that all requirements have adequate test coverage, making it ideal for CI/CD quality
-gates:
-
-### 1. How the `--enforce` Flag Works
-
-When `--enforce` is specified:
-
-1. Requirements and test results are processed normally
-2. Reports are generated (if requested)
-3. Requirement satisfaction is calculated
-4. If any requirements are unsatisfied:
-   - An error message is written to stderr
-   - Unsatisfied requirement IDs are listed
-   - Exit code is set to 1
-5. If all requirements are satisfied:
-   - Exit code remains 0
-
-**Example**:
-
-```bash
-reqstream --requirements "**/*.yaml" --tests "**/*.trx" --matrix matrix.md --enforce
-```
-
-**Output** (if unsatisfied):
-
-```text
-Error: Only 45 of 50 requirements are satisfied with tests.
-Unsatisfied requirements:
-  - REQ-001
-  - REQ-015
-  - REQ-023
-  - REQ-034
-  - REQ-042
-```
-
-### 2. Requirement Satisfaction Criteria
-
-A requirement is **satisfied** if:
+A requirement is **satisfied** if all of the following hold:
 
 | Criteria | Description |
 | -------- | ----------- |
@@ -764,7 +269,7 @@ A requirement is **satisfied** if:
 | Tests executed | All mapped tests have `Executed > 0` |
 | Tests passed | All mapped tests have `Passed == Executed` |
 
-A requirement is **unsatisfied** if:
+A requirement is **unsatisfied** if any of the following apply:
 
 | Condition | Reason |
 | --------- | ------ |
@@ -773,52 +278,23 @@ A requirement is **unsatisfied** if:
 | Test not executed | A mapped test has `Executed == 0` |
 | Test failed | A mapped test has `Passed != Executed` |
 
-### 3. Unsatisfied Requirements Identification
+## Test Coverage Enforcement
 
-Unsatisfied requirements are collected by recursively traversing the section tree:
+When `--enforce` is specified, ReqStream calculates requirement satisfaction after generating all
+requested reports. If any requirements are unsatisfied, an error message listing each unsatisfied
+requirement ID is written to stderr and the exit code is set to 1. Reports are always written before
+enforcement results — this allows users to review the trace matrix even on a failing run.
 
-```csharp
-public List<string> GetUnsatisfiedRequirements()
-{
-    var unsatisfied = new List<string>();
-    CollectUnsatisfiedRequirements(_requirements, unsatisfied);
-    return unsatisfied;
-}
-
-private void CollectUnsatisfiedRequirements(Section section, List<string> unsatisfied)
-{
-    foreach (var requirement in section.Requirements)
-    {
-        if (!IsRequirementSatisfied(requirement, _requirements))
-        {
-            unsatisfied.Add(requirement.Id);
-        }
-    }
-    foreach (var childSection in section.Sections)
-    {
-        CollectUnsatisfiedRequirements(childSection, unsatisfied);
-    }
-}
-```
-
-### 4. Exit Code Behavior
+**Exit Code Behavior**:
 
 | Condition | Exit Code | Behavior |
 | --------- | --------- | -------- |
 | No errors | 0 | Success |
 | Argument error | 1 | `ArgumentException` caught in `Main` |
-| Enforcement failed | 1 | `Context.WriteError` sets `_hasErrors = true` |
-| Unexpected error | Exception | Re-thrown for event logging |
-
-**Key Points**:
-
-- Enforcement errors are written **after** all reports are generated
-- This allows users to review reports for failure analysis
-- The `Context` class tracks error state and returns appropriate exit code
+| Enforcement failed | 1 | `Context.WriteError` sets internal error flag |
+| Unexpected error | Exception | Printed and re-thrown for event logging |
 
 ## Program Execution Flow
-
-The program follows a priority-based execution flow:
 
 ### Priority Order
 
@@ -848,316 +324,87 @@ Note: When --filter is specified, tag filtering is applied to all exports and en
 
 ### Error Handling Patterns
 
-ReqStream uses different exception types for different error scenarios:
-
 | Exception Type | Usage | Handling |
 | -------------- | ----- | -------- |
 | `ArgumentException` | Invalid command-line arguments | Caught in `Main`, error printed, exit code 1 |
 | `InvalidOperationException` | Runtime errors during execution | Caught in `Main`, error printed, exit code 1 |
 | Other exceptions | Unexpected errors | Printed and re-thrown for event logging |
 
-**Design Rationale**:
-
-- `ArgumentException` is thrown during `Context.Create` for argument parsing errors
-- `InvalidOperationException` is thrown during execution for validation and processing errors
-- Write methods (`WriteLine`, `WriteError`) are only used after successful argument parsing
-
-### Key Execution Steps
-
-**1. Context Creation** (`Context.Create`):
-
-- Parse command-line arguments
-- Expand glob patterns to file lists
-- Validate argument values (depths, file paths)
-- Open log file if specified
-- Throw `ArgumentException` on errors
-
-**2. Version Query** (`--version`):
-
-- Print version string only (no banner)
-- Exit immediately
-
-**3. Banner Printing**:
-
-- Print application name and version
-- Print copyright notice
-- Always printed except when `--version` is specified
-
-**4. Help Query** (`--help`):
-
-- Print usage information
-- List all command-line options
-- Exit after printing
-
-**5. Self-Validation** (`--validate`):
-
-- Run internal validation tests
-- Write results to file if `--results` specified
-- Exit after validation
-
-**6. Requirements Processing**:
-
-- Read and merge requirements files
-- Validate requirements structure
-- Export requirements report if requested
-- Parse test result files if specified
-- Build trace matrix
-- Export trace matrix if requested
-- Enforce coverage if requested
-
-### Report Generation
-
-Reports are generated in order:
-
-1. **Requirements Report** (`--report`): Markdown table of requirements by section
-2. **Justifications Report** (`--justifications`): Markdown document showing requirement IDs, titles, and
-   justifications organized by section
-3. **Trace Matrix Report** (`--matrix`): Three sections:
-   - Summary: Satisfied vs total requirements
-   - Requirements: Test statistics per requirement
-   - Testing: Test-to-requirement mappings
-
-**Example Justifications Report Structure**:
-
-```markdown
-# Security
-
-## SEC-001: The system shall encrypt all data at rest.
-
-Data encryption at rest protects sensitive information from unauthorized access
-in case of physical storage theft or unauthorized access to storage media.
-
-## SEC-002: The system shall use TLS 1.3 for network communications.
-
-TLS 1.3 provides modern cryptographic security and eliminates known vulnerabilities
-present in earlier TLS versions.
-```
-
-**Example Trace Matrix Structure**:
-
-```markdown
-# Summary
-
-45 of 50 requirements are satisfied with tests.
-
-## Requirements
-
-### Authentication
-
-| ID | Tests Linked | Passed | Failed | Not Executed |
-|----|--------------|--------|--------|--------------|
-| AUTH-001 | 3 | 3 | 0 | 0 |
-| AUTH-002 | 2 | 1 | 1 | 0 |
-
-## Testing
-
-| Test | Requirement | Passed | Failed |
-|------|-------------|--------|--------|
-| TestAuth_Valid_Passes | AUTH-001 | 10 | 0 |
-| TestAuth_Invalid_Fails | AUTH-001 | 10 | 0 |
-```
+`ArgumentException` is thrown during `Context.Create`; `InvalidOperationException` during execution.
+Output methods are only used after successful argument parsing.
 
 ## Implementation Notes
 
 ### Why Sections Are Merged by Matching Titles
 
-Sections are merged by matching titles at the same hierarchy level to enable **modular requirements management**:
+Title-based merging enables **modular requirements management** without any explicit namespace or import
+declaration. Benefits:
 
-**Benefits**:
-
-- Multiple files can contribute to the same section
-- Requirements can be organized by feature, component, or responsibility
-- Test mappings can be in separate files from requirements
-- Teams can work on different requirement files without conflicts
-
-**Example Use Case**:
-
-```text
-requirements/
-  ├─ system_requirements.yaml       # Defines top-level sections
-  ├─ auth_requirements.yaml         # Adds to "Authentication" section
-  ├─ data_requirements.yaml         # Adds to "Data Management" section
-  └─ test_mappings.yaml             # Adds tests to all sections
-```
+- Multiple files can contribute to the same logical section
+- Requirements, mappings, and justifications can live in separate files owned by separate teams
+- A repository can organize files by feature, component, or responsibility and still produce one
+  coherent requirement tree
 
 ### How Infinite Include Loops Are Prevented
 
-The `Requirements` class maintains a `HashSet<string>` of included file paths (`_includedFiles`):
+The `Requirements` class maintains a `HashSet<string>` of absolute file paths already processed
+(`_includedFiles`). Before reading any file, the path is normalized to an absolute path; if it is
+already in the set the file is silently skipped, otherwise it is added and processed.
 
-```csharp
-private void ReadFile(string path)
-{
-    var fullPath = Path.GetFullPath(path);
-    
-    if (_includedFiles.Contains(fullPath))
-    {
-        return;  // Skip if already included
-    }
-    
-    _includedFiles.Add(fullPath);
-    // ... process file and includes ...
-}
-```
-
-**Key Points**:
-
-- File paths are converted to full paths for consistent comparison
-- If a file is encountered again, it is silently skipped
-- This prevents infinite recursion and stack overflow
-- The same file can be safely referenced by multiple parent files
+- Full-path normalization ensures aliases and relative paths resolve to the same entry
+- Silent skipping allows the same utility mapping file to be safely referenced from multiple parents
+- This prevents infinite recursion and stack overflow with no performance overhead
 
 ### How Circular Requirement References Are Prevented
 
-Child requirement references in `requirements.yaml` can form circular chains (e.g., `REQ-A` lists
-`REQ-B` as a child, `REQ-B` lists `REQ-C` as a child, and `REQ-C` lists `REQ-A` as a child).
-Without detection, these cycles would cause infinite recursion during satisfaction analysis —
-for example in `TraceMatrix.CollectAllTests()`, which recurses through child requirements to
-collect all associated tests.
+Child requirement IDs can form circular chains (e.g., `REQ-A → REQ-B → REQ-C → REQ-A`). Without
+detection these would cause infinite recursion during satisfaction analysis.
 
-To prevent this, `Requirements.Read()` calls `ValidateCycles()` immediately after all files are
-parsed, before any analysis begins:
+`Requirements.Read()` calls `ValidateCycles()` immediately after all files are parsed, before any
+downstream analysis begins. The method performs a **depth-first search (DFS)** over every requirement,
+using three tracking structures:
 
-```csharp
-// Validate no cyclic requirement references exist
-requirements.ValidateCycles();
-```
+- **`visiting`** — requirement IDs on the current DFS stack; a node that appears here while being
+  recursed into indicates a back-edge and therefore a cycle
+- **`path`** — the ordered sequence of IDs on the current DFS stack, used to build a human-readable
+  error message (`REQ-A -> REQ-B -> REQ-C -> REQ-A`)
+- **`visited`** — IDs whose entire sub-tree has been confirmed cycle-free; these are skipped on future
+  encounters, keeping the overall check O(n) over all requirements
 
-`ValidateCycles()` uses a **depth-first search (DFS)** over every requirement in
-`_allRequirements`, tracking state with three data structures:
-
-- **`visiting`** (`HashSet<string>`): requirements on the current DFS stack — a node appearing
-  here while being recursed into means a cycle has been found
-- **`path`** (`List<string>`): the ordered sequence of IDs on the current DFS stack, used to
-  build a human-readable error message
-- **`visited`** (`HashSet<string>`): requirements whose entire sub-tree has been fully explored
-  and confirmed cycle-free; these are skipped on future encounters
-
-```csharp
-private void ValidateCycles()
-{
-    var visiting = new HashSet<string>();
-    var path = new List<string>();
-    var visited = new HashSet<string>();
-
-    foreach (var reqId in _allRequirements.Keys.Where(id => !visited.Contains(id)))
-    {
-        ValidateCyclesFromRequirement(reqId, visiting, path, visited);
-    }
-}
-
-private void ValidateCyclesFromRequirement(
-    string reqId, HashSet<string> visiting, List<string> path, HashSet<string> visited)
-{
-    visiting.Add(reqId);
-    path.Add(reqId);
-
-    if (_allRequirements.TryGetValue(reqId, out var requirement))
-    {
-        var cycleId = requirement.Children.FirstOrDefault(visiting.Contains);
-        if (cycleId != null)
-        {
-            var cycleStart = path.IndexOf(cycleId);
-            var cyclePath = string.Join(" -> ", path.Skip(cycleStart).Append(cycleId));
-            throw new InvalidOperationException(
-                $"Circular requirement reference detected: {cyclePath}");
-        }
-
-        foreach (var childId in requirement.Children.Where(id => !visited.Contains(id)))
-        {
-            ValidateCyclesFromRequirement(childId, visiting, path, visited);
-        }
-    }
-
-    visiting.Remove(reqId);
-    path.RemoveAt(path.Count - 1);
-    visited.Add(reqId);
-}
-```
-
-For example, given this cycle in `requirements.yaml`:
-
-```yaml
-- id: REQ-A
-  children: [REQ-B]
-- id: REQ-B
-  children: [REQ-C]
-- id: REQ-C
-  children: [REQ-A]
-```
-
-`ValidateCycles()` would throw:
-
-```text
-Circular requirement reference detected: REQ-A -> REQ-B -> REQ-C -> REQ-A
-```
-
-Because `ValidateCycles()` runs unconditionally during `Requirements.Read()`, all downstream
-consumers receive a cycle-free graph. `TraceMatrix.CollectAllTests()` therefore recurses through
-child requirements without its own cycle guard — the guarantee is already established at load
-time.
-
-**Key Points**:
-
-- DFS cycle detection runs once at load time, before any analysis
-- `visiting` detects the back-edge; `path` reconstructs the human-readable cycle for the error
-- `visited` prunes already-confirmed sub-trees, keeping the check O(n) over all requirements
-- A clear `InvalidOperationException` with the full cycle path is thrown on detection
-- `TraceMatrix.CollectAllTests()` relies on this guarantee and requires no independent guard
+Cycle detection runs once at load time before any analysis; a clear `InvalidOperationException` with
+the full cycle path is thrown on detection. Because the guarantee is established at load time,
+`TraceMatrix.CollectAllTests()` recurses through child requirements without its own cycle guard.
 
 ### Design Decisions for Maintainability
 
-**1. Separation of Concerns**:
+**Separation of Concerns**:
 
-- `Context`: CLI argument handling and output
-- `Requirements`: YAML parsing and merging
-- `TraceMatrix`: Test result analysis
-- `Program`: Execution flow orchestration
+- `Context` owns CLI argument handling and output; it never touches YAML or test results
+- `Requirements` owns YAML parsing and merging; it never touches test results or reports
+- `TraceMatrix` owns test result analysis; it receives an already-validated requirements tree
+- `Program` owns execution flow; it delegates all work to the other three components
 
-**2. Immutable Data Structures**:
+**Immutable Data Structures**:
 
-- Properties use `{ get; private init; }` or `{ get; }` to prevent modification after construction
-- Lists use `{ get; } = []` to allow adding items but not replacing the list
+- Properties prevent modification after construction; collections allow population during
+  construction but not replacement
+- `TestMetrics` and `TestExecution` are immutable records
 
-**3. Error Context**:
+**Error Context and Testability**:
 
-- Validation errors include file paths for debugging
-- Test result parsing errors include test file paths
-- Error messages are clear and actionable
+- Validation and parsing errors always include the source file path for actionable debugging
+- Static factory methods (`Context.Create`, `Requirements.Read`) decouple construction from consumers
+- Public satisfaction-calculation methods and clear parsing/analysis separation enable direct testing
 
-**4. Testability**:
+**Key Architectural Patterns**:
 
-- Static factory methods (`Context.Create`, `Requirements.Read`) enable testing
-- Public methods for satisfaction calculation enable verification
-- Clear separation between parsing and analysis
-
-### Key Architectural Patterns
-
-**1. Factory Pattern**:
-
-- `Context.Create(args)` - Creates context from arguments
-- `Requirements.Read(paths)` - Creates requirements from files
-
-**2. Visitor Pattern** (implicit):
-
-- Section tree traversal for validation
-- Section tree traversal for export
-- Section tree traversal for satisfaction calculation
-
-**3. Builder Pattern** (implicit):
-
-- Requirements are built incrementally through file reading and merging
-- Trace matrix is built incrementally through test result processing
-
-**4. Strategy Pattern**:
-
-- Test result parsing tries TRX first, then JUnit
-- Test name matching tries source-specific first, then plain names
-
-**5. Disposable Pattern**:
-
-- `Context` implements `IDisposable` for log file cleanup
-- Ensures resources are released properly
+- **Factory** — `Context.Create(args)` and `Requirements.Read(paths)` encapsulate object construction
+- **Composite** — `Section` trees enable recursive traversal for export and satisfaction calculation
+- **Strategy** — test result parsing tries TRX first, then JUnit; matching tries source-specific first,
+  then plain names
+- **Disposable** — `Context` implements `IDisposable` for deterministic log file cleanup
 
 ---
 
-For questions or suggestions about this architecture document, please open an issue or submit a pull request.
+For questions or suggestions about this architecture document, please open an issue or submit a pull
+request.
