@@ -27,9 +27,10 @@ body:
       label: What Have You Tried?
       description: Describe what you have already attempted, including any code or configuration you have used.
       placeholder: |
-        ```yaml
         # Your configuration here
-        ```
+        # e.g.:
+        # setting1: value
+        # setting2: value
       render: yaml
 
   - type: textarea
