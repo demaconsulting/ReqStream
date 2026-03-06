@@ -34,25 +34,24 @@ Two supporting value types live alongside `TraceMatrix`:
 
 ### How the Components Fit Together
 
-```text
-  YAML Files          Test Result Files      CLI Arguments
-      │                       │                    │
-      └───────────┬───────────┘                    │
-                  │                                │
-                  ▼                                ▼
-           Requirements ◄────────────────── Context
-           (parsed tree)                   (options & output)
-                  │
-                  ▼
-            TraceMatrix
-          (coverage analysis)
-                  │
-        ┌─────────┴──────────┐
-        ▼                    ▼
-  Markdown Reports       Exit Code
-  (requirements,         (0 = pass,
-   justifications,        1 = fail)
-   trace matrix)
+```mermaid
+flowchart TD
+    yaml[YAML Files]
+    tests[Test Result Files]
+    args[CLI Arguments]
+    ctx[Context\noptions & output]
+    req[Requirements\nparsed tree]
+    tm[TraceMatrix\ncoverage analysis]
+    reports[Markdown Reports\nrequirements · justifications · trace matrix]
+    exit[Exit Code\n0 = pass · 1 = fail]
+
+    yaml --> req
+    tests --> tm
+    args --> ctx
+    ctx --> req
+    req --> tm
+    tm --> reports
+    tm --> exit
 ```
 
 ### Execution Flow at a Glance
