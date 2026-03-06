@@ -191,6 +191,7 @@ jobs:
           dotnet pack
           --no-build
           --no-restore
+          --configuration Release
           --property:PackageVersion=${{ inputs.version }}
 
       # === UPLOAD ARTIFACTS ===
