@@ -5,16 +5,6 @@ command-line tool for managing requirements written in YAML files.
 
 **Note**: This is the authoritative source for understanding ReqStream's behavior and internal design.
 
-## Table of Contents
-
-- [Overview](#overview)
-- [Core Data Model](#core-data-model)
-- [Requirements Processing Flow](#requirements-processing-flow)
-- [Trace Matrix Construction and Analysis](#trace-matrix-construction-and-analysis)
-- [Test Coverage Enforcement](#test-coverage-enforcement)
-- [Program Execution Flow](#program-execution-flow)
-- [Implementation Notes](#implementation-notes)
-
 ## Overview
 
 ReqStream is a .NET command-line tool designed to manage requirements written in YAML files. It provides three core
@@ -27,6 +17,61 @@ capabilities:
 
 The tool is built with .NET 8.0+, uses YamlDotNet for YAML parsing, and follows a clear separation of concerns with
 distinct classes for each major responsibility.
+
+### Components at a Glance
+
+| Component | File | Responsibility |
+| --------- | ---- | -------------- |
+| `Program` | `Program.cs` | Entry point; orchestrates the execution flow |
+| `Context` | `Context.cs` | Parses CLI arguments; owns all options and output |
+| `Requirements` | `Requirements.cs` | Reads, merges, and validates YAML requirement files |
+| `TraceMatrix` | `TraceMatrix.cs` | Maps test results to requirements; calculates coverage |
+
+Two supporting value types live alongside `TraceMatrix`:
+
+- `TestMetrics` — aggregated pass/fail counts for a named test
+- `TestExecution` — a single test result from one result file
+
+### How the Components Fit Together
+
+`Program.Main` creates a `Context` from the command-line arguments, which expands glob patterns into concrete file
+lists. `Requirements.Read()` then parses those YAML files into a section/requirement tree. `TraceMatrix` is built from
+the requirement tree plus test result files (TRX or JUnit), mapping every test result to the requirements that
+reference it. Finally, `Program` uses `Context`, `Requirements`, and `TraceMatrix` together to generate reports and
+enforce coverage.
+
+```text
+CLI Arguments
+      │
+      ▼
+  Context.Create()          ← validates args, expands globs
+      │
+      ├──────────────────────────────────────────────────►  Reports
+      │                                                       (requirements, justifications)
+      ▼
+Requirements.Read()         ← parses & merges YAML files
+      │
+      ├──────────────────────────────────────────────────►  Reports
+      │                                                       (requirements report, justifications)
+      ▼
+TraceMatrix(requirements,   ← maps test results to requirements
+            testFiles)
+      │
+      ├──────────────────────────────────────────────────►  Reports
+      │                                                       (trace matrix)
+      └──────────────────────────────────────────────────►  Enforcement
+                                                             (--enforce exit code)
+```
+
+### Execution Flow at a Glance
+
+1. `--version`  → print version and exit
+2. Banner       → printed for all remaining steps (`--help`, `--validate`, normal run)
+3. `--help`     → print usage and exit
+4. `--validate` → run self-validation tests and exit
+5. Normal run   → read requirements → generate reports → enforce coverage
+
+Each step is described in detail in the [Program Execution Flow](#program-execution-flow) section.
 
 ## Core Data Model
 
