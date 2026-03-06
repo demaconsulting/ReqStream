@@ -234,8 +234,9 @@ ReqStream supports two test result formats via the `DemaConsulting.TestResults.I
 - **TRX** — Visual Studio Test Results format
 - **JUnit** — Java/XML test results format
 
-Each file is tried as TRX first; if that fails, JUnit is attempted. A file that cannot be parsed in
-either format raises `InvalidOperationException` including the file path.
+For each test result file, ReqStream uses `DemaConsulting.TestResults.IO.Serializer.Deserialize(content)`
+to auto-detect the format and parse the results. If a file cannot be parsed, the underlying error is
+wrapped in an `InvalidOperationException` that includes the file path.
 
 ### 2. Test Name Matching
 
