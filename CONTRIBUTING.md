@@ -50,7 +50,7 @@ We follow a standard GitHub workflow for contributions:
 - [.NET SDK][dotnet-download] 8.0, 9.0, or 10.0
 - Git
 - Node.js (with npm, required for running JavaScript-based tools and lint scripts)
-- Python 3 (with venv and pip, required for Python-based tooling used by lint scripts)
+- Python 3 (with virtual environment support and pip, required for Python-based tooling used by lint scripts)
 - A code editor (Visual Studio, VS Code, or Rider recommended)
 
 ### Getting Started
