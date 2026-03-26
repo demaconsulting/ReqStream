@@ -1,0 +1,124 @@
+---
+sections:
+  - title: ReqStream Requirements
+    sections:
+      - title: Requirements File Processing
+        requirements:
+          - id: ReqStream-Req-YamlProcessing
+            title: The tool shall process YAML requirements files.
+            justification: |
+              YAML provides a human-readable, version-control-friendly format for managing requirements.
+              This makes requirements accessible to both technical and non-technical stakeholders.
+            tags:
+              - requirements
+            tests:
+              - Requirements_Read_SimpleRequirement_ParsesCorrectly
+              - Program_Run_WithRequirementsFiles_ProcessesSuccessfully
+              - Requirements_Read_ComplexStructure_ParsesCorrectly
+
+          - id: ReqStream-Req-GlobPatterns
+            title: The tool shall support glob patterns for requirements files.
+            justification: |
+              Glob patterns enable flexible file selection and reduce the need for explicit file listing,
+              making the tool easier to use in various project structures.
+            tags:
+              - requirements
+            tests:
+              - Context_Create_WithRequirementsPattern_ExpandsGlobPattern
+
+          - id: ReqStream-Req-Validation
+            title: The tool shall validate requirements file structure.
+            justification: |
+              Early validation prevents runtime errors and ensures requirements data integrity, catching
+              issues before they impact downstream processes.
+            tags:
+              - requirements
+            tests:
+              - Requirements_Read_BlankSectionTitle_ThrowsExceptionWithFileLocation
+              - Requirements_Read_BlankRequirementId_ThrowsExceptionWithFileLocation
+              - Requirements_Read_BlankRequirementTitle_ThrowsExceptionWithFileLocation
+              - Requirements_Read_DuplicateRequirementId_ThrowsException
+              - Requirements_Read_DuplicateRequirementId_ExceptionIncludesFileLocation
+
+          - id: ReqStream-Req-Hierarchy
+            title: The tool shall support hierarchical sections and subsections.
+            justification: |
+              Hierarchical organization allows requirements to be grouped logically by system components,
+              features, or concerns, improving maintainability and navigation.
+            tags:
+              - requirements
+            tests:
+              - Requirements_Read_NestedSections_ParsesHierarchyCorrectly
+              - Requirements_Export_NestedSections_CreatesHierarchy
+
+          - id: ReqStream-Req-Includes
+            title: The tool shall support file includes in requirements files.
+            justification: |
+              File includes enable modular requirements management, allowing teams to organize requirements
+              across multiple files and reducing merge conflicts in version control.
+            tags:
+              - requirements
+            tests:
+              - Requirements_Read_WithIncludes_MergesFilesCorrectly
+              - Requirements_Read_MultipleFiles_MergesAllFiles
+              - Requirements_Read_IncludeLoop_DoesNotCauseInfiniteLoop
+
+          - id: ReqStream-Req-SectionMerging
+            title: The tool shall merge sections with the same hierarchy path.
+            justification: |
+              Section merging allows multiple files to contribute to the same logical section, supporting
+              distributed authoring and modular organization of requirements.
+            tags:
+              - requirements
+            tests:
+              - Requirements_Read_IdenticalSections_MergesCorrectly
+              - Requirements_Read_MultipleFilesWithSameSections_MergesSections
+
+      - title: Requirements Definition
+        requirements:
+          - id: ReqStream-Req-UniqueIds
+            title: The tool shall require each requirement to have a unique identifier.
+            justification: |
+              Unique identifiers enable unambiguous referencing of requirements in documentation, test
+              mappings, and traceability reports.
+            tags:
+              - requirements
+            tests:
+              - Requirements_Read_DuplicateRequirementId_ThrowsException
+              - Requirements_Read_BlankRequirementId_ThrowsExceptionWithFileLocation
+              - Requirements_Read_MultipleFilesWithDuplicateIds_ThrowsException
+
+          - id: ReqStream-Req-RequiredTitle
+            title: The tool shall require each requirement to have a title.
+            justification: |
+              Titles provide human-readable descriptions of requirements, making them understandable to
+              stakeholders without needing to reference external documentation.
+            tags:
+              - requirements
+            tests:
+              - Requirements_Read_BlankRequirementTitle_ThrowsExceptionWithFileLocation
+
+          - id: ReqStream-Req-ParentChild
+            title: The tool shall support parent-child relationships between requirements.
+            justification: |
+              Parent-child relationships enable hierarchical requirement decomposition, allowing high-level
+              requirements to be satisfied through lower-level requirements.
+            tags:
+              - requirements
+            tests:
+              - Requirements_Read_RequirementWithChildren_ParsesChildrenCorrectly
+              - TraceMatrix_Export_WithChildRequirements_ConsidersChildTests
+
+          - id: ReqStream-Req-TestMappings
+            title: The tool shall support test mappings for requirements.
+            justification: |
+              Test mappings establish traceability between requirements and tests, enabling verification
+              that requirements are adequately tested and satisfied.
+            tags:
+              - requirements
+            tests:
+              - Requirements_Read_RequirementWithTests_ParsesTestsCorrectly
+              - Requirements_Read_BlankTestNameInRequirement_ThrowsExceptionWithFileLocation
+              - Requirements_Read_TestMappings_AppliesMappingsCorrectly
+              - Requirements_Read_BlankTestNameInMapping_ThrowsExceptionWithFileLocation
+              - Requirements_Read_BlankMappingId_ThrowsExceptionWithFileLocation

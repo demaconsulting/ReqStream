@@ -1,0 +1,19 @@
+---
+sections:
+  - title: ReqStream Requirements
+    sections:
+      - title: OTS Software
+        requirements:
+          - id: ReqStream-OTS-SonarMark
+            title: SonarMark shall generate a SonarCloud quality report.
+            justification: |
+              DemaConsulting.SonarMark retrieves quality-gate and metrics data from SonarCloud and
+              renders it as a markdown document included in the release artifacts. It runs in the
+              same CI pipeline that produces the TRX test results, so a successful pipeline run is
+              evidence that SonarMark executed without error.
+            tags: [ots]
+            tests:
+              - SonarMark_QualityGateRetrieval
+              - SonarMark_IssuesRetrieval
+              - SonarMark_HotSpotsRetrieval
+              - SonarMark_MarkdownReportGeneration

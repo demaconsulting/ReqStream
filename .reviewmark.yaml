@@ -27,23 +27,27 @@ reviews:
   - id: ReqStream-Context
     title: Review of ReqStream Context Unit
     paths:
+      - "docs/reqstream/unit-context.yaml"
       - "src/**/Context.cs"
       - "test/**/ContextTests.cs"
 
   - id: ReqStream-Program
     title: Review of ReqStream Program Unit
     paths:
+      - "docs/reqstream/unit-program.yaml"
       - "src/**/Program.cs"
       - "test/**/ProgramTests.cs"
 
   - id: ReqStream-Validation
     title: Review of ReqStream Validation Unit
     paths:
+      - "docs/reqstream/unit-validation.yaml"
       - "src/**/Validation.cs"
 
   - id: ReqStream-Requirements
     title: Review of ReqStream Requirements Unit
     paths:
+      - "docs/reqstream/unit-requirements.yaml"
       - "src/**/Requirement.cs"
       - "src/**/Requirements.cs"
       - "src/**/Section.cs"
@@ -53,7 +57,24 @@ reviews:
   - id: ReqStream-TraceMatrix
     title: Review of ReqStream TraceMatrix Unit
     paths:
+      - "docs/reqstream/unit-trace-matrix.yaml"
       - "src/**/TraceMatrix.cs"
       - "test/**/TraceMatrixTests.cs"
       - "test/**/TraceMatrixReadTests.cs"
       - "test/**/TraceMatrixExportTests.cs"
+
+  # Platform and OTS dependency reviews
+  - id: Platform-Support
+    title: Review of Platform and Runtime Support Requirements
+    paths:
+      - "docs/reqstream/platform-requirements.yaml"
+
+  - id: OTS-Dependencies
+    title: Review of Off-The-Shelf Software Dependencies
+    paths:
+      - "docs/reqstream/ots-mstest.yaml"
+      - "docs/reqstream/ots-reqstream.yaml"
+      - "docs/reqstream/ots-buildmark.yaml"
+      - "docs/reqstream/ots-versionmark.yaml"
+      - "docs/reqstream/ots-sarifmark.yaml"
+      - "docs/reqstream/ots-sonarmark.yaml"

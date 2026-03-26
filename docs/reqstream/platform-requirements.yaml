@@ -1,0 +1,88 @@
+---
+sections:
+  - title: ReqStream Requirements
+    sections:
+      - title: Platform Support
+        requirements:
+          - id: ReqStream-Plt-Windows
+            title: The tool shall run on Windows operating systems.
+            justification: |
+              Windows support is essential for .NET developers who primarily work in Windows environments
+              and use Visual Studio.
+            tags:
+              - platform
+            tests:
+              - "windows@ReqStream_RequirementsProcessing"
+              - "windows@ReqStream_TraceMatrix"
+              - "windows@ReqStream_ReportExport"
+              - "windows@ReqStream_TagsFiltering"
+              - "windows@ReqStream_EnforcementMode"
+
+          - id: ReqStream-Plt-Linux
+            title: The tool shall run on Linux operating systems.
+            justification: |
+              Linux support enables use in containerized CI/CD environments and cloud-based build systems
+              that typically use Linux.
+            tags:
+              - platform
+            tests:
+              - "ubuntu@ReqStream_RequirementsProcessing"
+              - "ubuntu@ReqStream_TraceMatrix"
+              - "ubuntu@ReqStream_ReportExport"
+              - "ubuntu@ReqStream_TagsFiltering"
+              - "ubuntu@ReqStream_EnforcementMode"
+
+          - id: ReqStream-Plt-MacOS
+            title: The tool shall run on macOS operating systems.
+            justification: |
+              macOS support is essential for developers using Apple platforms who need to run
+              ReqStream locally and in CI/CD pipelines on macOS agents.
+            tags:
+              - platform
+            tests:
+              - "macos@ReqStream_RequirementsProcessing"
+              - "macos@ReqStream_TraceMatrix"
+              - "macos@ReqStream_ReportExport"
+              - "macos@ReqStream_TagsFiltering"
+              - "macos@ReqStream_EnforcementMode"
+
+          - id: ReqStream-Plt-Net8
+            title: The tool shall support .NET 8.0 runtime.
+            justification: |
+              .NET 8.0 is an LTS release, providing long-term stability and support for enterprise users.
+            tags:
+              - platform
+            tests:
+              - "dotnet8.x@ReqStream_RequirementsProcessing"
+              - "dotnet8.x@ReqStream_TraceMatrix"
+              - "dotnet8.x@ReqStream_ReportExport"
+              - "dotnet8.x@ReqStream_TagsFiltering"
+              - "dotnet8.x@ReqStream_EnforcementMode"
+
+          - id: ReqStream-Plt-Net9
+            title: The tool shall support .NET 9.0 runtime.
+            justification: |
+              .NET 9.0 support enables users to leverage the latest .NET features and performance
+              improvements.
+            tags:
+              - platform
+            tests:
+              - "dotnet9.x@ReqStream_RequirementsProcessing"
+              - "dotnet9.x@ReqStream_TraceMatrix"
+              - "dotnet9.x@ReqStream_ReportExport"
+              - "dotnet9.x@ReqStream_TagsFiltering"
+              - "dotnet9.x@ReqStream_EnforcementMode"
+
+          - id: ReqStream-Plt-Net10
+            title: The tool shall support .NET 10.0 runtime.
+            justification: |
+              .NET 10.0 support ensures the tool remains compatible with the latest .NET ecosystem and
+              future-proofs the project.
+            tags:
+              - platform
+            tests:
+              - "dotnet10.x@ReqStream_RequirementsProcessing"
+              - "dotnet10.x@ReqStream_TraceMatrix"
+              - "dotnet10.x@ReqStream_ReportExport"
+              - "dotnet10.x@ReqStream_TagsFiltering"
+              - "dotnet10.x@ReqStream_EnforcementMode"

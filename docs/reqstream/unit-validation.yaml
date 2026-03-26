@@ -1,0 +1,33 @@
+---
+sections:
+  - title: ReqStream Requirements
+    sections:
+      - title: Validation
+        requirements:
+          - id: ReqStream-Val-SelfValidation
+            title: The tool shall support self-validation mode.
+            justification: |
+              Self-validation ensures the tool's own integrity and serves as a smoke test for
+              installation and configuration issues.
+            tags:
+              - validation
+            tests:
+              - Program_Run_WithValidateFlag_RunsValidation
+              - Context_Create_ValidateFlag_SetsValidateProperty
+
+          - id: ReqStream-Val-EnforcementMode
+            title: >-
+              The tool shall support enforcement mode to fail when requirements are
+              not fully tested.
+            justification: |
+              Enforcement mode enables CI/CD pipelines to block releases when requirements
+              lack test coverage, ensuring product quality and compliance.
+            tags:
+              - validation
+            tests:
+              - Context_Create_EnforceFlag_SetsEnforceProperty
+              - Program_Run_WithEnforcementAndFullySatisfiedRequirements_Succeeds
+              - Program_Run_WithEnforcementAndUnsatisfiedRequirements_Fails
+              - Program_Run_WithEnforcementAndNoTests_Fails
+              - Program_Run_WithEnforcementAndFailedTests_Fails
+              - ReqStream_EnforcementMode
