@@ -14,6 +14,9 @@ sections:
             tests:
               - Program_Run_WithValidateFlag_RunsValidation
               - Context_Create_ValidateFlag_SetsValidateProperty
+              - Validation_Run_WithSilentContext_CompletesSuccessfully
+              - Validation_Run_WithTrxResultsFile_WritesTrxFile
+              - Validation_Run_WithXmlResultsFile_WritesXmlFile
 
           - id: ReqStream-Val-EnforcementMode
             title: >-

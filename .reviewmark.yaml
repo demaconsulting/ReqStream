@@ -47,7 +47,7 @@ reviews:
       - "docs/reqstream/unit-validation.yaml"
       - "docs/design/validation.md"
       - "src/**/Validation.cs"
-      - "test/**/ProgramTests.cs"
+      - "test/**/ValidationTests.cs"
 
   - id: ReqStream-Requirements
     title: Review of ReqStream Requirements Unit
