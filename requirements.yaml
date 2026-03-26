@@ -12,3 +12,4 @@ includes:
   - docs/reqstream/ots-versionmark.yaml
   - docs/reqstream/ots-sarifmark.yaml
   - docs/reqstream/ots-sonarmark.yaml
+  - docs/reqstream/ots-reviewmark.yaml

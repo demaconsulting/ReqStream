@@ -174,7 +174,7 @@ dotnet reviewmark --definition .reviewmark.yaml --enforce
 
 # Generate compliance documentation
 dotnet buildmark --tools tools.yaml --output docs/build_notes.md
-dotnet reqstream --report docs/requirements/requirements.md --justifications docs/justifications/justifications.md
+dotnet reqstream --report docs/requirements_doc/requirements.md --justifications docs/requirements_doc/justifications.md
 ```
 
 ## Cross-Agent Coordination
