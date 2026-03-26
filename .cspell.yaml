@@ -55,6 +55,7 @@ words:
   - testname
   - tracematrix
   - Triaging
+  - venv
   - versionmark
   - VersionMark
   - Weasyprint
