@@ -1,0 +1,37 @@
+---
+# Markdownlint configuration for ReqStream
+# See: https://github.com/DavidAnson/markdownlint-cli2
+
+config:
+  default: true
+
+  # Use ATX-style headers (# Header)
+  MD003:
+    style: atx
+
+  # Unordered list indentation
+  MD007:
+    indent: 2
+
+  # Line length (120 chars to allow for URLs)
+  MD013:
+    line_length: 120
+
+  # Allow multiple top-level headers (for fragments)
+  MD025: false
+
+  # Allow inline HTML
+  MD033: false
+
+  # Allow documents without top-level header (for fragments)
+  MD041: false
+
+# Exclude common build artifacts, dependencies, and vendored third-party code
+ignores:
+  - "**/.git/**"
+  - "**/node_modules/**"
+  - "**/.venv/**"
+  - "**/thirdparty/**"
+  - "**/third-party/**"
+  - "**/3rd-party/**"
+  - "**/AGENT_REPORT_*.md"
