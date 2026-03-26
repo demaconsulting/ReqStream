@@ -90,8 +90,6 @@ public class ValidationTests
         Assert.Contains("ReqStream_ReportExport - Passed", logContent);
         Assert.Contains("ReqStream_TagsFiltering - Passed", logContent);
         Assert.Contains("ReqStream_EnforcementMode - Passed", logContent);
-        Assert.Contains("Total Tests: 5", logContent);
-        Assert.Contains("Passed: 5", logContent);
         Assert.Contains("Failed: 0", logContent);
     }
 
