@@ -41,8 +41,9 @@ constructed `Context`, and inspects the output files or `Context.ExitCode` to ve
 ### Results File Output
 
 If `context.ResultsFile` is specified, the collected `TestResults` object is serialized using
-`DemaConsulting.TestResults.IO.Serializer.Serialize`. The format (TRX or JUnit) is determined
-automatically from the file extension.
+`TrxSerializer.Serialize` when the results file has a `.trx` extension and `JUnitSerializer.Serialize`
+when the results file has a `.xml` extension; the appropriate format (TRX or JUnit) is therefore
+selected automatically based on the file extension.
 
 ## Key Design Decisions
 
