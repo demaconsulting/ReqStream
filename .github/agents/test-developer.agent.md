@@ -1,6 +1,6 @@
 ---
 name: test-developer
-description: Writes unit and integration tests following AAA pattern - clear documentation of what's tested and proved
+description: Writes unit and integration tests.
 tools: [read, search, edit, execute, github, agent]
 user-invocable: true
 ---

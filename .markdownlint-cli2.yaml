@@ -1,26 +1,36 @@
 ---
-# Markdownlint configuration for ReqStream
-# See: https://github.com/DavidAnson/markdownlint-cli2
+# Markdown Linting Standards
+#
+# PURPOSE:
+# - Maintain professional technical documentation standards
+# - Ensure consistent formatting for readability and maintenance
+# - Support automated documentation generation and publishing
+#
+# DO NOT MODIFY: These rules represent coding standards
+# - If files fail linting, fix the files to meet these standards
+# - Do not relax rules to accommodate existing non-compliant files
+# - Consistency across repositories is critical for documentation quality
 
 config:
+  # Enable all default rules
   default: true
 
-  # Use ATX-style headers (# Header)
+  # Require ATX-style headers (# Header) instead of Setext-style
   MD003:
     style: atx
 
-  # Unordered list indentation
+  # Set consistent indentation for nested lists
   MD007:
     indent: 2
 
-  # Line length (120 chars to allow for URLs)
+  # Allow longer lines for URLs and technical content
   MD013:
     line_length: 120
 
-  # Allow multiple top-level headers (for fragments)
+  # Allow multiple top-level headers per document
   MD025: false
 
-  # Allow inline HTML
+  # Allow inline HTML for enhanced documentation
   MD033: false
 
   # Allow documents without top-level header (for fragments)

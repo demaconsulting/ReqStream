@@ -15,8 +15,12 @@ language: en
 # Project-specific technical terms and tool names
 words:
   - Blockquotes
+  - buildmark
+  - BuildMark
   - buildnotes
+  - camelcase
   - CodeQL
+  - copilot
   - cspell
   - csproj
   - dcterms
@@ -24,26 +28,35 @@ words:
   - DemaConsulting
   - demaconsulting
   - dependabot
+  - Dependabot
   - dotnet
+  - editorconfig
   - filepart
+  - gitattributes
   - hotspots
   - markdownlint
   - MSTest
   - nuget
   - NuGet
+  - nupkg
   - Pandoc
   - pagetitle
   - reqstream
   - ReqStream
+  - reviewmark
+  - ReviewMark
   - SARIF
   - SarifMark
   - SBOM
   - slnx
+  - snupkg
   - sonarcloud
   - SonarMark
   - testname
   - tracematrix
   - Triaging
+  - versionmark
+  - VersionMark
   - Weasyprint
   - weasyprint
   - xunit
