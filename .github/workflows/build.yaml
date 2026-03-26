@@ -539,20 +539,20 @@ jobs:
         run: >
           dotnet buildmark
           --build-version ${{ inputs.version }}
-          --report docs/buildnotes.md
+          --report docs/build_notes.md
           --report-depth 1
 
       - name: Display Build Notes Report
         shell: bash
         run: |
           echo "=== Build Notes Report ==="
-          cat docs/buildnotes.md
+          cat docs/build_notes.md
 
       - name: Publish Tool Versions
         shell: bash
         run: |
           echo "Publishing tool versions..."
-          dotnet versionmark --publish --report docs/buildnotes/versions.md --report-depth 1 \
+          dotnet versionmark --publish --report docs/build_notes/versions.md --report-depth 1 \
             -- "artifacts/**/versionmark-*.json"
           echo "✓ Tool versions published"
 
@@ -560,7 +560,7 @@ jobs:
         shell: bash
         run: |
           echo "=== Tool Versions Report ==="
-          cat docs/buildnotes/versions.md
+          cat docs/build_notes/versions.md
 
       # === GENERATE HTML DOCUMENTS WITH PANDOC ===
       # This section converts markdown documents to HTML using Pandoc.
@@ -570,11 +570,11 @@ jobs:
         shell: bash
         run: >
           dotnet pandoc
-          --defaults docs/buildnotes/definition.yaml
+          --defaults docs/build_notes/definition.yaml
           --filter node_modules/.bin/mermaid-filter.cmd
           --metadata version="${{ inputs.version }}"
           --metadata date="$(date +'%Y-%m-%d')"
-          --output docs/buildnotes/buildnotes.html
+          --output docs/build_notes/buildnotes.html
 
       - name: Generate Guide HTML with Pandoc
         shell: bash
@@ -634,7 +634,7 @@ jobs:
         run: >
           dotnet weasyprint
           --pdf-variant pdf/a-3u
-          docs/buildnotes/buildnotes.html
+          docs/build_notes/buildnotes.html
           "docs/ReqStream Build Notes.pdf"
 
       - name: Generate Guide PDF with Weasyprint
@@ -682,4 +682,4 @@ jobs:
           name: documents
           path: |
             docs/*.pdf
-            docs/buildnotes.md
+            docs/build_notes.md
