@@ -118,7 +118,8 @@ build.bat     # Windows
 
 ## Markdown Link Style
 
-- **AI agent markdown files** (`.github/agents/*.md`): Use inline links `[text](url)` so URLs are visible in agent context
+- **AI agent markdown files** (`.github/agents/*.agent.md`): Use inline links `[text](url)` so
+  URLs are visible in agent context
 - **README.md**: Use absolute URLs (shipped in NuGet package)
 - **All other markdown files**: Use reference-style links `[text][ref]` with `[ref]: url` at document end
 
