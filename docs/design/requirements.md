@@ -46,7 +46,7 @@ public static Requirements Read(params string[] paths)
 ```
 
 - Creates a single `Requirements` instance and calls `ReadFile` for each path
-- `ReadFile` deserializes the YAML using `YamlDotNet` with `CamelCaseNamingConvention`
+- `ReadFile` deserializes the YAML using `YamlDotNet` with `HyphenatedNamingConvention`
 - Supports an `includes:` field in YAML documents to recursively include other files
 - Cycle detection for included files is maintained in the private `_includedFiles` `HashSet`
 - Duplicate requirement IDs are detected using the private `_allRequirements` dictionary; a duplicate
