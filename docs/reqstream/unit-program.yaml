@@ -1,4 +1,62 @@
 ---
 sections:
   - title: ReqStream Requirements
-    sections: []
+    sections:
+      - title: Program Orchestration
+        requirements:
+          - id: ReqStream-Prog-Version
+            title: The tool shall print version information and exit when the version flag is provided.
+            justification: |
+              Printing version information and exiting immediately allows callers to query the installed
+              version without triggering any other processing, supporting scripted compatibility checks.
+            tags:
+              - cli
+            tests:
+              - Program_Run_WithVersionFlag_PrintsVersion
+
+          - id: ReqStream-Prog-Help
+            title: The tool shall print usage help and exit when the help flag is provided.
+            justification: |
+              Printing usage help and exiting immediately gives users quick access to command-line
+              options without requiring separate documentation or triggering unintended processing.
+            tags:
+              - cli
+            tests:
+              - Program_Run_WithHelpFlag_PrintsHelp
+
+          - id: ReqStream-Prog-Validate
+            title: The tool shall run self-validation when the validate flag is provided.
+            justification: |
+              Self-validation allows the tool to test its own behavior in the target environment,
+              providing confidence that the installation is correct and the tool operates as expected.
+            tags:
+              - cli
+            tests:
+              - Program_Run_WithValidateFlag_RunsValidation
+              - Program_Run_WithValidateAndResults_WritesResultsFile
+
+          - id: ReqStream-Prog-Requirements
+            title: The tool shall load and process requirements files when invoked without special flags.
+            justification: |
+              Loading and processing requirements files is the primary function of the tool, enabling
+              generation of reports and trace matrices from structured requirements data.
+            tags:
+              - requirements
+            tests:
+              - Program_Run_WithNoRequirementsFiles_ShowsMessage
+              - Program_Run_WithRequirementsFiles_ProcessesSuccessfully
+              - Program_Run_WithRequirementsExport_GeneratesReport
+              - Program_Run_WithTraceMatrixExport_GeneratesMatrix
+
+          - id: ReqStream-Prog-Enforce
+            title: The tool shall enforce requirements coverage and fail when requirements are unsatisfied.
+            justification: |
+              Enforcement prevents unverified requirements from passing silently through a CI/CD pipeline,
+              ensuring that every requirement is backed by at least one passing test before a build succeeds.
+            tags:
+              - requirements
+            tests:
+              - Program_Run_WithEnforcementAndFullySatisfiedRequirements_Succeeds
+              - Program_Run_WithEnforcementAndUnsatisfiedRequirements_Fails
+              - Program_Run_WithEnforcementAndNoTests_Fails
+              - Program_Run_WithEnforcementAndFailedTests_Fails

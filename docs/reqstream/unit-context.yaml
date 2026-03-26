@@ -59,6 +59,16 @@ sections:
               - Context_Create_MissingLogFilename_ThrowsException
               - Context_Create_MissingResultsFilename_ThrowsException
 
+          - id: ReqStream-Req-GlobPatterns
+            title: The tool shall support glob patterns for requirements files.
+            justification: |
+              Glob patterns enable flexible file selection and reduce the need for explicit file listing,
+              making the tool easier to use in various project structures.
+            tags:
+              - cli
+            tests:
+              - Context_Create_WithRequirementsPattern_ExpandsGlobPattern
+
           - id: ReqStream-Cmd-ExitCode
             title: The tool shall return a non-zero exit code on failure.
             justification: |

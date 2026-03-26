@@ -38,18 +38,6 @@ constructed `Context`, and inspects the output files or `Context.ExitCode` to ve
 | `ReqStream_TagsFiltering` | Tag-based filtering of requirements during export |
 | `ReqStream_EnforcementMode` | Enforcement of requirements coverage |
 
-### Test Result Naming
-
-Test results are named using the base name of the results file as a source prefix:
-
-```text
-windows@ReqStream_RequirementsProcessing
-```
-
-This allows CI pipelines running on multiple platforms to aggregate results while keeping per-platform
-attribution. The prefix is matched as a substring of the result file's base name, so a prefix of `windows`
-matches a file such as `windows-latest-results.trx`.
-
 ### Results File Output
 
 If `context.ResultsFile` is specified, the collected `TestResults` object is serialized using
@@ -63,8 +51,6 @@ automatically from the file extension.
   the full code path.
 - **Public class for testability**: `Validation` is `public` so that unit tests in the test project can
   also call it directly.
-- **Source filter prefix in test names**: Using `basename@testName` allows the same logical test to be
-  tracked independently per platform when results from multiple CI agents are merged.
 - **Error propagation via `Context`**: Test failures are reported through `context.WriteError`, which
   automatically sets the exit code to 1 without requiring explicit error handling in callers.
 

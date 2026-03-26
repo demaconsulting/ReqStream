@@ -166,7 +166,7 @@ sections:
               - reporting
             tests:
               - Context_Create_MatrixDepth_SetsMatrixDepthProperty
-              - Requirements_Export_WithCustomDepth_UsesCorrectHeaderLevel
+              - TraceMatrix_Export_WithCustomDepth_UsesCorrectHeaderLevel
 
           - id: ReqStream-Rpt-TagFiltering
             title: The tool shall support filtering requirements by tags.

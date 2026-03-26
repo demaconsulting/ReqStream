@@ -80,7 +80,11 @@ Validates that all requirements (within any tag filter) are satisfied by passing
 
 - If no trace matrix is available, reports an error via `context.WriteError`
 - Calls `traceMatrix.CalculateSatisfiedRequirements` to get totals
-- If unsatisfied requirements exist, lists each ID via `context.WriteError`
+- If unsatisfied requirements exist:
+  - Calls `traceMatrix.GetUnsatisfiedRequirements(context.FilterTags)` to get the list
+  - Writes a header line: `"Unsatisfied requirements:"`
+  - Lists each unsatisfied requirement ID via `context.WriteError`
+  - Writes a summary: `"Error: Only {satisfied} of {total} requirements are satisfied with tests."`
 
 ## Key Design Decisions
 
