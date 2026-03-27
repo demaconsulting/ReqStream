@@ -64,6 +64,13 @@ reviews:
       - "test/**/TraceMatrixReadTests.cs"
       - "test/**/TraceMatrixExportTests.cs"
 
+  - id: ReqStream-Linter
+    title: Review of ReqStream Linter Unit
+    paths:
+      - "docs/reqstream/unit-linter.yaml"
+      - "src/**/Linter.cs"
+      - "test/**/LinterTests.cs"
+
   # Platform and OTS dependency reviews
   - id: Platform-Support
     title: Review of Platform and Runtime Support Requirements
