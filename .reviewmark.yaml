@@ -88,14 +88,8 @@ reviews:
       - "src/**/Linter.cs"
       - "test/**/LinterTests.cs"
 
-  # OTS dependency review
-  - id: OTS-Dependencies
-    title: Review of Off-The-Shelf Software Dependencies
+  # Full requirements review — all requirements files reviewed together for completeness and consistency
+  - id: ReqStream-AllRequirements
+    title: Review of All ReqStream Requirements for Consistency
     paths:
-      - "docs/reqstream/ots-mstest.yaml"
-      - "docs/reqstream/ots-reqstream.yaml"
-      - "docs/reqstream/ots-buildmark.yaml"
-      - "docs/reqstream/ots-versionmark.yaml"
-      - "docs/reqstream/ots-sarifmark.yaml"
-      - "docs/reqstream/ots-sonarmark.yaml"
-      - "docs/reqstream/ots-reviewmark.yaml"
+      - "docs/reqstream/**/*.yaml"
