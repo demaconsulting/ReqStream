@@ -65,7 +65,7 @@ public class IntegrationTests
             sections:
               - title: System Requirements
                 requirements:
-                  - id: SYS-001
+                  - id: Integration-System-DoSomethingUseful
                     title: The system shall do something useful.
                     justification: |
                       This is a test justification.
@@ -121,13 +121,13 @@ public class IntegrationTests
 
         // Assert: report contains the requirement ID and title
         var reportContent = File.ReadAllText(reportFile);
-        Assert.IsTrue(reportContent.Contains("SYS-001"), "Requirements report should contain the requirement ID.");
+        Assert.IsTrue(reportContent.Contains("Integration-System-DoSomethingUseful"), "Requirements report should contain the requirement ID.");
         Assert.IsTrue(reportContent.Contains("The system shall do something useful."),
             "Requirements report should contain the requirement title.");
 
         // Assert: trace matrix contains the satisfied requirement
         var matrixContent = File.ReadAllText(matrixFile);
-        Assert.IsTrue(matrixContent.Contains("SYS-001"), "Trace matrix should contain the requirement ID.");
+        Assert.IsTrue(matrixContent.Contains("Integration-System-DoSomethingUseful"), "Trace matrix should contain the requirement ID.");
         Assert.IsTrue(matrixContent.Contains("satisfied with tests"), "Trace matrix should show requirements as satisfied.");
     }
 
@@ -145,7 +145,7 @@ public class IntegrationTests
             sections:
               - title: Platform Requirements
                 requirements:
-                  - id: SYS-PLATFORM-001
+                  - id: Integration-PlatformA-SourceFilter
                     title: The system shall pass the platform-specific test on platform-a.
                     justification: |
                       Platform-specific behavior must be validated on the target platform.
