@@ -623,9 +623,9 @@ reqstream --requirements "docs/**/*.yaml" --lint
 **Example output when issues are found:**
 
 ```text
-docs/reqs/unit.yaml(42,5): error: Unknown field 'tittle' in requirement
-docs/reqs/unit.yaml(57,13): error: Duplicate requirement ID 'REQ-001' (first seen in docs/reqs/base.yaml)
-docs/reqs/other.yaml(10,1): error: Section missing required field 'title'
+docs/requirements/unit.yaml(42,5): error: Unknown field 'tittle' in requirement
+docs/requirements/unit.yaml(57,13): error: Duplicate requirement ID 'REQ-001' (first seen in docs/requirements/base.yaml)
+docs/requirements/other.yaml(10,1): error: Section missing required field 'title'
 ```
 
 **Example output when no issues are found:**
@@ -644,7 +644,7 @@ suitable for use in CI/CD quality gates.
 | Malformed YAML | File cannot be parsed as valid YAML |
 | Unknown document field | Top-level key other than `sections`, `mappings`, or `includes` |
 | Unknown section field | Section key other than `title`, `requirements`, or `sections` |
-| Unknown requirement field | Requirement key other than `id`, `title`, `justification`, `tests`, `children`, or `tags` |
+| Unknown requirement field | Requirement key other than `id`, `title`, `justification`, `tests`, `children`, `tags` |
 | Unknown mapping field | Mapping key other than `id` or `tests` |
 | Missing section title | Section does not have a `title` field |
 | Blank section title | Section `title` is empty or whitespace |
