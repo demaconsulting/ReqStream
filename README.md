@@ -25,6 +25,7 @@ create, validate, and manage requirement documents in a structured and maintaina
 - 🧪 **Test Mapping** - Link requirements to test cases for traceability
 - 📦 **File Includes** - Modularize requirements across multiple YAML files
 - ✅ **Validation** - Built-in validation for requirement structure and references
+- 🔍 **Linting** - Validate requirements YAML structure and report all issues in one pass
 - 🏷️ **Tag Filtering** - Categorize and filter requirements using tags
 - 📋 **Justifications** - Document the rationale behind each requirement
 - 🔒 **Continuous Compliance** - Compliance evidence generated automatically on every CI run, following
@@ -97,6 +98,7 @@ Options:
   --validate                       Run self-validation
   --results <file>                 Write validation results to file (TRX or JUnit format)
   --log <file>                     Write output to log file
+  --lint                           Lint requirements files for structural issues
   --requirements <pattern>         Requirements files glob pattern
   --report <file>                  Export requirements to markdown file
   --report-depth <depth>           Markdown header depth for requirements report (default: 1)
@@ -129,9 +131,10 @@ Running self-validation produces a report containing the following information:
 ✓ ReqStream_ReportExport - Passed
 ✓ ReqStream_TagsFiltering - Passed
 ✓ ReqStream_EnforcementMode - Passed
+✓ ReqStream_Lint - Passed
 
-Total Tests: 5
-Passed: 5
+Total Tests: 6
+Passed: 6
 Failed: 0
 ```
 
@@ -142,6 +145,7 @@ Each test in the report proves:
 - **`ReqStream_ReportExport`** - requirements report is correctly exported to a markdown file.
 - **`ReqStream_TagsFiltering`** - requirements are correctly filtered by tags.
 - **`ReqStream_EnforcementMode`** - enforcement mode correctly validates requirement test coverage.
+- **`ReqStream_Lint`** - linter correctly validates requirements YAML file structure and reports all issues.
 
 See the [User Guide][link-guide] for more details on the self-validation tests.
 

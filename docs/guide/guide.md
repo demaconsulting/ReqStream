@@ -36,6 +36,7 @@ to be treated as code, stored in source control, and integrated into CI/CD pipel
 - **Test Mapping** - Link requirements to test cases for traceability and verification
 - **Justifications** - Document the rationale behind each requirement for better understanding
 - **File Includes** - Modularize requirements across multiple YAML files for better maintainability
+- **Linting** - Inspect requirements files for structural issues before processing
 - **Validation** - Built-in validation ensures requirement structure and references are correct
 - **Tag Filtering** - Categorize and filter requirements using tags for focused reporting and enforcement
 - **Export Capabilities** - Generate markdown reports for requirements, justifications, and test trace matrices
@@ -526,6 +527,7 @@ ReqStream supports the following command-line options:
 | `--silent` | Suppress console output (useful in CI/CD) |
 | `--validate` | Run self-validation and display test results |
 | `--results <file>` | Write validation test results to a file (TRX or JUnit format, use .trx or .xml extension) |
+| `--lint` | Lint requirements files for structural issues |
 | `--log <file>` | Write output to specified log file |
 | `--requirements <pattern>` | Glob pattern for requirements YAML files |
 | `--report <file>` | Export requirements to markdown file |
@@ -583,9 +585,10 @@ Example validation report:
 ✓ ReqStream_ReportExport - Passed
 ✓ ReqStream_TagsFiltering - Passed
 ✓ ReqStream_EnforcementMode - Passed
+✓ ReqStream_Lint - Passed
 
-Total Tests: 5
-Passed: 5
+Total Tests: 6
+Passed: 6
 Failed: 0
 ```
 
@@ -598,6 +601,62 @@ Each test proves specific functionality works correctly:
 - **`ReqStream_ReportExport`** - requirements report is correctly exported to a markdown file.
 - **`ReqStream_TagsFiltering`** - requirements are correctly filtered by tags.
 - **`ReqStream_EnforcementMode`** - enforcement mode correctly validates requirement test coverage.
+- **`ReqStream_Lint`** - lint mode correctly identifies and reports issues in requirements files.
+
+### Linting Requirements Files
+
+Use the `--lint` flag to inspect requirements files for structural problems before processing them.
+Unlike normal processing, linting reports **all** issues found rather than stopping at the first error.
+
+**Lint a single requirements file (including all its includes):**
+
+```bash
+reqstream --requirements requirements.yaml --lint
+```
+
+**Lint multiple requirements files:**
+
+```bash
+reqstream --requirements "docs/**/*.yaml" --lint
+```
+
+**Example output when issues are found:**
+
+```text
+docs/requirements/unit.yaml(42,5): error: Unknown field 'tittle' in requirement
+docs/requirements/unit.yaml(57,13): error: Duplicate requirement ID 'REQ-001' (first seen in docs/requirements/base.yaml)
+docs/requirements/other.yaml(10,1): error: Section missing required field 'title'
+```
+
+**Example output when no issues are found:**
+
+```text
+requirements.yaml: No issues found
+```
+
+The exit code is `0` when no issues are found, and `1` when any issues are reported — making `--lint`
+suitable for use in CI/CD quality gates.
+
+**Issues detected by the linter:**
+
+| Issue | Description |
+| ----- | ----------- |
+| Malformed YAML | File cannot be parsed as valid YAML |
+| Unknown document field | Top-level key other than `sections`, `mappings`, or `includes` |
+| Unknown section field | Section key other than `title`, `requirements`, or `sections` |
+| Unknown requirement field | Requirement key other than `id`, `title`, `justification`, `tests`, `children`, `tags` |
+| Unknown mapping field | Mapping key other than `id` or `tests` |
+| Missing section title | Section does not have a `title` field |
+| Blank section title | Section `title` is empty or whitespace |
+| Missing requirement id | Requirement does not have an `id` field |
+| Blank requirement id | Requirement `id` is empty or whitespace |
+| Missing requirement title | Requirement does not have a `title` field |
+| Blank requirement title | Requirement `title` is empty or whitespace |
+| Missing mapping id | Mapping does not have an `id` field |
+| Blank mapping id | Mapping `id` is empty or whitespace |
+| Blank test name | A test name in a `tests` list is empty or whitespace |
+| Blank tag name | A tag name in a `tags` list is empty or whitespace |
+| Duplicate requirement ID | Two requirements share the same `id` (within or across files) |
 
 ### Requirements Processing
 

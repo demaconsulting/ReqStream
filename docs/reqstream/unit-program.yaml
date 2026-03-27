@@ -60,3 +60,16 @@ sections:
               - Program_Run_WithEnforcementAndUnsatisfiedRequirements_Fails
               - Program_Run_WithEnforcementAndNoTests_Fails
               - Program_Run_WithEnforcementAndFailedTests_Fails
+
+          - id: ReqStream-Prog-Lint
+            title: The tool shall lint requirements files and report all issues when the lint flag is provided.
+            justification: |
+              Linting requirements files allows users to identify structural problems such as malformed YAML,
+              missing mandatory fields, unknown fields, and duplicate requirement IDs before processing,
+              improving the quality and reliability of requirement definitions.
+            tags:
+              - cli
+              - requirements
+            tests:
+              - Linter_ProgramRun_WithLintFlag_RunsLinter
+              - ReqStream_Lint

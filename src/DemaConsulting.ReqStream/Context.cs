@@ -59,6 +59,11 @@ public sealed class Context : IDisposable
     public bool Validate { get; private init; }
 
     /// <summary>
+    ///     Gets a value indicating whether the lint flag was specified.
+    /// </summary>
+    public bool Lint { get; private init; }
+
+    /// <summary>
     ///     Gets the validation results output file path.
     /// </summary>
     public string? ResultsFile { get; private init; }
@@ -142,6 +147,7 @@ public sealed class Context : IDisposable
         var help = false;
         var silent = false;
         var validate = false;
+        var lint = false;
         var enforce = false;
 
         // Initialize collection variables
@@ -185,6 +191,10 @@ public sealed class Context : IDisposable
 
                 case "--validate":
                     validate = true;
+                    break;
+
+                case "--lint":
+                    lint = true;
                     break;
 
                 case "--results":
@@ -335,6 +345,7 @@ public sealed class Context : IDisposable
             Help = help,
             Silent = silent,
             Validate = validate,
+            Lint = lint,
             ResultsFile = resultsFile,
             Enforce = enforce,
             FilterTags = filterTags,

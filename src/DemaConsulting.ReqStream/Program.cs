@@ -109,7 +109,14 @@ internal static class Program
             return;
         }
 
-        // Priority 4: Requirements processing
+        // Priority 4: Lint requirements files
+        if (context.Lint)
+        {
+            Linter.Lint(context, context.RequirementsFiles);
+            return;
+        }
+
+        // Priority 5: Requirements processing
         ProcessRequirements(context);
     }
 
@@ -138,6 +145,7 @@ internal static class Program
         context.WriteLine("  --silent                   Suppress console output");
         context.WriteLine("  --validate                 Run self-validation");
         context.WriteLine("  --results <file>           Write validation results to file (TRX or JUnit format)");
+        context.WriteLine("  --lint                     Lint requirements files for issues");
         context.WriteLine("  --log <file>               Write output to log file");
         context.WriteLine("  --requirements <pattern>   Requirements files glob pattern");
         context.WriteLine("  --report <file>            Export requirements to markdown file");

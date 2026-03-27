@@ -5,6 +5,7 @@ includes:
   - docs/reqstream/unit-validation.yaml
   - docs/reqstream/unit-requirements.yaml
   - docs/reqstream/unit-trace-matrix.yaml
+  - docs/reqstream/unit-linter.yaml
   - docs/reqstream/platform-requirements.yaml
   - docs/reqstream/ots-mstest.yaml
   - docs/reqstream/ots-reqstream.yaml

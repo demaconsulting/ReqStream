@@ -26,6 +26,7 @@ concerns with distinct classes for each major responsibility.
 | `Context` | `Context.cs` | Parses CLI arguments; owns all options and output |
 | `Requirements` | `Requirements.cs` | Reads, merges, and validates YAML requirement files |
 | `TraceMatrix` | `TraceMatrix.cs` | Maps test results to requirements; calculates coverage |
+| `Linter` | `Linter.cs` | Lints requirement YAML files and reports all structural issues |
 
 Two supporting value types live alongside `TraceMatrix`:
 
@@ -42,16 +43,20 @@ flowchart TD
     ctx[Context<br/>options & output]
     req[Requirements<br/>parsed tree]
     tm[TraceMatrix<br/>coverage analysis]
+    lint[Linter<br/>YAML structural checks]
     reports[Markdown Reports<br/>requirements · justifications · trace matrix]
     exit[Exit Code<br/>0 = pass · 1 = fail]
 
     yaml --> req
+    yaml --> lint
     tests --> tm
     args --> ctx
     ctx --> req
+    ctx --> lint
     req --> tm
     tm --> reports
     tm --> exit
+    lint --> exit
 ```
 
 ### Execution Flow at a Glance
@@ -60,7 +65,8 @@ flowchart TD
 2. Banner       → printed for all remaining steps (`--help`, `--validate`, normal run)
 3. `--help`     → print usage and exit
 4. `--validate` → run self-validation tests and exit
-5. Normal run   → read requirements → generate reports → enforce coverage
+5. `--lint`     → lint requirements files and exit
+6. Normal run   → read requirements → generate reports → enforce coverage
 
 Each step is described in detail in the [Program Execution Flow](#program-execution-flow) section.
 
@@ -150,6 +156,24 @@ Handles CLI argument parsing and owns all program-wide options and output.
 - Parse `--filter` tags into a set used by all downstream operations
 - Manage console and log file output through `WriteLine` / `WriteError`
 - Track error state and surface the appropriate process exit code
+
+### Linter
+
+**Location**: `Linter.cs`
+
+Lints requirement YAML files and reports all structural issues found.
+
+**Key Responsibilities**:
+
+- Parse YAML files using YamlDotNet's representation model to retain position information
+- Report unknown fields at document root, section, requirement, and mapping level
+- Report missing required fields (`title` for sections; `id` and `title` for requirements; `id` for mappings)
+- Report blank field values for `title`, `id`, and list entries (tests, tags)
+- Detect and report duplicate requirement IDs across all files (including includes)
+- Follow `includes:` directives recursively, deduplicating visited files
+- Report **all** issues found rather than stopping at the first error
+- Format errors as `{file}({line},{col}): error: {description}`
+- Print a no-issues message when the files pass all checks
 
 ## Requirements Processing Flow
 
@@ -311,7 +335,10 @@ enforcement results — this allows users to review the trace matrix even on a f
 4. Self-Validation (--validate)
    └─> Run self-validation tests and exit
 
-5. Requirements Processing
+5. Lint (--lint)
+   └─> Lint requirements files and exit
+
+6. Requirements Processing
    ├─> Read and merge requirements files
    ├─> Export requirements report (if --report specified)
    ├─> Export justifications report (if --justifications specified)
