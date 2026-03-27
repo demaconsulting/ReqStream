@@ -410,7 +410,7 @@ unknown_root_field: bad
     /// Test that linting follows includes.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithIncludes_LintesIncludedFiles()
+    public void Linter_Lint_WithIncludes_LintsIncludedFiles()
     {
         var includedFile = Path.Combine(_testDirectory, "included.yaml");
         File.WriteAllText(includedFile, @"sections:

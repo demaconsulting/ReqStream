@@ -18,7 +18,7 @@ sections:
             title: The linter shall report an error when the requirements document contains an unknown field.
             justification: |
               Unknown fields may indicate typos or outdated configuration that would otherwise be silently
-              ignored, leading to unexpected behaviour.
+              ignored, leading to unexpected behavior.
             tags:
               - lint
             tests:
@@ -96,7 +96,7 @@ sections:
             tags:
               - lint
             tests:
-              - Linter_Lint_WithIncludes_LintesIncludedFiles
+              - Linter_Lint_WithIncludes_LintsIncludedFiles
 
           - id: ReqStream-Lint-NoIssuesMessage
             title: The linter shall print a no-issues message when no problems are found.
