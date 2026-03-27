@@ -1,0 +1,131 @@
+---
+sections:
+  - title: ReqStream Requirements
+    sections:
+      - title: Linting
+        requirements:
+          - id: ReqStream-Lint-MalformedYaml
+            title: The linter shall report an error when a requirements file contains malformed YAML.
+            justification: |
+              Malformed YAML files cannot be parsed and prevent requirements from being loaded.
+              Reporting the error with a file location helps users identify and fix the syntax problem.
+            tags:
+              - lint
+            tests:
+              - Linter_Lint_WithMalformedYaml_ReportsError
+
+          - id: ReqStream-Lint-UnknownDocumentField
+            title: The linter shall report an error when the requirements document contains an unknown field.
+            justification: |
+              Unknown fields may indicate typos or outdated configuration that would otherwise be silently
+              ignored, leading to unexpected behaviour.
+            tags:
+              - lint
+            tests:
+              - Linter_Lint_WithUnknownDocumentField_ReportsError
+
+          - id: ReqStream-Lint-UnknownSectionField
+            title: The linter shall report an error when a section contains an unknown field.
+            justification: |
+              Unknown fields in sections may indicate typos or unsupported configuration that would otherwise
+              be silently ignored.
+            tags:
+              - lint
+            tests:
+              - Linter_Lint_WithUnknownSectionField_ReportsError
+
+          - id: ReqStream-Lint-MissingSectionTitle
+            title: The linter shall report an error when a section is missing the required title field.
+            justification: |
+              The title field is mandatory for all sections. Missing it prevents the section from being
+              correctly identified in reports and trace matrices.
+            tags:
+              - lint
+            tests:
+              - Linter_Lint_WithSectionMissingTitle_ReportsError
+              - Linter_Lint_WithBlankSectionTitle_ReportsError
+
+          - id: ReqStream-Lint-UnknownRequirementField
+            title: The linter shall report an error when a requirement contains an unknown field.
+            justification: |
+              Unknown fields in requirements may indicate typos or unsupported attributes that would otherwise
+              be silently ignored.
+            tags:
+              - lint
+            tests:
+              - Linter_Lint_WithUnknownRequirementField_ReportsError
+              - Linter_Lint_WithNestedSectionIssues_ReportsError
+
+          - id: ReqStream-Lint-MissingRequirementFields
+            title: The linter shall report an error when a requirement is missing the required id or title field.
+            justification: |
+              The id and title fields are mandatory for all requirements. Missing them causes downstream
+              processing failures and produces incomplete reports.
+            tags:
+              - lint
+            tests:
+              - Linter_Lint_WithRequirementMissingId_ReportsError
+              - Linter_Lint_WithRequirementMissingTitle_ReportsError
+
+          - id: ReqStream-Lint-DuplicateIds
+            title: The linter shall report an error when duplicate requirement IDs are found.
+            justification: |
+              Duplicate requirement IDs cause ambiguity in trace matrices and reports, and can lead to
+              incorrect coverage calculations.
+            tags:
+              - lint
+            tests:
+              - Linter_Lint_WithDuplicateIds_ReportsError
+              - Linter_Lint_WithDuplicateIdsAcrossFiles_ReportsError
+
+          - id: ReqStream-Lint-MultipleIssues
+            title: The linter shall report all issues found rather than stopping at the first issue.
+            justification: |
+              Reporting all issues at once allows users to fix all problems in a single pass, which is more
+              efficient than fixing one issue at a time and re-running.
+            tags:
+              - lint
+            tests:
+              - Linter_Lint_WithMultipleIssues_ReportsAllIssues
+
+          - id: ReqStream-Lint-FollowsIncludes
+            title: The linter shall follow include directives and lint all included files.
+            justification: |
+              Requirements files can include other files. Linting must follow these includes to ensure all
+              referenced files are also checked for issues.
+            tags:
+              - lint
+            tests:
+              - Linter_Lint_WithIncludes_LintesIncludedFiles
+
+          - id: ReqStream-Lint-NoIssuesMessage
+            title: The linter shall print a no-issues message when no problems are found.
+            justification: |
+              Printing a success message when no issues are found provides positive confirmation to the user
+              that the requirements files passed all lint checks.
+            tags:
+              - lint
+            tests:
+              - Linter_Lint_WithValidFile_ReportsNoIssues
+              - Linter_Lint_WithEmptyFile_ReportsNoIssues
+
+          - id: ReqStream-Lint-ErrorFormat
+            title: "The linter shall format errors as \"[location]: [severity]: [description]\"."
+            justification: |
+              Standard lint output format with file path and location information allows editors and CI tools
+              to parse the output and navigate directly to the reported issue.
+            tags:
+              - lint
+            tests:
+              - Linter_Lint_ErrorFormat_IncludesFileAndLocation
+
+          - id: ReqStream-Lint-UnknownMappingField
+            title: The linter shall report an error when a test mapping contains an unknown field.
+            justification: |
+              Unknown fields in test mappings may indicate typos or unsupported configuration that would
+              otherwise be silently ignored.
+            tags:
+              - lint
+            tests:
+              - Linter_Lint_WithUnknownMappingField_ReportsError
+              - Linter_Lint_WithMappingMissingId_ReportsError

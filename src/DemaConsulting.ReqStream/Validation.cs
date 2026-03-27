@@ -51,6 +51,7 @@ public static class Validation
         RunReportExportTest(context, testResults);
         RunTagsFilteringTest(context, testResults);
         RunEnforcementModeTest(context, testResults);
+        RunLintTest(context, testResults);
 
         // Calculate totals
         var totalTests = testResults.Results.Count;
@@ -492,6 +493,98 @@ public static class Validation
         catch (Exception ex)
         {
             HandleTestException(test, context, "ReqStream_EnforcementMode", ex);
+        }
+
+        FinalizeTestResult(test, startTime, testResults);
+    }
+
+    /// <summary>
+    ///     Runs a test for lint functionality.
+    /// </summary>
+    /// <param name="context">The context for output.</param>
+    /// <param name="testResults">The test results collection.</param>
+    private static void RunLintTest(Context context, DemaConsulting.TestResults.TestResults testResults)
+    {
+        var startTime = DateTime.UtcNow;
+        var test = CreateTestResult("ReqStream_Lint");
+
+        try
+        {
+            using var tempDir = new TemporaryDirectory();
+
+            // Create a valid requirements file
+            var reqFile = Path.Combine(tempDir.DirectoryPath, "lint-requirements.yaml");
+            var reqYaml = @"sections:
+  - title: Lint Test
+    requirements:
+      - id: LNT-001
+        title: Lint requirement
+";
+            File.WriteAllText(reqFile, reqYaml);
+
+            // Create a requirements file with a known issue (duplicate ID)
+            var badReqFile = Path.Combine(tempDir.DirectoryPath, "bad-requirements.yaml");
+            var badReqYaml = @"sections:
+  - title: Bad Lint Test
+    requirements:
+      - id: LNT-001
+        title: Duplicate requirement ID
+";
+            File.WriteAllText(badReqFile, badReqYaml);
+
+            using (new DirectorySwitch(tempDir.DirectoryPath))
+            {
+                // Test 1: Lint a valid file - should succeed with no issues
+                int exitCode;
+                string logContent;
+                var logFile = Path.Combine(tempDir.DirectoryPath, "lint-test.log");
+
+                using (var testContext = Context.Create(["--silent", "--log", "lint-test.log", "--lint",
+                                                          "--requirements", "lint-requirements.yaml"]))
+                {
+                    Program.Run(testContext);
+                    exitCode = testContext.ExitCode;
+                }
+
+                logContent = File.ReadAllText(logFile);
+
+                if (exitCode != 0 || !logContent.Contains("No issues found"))
+                {
+                    test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
+                    test.ErrorMessage = "Lint of valid file should succeed with 'No issues found'";
+                    context.WriteError($"✗ ReqStream_Lint - Failed: {test.ErrorMessage}");
+                    FinalizeTestResult(test, startTime, testResults);
+                    return;
+                }
+
+                // Test 2: Lint a file with a duplicate ID - should fail
+                var logFile2 = Path.Combine(tempDir.DirectoryPath, "lint-test2.log");
+                using (var testContext = Context.Create(["--silent", "--log", "lint-test2.log", "--lint",
+                                                          "--requirements", "lint-requirements.yaml",
+                                                          "--requirements", "bad-requirements.yaml"]))
+                {
+                    Program.Run(testContext);
+                    exitCode = testContext.ExitCode;
+                }
+
+                var logContent2 = File.ReadAllText(logFile2);
+
+                if (exitCode == 0 || !logContent2.Contains("Duplicate requirement ID 'LNT-001'"))
+                {
+                    test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
+                    test.ErrorMessage = "Lint of file with duplicate ID should fail";
+                    context.WriteError($"✗ ReqStream_Lint - Failed: {test.ErrorMessage}");
+                }
+                else
+                {
+                    test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
+                    context.WriteLine("✓ ReqStream_Lint - Passed");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            HandleTestException(test, context, "ReqStream_Lint", ex);
         }
 
         FinalizeTestResult(test, startTime, testResults);
