@@ -1,6 +1,8 @@
 ---
-name: Software Developer
-description: Writes production code and self-validation tests - targets design-for-testability and literate programming style
+name: software-developer
+description: Writes production code and self-validation tests.
+tools: [read, search, edit, execute, github, agent]
+user-invocable: true
 ---
 
 # Software Developer - ReqStream
@@ -66,12 +68,19 @@ var results = ProcessFile(options.InputFile);
 - Must support TRX/JUnit output format
 - Link to requirements in `requirements.yaml`
 
-## Defer To
+## Subagent Delegation
 
-- **Requirements Agent**: For new requirement creation and test strategy
-- **Test Developer Agent**: For unit and integration tests
-- **Technical Writer Agent**: For documentation updates
-- **Code Quality Agent**: For linting, formatting, and static analysis
+If new requirements or test strategy is needed, call the @requirements agent with the **request** to create or
+update requirements and the **context** of the feature being implemented.
+
+If unit or integration tests are needed, call the @test-developer agent with the **request** to write unit or
+integration tests and the **context** of the code to be tested.
+
+If documentation updates are needed, call the @technical-writer agent with the **request** to update documentation
+and the **context** of the changes made.
+
+If linting, formatting, or static analysis issues arise, call the @code-quality agent with the **request** to
+fix the quality issues and the **context** of the issues found.
 
 ## Don't
 

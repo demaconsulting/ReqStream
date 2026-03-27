@@ -1,49 +1,57 @@
 # Contributing to ReqStream
 
-Thank you for your interest in contributing to ReqStream! This document provides guidelines and instructions for
-contributing to the project.
+Thank you for your interest in contributing to ReqStream! We welcome contributions from the community and appreciate
+your help in making this project better.
 
 ## Code of Conduct
 
-This project adheres to the Contributor Covenant [Code of Conduct][code-of-conduct]. By participating, you are
-expected to uphold this code. Please report unacceptable behavior through [GitHub Issues][issues] or by contacting
-the project maintainers directly.
+This project adheres to a [Code of Conduct][code-of-conduct]. By participating, you are expected to uphold this code.
+Please report unacceptable behavior through GitHub.
 
 ## How to Contribute
 
 ### Reporting Bugs
 
-If you find a bug, please create an issue using the bug report template. Include:
+If you find a bug, please create an issue on GitHub with the following information:
 
-- A clear description of the problem
-- Steps to reproduce the issue
-- Expected vs. actual behavior
-- Version information (ReqStream version, .NET version, OS)
-- Any relevant error messages or logs
+- **Description**: Clear description of the bug
+- **Steps to Reproduce**: Detailed steps to reproduce the issue
+- **Expected Behavior**: What you expected to happen
+- **Actual Behavior**: What actually happened
+- **Environment**: Operating system, .NET version, ReqStream version
+- **Logs**: Any relevant error messages or logs
 
 ### Suggesting Features
 
-We welcome feature suggestions! Please create an issue using the feature request template. Include:
+We welcome feature suggestions! Please create an issue on GitHub with:
 
-- A clear description of the problem you're trying to solve
-- Your proposed solution
-- Any alternative solutions you've considered
-- Examples or mockups if applicable
+- **Feature Description**: Clear description of the proposed feature
+- **Use Case**: Why this feature would be useful
+- **Proposed Solution**: Your ideas on how to implement it (optional)
+- **Alternatives**: Any alternative solutions you've considered (optional)
 
-### Contributing Code
+### Submitting Pull Requests
 
-1. **Fork the repository** and create a branch for your changes
-2. **Make your changes** following the coding standards below
-3. **Test your changes** thoroughly
-4. **Submit a pull request** with a clear description of your changes
+We follow a standard GitHub workflow for contributions:
+
+1. **Fork** the repository
+2. **Clone** your fork locally
+3. **Create a branch** for your changes (`git checkout -b feature/my-feature`)
+4. **Make your changes** following our coding standards
+5. **Test your changes** thoroughly
+6. **Commit your changes** with clear commit messages
+7. **Push** to your fork
+8. **Create a Pull Request** to the main repository
 
 ## Development Setup
 
 ### Prerequisites
 
-- .NET SDK 8.0, 9.0, or 10.0
+- [.NET SDK][dotnet-download] 8.0, 9.0, or 10.0
 - Git
-- A code editor (Visual Studio, VS Code, JetBrains Rider, etc.)
+- Node.js (with npm, required for running JavaScript-based tools and lint scripts)
+- Python 3 (with venv and pip, required for Python-based tooling used by lint scripts)
+- A code editor (Visual Studio, VS Code, or Rider recommended)
 
 ### Getting Started
 
@@ -57,80 +65,90 @@ We welcome feature suggestions! Please create an issue using the feature request
 2. Restore dependencies:
 
    ```bash
+   dotnet tool restore
    dotnet restore
    ```
 
-3. Build the solution:
+3. Build the project:
 
    ```bash
-   dotnet build
+   dotnet build --configuration Release
    ```
 
-4. Run tests:
+4. Run unit tests:
 
    ```bash
-   dotnet test
+   dotnet test --configuration Release
    ```
 
 ## Coding Standards
 
+### General Guidelines
+
+- Follow the [C# Coding Conventions][csharp-conventions]
+- Use clear, descriptive names for variables, methods, and classes
+- Write XML documentation comments for all public, internal, and private members
+- Keep methods focused and single-purpose
+- Write tests for new functionality
+
 ### Code Style
 
-This project follows the coding standards defined in `.editorconfig`. Key conventions:
+This project enforces code style through `.editorconfig`. Key requirements:
 
 - **Indentation**: 4 spaces for C#, 2 spaces for YAML/JSON/XML
-- **Line endings**: LF (Unix-style)
+- **Line Endings**: LF (Unix-style)
 - **Encoding**: UTF-8
+- **Namespaces**: Use file-scoped namespace declarations
 - **Braces**: Required for all control statements
-- **Naming**:
-  - Interfaces: `IRequirementParser`
+- **Naming Conventions**:
+  - Interfaces: `IInterfaceName`
   - Classes/Structs/Enums: `PascalCase`
   - Methods/Properties: `PascalCase`
-  - Parameters/Local variables: `camelCase`
+  - Parameters/Local Variables: `camelCase`
 
-### Documentation
+### XML Documentation
 
-- Use XML documentation comments (`///`) for all public APIs
-- Include meaningful comments for complex logic
-- Keep README.md and other documentation up to date
+All members require XML documentation with proper indentation:
 
-### Testing
-
-- All new features must include tests
-- Tests should follow the AAA (Arrange, Act, Assert) pattern
-- Test method naming: `TestMethod_Scenario_ExpectedBehavior`
-- All unit tests must pass before submitting a PR
-- Aim for high code coverage (>80%)
-
-### Commit Messages
-
-Write clear, descriptive commit messages:
-
-- Use the imperative mood ("Add feature" not "Added feature")
-- Keep the first line under 72 characters
-- Add details in the body if needed
-
-Example:
-
-```text
-Add validation for requirement IDs
-
-- Ensures requirement IDs are unique
-- Adds tests for duplicate ID detection
-- Updates error messages for clarity
+```csharp
+/// <summary>
+///     Brief description of what this does.
+/// </summary>
+/// <param name="parameter">Description of the parameter.</param>
+/// <returns>Description of the return value.</returns>
+public int ExampleMethod(string parameter)
+{
+    // Implementation
+}
 ```
 
-## Quality Checks
+Note the spaces after `///` for proper indentation in summary blocks.
 
-Before submitting a pull request, ensure your code passes all quality checks:
+## Testing Guidelines
 
-### Build and Test
+### Test Framework
 
-```bash
-dotnet restore
-dotnet build --configuration Release
-dotnet test --configuration Release
-```
+We use MSTest v4 for unit and integration tests.
+
+### Test Naming Convention
+
+Use the pattern: `ClassName_MethodUnderTest_Scenario_ExpectedBehavior`
+
+Examples:
+
+- `Program_Main_NoArguments_ReturnsSuccess`
+- `Context_Create_WithInvalidFlag_ThrowsArgumentException`
+- `Validation_Run_AllTests_ReturnsSuccess`
+
+### Writing Tests
+
+- Write tests that are clear and focused
+- Use modern MSTest v4 assertions:
+  - `Assert.HasCount(expectedCount, collection)`
+  - `Assert.IsEmpty(collection)`
+  - `Assert.DoesNotContain(item, collection)`
+- Always clean up resources (use `try/finally` for console redirection)
+- Link tests to requirements in `requirements.yaml` when applicable
 
 ### Running Tests
 
@@ -155,68 +173,127 @@ dotnet run --project src/DemaConsulting.ReqStream \
   --configuration Release --framework net10.0 --no-build -- --validate
 ```
 
-### Linting
+## Documentation
 
-The CI pipeline runs the following checks:
+### Markdown Guidelines
 
-- **Markdown linting**: Checks markdown file formatting
-- **Spell checking**: Validates spelling in markdown and C# files
-- **YAML linting**: Validates YAML file structure
+All markdown files must follow these rules (enforced by markdownlint):
 
-You can run these locally if you have the tools installed:
+- Maximum line length: 120 characters
+- Use ATX-style headers (`# Header`)
+- Lists must be surrounded by blank lines
+- Use reference-style links: `[text][ref]` with `[ref]: url` at document end
+- **Exceptions**:
+  - `README.md` uses absolute URLs (it's included in the NuGet package)
+  - AI agent markdown files (`.github/agents/*.agent.md`) use inline links
+    `[text](url)` so URLs are visible in agent context
+
+### Spell Checking
+
+All files are spell-checked using cspell. **Never** add a word to the `.cspell.yaml` word list in order to silence a
+spell-checking failure. Doing so defeats the purpose of spell-checking and reduces the quality of the repository.
+
+- If cspell flags a word that is **misspelled**, fix the spelling in the source file.
+- If cspell flags a word that is a **genuine technical term** (tool name, project identifier, etc.) and is spelled
+  correctly, raise a **proposal** (e.g. comment in a pull request) explaining why the word should be added. The
+  proposal must be reviewed and approved before the word is added to the list.
+
+## Quality Checks
+
+Before submitting a pull request, ensure all quality checks pass:
+
+### 1. Build, Test, and Validate
 
 ```bash
-# Markdown linting
-markdownlint-cli2 "**/*.md"
+# Build the project
+dotnet build --configuration Release
 
-# Spell checking
-cspell "**/*.md" "**/*.cs"
+# Run unit tests
+dotnet test --configuration Release
 
-# YAML linting
-yamllint .
+# Run self-validation tests
+dotnet run --project src/DemaConsulting.ReqStream --configuration Release --framework net10.0 --no-build -- --validate
 ```
+
+All tests must pass with zero warnings.
+
+### 2. Linting
+
+```bash
+# Use the lint script which installs dependencies and runs all linters
+./lint.sh           # Linux/macOS (or: bash ./lint.sh)
+cmd /c lint.bat     # Windows (Command Prompt)
+./lint.bat          # Windows (PowerShell)
+```
+
+### 3. Code Coverage
+
+Maintain or improve code coverage. Use the `--collect "XPlat Code Coverage"` option when running tests.
+
+## Commit Messages
+
+Write clear, concise commit messages:
+
+- Use present tense ("Add feature" not "Added feature")
+- Use imperative mood ("Move cursor to..." not "Moves cursor to...")
+- Limit first line to 72 characters
+- Reference issues and pull requests when applicable
+
+Examples:
+
+- `Add support for custom report headers`
+- `Fix crash when results file path is invalid`
+- `Update documentation for --report-depth option`
+- `Refactor argument parsing for better testability`
 
 ## Pull Request Process
 
-1. **Update documentation** if your changes affect usage or behavior
-2. **Add tests** for new functionality or bug fixes
-3. **Ensure all tests pass** and the code builds without warnings
-4. **Update the README** if necessary
-5. **Submit the PR** with a clear description of your changes
-6. **Address review feedback** promptly
+1. **Update Documentation**: Update relevant documentation for your changes
+2. **Add Tests**: Include tests that cover your changes
+3. **Run Quality Checks**: Ensure all linters, tests, and builds pass
+4. **Submit PR**: Create a pull request with a clear description
+5. **Code Review**: Address feedback from maintainers
+6. **Merge**: Once approved, a maintainer will merge your PR
 
-### PR Guidelines
+### Pull Request Template
 
-- Keep PRs focused on a single feature or fix
-- Write a clear PR description explaining what and why
-- Reference any related issues
-- Be responsive to review feedback
-- Ensure CI checks pass
+When creating a pull request, include:
 
-## Project Structure
+- **Description**: What changes does this PR introduce?
+- **Motivation**: Why are these changes needed?
+- **Related Issues**: Link to any related issues
+- **Testing**: How have you tested these changes?
+- **Checklist**:
+  - [ ] Tests added/updated
+  - [ ] Documentation updated
+  - [ ] All tests pass
+  - [ ] Code follows style guidelines
+  - [ ] No new warnings introduced
 
-```text
-ReqStream/
-├── .github/              # GitHub configuration (workflows, issue templates)
-├── src/                  # Source code
-│   └── DemaConsulting.ReqStream/
-├── test/                 # Test projects
-│   └── DemaConsulting.ReqStream.Tests/
-├── .editorconfig         # Code style configuration
-├── AGENTS.md             # AI agent guidelines
-├── CODE_OF_CONDUCT.md    # Code of conduct
-├── CONTRIBUTING.md       # This file
-├── LICENSE               # MIT License
-└── README.md             # Project documentation
-```
+## Requirements Management
 
-## Questions?
+ReqStream uses itself for requirements traceability:
 
-If you have questions about contributing, feel free to:
+- All requirements are defined in `requirements.yaml`
+- Each requirement should be linked to test cases
+- Run `dotnet reqstream` to generate requirements documentation
+- Use the `--enforce` flag to ensure all requirements have test coverage
 
-- Open an issue for discussion
-- Reach out to the maintainers
-- Check the [AGENTS.md][agents] file for detailed technical guidelines
+## Release Process
+
+Releases are managed by project maintainers. The process includes:
+
+1. Version bump in project files
+2. Tag the release in Git
+3. Build and test across all supported platforms
+4. Publish NuGet package
+5. Create GitHub release with artifacts and release notes
+
+## Getting Help
+
+- **Questions**: Use [GitHub Discussions][discussions]
+- **Bugs**: Report via [GitHub Issues][issues]
+- **Security**: See [SECURITY.md][security] for vulnerability reporting
 
 ## License
 
@@ -224,6 +301,9 @@ By contributing to ReqStream, you agree that your contributions will be licensed
 
 Thank you for contributing to ReqStream!
 
-[code-of-conduct]: CODE_OF_CONDUCT.md
-[agents]: AGENTS.md
+[code-of-conduct]: https://github.com/demaconsulting/ReqStream/blob/main/CODE_OF_CONDUCT.md
+[dotnet-download]: https://dotnet.microsoft.com/download
+[csharp-conventions]: https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions
+[discussions]: https://github.com/demaconsulting/ReqStream/discussions
 [issues]: https://github.com/demaconsulting/ReqStream/issues
+[security]: https://github.com/demaconsulting/ReqStream/blob/main/SECURITY.md

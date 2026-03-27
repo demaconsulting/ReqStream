@@ -1,6 +1,8 @@
 ---
-name: Test Developer
-description: Writes unit and integration tests following AAA pattern - clear documentation of what's tested and proved
+name: test-developer
+description: Writes unit and integration tests.
+tools: [read, search, edit, execute, github, agent]
+user-invocable: true
 ---
 
 # Test Developer - ReqStream
@@ -132,12 +134,19 @@ Common anti-patterns to avoid (not exhaustive):
    // ✅ Good: Assert.StartsWith("prefix", value);
    ```
 
-## Defer To
+## Subagent Delegation
 
-- **Requirements Agent**: For test strategy and coverage requirements
-- **Software Developer Agent**: For self-validation tests and production code issues
-- **Technical Writer Agent**: For test documentation in markdown
-- **Code Quality Agent**: For test linting and static analysis
+If test strategy or coverage requirements need defining, call the @requirements agent with the **request** to
+define test strategy and coverage requirements and the **context** of the feature being tested.
+
+If self-validation tests or production code issues arise, call the @software-developer agent with the **request**
+to implement self-validation tests or fix production code and the **context** of the issue found.
+
+If test documentation in markdown needs updating, call the @technical-writer agent with the **request** to
+update test documentation and the **context** of the tests written.
+
+If test linting or static analysis issues arise, call the @code-quality agent with the **request** to fix test
+linting or static analysis issues and the **context** of the issues found.
 
 ## Don't
 

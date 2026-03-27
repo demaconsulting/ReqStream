@@ -10,6 +10,7 @@ written in YAML files.
 - **Software Developer** - Writes production code and self-validation tests in literate style
 - **Test Developer** - Creates unit and integration tests following AAA pattern
 - **Code Quality Agent** - Enforces linting, static analysis, and security standards
+- **Code Review Agent** - Assists in performing formal file reviews
 - **Repo Consistency Agent** - Ensures downstream repositories remain consistent with template patterns
 
 ## Agent Selection Guide
@@ -22,6 +23,7 @@ written in YAML files.
 - Add or update requirements → **Requirements Agent**
 - Ensure test coverage linkage in `requirements.yaml` → **Requirements Agent**
 - Run security scanning or address CodeQL alerts → **Code Quality Agent**
+- Perform formal file reviews → **Code Review Agent**
 - Propagate template changes → **Repo Consistency Agent**
 
 ## Tech Stack
@@ -32,7 +34,17 @@ written in YAML files.
 
 - **`requirements.yaml`** - All requirements with test linkage (enforced via `dotnet reqstream --enforce`)
 - **`.editorconfig`** - Code style (file-scoped namespaces, 4-space indent, UTF-8, LF endings)
-- **`.cspell.json`, `.markdownlint-cli2.jsonc`, `.yamllint.yaml`** - Linting configs
+- **`.cspell.yaml`, `.markdownlint-cli2.yaml`, `.yamllint.yaml`** - Linting configs
+
+### Spell check word list policy
+
+**Never** add a word to the `.cspell.yaml` word list in order to silence a spell-checking failure.
+Doing so defeats the purpose of spell-checking and reduces the quality of the repository.
+
+- If cspell flags a word that is **misspelled**, fix the spelling in the source file.
+- If cspell flags a word that is a **genuine technical term** (tool name, project identifier, etc.) and is
+  spelled correctly, raise a **proposal** (e.g. comment in a pull request) explaining why the word
+  should be added. The proposal must be reviewed and approved before the word is added to the list.
 
 ## Requirements
 
@@ -108,7 +120,8 @@ build.bat     # Windows
 
 ## Markdown Link Style
 
-- **AI agent markdown files** (`.github/agents/*.md`): Use inline links `[text](url)` so URLs are visible in agent context
+- **AI agent markdown files** (`.github/agents/*.agent.md`): Use inline links `[text](url)` so
+  URLs are visible in agent context
 - **README.md**: Use absolute URLs (shipped in NuGet package)
 - **All other markdown files**: Use reference-style links `[text][ref]` with `[ref]: url` at document end
 
