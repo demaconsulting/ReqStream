@@ -26,3 +26,15 @@ sections:
               requirements are satisfied only by test evidence from the appropriate source files.
             tests:
               - ReqStream_SourceFilter_MatchesTestsBySourceFile
+
+          - id: ReqStream-Sys-EnforceMode
+            title: >-
+              The system shall exit with a non-zero code when enforcement mode is active and any
+              requirement lacks passing test evidence.
+            justification: |
+              Enforcement mode makes unproven requirements a build-breaking condition, ensuring
+              that the CI/CD pipeline fails if any requirement is not covered by passing tests.
+              This validates both the positive case (all requirements satisfied, exit code 0) and
+              the negative case (unsatisfied requirement, non-zero exit code).
+            tests:
+              - ReqStream_EnforcementMode
