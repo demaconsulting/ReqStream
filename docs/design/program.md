@@ -56,7 +56,7 @@ order; if a step applies, execution returns immediately without reaching later s
 
 | Priority | Condition | Action |
 | -------- | --------- | ------ |
-| 1 | `context.Version` is `true` | Call `PrintBanner`; print version only; return |
+| 1 | `context.Version` is `true` | Print version string only; return |
 | 2 | (always) | Call `PrintBanner` |
 | 3 | `context.Help` is `true` | Call `PrintHelp`; return |
 | 4 | `context.Validate` is `true` | Call `Validation.Run(context)`; return |
@@ -65,9 +65,9 @@ order; if a step applies, execution returns immediately without reaching later s
 
 ### `PrintBanner`
 
-`PrintBanner` writes a single line to `context` containing the tool name, version string, and
-copyright notice. It is called at priority step 2 (and also at step 1 for the version query) so
-that every non-trivial invocation identifies the running version.
+`PrintBanner` writes three lines to `context`: the tool name with version string, the copyright
+notice, and a blank line. It is called at priority step 2 for all invocations except version
+queries, so that every non-trivial invocation identifies the running version.
 
 ### `PrintHelp`
 
@@ -88,8 +88,7 @@ Its internal sequence is:
    the test result files.
 5. If `context.Matrix` is set and a trace matrix was constructed, export the matrix report at
    `context.MatrixDepth`.
-6. If `context.Enforce` is `true`, call `EnforceRequirementsCoverage(context, requirements,
-   traceMatrix)`.
+6. If `context.Enforce` is `true`, call `EnforceRequirementsCoverage(context, traceMatrix)`.
 
 All export methods respect `context.FilterTags` for tag-filtered output.
 

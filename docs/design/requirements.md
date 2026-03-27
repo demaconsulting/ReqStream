@@ -41,7 +41,7 @@ operation:
 | Field | Type | Purpose |
 | ----- | ---- | ------- |
 | `_includedFiles` | `HashSet<string>` | Absolute paths of files already processed; prevents infinite include loops |
-| `_allRequirements` | `Dictionary<string, string>` | Maps requirement ID to source file path; detects duplicate IDs |
+| `_allRequirements` | `Dictionary<string, Requirement>` | Maps requirement ID to the owning `Requirement` object; detects duplicate IDs and enables child-requirement lookup |
 
 ## YAML Intermediate Types
 

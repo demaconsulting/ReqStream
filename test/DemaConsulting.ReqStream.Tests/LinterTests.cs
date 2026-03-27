@@ -565,4 +565,112 @@ mappings:
         // Error should include 'error:' severity
         Assert.Contains("error:", errors);
     }
+
+    /// <summary>
+    /// Test that a requirement with a blank id reports an error.
+    /// </summary>
+    [TestMethod]
+    public void Linter_Lint_WithBlankRequirementId_ReportsError()
+    {
+        var reqFile = Path.Combine(_testDirectory, "blank-req-id.yaml");
+        File.WriteAllText(reqFile, @"sections:
+  - title: Test Section
+    requirements:
+      - id: ''
+        title: Test requirement
+");
+
+        var (exitCode, errors) = RunLint(reqFile);
+
+        Assert.AreEqual(1, exitCode);
+        Assert.Contains("Requirement 'id' cannot be blank", errors);
+    }
+
+    /// <summary>
+    /// Test that a requirement with a blank title reports an error.
+    /// </summary>
+    [TestMethod]
+    public void Linter_Lint_WithBlankRequirementTitle_ReportsError()
+    {
+        var reqFile = Path.Combine(_testDirectory, "blank-req-title.yaml");
+        File.WriteAllText(reqFile, @"sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: ''
+");
+
+        var (exitCode, errors) = RunLint(reqFile);
+
+        Assert.AreEqual(1, exitCode);
+        Assert.Contains("Requirement 'title' cannot be blank", errors);
+    }
+
+    /// <summary>
+    /// Test that a mapping with a blank id reports an error.
+    /// </summary>
+    [TestMethod]
+    public void Linter_Lint_WithBlankMappingId_ReportsError()
+    {
+        var reqFile = Path.Combine(_testDirectory, "blank-mapping-id.yaml");
+        File.WriteAllText(reqFile, @"sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Test requirement
+mappings:
+  - id: ''
+    tests:
+      - SomeTest
+");
+
+        var (exitCode, errors) = RunLint(reqFile);
+
+        Assert.AreEqual(1, exitCode);
+        Assert.Contains("Mapping 'id' cannot be blank", errors);
+    }
+
+    /// <summary>
+    /// Test that a blank test name in a requirement reports an error.
+    /// </summary>
+    [TestMethod]
+    public void Linter_Lint_WithBlankTestName_ReportsError()
+    {
+        var reqFile = Path.Combine(_testDirectory, "blank-test-name.yaml");
+        File.WriteAllText(reqFile, @"sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Test requirement
+        tests:
+          - ''
+");
+
+        var (exitCode, errors) = RunLint(reqFile);
+
+        Assert.AreEqual(1, exitCode);
+        Assert.Contains("Test name cannot be blank", errors);
+    }
+
+    /// <summary>
+    /// Test that a blank tag name in a requirement reports an error.
+    /// </summary>
+    [TestMethod]
+    public void Linter_Lint_WithBlankTagName_ReportsError()
+    {
+        var reqFile = Path.Combine(_testDirectory, "blank-tag-name.yaml");
+        File.WriteAllText(reqFile, @"sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Test requirement
+        tags:
+          - ''
+");
+
+        var (exitCode, errors) = RunLint(reqFile);
+
+        Assert.AreEqual(1, exitCode);
+        Assert.Contains("Tag name cannot be blank", errors);
+    }
 }

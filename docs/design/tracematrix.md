@@ -49,32 +49,33 @@ result file.
 The constructor builds the internal test-execution index:
 
 1. Store `requirements` for later iteration.
-2. For each path in `testResultFiles`, call `LoadTestResultFile(path)`.
+2. For each path in `testResultFiles`, call `ProcessTestResultFile(path)`.
 3. After all files are loaded, `_testExecutions` contains every unique test name seen, each mapped
    to a list of `TestExecution` records (one per file that contained that test name).
 
-### `LoadTestResultFile(path)`
+### `ProcessTestResultFile(filePath)`
 
-`LoadTestResultFile` reads and parses one test-result file.
+`ProcessTestResultFile` reads and parses one test-result file.
 
 1. Read the file text.
 2. Call `DemaConsulting.TestResults.IO.Serializer.Deserialize(content)` to auto-detect the format
    (TRX or JUnit) and parse the results.
 3. If parsing fails, wrap the underlying exception in an `InvalidOperationException` that includes
-   `path` so the caller can identify the offending file.
+   `filePath` so the caller can identify the offending file.
 4. For each test case in the deserialized result set, create a `TestExecution` with:
-   - `FileBaseName` = `Path.GetFileNameWithoutExtension(path)`
+   - `FileBaseName` = `Path.GetFileNameWithoutExtension(filePath)`
    - `Name` = test case name
    - `Metrics` = `TestMetrics(passes, fails)` derived from the test case outcome
 5. Append the `TestExecution` to `_testExecutions[name]`, creating the list entry if absent.
 
 ## Methods
 
-### `GetTestResult(testName, sourceFilter)`
+### `GetTestResult(testName)`
 
-`GetTestResult` returns aggregated `TestMetrics` for a named test, with optional source filtering.
+`GetTestResult` returns aggregated `TestMetrics` for a named test, with optional source filtering
+encoded in the `testName` parameter itself.
 
-**Source-specific format** (`testName` contains `'@'`):
+**Source-specific format** (`testName` contains `'@'` not at position 0 or end):
 
 1. Split `testName` on the first `'@'` to obtain `sourcePart` and `namePart`.
 2. Look up `_testExecutions[namePart]`.
@@ -82,7 +83,7 @@ The constructor builds the internal test-execution index:
 4. Sum the `Metrics.Passes` and `Metrics.Fails` of the filtered entries.
 5. Return `TestMetrics(totalPasses, totalFails)`.
 
-**Plain format** (`testName` does not contain `'@'`):
+**Plain format** (`testName` does not contain a valid `'@'` separator):
 
 1. Look up `_testExecutions[testName]`.
 2. Sum all `Metrics.Passes` and `Metrics.Fails` without source filtering.

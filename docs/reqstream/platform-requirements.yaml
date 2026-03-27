@@ -39,6 +39,7 @@ sections:
               - "windows@ReqStream_ReportExport"
               - "windows@ReqStream_TagsFiltering"
               - "windows@ReqStream_EnforcementMode"
+              - "windows@ReqStream_Lint"
 
           - id: ReqStream-Plt-Linux
             title: The tool shall run on Linux operating systems.
@@ -53,6 +54,7 @@ sections:
               - "ubuntu@ReqStream_ReportExport"
               - "ubuntu@ReqStream_TagsFiltering"
               - "ubuntu@ReqStream_EnforcementMode"
+              - "ubuntu@ReqStream_Lint"
 
           - id: ReqStream-Plt-MacOS
             title: The tool shall run on macOS operating systems.
@@ -67,6 +69,7 @@ sections:
               - "macos@ReqStream_ReportExport"
               - "macos@ReqStream_TagsFiltering"
               - "macos@ReqStream_EnforcementMode"
+              - "macos@ReqStream_Lint"
 
           - id: ReqStream-Plt-Net8
             title: The tool shall support .NET 8.0 runtime.
@@ -80,6 +83,7 @@ sections:
               - "dotnet8.x@ReqStream_ReportExport"
               - "dotnet8.x@ReqStream_TagsFiltering"
               - "dotnet8.x@ReqStream_EnforcementMode"
+              - "dotnet8.x@ReqStream_Lint"
 
           - id: ReqStream-Plt-Net9
             title: The tool shall support .NET 9.0 runtime.
@@ -94,6 +98,7 @@ sections:
               - "dotnet9.x@ReqStream_ReportExport"
               - "dotnet9.x@ReqStream_TagsFiltering"
               - "dotnet9.x@ReqStream_EnforcementMode"
+              - "dotnet9.x@ReqStream_Lint"
 
           - id: ReqStream-Plt-Net10
             title: The tool shall support .NET 10.0 runtime.
@@ -108,3 +113,4 @@ sections:
               - "dotnet10.x@ReqStream_ReportExport"
               - "dotnet10.x@ReqStream_TagsFiltering"
               - "dotnet10.x@ReqStream_EnforcementMode"
+              - "dotnet10.x@ReqStream_Lint"

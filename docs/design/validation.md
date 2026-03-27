@@ -34,7 +34,8 @@ The six validation tests are listed in the order they are executed:
 
 Each test method:
 
-1. Creates a `DirectorySwitch` (see below) to operate in a fresh temporary directory.
+1. Creates a `TemporaryDirectory` for isolation and uses `DirectorySwitch` (see below) to operate
+   within it.
 2. Writes one or more YAML or test-result fixture files to the temporary directory.
 3. Invokes a `Program` method or builds a `Context` and executes the relevant workflow.
 4. Asserts the expected outcomes (file content, exit code, error messages).
@@ -56,24 +57,39 @@ The serializer is invoked with the assembled `TestResults` object and the resolv
 
 ## Supporting Types
 
+### `TemporaryDirectory` (nested helper class)
+
+`TemporaryDirectory` is an `IDisposable` helper that creates and manages the lifetime of a
+temporary directory.
+
+**Construction**:
+
+1. Compose a unique path under `Path.GetTempPath()` using a GUID suffix.
+2. Call `Directory.CreateDirectory` to create the directory.
+3. Expose the path via the `DirectoryPath` property.
+
+**Disposal**:
+
+1. If the directory still exists, call `Directory.Delete` recursively to remove it and all
+   contents.
+
 ### `DirectorySwitch` (nested helper class)
 
-`DirectorySwitch` is an `IDisposable` helper that manages temporary working-directory lifetime for
-test isolation.
+`DirectorySwitch` is an `IDisposable` helper that temporarily changes the process working directory.
 
 **Construction**:
 
 1. Capture `Directory.GetCurrentDirectory()` as the original directory.
-2. Create a new temporary directory (e.g., via `Path.GetTempPath()` + a unique name).
-3. Call `Directory.SetCurrentDirectory` to make the temporary directory the working directory.
+2. Call `Directory.SetCurrentDirectory` to switch to the supplied `newDirectory`.
 
 **Disposal**:
 
 1. Call `Directory.SetCurrentDirectory` to restore the original directory.
-2. Delete the temporary directory and all its contents recursively.
 
-This pattern guarantees that each test starts with a clean file system state and that no test
-artifacts persist after the test completes, regardless of whether the test passes or fails.
+Each test uses both classes together: `TemporaryDirectory` owns the directory lifetime and
+`DirectorySwitch` makes it the working directory for the duration of the test. This pattern
+guarantees that each test starts with a clean file system state and that no test artifacts persist
+after the test completes, regardless of whether the test passes or fails.
 
 ## Dependencies
 
