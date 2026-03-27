@@ -673,4 +673,45 @@ mappings:
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Tag name cannot be blank", errors);
     }
+
+    /// <summary>
+    /// Test that a mapping with a blank test name reports an error.
+    /// </summary>
+    [TestMethod]
+    public void Linter_Lint_WithBlankMappingTestName_ReportsError()
+    {
+        var reqFile = Path.Combine(_testDirectory, "blank-mapping-test-name.yaml");
+        File.WriteAllText(reqFile, @"sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Test requirement
+mappings:
+  - id: REQ-001
+    tests:
+      - ''
+");
+
+        var (exitCode, errors) = RunLint(reqFile);
+
+        Assert.AreEqual(1, exitCode);
+        Assert.Contains("Test name cannot be blank in mapping", errors);
+    }
+
+    /// <summary>
+    /// Test that a requirements file with a non-mapping root (e.g. a top-level sequence) reports an error.
+    /// </summary>
+    [TestMethod]
+    public void Linter_Lint_WithNonMappingRoot_ReportsError()
+    {
+        var reqFile = Path.Combine(_testDirectory, "non-mapping-root.yaml");
+        File.WriteAllText(reqFile, @"- item1
+- item2
+");
+
+        var (exitCode, errors) = RunLint(reqFile);
+
+        Assert.AreEqual(1, exitCode);
+        Assert.Contains("Document root must be a mapping", errors);
+    }
 }

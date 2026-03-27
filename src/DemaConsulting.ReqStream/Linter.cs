@@ -74,7 +74,7 @@ public static class Linter
         var seenIds = new Dictionary<string, string>(StringComparer.Ordinal);
 
         // Track all visited files to avoid linting the same file twice (following includes)
-        var visitedFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var visitedFiles = new HashSet<string>(StringComparer.Ordinal);
 
         // Count total issues
         var issueCount = 0;
@@ -146,10 +146,10 @@ public static class Linter
         }
 
         // Parse the YAML into a node tree
-        YamlMappingNode? root;
+        YamlNode? rawRoot;
         try
         {
-            root = ParseYaml(yaml);
+            rawRoot = ParseYaml(yaml);
         }
         catch (Exception ex)
         {
@@ -162,9 +162,17 @@ public static class Linter
         }
 
         // Empty documents are valid
-        if (root == null)
+        if (rawRoot == null)
         {
             return 0;
+        }
+
+        // Document root must be a mapping node
+        if (rawRoot is not YamlMappingNode root)
+        {
+            context.WriteError(
+                $"{path}({rawRoot.Start.Line},{rawRoot.Start.Column}): error: Document root must be a mapping");
+            return 1;
         }
 
         // Lint document root fields
@@ -191,12 +199,12 @@ public static class Linter
     }
 
     /// <summary>
-    ///     Parses YAML text into a mapping node, or returns null for empty documents.
+    ///     Parses YAML text and returns the root node, or returns null for empty documents.
     /// </summary>
     /// <param name="yaml">The YAML text to parse.</param>
-    /// <returns>The root mapping node, or null if the document is empty.</returns>
+    /// <returns>The root node, or null if the document is empty.</returns>
     /// <exception cref="YamlException">Thrown when the YAML is malformed.</exception>
-    private static YamlMappingNode? ParseYaml(string yaml)
+    private static YamlNode? ParseYaml(string yaml)
     {
         var stream = new YamlStream();
         using var reader = new StringReader(yaml);
@@ -207,8 +215,7 @@ public static class Linter
             return null;
         }
 
-        var rootNode = stream.Documents[0].RootNode;
-        return rootNode as YamlMappingNode;
+        return stream.Documents[0].RootNode;
     }
 
     /// <summary>
@@ -240,7 +247,7 @@ public static class Linter
         }
 
         // Lint sections
-        var sections = GetSequence(root, "sections");
+        var sections = GetSequenceChecked(context, path, root, "sections", ref issueCount);
         if (sections != null)
         {
             foreach (var sectionNode in sections.Children)
@@ -259,7 +266,7 @@ public static class Linter
         }
 
         // Lint mappings
-        var mappings = GetSequence(root, "mappings");
+        var mappings = GetSequenceChecked(context, path, root, "mappings", ref issueCount);
         if (mappings != null)
         {
             foreach (var mappingNode in mappings.Children)
@@ -324,7 +331,7 @@ public static class Linter
         }
 
         // Lint requirements
-        var requirements = GetSequence(section, "requirements");
+        var requirements = GetSequenceChecked(context, path, section, "requirements", ref issueCount);
         if (requirements != null)
         {
             foreach (var reqNode in requirements.Children)
@@ -343,7 +350,7 @@ public static class Linter
         }
 
         // Lint child sections
-        var sections = GetSequence(section, "sections");
+        var sections = GetSequenceChecked(context, path, section, "sections", ref issueCount);
         if (sections != null)
         {
             foreach (var childNode in sections.Children)
@@ -530,6 +537,40 @@ public static class Linter
         }
 
         return issueCount;
+    }
+
+    /// <summary>
+    ///     Gets a sequence node from a mapping node by key, reporting a type mismatch error if the
+    ///     key exists but the value is not a sequence.
+    /// </summary>
+    /// <param name="context">The context for output.</param>
+    /// <param name="path">The file path for error messages.</param>
+    /// <param name="mapping">The mapping node to search.</param>
+    /// <param name="key">The key to look up.</param>
+    /// <param name="issues">Incremented by one when a type mismatch error is reported.</param>
+    /// <returns>The sequence node, or null if not found or a type error was reported.</returns>
+    private static YamlSequenceNode? GetSequenceChecked(
+        Context context,
+        string path,
+        YamlMappingNode mapping,
+        string key,
+        ref int issues)
+    {
+        var keyNode = new YamlScalarNode(key);
+        if (!mapping.Children.TryGetValue(keyNode, out var value))
+        {
+            return null;
+        }
+
+        if (value is YamlSequenceNode seq)
+        {
+            return seq;
+        }
+
+        context.WriteError(
+            $"{path}({value.Start.Line},{value.Start.Column}): error: Field '{key}' must be a sequence");
+        issues++;
+        return null;
     }
 
     /// <summary>

@@ -65,20 +65,24 @@ causes the process to exit with code `1`.
 5. Attempt to parse the text with `YamlStream.Load()`. If a `YamlException` is thrown (malformed
    YAML), call `context.WriteError` with the exception message and return; do not attempt to lint
    further.
-6. For each `YamlDocument` in the stream, call `LintDocument(context, path, doc, seenIds)`.
-7. After all documents are linted, locate the `includes:` sequence in the root mapping (if present)
+6. If the stream has no documents (empty file), return immediately — empty files are valid.
+7. If the root node is present but is not a `YamlMappingNode` (e.g. a top-level sequence or scalar),
+   emit an error at the node's position and return.
+8. Call `LintDocumentRoot(context, path, root, seenIds)` with the mapping root.
+9. After all documents are linted, locate the `includes:` sequence in the root mapping (if present)
    and for each scalar entry call `LintFile` recursively, resolving the include path relative to
    the directory of the current file.
 
-### `LintDocument(context, path, doc, seenIds)`
+### `LintDocumentRoot(context, path, root, seenIds)`
 
-`LintDocument` validates the top-level structure of a single YAML document.
+`LintDocumentRoot` validates the top-level structure of a single YAML document.
 
-1. Assert that the document root is a `YamlMappingNode`; if not, emit an error and return.
-2. For each key in the root mapping, check that it is a member of `KnownDocumentFields`; if not,
+1. For each key in the root mapping, check that it is a member of `KnownDocumentFields`; if not,
    emit an unknown-field error at the key's position.
-3. Locate the `sections:` node and delegate to `LintSections`.
-4. Locate the `mappings:` node and delegate to `LintMappings`.
+2. Locate the `sections:` node. If the key exists but its value is not a `YamlSequenceNode`, emit a
+   type-mismatch error. Otherwise delegate to `LintSections`.
+3. Locate the `mappings:` node. If the key exists but its value is not a `YamlSequenceNode`, emit a
+   type-mismatch error. Otherwise delegate to `LintMappings`.
 
 ### `LintSections(context, path, sectionsNode, seenIds)`
 
@@ -91,8 +95,10 @@ causes the process to exit with code `1`.
 1. Assert `sectionNode` is a `YamlMappingNode`; emit an error and return if not.
 2. For each key, check against `KnownSectionFields`; emit an unknown-field error for any unknown key.
 3. Check that `title` is present and non-blank; emit an error if missing or blank.
-4. If `sections:` is present, call `LintSections` recursively.
-5. If `requirements:` is present, call `LintRequirements`.
+4. If `sections:` key is present but its value is not a sequence, emit a type-mismatch error;
+   otherwise call `LintSections` recursively.
+5. If `requirements:` key is present but its value is not a sequence, emit a type-mismatch error;
+   otherwise call `LintRequirements`.
 
 ### `LintRequirements(context, path, requirementsNode, seenIds)`
 

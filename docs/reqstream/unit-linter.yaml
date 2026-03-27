@@ -57,15 +57,17 @@ sections:
               - Linter_Lint_WithNestedSectionIssues_ReportsError
 
           - id: ReqStream-Lint-MissingRequirementFields
-            title: The linter shall report an error when a requirement is missing the required id or title field.
+            title: The linter shall report an error when a requirement is missing or has a blank id or title field.
             justification: |
-              The id and title fields are mandatory for all requirements. Missing them causes downstream
-              processing failures and produces incomplete reports.
+              The id and title fields are mandatory for all requirements. Missing or blank values cause downstream
+              processing failures and produce incomplete reports.
             tags:
               - lint
             tests:
               - Linter_Lint_WithRequirementMissingId_ReportsError
               - Linter_Lint_WithRequirementMissingTitle_ReportsError
+              - Linter_Lint_WithBlankRequirementId_ReportsError
+              - Linter_Lint_WithBlankRequirementTitle_ReportsError
 
           - id: ReqStream-Lint-DuplicateIds
             title: The linter shall report an error when duplicate requirement IDs are found.
@@ -128,4 +130,35 @@ sections:
               - lint
             tests:
               - Linter_Lint_WithUnknownMappingField_ReportsError
+
+          - id: ReqStream-Lint-MissingMappingId
+            title: The linter shall report an error when a test mapping is missing or has a blank id field.
+            justification: |
+              The id field is mandatory for all test mappings. Missing or blank values prevent the mapping
+              from being associated with a requirement and cause downstream processing failures.
+            tags:
+              - lint
+            tests:
               - Linter_Lint_WithMappingMissingId_ReportsError
+              - Linter_Lint_WithBlankMappingId_ReportsError
+
+          - id: ReqStream-Lint-BlankTestName
+            title: The linter shall report an error when a test name in a requirement or mapping is blank.
+            justification: |
+              Blank test names cannot be matched against test result files and would silently break
+              coverage calculations.
+            tags:
+              - lint
+            tests:
+              - Linter_Lint_WithBlankTestName_ReportsError
+              - Linter_Lint_WithBlankMappingTestName_ReportsError
+
+          - id: ReqStream-Lint-BlankTagName
+            title: The linter shall report an error when a tag name in a requirement is blank.
+            justification: |
+              Blank tag names cannot be used for filtering and would silently produce incorrect filtered
+              exports.
+            tags:
+              - lint
+            tests:
+              - Linter_Lint_WithBlankTagName_ReportsError
