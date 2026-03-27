@@ -170,10 +170,12 @@ public class IntegrationTests
         var platformBResults = new DemaConsulting.TestResults.TestResults { Name = "PlatformBRun" };
         platformBResults.Results.Add(new DemaConsulting.TestResults.TestResult
         {
-            Name = "OtherTest",
+            // Include the same test name as in platform-a.trx, but with a failing outcome,
+            // so the test validates that the source-specific filter (platform-a@) is honored.
+            Name = "PlatformTest1",
             ClassName = "PlatformTests",
             CodeBase = "Tests.dll",
-            Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
+            Outcome = DemaConsulting.TestResults.TestOutcome.Failed,
             Duration = TimeSpan.FromSeconds(1)
         });
         var platformBFile = Path.Combine(_testDirectory, "platform-b.trx");
