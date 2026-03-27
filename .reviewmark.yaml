@@ -24,6 +24,12 @@ evidence-source:
 # Each review-set groups requirements, source, and tests for a coherent software unit
 # so that an AI-assisted review can verify consistency across the full evidence chain.
 reviews:
+  # System-level design document review
+  - id: ReqStream-Design-Introduction
+    title: Review of ReqStream Design Introduction
+    paths:
+      - "docs/design/introduction.md"
+
   # Software unit reviews - one per class
   - id: ReqStream-Context
     title: Review of ReqStream Context Unit
