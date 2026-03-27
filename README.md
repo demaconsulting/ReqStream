@@ -166,19 +166,19 @@ with sections, requirements, test mappings, and file includes.
 sections:
   - title: System Security
     requirements:
-      - id: SYS-SEC-001
+      - id: Security-CredentialAuthentication
         title: The system shall support credentials authentication.
         justification: |
           Authentication is critical to ensure only authorized users can access the system.
           This requirement establishes the foundation for our security posture.
         children: # Support linking to child requirements
-          - AUTH-001
+          - Auth-CredentialValidation
 
   - title: Data Management
     sections:
       - title: User Authentication
         requirements:
-          - id: AUTH-001
+          - id: Auth-CredentialValidation
             title: All requests shall have their credentials authenticated before being processed.
             justification: |
               Prevents unauthorized access to system resources and ensures compliance with
@@ -190,7 +190,7 @@ sections:
 
       - title: Logging
         requirements:
-          - id: DATA-001
+          - id: Logging-RequestLogging
             title: All requests shall be logged.
 
 # Include other requirement files - may contain requirements and/or test mappings
@@ -200,7 +200,7 @@ includes:
 
 # Test mappings support defining tests separate from requirements
 mappings:
-  - id: DATA-001
+  - id: Logging-RequestLogging
     tests:
       - Logging_ValidRequest_Logged
       - Logging_InvalidRequest_Logged
@@ -239,17 +239,17 @@ Test source linking allows requirements to specify which test results should com
 
 ```yaml
 requirements:
-  - id: PLAT-001
+  - id: Platform-Windows
     title: Shall support Windows
     tests:
       - windows@Test_PlatformFeature  # Matches only from files containing "windows"
   
-  - id: PLAT-002
+  - id: Platform-Linux
     title: Shall support Linux
     tests:
       - ubuntu@Test_PlatformFeature   # Matches only from files containing "ubuntu"
   
-  - id: PLAT-003
+  - id: Platform-CrossPlatform
     title: Shall support cross-platform features
     tests:
       - Test_CrossPlatformFeature     # Aggregates from all test result files
@@ -275,13 +275,13 @@ Tags are defined as an optional list in the requirement definition:
 sections:
   - title: System Security
     requirements:
-      - id: SYS-SEC-001
+      - id: Security-CredentialAuthentication
         title: The system shall support credentials authentication.
         tags:
           - security
           - critical
       
-      - id: SYS-SEC-002
+      - id: Security-AuditLogging
         title: The system shall log all authentication attempts.
         tags:
           - security
@@ -289,7 +289,7 @@ sections:
   
   - title: Performance
     requirements:
-      - id: PERF-001
+      - id: Performance-ResponseTime
         title: The system shall respond within 100ms.
         tags:
           - performance
@@ -442,7 +442,7 @@ Given requirements with justifications:
 sections:
   - title: Security
     requirements:
-      - id: SEC-001
+      - id: Security-DataEncryption
         title: The system shall encrypt all data at rest.
         justification: |
           Data encryption at rest protects sensitive information from unauthorized access
@@ -454,7 +454,7 @@ The exported justifications document would look like:
 ```markdown
 # Security
 
-## SEC-001
+## Security-DataEncryption
 
 **The system shall encrypt all data at rest.**
 

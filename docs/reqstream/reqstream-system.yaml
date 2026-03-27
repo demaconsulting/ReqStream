@@ -1,0 +1,40 @@
+---
+sections:
+  - title: ReqStream Requirements
+    sections:
+      - title: System Integration
+        requirements:
+          - id: ReqStream-Sys-FullPipeline
+            title: >-
+              The system shall process requirements files, load test results, generate reports, and
+              enforce coverage in a single invocation.
+            justification: |
+              Combining requirements processing, test result loading, report generation, and
+              enforcement in a single invocation is the primary CI/CD use case. This system-level
+              requirement verifies that all subsystems — Requirements, TraceMatrix, and Program —
+              work correctly when integrated together.
+            tests:
+              - ReqStream_FullPipeline_GeneratesAllReportsAndEnforces
+
+          - id: ReqStream-Sys-SourceFilter
+            title: >-
+              The system shall support source-specific test matching to restrict coverage evidence
+              to tests from named result files.
+            justification: |
+              When running tests across multiple platforms or configurations, each producing
+              separate test result files, source-specific matching ensures that platform-specific
+              requirements are satisfied only by test evidence from the appropriate source files.
+            tests:
+              - ReqStream_SourceFilter_MatchesTestsBySourceFile
+
+          - id: ReqStream-Sys-EnforceMode
+            title: >-
+              The system shall exit with a non-zero code when enforcement mode is active and any
+              requirement lacks passing test evidence.
+            justification: |
+              Enforcement mode makes unproven requirements a build-breaking condition, ensuring
+              that the CI/CD pipeline fails if any requirement is not covered by passing tests.
+              This validates both the positive case (all requirements satisfied, exit code 0) and
+              the negative case (unsatisfied requirement, non-zero exit code).
+            tests:
+              - ReqStream_EnforcementMode

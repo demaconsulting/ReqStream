@@ -28,6 +28,32 @@ The following topics are out of scope:
 - Build pipeline configuration
 - Deployment and packaging
 
+## Software Structure
+
+The following tree shows how the ReqStream software items are organized across the system,
+subsystem, and unit levels:
+
+```text
+ReqStream (System)
+├── Program Orchestration (Subsystem)
+│   ├── Command-Line Interface (Subsystem)
+│   │   └── Context (Unit)
+│   └── Program (Unit)
+├── Requirements (Subsystem)
+│   ├── Requirements File Processing (Subsystem)
+│   │   ├── Requirements (Unit)
+│   │   ├── Section (Unit)
+│   │   └── Requirement (Unit)
+│   ├── Test Integration (Subsystem)
+│   │   └── TraceMatrix (Unit)
+│   └── Linting (Subsystem)
+│       └── Linter (Unit)
+└── Validation (Subsystem)
+    └── Validation (Unit)
+```
+
+Each unit is described in detail in its own chapter within this document.
+
 ## Document Conventions
 
 Throughout this document:

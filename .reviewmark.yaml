@@ -24,6 +24,16 @@ evidence-source:
 # Each review-set groups requirements, source, and tests for a coherent software unit
 # so that an AI-assisted review can verify consistency across the full evidence chain.
 reviews:
+  # System-level review — requirements, design, integration tests, and platform support
+  - id: ReqStream-System
+    title: Review of ReqStream System-Level Design and Requirements
+    paths:
+      - "docs/reqstream/reqstream-system.yaml"
+      - "docs/reqstream/platform-requirements.yaml"
+      - "docs/design/introduction.md"
+      - "docs/design/system.md"
+      - "test/**/IntegrationTests.cs"
+
   # Software unit reviews - one per class
   - id: ReqStream-Context
     title: Review of ReqStream Context Unit
@@ -78,19 +88,8 @@ reviews:
       - "src/**/Linter.cs"
       - "test/**/LinterTests.cs"
 
-  # Platform and OTS dependency reviews
-  - id: Platform-Support
-    title: Review of Platform and Runtime Support Requirements
+  # Full requirements review — all requirements files reviewed together for completeness and consistency
+  - id: ReqStream-AllRequirements
+    title: Review of All ReqStream Requirements for Consistency
     paths:
-      - "docs/reqstream/platform-requirements.yaml"
-
-  - id: OTS-Dependencies
-    title: Review of Off-The-Shelf Software Dependencies
-    paths:
-      - "docs/reqstream/ots-mstest.yaml"
-      - "docs/reqstream/ots-reqstream.yaml"
-      - "docs/reqstream/ots-buildmark.yaml"
-      - "docs/reqstream/ots-versionmark.yaml"
-      - "docs/reqstream/ots-sarifmark.yaml"
-      - "docs/reqstream/ots-sonarmark.yaml"
-      - "docs/reqstream/ots-reviewmark.yaml"
+      - "docs/reqstream/**/*.yaml"

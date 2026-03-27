@@ -158,7 +158,7 @@ A requirements YAML file has a top-level `sections` array:
 sections:
   - title: My Section
     requirements:
-      - id: REQ-001
+      - id: Core-BasicRequirement
         title: My first requirement
 ```
 
@@ -171,18 +171,18 @@ Sections provide hierarchical organization. Sections can contain requirements an
 sections:
   - title: System Requirements
     requirements:
-      - id: SYS-001
+      - id: System-TopLevel
         title: Top-level system requirement
     
     sections:
       - title: Security
         requirements:
-          - id: SEC-001
+          - id: Security-AuthRequired
             title: Security requirement
       
       - title: Performance
         requirements:
-          - id: PERF-001
+          - id: Performance-ResponseTime
             title: Performance requirement
 ```
 
@@ -206,7 +206,7 @@ Example:
 
 ```yaml
 requirements:
-  - id: SYS-SEC-001
+  - id: Security-CredentialAuthentication
     title: The system shall support credentials authentication.
     justification: |
       Authentication is critical to ensure only authorized users can access the system.
@@ -215,8 +215,8 @@ requirements:
       - security
       - critical
     children:
-      - AUTH-001
-      - AUTH-002
+      - Auth-CredentialValidation
+      - Auth-FailedAttemptLogging
 ```
 
 ## Test Mappings
@@ -227,7 +227,7 @@ Tests can be mapped to requirements in two ways:
 
 ```yaml
 requirements:
-  - id: AUTH-001
+  - id: Auth-CredentialValidation
     title: All requests shall have their credentials authenticated before being processed.
     tests:
       - Credentials_Valid_Allowed
@@ -241,11 +241,11 @@ requirements:
 sections:
   - title: Logging
     requirements:
-      - id: DATA-001
+      - id: Logging-RequestLogging
         title: All requests shall be logged.
 
 mappings:
-  - id: DATA-001
+  - id: Logging-RequestLogging
     tests:
       - Logging_ValidRequest_Logged
       - Logging_InvalidRequest_Logged
@@ -268,19 +268,19 @@ from different sources. This is particularly useful for matrix testing scenarios
 
 ```yaml
 requirements:
-  - id: PLAT-001
+  - id: Platform-Windows
     title: Shall support Windows operating systems
     tests:
       - "windows-latest@Test_PlatformBasic"
       - "windows-latest@Test_FileSystem"
   
-  - id: PLAT-002
+  - id: Platform-Linux
     title: Shall support Linux operating systems
     tests:
       - "ubuntu-latest@Test_PlatformBasic"
       - "ubuntu-latest@Test_FileSystem"
   
-  - id: PLAT-003
+  - id: Platform-CrossPlatform
     title: Shall support cross-platform APIs
     tests:
       - Test_CrossPlatformAPI  # Aggregates from all platforms
@@ -313,16 +313,16 @@ themes (e.g., security, performance, compliance) and generating focused reports 
 sections:
   - title: System Requirements
     requirements:
-      - id: SYS-SEC-001
+      - id: Security-CredentialAuthentication
         title: The system shall support credentials authentication.
         tags:
           - security
           - critical
-      - id: SYS-PERF-001
+      - id: Performance-ResponseTime
         title: The system shall respond within 100ms.
         tags:
           - performance
-      - id: SYS-SEC-002
+      - id: Security-DataEncryption
         title: The system shall encrypt data at rest.
         tags:
           - security
@@ -383,7 +383,7 @@ Large projects can be split across multiple YAML files using the `includes` sect
 sections:
   - title: Core Requirements
     requirements:
-      - id: CORE-001
+      - id: Core-Functional
         title: Core requirement
 
 includes:
@@ -414,7 +414,7 @@ sections:
     sections:
       - title: Security
         requirements:
-          - id: SEC-001
+          - id: Security-AuthRequired
             title: Authentication required
 ```
 
@@ -427,11 +427,12 @@ sections:
     sections:
       - title: Security
         requirements:
-          - id: SEC-002
+          - id: Security-AuthorizationRequired
             title: Authorization required
 ```
 
-When both files are loaded, the "Security" section will contain both SEC-001 and SEC-002.
+When both files are loaded, the "Security" section will contain both Security-AuthRequired and
+Security-AuthorizationRequired.
 
 ## Complete Example
 
@@ -444,34 +445,34 @@ Here's a comprehensive example showing all features:
 sections:
   - title: System Security
     requirements:
-      - id: SYS-SEC-001
+      - id: Security-CredentialAuthentication
         title: The system shall support credentials authentication.
         children:
-          - "AUTH-001"
-          - "AUTH-002"
+          - "Auth-CredentialValidation"
+          - "Auth-FailedAttemptLogging"
 
   - title: Data Management
     sections:
       - title: User Authentication
         requirements:
-          - id: AUTH-001
+          - id: Auth-CredentialValidation
             title: All requests shall have their credentials authenticated before being processed.
             tests:
               - Credentials_Valid_Allowed
               - Credentials_Invalid_Refused
               - Credentials_Missing_Refused
           
-          - id: AUTH-002
+          - id: Auth-FailedAttemptLogging
             title: Failed authentication attempts shall be logged.
             tests:
               - Authentication_Failed_Logged
 
       - title: Logging
         requirements:
-          - id: DATA-001
+          - id: Logging-RequestLogging
             title: All requests shall be logged with timestamp and user information.
           
-          - id: DATA-002
+          - id: Logging-RetentionPolicy
             title: Logs shall be retained for at least 90 days.
 
 # Include additional requirements from other files
@@ -481,14 +482,14 @@ includes:
 
 # Test mappings separate from requirements
 mappings:
-  - id: DATA-001
+  - id: Logging-RequestLogging
     tests:
       - Logging_ValidRequest_Logged
       - Logging_InvalidRequest_Logged
       - Logging_ContainsTimestamp
       - Logging_ContainsUserInfo
   
-  - id: DATA-002
+  - id: Logging-RetentionPolicy
     tests:
       - LogRetention_OldLogs_Retained
       - LogRetention_VeryOldLogs_Deleted
@@ -624,7 +625,7 @@ reqstream --requirements "docs/**/*.yaml" --lint
 
 ```text
 docs/requirements/unit.yaml(42,5): error: Unknown field 'tittle' in requirement
-docs/requirements/unit.yaml(57,13): error: Duplicate requirement ID 'REQ-001' (first seen in docs/requirements/base.yaml)
+docs/requirements/unit.yaml(57,13): error: Duplicate requirement ID 'Core-BasicRequirement' (first seen in docs/requirements/base.yaml)
 docs/requirements/other.yaml(10,1): error: Section missing required field 'title'
 ```
 
@@ -772,19 +773,19 @@ reqstream --requirements "docs/**/*.yaml" --report requirements_report.md
 ```markdown
 # System Security
 
-## SYS-SEC-001
+## Security-CredentialAuthentication
 
 The system shall support credentials authentication.
 
 Children:
-- AUTH-001
-- AUTH-002
+- Auth-CredentialValidation
+- Auth-FailedAttemptLogging
 
 # Data Management
 
 ## User Authentication
 
-### AUTH-001
+### Auth-CredentialValidation
 
 All requests shall have their credentials authenticated before being processed.
 
@@ -819,13 +820,13 @@ The trace matrix includes:
 ```markdown
 # Trace Matrix
 
-## SYS-SEC-001: The system shall support credentials authentication.
+## Security-CredentialAuthentication: The system shall support credentials authentication.
 
 No direct tests (parent requirement)
 
-Child requirements: AUTH-001, AUTH-002
+Child requirements: Auth-CredentialValidation, Auth-FailedAttemptLogging
 
-## AUTH-001: All requests shall have their credentials authenticated before being processed.
+## Auth-CredentialValidation: All requests shall have their credentials authenticated before being processed.
 
 Tests:
 - ✓ Credentials_Valid_Allowed (Passed)
@@ -859,14 +860,14 @@ The justifications report includes:
 ```markdown
 # System Security
 
-## SYS-SEC-001
+## Security-CredentialAuthentication
 
 **The system shall support credentials authentication.**
 
 Authentication is critical to ensure only authorized users can access the system.
 This requirement establishes the foundation for our security posture.
 
-## AUTH-001
+## Auth-CredentialValidation
 
 **All requests shall have their credentials authenticated before being processed.**
 
@@ -977,19 +978,19 @@ For a requirement to be satisfied:
 sections:
   - title: System Security
     requirements:
-      - id: SYS-SEC-001
+      - id: Security-CredentialAuthentication
         title: The system shall support authentication.
         children:
-          - "AUTH-001"
-          - "AUTH-002"
+          - "Auth-CredentialValidation"
+          - "Auth-FailedAttemptLogging"
       
-      - id: AUTH-001
+      - id: Auth-CredentialValidation
         title: Users shall authenticate with username and password.
         tests:
           - Test_UsernamePassword_Valid
           - Test_UsernamePassword_Invalid
       
-      - id: AUTH-002
+      - id: Auth-FailedAttemptLogging
         title: Failed authentication attempts shall be logged.
         tests:
           - Test_FailedAuth_Logged
@@ -997,9 +998,10 @@ sections:
 
 In this example:
 
-- `AUTH-001` is satisfied if both its tests pass
-- `AUTH-002` is satisfied if its test passes
-- `SYS-SEC-001` is satisfied transitively through its children (if both `AUTH-001` and `AUTH-002` are satisfied)
+- `Auth-CredentialValidation` is satisfied if both its tests pass
+- `Auth-FailedAttemptLogging` is satisfied if its test passes
+- `Security-CredentialAuthentication` is satisfied transitively through its children (if both
+  `Auth-CredentialValidation` and `Auth-FailedAttemptLogging` are satisfied)
 
 ## Enforcement Output
 
@@ -1174,15 +1176,15 @@ tests if they're satisfied through child requirements:
 
 ```yaml
 requirements:
-  - id: HIGH-LEVEL-001
+  - id: Security-Overall
     title: System shall be secure
     children:
-      - "SEC-001"
-      - "SEC-002"
-      - "SEC-003"
+      - "Security-AuthRequired"
+      - "Security-AuthorizationRequired"
+      - "Security-DataProtection"
   
   # Children have direct tests
-  - id: SEC-001
+  - id: Security-AuthRequired
     title: Authentication required
     tests:
       - Test_Auth_Required
@@ -1227,12 +1229,12 @@ Ensure parent requirements reference their children via the `children` field:
 
 ```yaml
 requirements:
-  - id: PARENT-001
+  - id: System-ParentRequirement
     title: Parent requirement
     children:
-      - "CHILD-001"  # Add child references
+      - "System-ChildRequirement"  # Add child references
   
-  - id: CHILD-001
+  - id: System-ChildRequirement
     title: Child requirement
     tests:
       - Test_Child
@@ -1276,8 +1278,8 @@ generating reports.
 
 A: ReqStream doesn't enforce a specific ID format. You can use any format that makes sense for your project:
 
-- `REQ-001`, `REQ-002`, ...
-- `SYS-001`, `AUTH-001`, ...
+- `Core-BasicRequirement`, `Core-AnotherRequirement`, ...
+- `System-TopLevel`, `Auth-CredentialValidation`, ...
 - `FR-1.1`, `FR-1.2`, ...
 
 The only requirement is that IDs must be unique across all requirements files.
@@ -1334,12 +1336,12 @@ matches the base filename (without extension) of the test result file. For examp
 
 ```yaml
 requirements:
-  - id: WIN-001
+  - id: Platform-Windows
     title: Shall support Windows
     tests:
       - "windows-latest@Test_PlatformFeature"  # Matches only from files containing "windows-latest"
   
-  - id: LIN-001
+  - id: Platform-Linux
     title: Shall support Linux
     tests:
       - "ubuntu-latest@Test_PlatformFeature"   # Matches only from files containing "ubuntu-latest"
