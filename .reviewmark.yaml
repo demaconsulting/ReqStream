@@ -8,6 +8,7 @@
 needs-review:
   - "**/*.cs"                    # All C# source and test files
   - "docs/reqstream/**/*.yaml"   # Requirements files
+  - "docs/design/**/*.md"        # Design documents
   - "!**/obj/**"                 # Exclude build output
   - "!**/bin/**"                 # Exclude build output
 
@@ -28,6 +29,7 @@ reviews:
     title: Review of ReqStream Context Unit
     paths:
       - "docs/reqstream/unit-context.yaml"
+      - "docs/design/context.md"
       - "src/**/Context.cs"
       - "test/**/ContextTests.cs"
 
@@ -35,6 +37,7 @@ reviews:
     title: Review of ReqStream Program Unit
     paths:
       - "docs/reqstream/unit-program.yaml"
+      - "docs/design/program.md"
       - "src/**/Program.cs"
       - "test/**/ProgramTests.cs"
 
@@ -42,6 +45,7 @@ reviews:
     title: Review of ReqStream Validation Unit
     paths:
       - "docs/reqstream/unit-validation.yaml"
+      - "docs/design/validation.md"
       - "src/**/Validation.cs"
       - "test/**/ValidationTests.cs"
 
@@ -49,6 +53,7 @@ reviews:
     title: Review of ReqStream Requirements Unit
     paths:
       - "docs/reqstream/unit-requirements.yaml"
+      - "docs/design/requirements.md"
       - "src/**/Requirement.cs"
       - "src/**/Requirements.cs"
       - "src/**/Section.cs"
@@ -59,6 +64,7 @@ reviews:
     title: Review of ReqStream TraceMatrix Unit
     paths:
       - "docs/reqstream/unit-trace-matrix.yaml"
+      - "docs/design/tracematrix.md"
       - "src/**/TraceMatrix.cs"
       - "test/**/TraceMatrixTests.cs"
       - "test/**/TraceMatrixReadTests.cs"
@@ -68,6 +74,7 @@ reviews:
     title: Review of ReqStream Linter Unit
     paths:
       - "docs/reqstream/unit-linter.yaml"
+      - "docs/design/linter.md"
       - "src/**/Linter.cs"
       - "test/**/LinterTests.cs"
 

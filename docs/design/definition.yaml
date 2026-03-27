@@ -1,0 +1,20 @@
+---
+resource-path:
+  - docs/design
+  - docs/template
+
+input-files:
+  - docs/design/title.txt
+  - docs/design/introduction.md
+  - docs/design/program.md
+  - docs/design/context.md
+  - docs/design/validation.md
+  - docs/design/requirements.md
+  - docs/design/tracematrix.md
+  - docs/design/linter.md
+
+template: template.html
+
+table-of-contents: true
+
+number-sections: true

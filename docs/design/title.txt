@@ -1,0 +1,15 @@
+---
+title: ReqStream Design
+subtitle: Detailed Design for the ReqStream Tool
+author: DEMA Consulting
+description: Detailed design for the ReqStream Tool for managing requirements
+lang: en-US
+keywords:
+  - ReqStream
+  - Design
+  - Detailed Design
+  - Requirements
+  - C#
+  - .NET
+  - Documentation
+---
