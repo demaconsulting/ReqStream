@@ -122,6 +122,8 @@ public class IntegrationTests
         // Assert: report contains the requirement ID and title
         var reportContent = File.ReadAllText(reportFile);
         Assert.IsTrue(reportContent.Contains("SYS-001"), "Requirements report should contain the requirement ID.");
+        Assert.IsTrue(reportContent.Contains("The system shall do something useful."),
+            "Requirements report should contain the requirement title.");
 
         // Assert: trace matrix contains the satisfied requirement
         var matrixContent = File.ReadAllText(matrixFile);
