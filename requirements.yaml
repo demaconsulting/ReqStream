@@ -1,6 +1,6 @@
 ---
 includes:
-  - docs/reqstream/subsystem-system.yaml
+  - docs/reqstream/reqstream-system.yaml
   - docs/reqstream/unit-context.yaml
   - docs/reqstream/unit-program.yaml
   - docs/reqstream/unit-validation.yaml

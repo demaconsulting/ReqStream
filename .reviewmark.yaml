@@ -24,11 +24,12 @@ evidence-source:
 # Each review-set groups requirements, source, and tests for a coherent software unit
 # so that an AI-assisted review can verify consistency across the full evidence chain.
 reviews:
-  # System-level review — requirements, design, and integration tests
+  # System-level review — requirements, design, integration tests, and platform support
   - id: ReqStream-System
     title: Review of ReqStream System-Level Design and Requirements
     paths:
-      - "docs/reqstream/subsystem-system.yaml"
+      - "docs/reqstream/reqstream-system.yaml"
+      - "docs/reqstream/platform-requirements.yaml"
       - "docs/design/introduction.md"
       - "docs/design/system.md"
       - "test/**/IntegrationTests.cs"
@@ -87,12 +88,7 @@ reviews:
       - "src/**/Linter.cs"
       - "test/**/LinterTests.cs"
 
-  # Platform and OTS dependency reviews
-  - id: Platform-Support
-    title: Review of Platform and Runtime Support Requirements
-    paths:
-      - "docs/reqstream/platform-requirements.yaml"
-
+  # OTS dependency review
   - id: OTS-Dependencies
     title: Review of Off-The-Shelf Software Dependencies
     paths:
