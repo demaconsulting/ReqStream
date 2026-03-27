@@ -35,20 +35,21 @@ subsystem, and unit levels:
 
 ```text
 ReqStream (System)
-├── Command-Line Interface (Subsystem)
-│   └── Context (Unit)
 ├── Program Orchestration (Subsystem)
+│   ├── Command-Line Interface (Subsystem)
+│   │   └── Context (Unit)
 │   └── Program (Unit)
-├── Requirements File Processing (Subsystem)
-│   ├── Requirements (Unit)
-│   ├── Section (Unit)
-│   └── Requirement (Unit)
-├── Test Integration (Subsystem)
-│   └── TraceMatrix (Unit)
-├── Validation (Subsystem)
-│   └── Validation (Unit)
-└── Linting (Subsystem)
-    └── Linter (Unit)
+└── Requirements (Subsystem)
+    ├── Requirements File Processing (Subsystem)
+    │   ├── Requirements (Unit)
+    │   ├── Section (Unit)
+    │   └── Requirement (Unit)
+    ├── Test Integration (Subsystem)
+    │   └── TraceMatrix (Unit)
+    ├── Validation (Subsystem)
+    │   └── Validation (Unit)
+    └── Linting (Subsystem)
+        └── Linter (Unit)
 ```
 
 Each unit is described in detail in its own chapter within this document.
