@@ -38,3 +38,4 @@ sections:
               the negative case (unsatisfied requirement, non-zero exit code).
             tests:
               - ReqStream_EnforcementMode
+              - ReqStream_EnforcementMode_FailsWhenRequirementLacksTestEvidence
