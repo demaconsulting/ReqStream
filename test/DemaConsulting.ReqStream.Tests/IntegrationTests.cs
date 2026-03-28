@@ -132,6 +132,56 @@ public class IntegrationTests
     }
 
     /// <summary>
+    /// Integration test verifying that enforcement mode causes a non-zero exit code when a
+    /// requirement has no passing test evidence, confirming the CI/CD gate operates correctly.
+    /// </summary>
+    [TestMethod]
+    public void ReqStream_EnforcementMode_FailsWhenRequirementLacksTestEvidence()
+    {
+        // Arrange: create requirements file with one requirement that has no matching test
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: System Requirements
+                requirements:
+                  - id: Integration-System-Unsatisfied
+                    title: The system shall perform an unverified action.
+                    justification: |
+                      This requirement deliberately has no matching test to verify enforcement failure.
+                    tests:
+                      - NonExistentTest
+            """);
+
+        // Arrange: create TRX file with no tests (empty results)
+        var testResults = new DemaConsulting.TestResults.TestResults { Name = "EmptyRun" };
+        var trxFile = Path.Combine(_testDirectory, "empty.trx");
+        File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
+
+        // Act: run enforcement mode
+        var originalDir = Directory.GetCurrentDirectory();
+        int exitCode;
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory);
+
+            using var context = Context.Create([
+                "--requirements", "requirements.yaml",
+                "--tests", "empty.trx",
+                "--enforce"
+            ]);
+            Program.Run(context);
+            exitCode = context.ExitCode;
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+
+        // Assert: enforcement failed with a non-zero exit code
+        Assert.AreNotEqual(0, exitCode, "Enforcement should fail with non-zero exit code when a requirement lacks test evidence.");
+    }
+
+    /// <summary>
     /// Integration test verifying that source-specific test matching restricts coverage evidence
     /// to tests from the named result file, and that enforcement passes when the named source
     /// provides the required passing test.
