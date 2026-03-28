@@ -42,12 +42,12 @@ never throws and never returns `null`.
 | -------------- | -------- |
 | `ArgumentException` | Message written to `Console.Error`; returns exit code `1` |
 | `InvalidOperationException` | Message written to `Console.Error`; returns exit code `1` |
-| Any other exception | Message written to `Console.Error`; exception re-thrown for event-log capture |
+| Any other exception | Message written to `Console.Error`; exception re-thrown |
 
-`ArgumentException` originates in `Context.Create` during argument parsing.
-`InvalidOperationException` originates in the execution layer (e.g., YAML validation failures,
-test result parse errors). Unexpected exceptions are intentionally re-thrown so that the operating
-system or process supervisor can capture the full stack trace.
+`ArgumentException` is thrown by `Context.Create` for invalid arguments and is user-actionable.
+`InvalidOperationException` signals a domain error (YAML validation, test-result parse failure);
+its message is sufficient for diagnosis. All other exceptions are re-thrown so the operating
+system or process supervisor captures the full stack trace for unexpected failures.
 
 ### `Run(context)`
 
@@ -77,31 +77,22 @@ argument, grouped logically. It is only called when `--help` is present.
 ### `ProcessRequirements`
 
 `ProcessRequirements` orchestrates the normal (non-version, non-help, non-validate, non-lint) run.
-Its internal sequence is:
-
-1. Call `Requirements.Read(context.RequirementsFiles)` to build the parsed requirement tree.
-2. If `context.RequirementsReport` is set, export the requirements report at
-   `context.ReportDepth`.
-3. If `context.JustificationsFile` is set, export the justifications report at
-   `context.JustificationsDepth`.
-4. If `context.TestFiles` is non-empty, construct a `TraceMatrix` from the requirements tree and
-   the test result files.
-5. If `context.Matrix` is set and a trace matrix was constructed, export the matrix report at
-   `context.MatrixDepth`.
-6. If `context.Enforce` is `true`, call `EnforceRequirementsCoverage(context, traceMatrix)`.
-
-All export methods respect `context.FilterTags` for tag-filtered output.
+It begins by calling `Requirements.Read(context.RequirementsFiles)` to build the parsed requirement
+tree. It then conditionally generates the requirements report (if `--report` is set) and the
+justifications report (if `--justifications` is set). If `--tests` files are provided, a
+`TraceMatrix` is constructed from the requirement tree and the test result files to enable coverage
+analysis. If `--matrix` is set and a `TraceMatrix` was built, the trace matrix report is exported.
+If `--enforce` is active, `EnforceRequirementsCoverage` is called last so that all reports are
+generated even when coverage fails. All export methods respect `context.FilterTags` for tag-filtered
+output.
 
 ### `EnforceRequirementsCoverage`
 
-`EnforceRequirementsCoverage` evaluates whether all requirements are covered by passing tests.
-
-1. If no `TraceMatrix` was built (i.e., no `--tests` argument was provided), call
-   `context.WriteError` with a message indicating that enforcement requires test results; return.
-2. Call `traceMatrix.CalculateSatisfiedRequirements(context.FilterTags)` to obtain satisfied and
-   total counts.
-3. If `satisfied < total`, iterate all requirements that are unsatisfied and call
-   `context.WriteError` for each unsatisfied requirement ID.
+`EnforceRequirementsCoverage` evaluates whether all requirements are covered by passing tests. If
+no `TraceMatrix` was built (i.e., no `--tests` argument was provided), it reports an error
+indicating that enforcement requires test results. Otherwise, it calls
+`traceMatrix.CalculateSatisfiedRequirements(context.FilterTags)` to obtain satisfied and total
+counts, and reports each unsatisfied requirement via `context.WriteError` if any are found.
 
 This method never throws; all failure signalling goes through `context.WriteError`, which sets the
 internal error flag and eventually produces a non-zero exit code.

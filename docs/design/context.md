@@ -43,44 +43,23 @@ when the enclosing `using` block in `Program.Main` exits.
 
 ### `Create(args)`
 
-`Create` is the static factory method that constructs and returns a fully initialized `Context`.
-It implements a sequential switch-based parser over the `args` array.
+`Create` is the static factory method that constructs and returns a fully initialized `Context`. It
+implements a sequential switch-based parser over the `args` array. Each recognized flag sets the
+corresponding property; flags that consume the next element (e.g., `--requirements`) advance the
+index by one additional step. An unrecognized argument or a missing value for a flag that requires
+one causes an `ArgumentException`, which surfaces to the caller as a user-actionable error message
+rather than an unhandled exception.
 
-**Parse loop**:
-
-1. Iterate `args` with an index variable `i`.
-2. Match `args[i]` against known flags using a `switch` statement.
-3. For flags that consume the next element (e.g., `--requirements`), check `i + 1 >= args.Length`
-   before advancing; if the check fails an `ArgumentException` is thrown.
-4. An unrecognized argument causes an `ArgumentException` listing the unknown argument.
-
-**`--filter` handling**:
-
-The value following `--filter` is split on `','`. Each non-empty token is added to `FilterTags`.
-If `FilterTags` is `null` at the point the first `--filter` is encountered, the `HashSet` is
-created before adding tokens. Multiple `--filter` arguments are accumulated into the same set.
-
-**`--requirements` and `--tests` handling**:
-
-Each value is passed to `ExpandGlobPattern`; the resulting paths are appended to
-`RequirementsFiles` or `TestFiles` respectively.
-
-**Log file**:
-
-If `--log` was specified, `Create` opens the named file for writing and assigns the resulting
-`StreamWriter` to `_logWriter` before returning.
+`--filter` values are split on `','` and accumulated into `FilterTags`; multiple `--filter`
+arguments merge into the same set. `--requirements` and `--tests` values are passed to
+`ExpandGlobPattern` and appended to the respective file lists. If `--log` is specified, the named
+file is opened for writing and assigned to `_logWriter` before the method returns.
 
 ### `ExpandGlobPattern(pattern)`
 
 `ExpandGlobPattern` resolves a single pattern (which may contain `*` or `**` wildcards) to a list
-of absolute file paths.
-
-**Implementation**:
-
-1. Construct a `Microsoft.Extensions.FileSystemGlobbing.Matcher`.
-2. Add `pattern` as an include pattern.
-3. Execute the matcher against `Directory.GetCurrentDirectory()`.
-4. Return the matched absolute paths.
+of absolute file paths using `Microsoft.Extensions.FileSystemGlobbing.Matcher` against the current
+working directory.
 
 **Known limitation**: the `Matcher` library silently ignores patterns that are themselves absolute
 paths. Callers that pass absolute paths directly will receive an empty result set. This is an
@@ -88,19 +67,14 @@ accepted limitation of the underlying library; users should use relative paths o
 
 ### `WriteLine(message)`
 
-`WriteLine` writes a message to the output channel.
-
-1. If `Silent` is `false`, write to `Console.WriteLine`.
-2. If `_logWriter` is not `null`, write to `_logWriter`.
+`WriteLine` writes a message to the console (unless `Silent` is `true`) and to `_logWriter` if a
+log file is open.
 
 ### `WriteError(message)`
 
-`WriteError` records an error and writes it to the error channel.
-
-1. Set `_hasErrors = true`.
-2. If `Silent` is `false`, set `Console.ForegroundColor` to red, write to `Console.Error`, then
-   restore the original foreground color.
-3. If `_logWriter` is not `null`, write to `_logWriter`.
+`WriteError` sets `_hasErrors = true`, writes the message to `Console.Error` in red (unless
+`Silent` is `true`), and also writes it to `_logWriter` if a log file is open. Setting
+`_hasErrors` ensures that `ExitCode` returns `1` after any error is reported.
 
 ### `Dispose()`
 
