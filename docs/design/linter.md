@@ -178,7 +178,8 @@ registers the ID.
 2. If the scalar value is blank, emit a `"Requirement 'id' cannot be blank"` error (at the scalar
    start), increment `issueCount`, and return `null`.
 3. Check `seenIds` for the ID. If already present, emit a duplicate-ID error referencing the first
-   file, increment `issueCount`, and return `null`.
+   file, increment `issueCount`, and return `reqId` (the ID is still returned so downstream
+   validation can include it in error messages).
 4. Register `seenIds[reqId] = path` and return the ID string.
 
 ### `LintRequirementTitle(context, path, requirement, reqId)`

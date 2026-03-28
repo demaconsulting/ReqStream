@@ -552,7 +552,7 @@ public static class Linter
     /// <param name="requirement">The requirement mapping node.</param>
     /// <param name="seenIds">Dictionary of requirement IDs already seen and the file they came from.</param>
     /// <param name="issueCount">Incremented for each issue found.</param>
-    /// <returns>The requirement ID if valid and unique, or null if an issue was found.</returns>
+    /// <returns>The requirement ID if it can be parsed, or null if the ID is missing or blank.</returns>
     private static string? LintRequirementId(
         Context context,
         string path,
@@ -583,7 +583,7 @@ public static class Linter
             context.WriteError(
                 $"{path}({idNode.Start.Line},{idNode.Start.Column}): error: Duplicate requirement ID '{reqId}' (first seen in {firstFile})");
             issueCount++;
-            return null;
+            return reqId;
         }
 
         seenIds[reqId] = path;
