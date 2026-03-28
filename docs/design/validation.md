@@ -15,10 +15,10 @@ All tests run in temporary directories to avoid side effects and are isolated fr
 
 `Run` is the single public entry point. It prints a header block to `context` containing the tool
 version, machine name, operating system, .NET runtime version, and current UTC timestamp. It then
-executes the six validation tests in order, prints a summary line showing the number of passed and
-failed tests, and — if `context.ResultsFile` is set — calls `WriteResultsFile(context, testResults)`
+executes the six validation tests in order and prints a multi-line summary block showing the total
+number of tests, how many passed, and how many failed (using `WriteError` for the failed count when
+any tests have failed). If `context.ResultsFile` is set, it calls `WriteResultsFile(context, testResults)`
 to persist the results.
-
 The six validation tests exist to provide structured, machine-readable evidence that ReqStream
 correctly processes its own input formats. This evidence can be fed back into ReqStream to verify
 the tool's own requirements coverage, enabling a self-hosting compliance workflow.
