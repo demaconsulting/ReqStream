@@ -78,12 +78,13 @@ argument, grouped logically. It is only called when `--help` is present.
 
 `ProcessRequirements` orchestrates the normal (non-version, non-help, non-validate, non-lint) run.
 It begins by calling `Requirements.Read(context.RequirementsFiles)` to build the parsed requirement
-tree. It then conditionally generates each requested output: the requirements report (if `--report`
-is set), the justifications report (if `--justifications` is set), and the trace matrix report (if
-`--matrix` is set). If `--tests` files are provided, a `TraceMatrix` is constructed to enable
-coverage analysis and matrix export. If `--enforce` is active, `EnforceRequirementsCoverage` is
-called last so that all reports are generated even when coverage fails. All export methods respect
-`context.FilterTags` for tag-filtered output.
+tree. It then conditionally generates the requirements report (if `--report` is set) and the
+justifications report (if `--justifications` is set). If `--tests` files are provided, a
+`TraceMatrix` is constructed from the requirement tree and the test result files to enable coverage
+analysis. If `--matrix` is set and a `TraceMatrix` was built, the trace matrix report is exported.
+If `--enforce` is active, `EnforceRequirementsCoverage` is called last so that all reports are
+generated even when coverage fails. All export methods respect `context.FilterTags` for tag-filtered
+output.
 
 ### `EnforceRequirementsCoverage`
 
