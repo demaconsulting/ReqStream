@@ -63,45 +63,37 @@ These intermediate types are discarded after `ReadFile` completes; the resulting
 ### `Requirements.Read(paths)`
 
 `Read` is the static factory method that constructs and returns a fully loaded `Requirements`
-instance.
-
-1. Create a new `Requirements` with empty collections.
-2. For each path in `paths`, call `ReadFile(path)`.
-3. Call `ValidateCycles()` to detect circular child-requirement references.
-4. Return the populated `Requirements` instance.
+instance. It calls `ReadFile` for each supplied path to merge content into the tree, then calls
+`ValidateCycles()` to confirm the child-requirement graph is acyclic before returning.
 
 ### `ReadFile(path)`
 
-`ReadFile` loads a single YAML file and merges its content into the `Requirements` tree.
+`ReadFile` loads a single YAML file and merges its content into the `Requirements` tree. Four
+design points govern its behavior:
 
-1. Normalize `path` to an absolute path.
-2. If the path is already in `_includedFiles`, return immediately (loop prevention).
-3. Add the path to `_includedFiles`.
-4. Read the file text and deserialize it into a `YamlDocument` using `YamlDotNet`. If the document
-   is empty or `null`, return silently.
-5. Validate each section title (must not be blank) and each requirement ID and title (must not be
-   blank). Duplicate IDs are detected against `_allRequirements`; a duplicate causes an
-   `InvalidOperationException` with the file path and conflicting ID.
-6. Call `MergeSection` for each top-level section in the document.
-7. Apply each entry in the document's `mappings` block: find the matching `Requirement` by ID in
-   `_allRequirements` (skipping unknown IDs silently) and append the mapping's tests to
-   `Requirement.Tests`.
-8. For each path in the document's `includes` block, resolve it relative to the current file's
-   directory and call `ReadFile` recursively.
+- **Deduplication**: `path` is normalized to an absolute path and checked against `_includedFiles`
+  before any work is done. If already present, the method returns immediately. This prevents
+  infinite loops when files include each other directly or transitively.
+- **YAML deserialization**: the file text is deserialized into a `YamlDocument` using `YamlDotNet`
+  with `HyphenatedNamingConvention`. An empty or `null` document is silently accepted.
+- **Validation and merging**: each section is validated (title must not be blank) and each
+  requirement is validated (ID and title must not be blank; ID must not duplicate an entry already
+  in `_allRequirements`). Validated sections are merged into the tree via `MergeSection`. Mapping
+  entries append additional test IDs to already-registered requirements.
+- **Recursive includes**: each path in the document's `includes` block is resolved relative to the
+  current file's directory and passed to `ReadFile` recursively, enabling modular file
+  organization.
 
 ### `MergeSection(parent, yamlSection)`
 
-`MergeSection` integrates a newly parsed section into an existing section tree.
+`MergeSection` integrates a newly parsed section into an existing section tree. If `parent.Sections`
+already contains a section whose `Title` matches `yamlSection.Title`, the incoming requirements are
+appended to that existing section and child sections are recursively merged. If no match is found, a
+new `Section` is created and appended to `parent.Sections`.
 
-1. Search `parent.Sections` for an existing `Section` whose `Title` equals `yamlSection.Title`.
-2. If a match is found:
-   - Append all requirements from `yamlSection` to the existing section's `Requirements` list.
-   - Recursively call `MergeSection` for each child section in `yamlSection`.
-3. If no match is found:
-   - Create a new `Section` from `yamlSection` and append it to `parent.Sections`.
-
-This algorithm ensures that sections with the same title at the same hierarchy level are merged
-across multiple files, enabling modular requirements management.
+This same-title merge strategy is the key design decision that enables modular requirements
+management: multiple YAML files can contribute requirements to the same logical section without
+requiring a single monolithic file.
 
 ### `ValidateCycles()`
 

@@ -13,15 +13,17 @@ All tests run in temporary directories to avoid side effects and are isolated fr
 
 ### `Run(context)`
 
-`Run` is the single public entry point. Its sequence is:
+`Run` is the single public entry point. It prints a header block to `context` containing the tool
+version, machine name, operating system, .NET runtime version, and current UTC timestamp. It then
+executes the six validation tests in order, prints a summary line showing the number of passed and
+failed tests, and — if `context.ResultsFile` is set — calls `WriteResultsFile(context, testResults)`
+to persist the results.
 
-1. Print a header block to `context` containing the tool version, machine name, operating system,
-   .NET runtime version, and current UTC timestamp.
-2. Execute the six validation tests in order, collecting a `TestResult` for each.
-3. Print a summary line showing the number of passed and failed tests.
-4. If `context.ResultsFile` is set, call `WriteResultsFile(context, testResults)`.
+The six validation tests exist to provide structured, machine-readable evidence that ReqStream
+correctly processes its own input formats. This evidence can be fed back into ReqStream to verify
+the tool's own requirements coverage, enabling a self-hosting compliance workflow.
 
-The six validation tests are listed in the order they are executed:
+The six tests are listed in the order they are executed:
 
 | # | Method | What it verifies |
 | - | ------ | ---------------- |
@@ -32,14 +34,9 @@ The six validation tests are listed in the order they are executed:
 | 5 | `RunEnforcementModeTest` | `--enforce` produces a non-zero exit code when coverage fails |
 | 6 | `RunLintTest` | The linter detects and reports structural issues in YAML files |
 
-Each test method:
-
-1. Creates a `TemporaryDirectory` for isolation and uses `DirectorySwitch` (see below) to operate
-   within it.
-2. Writes one or more YAML or test-result fixture files to the temporary directory.
-3. Invokes a `Program` method or builds a `Context` and executes the relevant workflow.
-4. Asserts the expected outcomes (file content, exit code, error messages).
-5. Returns a `TestResult` with outcome `Passed` or `Failed`.
+Each test runs in a dedicated `TemporaryDirectory` with `DirectorySwitch` active, writes fixture
+files, invokes the relevant workflow, asserts expected outcomes, and returns a `TestResult` with
+outcome `Passed` or `Failed`.
 
 ### `WriteResultsFile(context, testResults)`
 
@@ -59,32 +56,17 @@ The serializer is invoked with the assembled `TestResults` object and the resolv
 
 ### `TemporaryDirectory` (nested helper class)
 
-`TemporaryDirectory` is an `IDisposable` helper that creates and manages the lifetime of a
-temporary directory.
-
-**Construction**:
-
-1. Compose a unique path under `Path.GetTempPath()` using a GUID suffix.
-2. Call `Directory.CreateDirectory` to create the directory.
-3. Expose the path via the `DirectoryPath` property.
-
-**Disposal**:
-
-1. If the directory still exists, call `Directory.Delete` recursively to remove it and all
-   contents.
+`TemporaryDirectory` is an `IDisposable` helper that creates a uniquely named directory under
+`Path.GetTempPath()` on construction and deletes it recursively on disposal. It exists to give
+each validation test a clean, isolated file-system workspace that is guaranteed to be removed after
+the test completes, regardless of whether the test passes or fails.
 
 ### `DirectorySwitch` (nested helper class)
 
-`DirectorySwitch` is an `IDisposable` helper that temporarily changes the process working directory.
-
-**Construction**:
-
-1. Capture `Directory.GetCurrentDirectory()` as the original directory.
-2. Call `Directory.SetCurrentDirectory` to switch to the supplied `newDirectory`.
-
-**Disposal**:
-
-1. Call `Directory.SetCurrentDirectory` to restore the original directory.
+`DirectorySwitch` is an `IDisposable` helper that changes the process working directory to a
+supplied path on construction and restores the original directory on disposal. It exists because
+ReqStream resolves relative paths against the working directory; tests must operate within their
+temporary directory for file references to resolve correctly.
 
 Each test uses both classes together: `TemporaryDirectory` owns the directory lifetime and
 `DirectorySwitch` makes it the working directory for the duration of the test. This pattern

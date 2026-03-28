@@ -34,6 +34,14 @@ reviews:
       - "docs/design/system.md"
       - "test/**/IntegrationTests.cs"
 
+  # Design review — system-level requirements traced against the complete design
+  - id: ReqStream-Design
+    title: Review of ReqStream Design Against Requirements
+    paths:
+      - "docs/reqstream/reqstream-system.yaml"
+      - "docs/reqstream/platform-requirements.yaml"
+      - "docs/design/**/*.md"
+
   # Software unit reviews - one per class
   - id: ReqStream-Context
     title: Review of ReqStream Context Unit

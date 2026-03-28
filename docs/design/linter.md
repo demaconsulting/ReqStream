@@ -45,165 +45,95 @@ causes the process to exit with code `1`.
 
 ### `Lint(context, files)`
 
-`Lint` is the single public entry point.
-
-1. If `files` is empty, print `"No requirements files specified."` and return.
-2. Initialize a `Dictionary<string, string> seenIds` (maps requirement ID to source file path) and
-   a `HashSet<string> visitedFiles` shared across all files in `files`.
-3. For each path in `files`, accumulate the return value of `LintFile(context, path, seenIds, visitedFiles)`
-   into a local `issueCount`.
-4. If the total issue count is zero, print `"{files[0]}: No issues found"` via `context.WriteLine`.
+`Lint` is the single public entry point. If `files` is empty it prints a notice and returns. For
+each file in `files` it calls `LintFile`, accumulating the returned issue count across all files.
+After all files are processed, it prints `"{files[0]}: No issues found"` via `context.WriteLine`
+only if the total issue count is zero. Accumulating all issues before deciding on the success
+message ensures that a clean run produces exactly one affirmative line of output and that a run
+with issues lists every problem without any misleading success message.
 
 ### `LintFile(context, path, seenIds, visitedFiles)`
 
-`LintFile` lints a single YAML file and follows its `includes:` entries.
+`LintFile` lints a single YAML file and follows its `includes:` entries. Three design points
+govern its behavior:
 
-1. Resolve `path` to its full absolute path (`fullPath`). On failure, emit an error and return `1`.
-2. If `fullPath` is already in `visitedFiles`, return `0` immediately (deduplication).
-3. Add `fullPath` to `visitedFiles`.
-4. Verify the file exists; emit an error and return `1` if not.
-5. Read the file text. On I/O failure, emit an error and return `1`.
-6. Parse the text via `ParseYaml`. If a `YamlException` or `InvalidOperationException` is thrown
-   (malformed YAML), emit an error at the reported source position and return `1`.
-7. If the parsed root is `null` (empty document), return `0` — empty files are valid.
-8. If the root node is not a `YamlMappingNode`, emit a type-mismatch error and return `1`.
-9. Delegate to `LintDocumentRoot(context, path, root, seenIds)`.
-10. Delegate to `LintIncludes(context, fullPath, GetStringList(root, "includes"), seenIds, visitedFiles)`
-    to follow included files.
-11. Return the accumulated issue count from steps 9–10.
+- **Deduplication**: `path` is resolved to a full absolute path and checked against
+  `visitedFiles`. If already visited, the method returns `0` immediately. This mirrors the
+  deduplication in `ReadFile` and prevents the same file from being linted twice when it is
+  included from multiple parents.
+- **Error-at-position reporting**: the file text is parsed via `YamlDotNet`'s representation model
+  rather than the deserializer, so every issue is emitted with the exact line and column of the
+  offending node. I/O errors, YAML parse exceptions, and structural type mismatches are all caught
+  and reported as positioned errors rather than unhandled exceptions.
+- **Recursive includes**: after linting the document root via `LintDocumentRoot`, the method
+  delegates to `LintIncludes` to follow and lint any files listed in the `includes:` sequence,
+  accumulating their issue counts alongside the root document's counts.
 
 ### `LintIncludes(context, parentFullPath, includes, seenIds, visitedFiles)`
 
-`LintIncludes` resolves and recursively lints all files listed in an `includes:` sequence.
-
-1. If `includes` is `null`, return `0`.
-2. Derive `baseDirectory` from `parentFullPath`.
-3. Filter out any blank entries (using `!string.IsNullOrWhiteSpace`).
-4. For each non-blank include path, call `LintFile(context, Path.Combine(baseDirectory, include),
-   seenIds, visitedFiles)` and accumulate the returned issue count.
-5. Return the total issue count.
+`LintIncludes` resolves each path in the `includes:` sequence relative to the parent file's
+directory and recursively lints it via `LintFile`. Blank entries are skipped. It returns the
+accumulated issue count from all included files.
 
 ### `LintDocumentRoot(context, path, root, seenIds)`
 
-`LintDocumentRoot` validates the top-level structure of a single YAML document.
-
-1. For each key in the root mapping, check that it is a member of `KnownDocumentFields`; if not,
-   emit an unknown-field error at the key's position.
-2. Delegate to `LintDocumentSections(context, path, root, seenIds)`.
-3. Delegate to `LintDocumentMappings(context, path, root)`.
+`LintDocumentRoot` validates the top-level structure of a single YAML document. It checks every
+key in the root mapping against `KnownDocumentFields`, emitting an unknown-field error for any
+unrecognized key, then delegates to `LintDocumentSections` and `LintDocumentMappings` to validate
+the document's content.
 
 ### `LintDocumentSections(context, path, root, seenIds)`
 
-`LintDocumentSections` retrieves the `sections:` sequence from the document root and lints each
-child.
-
-1. Call `GetSequenceChecked` for the `"sections"` key on `root`. If the key is absent, return `0`.
-   If it is present but not a sequence, emit a type-mismatch error and return `1`.
-2. Iterate `sections.Children`. For each child:
-
-   - If it is a `YamlMappingNode`, call `LintSection(context, path, child, seenIds)`.
-   - Otherwise emit a `"Section must be a mapping"` error.
+`LintDocumentSections` validates that the `sections:` key, if present, is a sequence, and that
+each element of that sequence is a mapping node. It delegates each valid element to `LintSection`.
 
 ### `LintDocumentMappings(context, path, root)`
 
-`LintDocumentMappings` retrieves the `mappings:` sequence from the document root and lints each
-child.
-
-1. Call `GetSequenceChecked` for the `"mappings"` key on `root`. If the key is absent, return `0`.
-   If it is present but not a sequence, emit a type-mismatch error and return `1`.
-2. Iterate `mappings.Children`. For each child:
-
-   - If it is a `YamlMappingNode`, call `LintMapping(context, path, child)`.
-   - Otherwise emit a `"Mapping must be a mapping node"` error.
+`LintDocumentMappings` validates that the `mappings:` key, if present, is a sequence, and that
+each element of that sequence is a mapping node. It delegates each valid element to `LintMapping`.
 
 ### `LintSection(context, path, section, seenIds)`
 
-`LintSection` validates one section mapping node. The caller (`LintDocumentSections` or
-`LintSectionChildren`) has already asserted that the node is a `YamlMappingNode`.
-
-1. For each key in `section`, check against `KnownSectionFields`; emit an unknown-field error for
-   any unknown key.
-2. Check that `title` is present and non-blank via `GetScalar`; emit an error at the section start
-   if missing, or at the scalar start if blank.
-3. Delegate to `LintSectionRequirements(context, path, section, seenIds)`.
-4. Delegate to `LintSectionChildren(context, path, section, seenIds)`.
+`LintSection` validates one section mapping node. It checks all keys against `KnownSectionFields`,
+validates that `title` is present and non-blank, then delegates to `LintSectionRequirements` and
+`LintSectionChildren` for the section's contents.
 
 ### `LintSectionRequirements(context, path, section, seenIds)`
 
-`LintSectionRequirements` retrieves the `requirements:` sequence from a section and lints each
-child.
-
-1. Call `GetSequenceChecked` for the `"requirements"` key on `section`. If the key is absent,
-   return `0`. If it is present but not a sequence, emit a type-mismatch error and return `1`.
-2. Iterate `requirements.Children`. For each child:
-
-   - If it is a `YamlMappingNode`, call `LintRequirement(context, path, child, seenIds)`.
-   - Otherwise emit a `"Requirement must be a mapping"` error.
+`LintSectionRequirements` validates that the `requirements:` key, if present, is a sequence, and
+that each element is a mapping node. It delegates each valid element to `LintRequirement`.
 
 ### `LintSectionChildren(context, path, section, seenIds)`
 
-`LintSectionChildren` retrieves the `sections:` sequence from a section and lints each child
-section recursively.
-
-1. Call `GetSequenceChecked` for the `"sections"` key on `section`. If the key is absent, return
-   `0`. If it is present but not a sequence, emit a type-mismatch error and return `1`.
-2. Iterate `sections.Children`. For each child:
-
-   - If it is a `YamlMappingNode`, call `LintSection(context, path, child, seenIds)` recursively.
-   - Otherwise emit a `"Section must be a mapping"` error.
+`LintSectionChildren` validates that the `sections:` key within a section, if present, is a
+sequence, and that each element is a mapping node. It delegates each valid element back to
+`LintSection` for recursive validation.
 
 ### `LintRequirement(context, path, requirement, seenIds)`
 
-`LintRequirement` validates one requirement mapping node. The caller (`LintSectionRequirements`)
-has already asserted that the node is a `YamlMappingNode`.
-
-1. For each key in `requirement`, check against `KnownRequirementFields`; emit an unknown-field
-   error for any unknown key.
-2. Call `LintRequirementId(context, path, requirement, seenIds, ref issueCount)` to validate and
-   register the `id` field; capture the returned ID string (or `null` on error).
-3. Call `LintRequirementTitle(context, path, requirement, reqId)` to validate the `title` field.
-4. If `tests:` is present, find blank entries using
-   `.OfType<YamlScalarNode>().Where(s => string.IsNullOrWhiteSpace(s.Value)).Select(s => s.Start)`
-   and emit a `"Test name cannot be blank"` error for each.
-5. If `tags:` is present, apply the same method chain and emit a `"Tag name cannot be blank"` error
-   for each blank entry.
+`LintRequirement` validates one requirement mapping node. It checks all keys against
+`KnownRequirementFields`, then delegates ID validation to `LintRequirementId` and title validation
+to `LintRequirementTitle`. It also checks `tests:` and `tags:` sequences for blank string entries,
+emitting a positioned error for each one found.
 
 ### `LintRequirementId(context, path, requirement, seenIds, ref issueCount)`
 
-`LintRequirementId` validates the `id` field of a requirement, checks for duplicates, and
-registers the ID.
-
-1. Look up the `id` scalar via `GetScalar`. If absent, emit a `"Requirement missing required field
-   'id'"` error (at the mapping start), increment `issueCount`, and return `null`.
-2. If the scalar value is blank, emit a `"Requirement 'id' cannot be blank"` error (at the scalar
-   start), increment `issueCount`, and return `null`.
-3. Check `seenIds` for the ID. If already present, emit a duplicate-ID error referencing the first
-   file, increment `issueCount`, and return `reqId` (the ID is still returned so downstream
-   validation can include it in error messages).
-4. Register `seenIds[reqId] = path` and return the ID string.
+`LintRequirementId` validates the `id` field and registers it in `seenIds` to detect
+cross-file duplicates. If the `id` is absent or blank it emits an error and returns `null`. If the
+ID is a duplicate, it emits an error referencing the first file but still returns the ID string so
+that downstream validators (`LintRequirementTitle`) can include it in their error messages for
+better context.
 
 ### `LintRequirementTitle(context, path, requirement, reqId)`
 
-`LintRequirementTitle` validates the `title` field of a requirement.
-
-1. Look up the `title` scalar via `GetScalar`. If absent, emit an error whose description uses
-   `"requirement '{reqId}'"` when `reqId` is non-null, or `"requirement"` otherwise (at the
-   mapping start), and return `1`.
-2. If the scalar value is blank, emit a `"Requirement 'title' cannot be blank"` error (at the
-   scalar start) and return `1`.
-3. Return `0`.
+`LintRequirementTitle` validates that the `title` field is present and non-blank. When `reqId` is
+non-null it includes the ID in the error description, making the error actionable even when
+the offending requirement is one of many in a large file.
 
 ### `LintMapping(context, path, mapping)`
 
-`LintMapping` validates one mapping entry. The caller (`LintDocumentMappings`) has already
-asserted that the node is a `YamlMappingNode`.
-
-1. For each key in `mapping`, check against `KnownMappingFields`; emit an unknown-field error for
-   any unknown key.
-2. Check that `id` is present and non-blank; emit an error at the mapping start if missing, or at
-   the scalar start if blank.
-3. If `tests:` is present, apply the same blank-entry method chain used in `LintRequirement` and
-   emit a `"Test name cannot be blank"` error for each blank entry.
+`LintMapping` validates one mapping entry. It checks all keys against `KnownMappingFields`,
+validates that `id` is present and non-blank, and checks any `tests:` sequence for blank entries.
 
 ## Issue Accumulation and No-Issues Message
 

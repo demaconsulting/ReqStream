@@ -46,87 +46,56 @@ result file.
 
 ### `TraceMatrix(requirements, testResultFiles)`
 
-The constructor builds the internal test-execution index:
-
-1. Store `requirements` for later iteration.
-2. For each path in `testResultFiles`, call `ProcessTestResultFile(path)`.
-3. After all files are loaded, `_testExecutions` contains every unique test name seen, each mapped
-   to a list of `TestExecution` records (one per file that contained that test name).
+The constructor stores the `Requirements` tree for later iteration and calls
+`ProcessTestResultFile` for each path in `testResultFiles` to populate `_testExecutions`. After
+construction, `_testExecutions` contains every unique test name seen, each mapped to one
+`TestExecution` record per result file that contained that test name.
 
 ### `ProcessTestResultFile(filePath)`
 
-`ProcessTestResultFile` reads and parses one test-result file.
-
-1. Read the file text.
-2. Call `DemaConsulting.TestResults.IO.Serializer.Deserialize(content)` to auto-detect the format
-   (TRX or JUnit) and parse the results.
-3. If parsing fails, wrap the underlying exception in an `InvalidOperationException` that includes
-   `filePath` so the caller can identify the offending file.
-4. For each test case in the deserialized result set, create a `TestExecution` with:
-   - `FileBaseName` = `Path.GetFileNameWithoutExtension(filePath)`
-   - `Name` = test case name
-   - `Metrics` = `TestMetrics(passes, fails)` derived from the test case outcome
-5. Append the `TestExecution` to `_testExecutions[name]`, creating the list entry if absent.
+`ProcessTestResultFile` reads one test-result file, auto-detects its format (TRX or JUnit) via
+`DemaConsulting.TestResults.IO.Serializer.Deserialize`, and adds a `TestExecution` record to
+`_testExecutions` for each test case found. If parsing fails, the underlying exception is wrapped
+in an `InvalidOperationException` that includes `filePath` — this ensures the caller can identify
+the offending file without inspecting nested exception detail.
 
 ## Methods
 
 ### `GetTestResult(testName)`
 
-`GetTestResult` returns aggregated `TestMetrics` for a named test, with optional source filtering
-encoded in the `testName` parameter itself.
+`GetTestResult` returns aggregated `TestMetrics` for a named test. When `testName` contains a
+`'@'` separator (not at position 0 or end), it applies source-specific filtering: the part before
+`'@'` is matched case-insensitively against each `TestExecution.FileBaseName`, so only results
+from files whose base name contains that prefix are summed. This lets a requirement reference a
+test from a specific result file (e.g., `ubuntu@TestFeature_Valid_Passes`) without excluding that
+test from plain-name lookups in other requirements.
 
-**Source-specific format** (`testName` contains `'@'` not at position 0 or end):
-
-1. Split `testName` on the first `'@'` to obtain `sourcePart` and `namePart`.
-2. Look up `_testExecutions[namePart]`.
-3. Filter the list to entries where `FileBaseName.Contains(sourcePart, OrdinalIgnoreCase)`.
-4. Sum the `Metrics.Passes` and `Metrics.Fails` of the filtered entries.
-5. Return `TestMetrics(totalPasses, totalFails)`.
-
-**Plain format** (`testName` does not contain a valid `'@'` separator):
-
-1. Look up `_testExecutions[testName]`.
-2. Sum all `Metrics.Passes` and `Metrics.Fails` without source filtering.
-3. Return `TestMetrics(totalPasses, totalFails)`.
-
-If the test name is not found in `_testExecutions`, return `TestMetrics(0, 0)`.
+When no `'@'` separator is present, all executions for the test name are summed across all result
+files. If the test name is not found in `_testExecutions`, the method returns `TestMetrics(0, 0)`,
+ensuring callers always receive a valid object. See the [Test Name Format Summary](#test-name-format-summary)
+table for a quick reference of both formats.
 
 ### `CalculateSatisfiedRequirements(filterTags)`
 
-`CalculateSatisfiedRequirements` iterates every requirement in the tree and returns a two-element
-tuple `(satisfied, total)`.
-
-For each requirement (subject to `filterTags` filtering):
-
-1. Increment `total`.
-2. Call `IsRequirementSatisfied(requirement)`.
-3. If satisfied, increment `satisfied`.
-
-Returns `(satisfied, total)`.
+`CalculateSatisfiedRequirements` iterates every requirement in the tree (subject to `filterTags`
+filtering) and returns a `(satisfied, total)` tuple. It calls `IsRequirementSatisfied` for each
+requirement to determine whether all associated tests have passed. This provides `Program` with the
+counts needed to report coverage status and determine whether `--enforce` should fail.
 
 ### `CollectAllTests(requirement)`
 
-`CollectAllTests` recursively collects every test name associated with a requirement and its
-descendants.
-
-1. Add all entries from `requirement.Tests` to the result set.
-2. For each ID in `requirement.Children`:
-   - Look up the child `Requirement` by ID.
-   - If found, recurse into `CollectAllTests(child)` and union the results.
-3. Return the union set.
-
-Because `Requirements.ValidateCycles()` has already confirmed the child graph is acyclic, this
-method recurses without a cycle guard.
+`CollectAllTests` returns the union of all test names associated with a requirement and its
+entire descendant subtree. Child requirements inherit their parent's coverage obligations, so a
+requirement is only considered covered when all tests across its whole subtree pass. Because
+`Requirements.ValidateCycles()` has already confirmed the child graph is acyclic, this method
+recurses without a cycle guard.
 
 ### `IsRequirementSatisfied(requirement)`
 
-`IsRequirementSatisfied` returns `true` if and only if the requirement has passing test coverage.
-
-1. Call `CollectAllTests(requirement)` to obtain the complete set of test names.
-2. If the set is empty, return `false` (no tests mapped — requirement is unsatisfied).
-3. For each test name, call `GetTestResult(testName)`.
-4. If any result has `AllPassed == false`, return `false`.
-5. Return `true`.
+`IsRequirementSatisfied` returns `true` if and only if the requirement has at least one test
+mapped (directly or via descendants) and every one of those tests has `AllPassed == true`. A
+requirement with no tests is never satisfied, enforcing the design expectation that every
+requirement must be traced to at least one passing test.
 
 ### `Export(filePath, depth, filterTags)`
 
