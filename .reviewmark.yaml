@@ -48,8 +48,8 @@ reviews:
     paths:
       - "docs/reqstream/unit-context.yaml"
       - "docs/design/context.md"
-      - "src/**/Context.cs"
-      - "test/**/ContextTests.cs"
+      - "src/**/Cli/Context.cs"
+      - "test/**/Cli/ContextTests.cs"
 
   - id: ReqStream-Program
     title: Review of ReqStream Program Unit
@@ -59,42 +59,42 @@ reviews:
       - "src/**/Program.cs"
       - "test/**/ProgramTests.cs"
 
-  - id: ReqStream-Validation
-    title: Review of ReqStream Validation Unit
+  - id: ReqStream-SelfTest
+    title: Review of ReqStream SelfTest Unit
     paths:
       - "docs/reqstream/unit-validation.yaml"
       - "docs/design/validation.md"
-      - "src/**/Validation.cs"
-      - "test/**/ValidationTests.cs"
+      - "src/**/SelfTest/Validation.cs"
+      - "test/**/SelfTest/ValidationTests.cs"
 
-  - id: ReqStream-Requirements
-    title: Review of ReqStream Requirements Unit
+  - id: ReqStream-Modeling
+    title: Review of ReqStream Modeling Unit
     paths:
       - "docs/reqstream/unit-requirements.yaml"
       - "docs/design/requirements.md"
-      - "src/**/Requirement.cs"
-      - "src/**/Requirements.cs"
-      - "src/**/Section.cs"
-      - "test/**/RequirementsReadTests.cs"
-      - "test/**/RequirementsExportTests.cs"
+      - "src/**/Modeling/Requirement.cs"
+      - "src/**/Modeling/Requirements.cs"
+      - "src/**/Modeling/Section.cs"
+      - "test/**/Modeling/RequirementsReadTests.cs"
+      - "test/**/Modeling/RequirementsExportTests.cs"
 
   - id: ReqStream-TraceMatrix
     title: Review of ReqStream TraceMatrix Unit
     paths:
       - "docs/reqstream/unit-trace-matrix.yaml"
       - "docs/design/tracematrix.md"
-      - "src/**/TraceMatrix.cs"
-      - "test/**/TraceMatrixTests.cs"
-      - "test/**/TraceMatrixReadTests.cs"
-      - "test/**/TraceMatrixExportTests.cs"
+      - "src/**/Tracing/TraceMatrix.cs"
+      - "test/**/Tracing/TraceMatrixTests.cs"
+      - "test/**/Tracing/TraceMatrixReadTests.cs"
+      - "test/**/Tracing/TraceMatrixExportTests.cs"
 
   - id: ReqStream-Linter
     title: Review of ReqStream Linter Unit
     paths:
       - "docs/reqstream/unit-linter.yaml"
       - "docs/design/linter.md"
-      - "src/**/Linter.cs"
-      - "test/**/LinterTests.cs"
+      - "src/**/Linting/Linter.cs"
+      - "test/**/Linting/LinterTests.cs"
 
   # Full requirements review — all requirements files reviewed together for completeness and consistency
   - id: ReqStream-AllRequirements

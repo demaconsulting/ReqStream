@@ -18,7 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.ReqStream.Tests;
+using DemaConsulting.ReqStream.Cli;
+using DemaConsulting.ReqStream.SelfTest;
+
+namespace DemaConsulting.ReqStream.Tests.SelfTest;
 
 /// <summary>
 /// Unit tests for the Validation class.

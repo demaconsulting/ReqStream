@@ -18,10 +18,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.ReqStream.Modeling;
 using DemaConsulting.TestResults;
 using DemaConsulting.TestResults.IO;
 
-namespace DemaConsulting.ReqStream;
+namespace DemaConsulting.ReqStream.Tracing;
 
 /// <summary>
 ///     Represents test metrics for a single test execution.

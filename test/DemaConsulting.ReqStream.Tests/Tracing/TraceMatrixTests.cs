@@ -18,11 +18,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.ReqStream.Modeling;
+using DemaConsulting.ReqStream.Tracing;
 using DemaConsulting.TestResults;
 using DemaConsulting.TestResults.IO;
 using TestResult = DemaConsulting.TestResults.TestResult;
 
-namespace DemaConsulting.ReqStream.Tests;
+namespace DemaConsulting.ReqStream.Tests.Tracing;
 
 /// <summary>
 ///     Unit tests for TraceMatrix functionality.

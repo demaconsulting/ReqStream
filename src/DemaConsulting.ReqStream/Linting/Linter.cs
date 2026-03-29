@@ -18,10 +18,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.ReqStream.Cli;
 using YamlDotNet.Core;
 using YamlDotNet.RepresentationModel;
 
-namespace DemaConsulting.ReqStream;
+namespace DemaConsulting.ReqStream.Linting;
 
 /// <summary>
 ///     Provides linting functionality for ReqStream requirement YAML files.

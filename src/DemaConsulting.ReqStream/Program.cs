@@ -19,6 +19,11 @@
 // SOFTWARE.
 
 using System.Reflection;
+using DemaConsulting.ReqStream.Cli;
+using DemaConsulting.ReqStream.Linting;
+using DemaConsulting.ReqStream.Modeling;
+using DemaConsulting.ReqStream.SelfTest;
+using DemaConsulting.ReqStream.Tracing;
 
 namespace DemaConsulting.ReqStream;
 

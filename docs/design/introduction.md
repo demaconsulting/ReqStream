@@ -35,24 +35,46 @@ subsystem, and unit levels:
 
 ```text
 ReqStream (System)
-├── Program Orchestration (Subsystem)
-│   ├── Command-Line Interface (Subsystem)
-│   │   └── Context (Unit)
-│   └── Program (Unit)
-├── Requirements (Subsystem)
-│   ├── Requirements File Processing (Subsystem)
-│   │   ├── Requirements (Unit)
-│   │   ├── Section (Unit)
-│   │   └── Requirement (Unit)
-│   ├── Test Integration (Subsystem)
-│   │   └── TraceMatrix (Unit)
-│   └── Linting (Subsystem)
-│       └── Linter (Unit)
-└── Validation (Subsystem)
+├── Program (Unit)
+├── Cli (Subsystem)
+│   └── Context (Unit)
+├── Modeling (Subsystem)
+│   ├── Requirements (Unit)
+│   ├── Section (Unit)
+│   └── Requirement (Unit)
+├── Tracing (Subsystem)
+│   └── TraceMatrix (Unit)
+├── Linting (Subsystem)
+│   └── Linter (Unit)
+└── SelfTest (Subsystem)
     └── Validation (Unit)
 ```
 
 Each unit is described in detail in its own chapter within this document.
+
+## Folder Layout
+
+The source code folder structure mirrors the top-level subsystem breakdown above, giving
+reviewers an explicit navigation aid from design to code:
+
+```text
+src/DemaConsulting.ReqStream/
+├── Program.cs                  — entry point and execution orchestrator
+├── Cli/
+│   └── Context.cs              — command-line argument parser and I/O owner
+├── Modeling/
+│   ├── Requirement.cs          — single requirement with ID, title, and test links
+│   ├── Requirements.cs         — parsed requirements document with section tree
+│   └── Section.cs              — named group of requirements within a document
+├── Tracing/
+│   └── TraceMatrix.cs          — test result loader and requirement-coverage analyzer
+├── Linting/
+│   └── Linter.cs               — structural linter for requirement YAML files
+└── SelfTest/
+    └── Validation.cs           — self-validation test runner
+```
+
+The test project mirrors the same layout under `test/DemaConsulting.ReqStream.Tests/`.
 
 ## Document Conventions
 

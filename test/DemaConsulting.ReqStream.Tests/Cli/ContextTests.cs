@@ -18,7 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.ReqStream.Tests;
+using DemaConsulting.ReqStream.Cli;
+
+namespace DemaConsulting.ReqStream.Tests.Cli;
 
 /// <summary>
 /// Unit tests for the Context class.

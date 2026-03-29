@@ -18,7 +18,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.ReqStream.Tests;
+using DemaConsulting.ReqStream;
+using DemaConsulting.ReqStream.Cli;
+using DemaConsulting.ReqStream.Linting;
+
+namespace DemaConsulting.ReqStream.Tests.Linting;
 
 /// <summary>
 /// Unit tests for the Linter class.

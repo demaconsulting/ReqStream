@@ -18,7 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.ReqStream.Tests;
+using DemaConsulting.ReqStream.Modeling;
+
+namespace DemaConsulting.ReqStream.Tests.Modeling;
 
 /// <summary>
 /// Unit tests for Requirements Markdown export functionality.

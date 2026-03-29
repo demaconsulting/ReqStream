@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.ReqStream;
+namespace DemaConsulting.ReqStream.Modeling;
 
 /// <summary>
 ///     Represents a single requirement with its metadata.

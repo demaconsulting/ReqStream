@@ -21,7 +21,7 @@
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 
-namespace DemaConsulting.ReqStream;
+namespace DemaConsulting.ReqStream.Cli;
 
 /// <summary>
 ///     Context class that handles command-line arguments and program output.
