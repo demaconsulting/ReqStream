@@ -18,11 +18,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.ReqStream.Tracing;
 using DemaConsulting.TestResults;
 using DemaConsulting.TestResults.IO;
+using RequirementsDocument = DemaConsulting.ReqStream.Requirements.Requirements;
 using TestResult = DemaConsulting.TestResults.TestResult;
 
-namespace DemaConsulting.ReqStream.Tests;
+namespace DemaConsulting.ReqStream.Tests.Tracing;
 
 /// <summary>
 ///     Unit tests for TraceMatrix reading functionality.
@@ -73,7 +75,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         // Create TRX file using the TestResults library
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -130,7 +132,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         // Create first TRX file (Windows, passed)
         var testResults1 = new TestResults.TestResults { Name = "WindowsRun" };
@@ -200,7 +202,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         // Create TRX with multiple tests
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -288,7 +290,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         var nonExistentPath = Path.Combine(_testDirectory, "nonexistent.trx");
 
@@ -315,7 +317,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         // Create TRX with passed and failed tests
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -374,7 +376,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         // Create TraceMatrix with no files
         var matrix = new TraceMatrix(requirements);
@@ -406,7 +408,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         // Create JUnit file using the TestResults library
         var testResults = new TestResults.TestResults { Name = "DataTests" };
@@ -464,7 +466,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         // Create TRX file
         var trxResults = new TestResults.TestResults { Name = "TrxRun" };
@@ -527,7 +529,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         // Create JUnit file with passed and failed tests
         var testResults = new TestResults.TestResults { Name = "JUnitTestRun" };

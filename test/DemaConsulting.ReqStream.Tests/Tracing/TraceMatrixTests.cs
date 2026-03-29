@@ -18,11 +18,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.ReqStream.Tracing;
 using DemaConsulting.TestResults;
 using DemaConsulting.TestResults.IO;
+using RequirementsDocument = DemaConsulting.ReqStream.Requirements.Requirements;
 using TestResult = DemaConsulting.TestResults.TestResult;
 
-namespace DemaConsulting.ReqStream.Tests;
+namespace DemaConsulting.ReqStream.Tests.Tracing;
 
 /// <summary>
 ///     Unit tests for TraceMatrix functionality.
@@ -76,7 +78,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         // Create Windows test results
         var windowsResults = new TestResults.TestResults { Name = "WindowsRun" };
@@ -142,7 +144,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         // Create Linux test results (should not match)
         var linuxResults = new TestResults.TestResults { Name = "LinuxRun" };
@@ -183,7 +185,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         // Create Windows test results
         var windowsResults = new TestResults.TestResults { Name = "WindowsRun" };
@@ -241,7 +243,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         // Create Windows test results
         var windowsResults = new TestResults.TestResults { Name = "WindowsRun" };
@@ -329,7 +331,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         // Create test results with uppercase WINDOWS in filename
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -372,7 +374,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         // Create test results with full filename containing ubuntu
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -420,7 +422,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         // Create test results with filename containing both windows and dotnet8
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -480,7 +482,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         // Create a Windows test result file containing the shared test
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -535,7 +537,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         // Create test results with one executed and one not-executed test
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -596,7 +598,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         // Create test results with only not-executed tests
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -655,7 +657,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = RequirementsDocument.Read(reqPath);
 
         // Create test results with passed, failed, and not-executed tests
         var testResults = new TestResults.TestResults { Name = "TestRun" };

@@ -20,8 +20,11 @@
 
 using DemaConsulting.TestResults;
 using DemaConsulting.TestResults.IO;
+using Requirement = DemaConsulting.ReqStream.Requirements.Requirement;
+using RequirementsDocument = DemaConsulting.ReqStream.Requirements.Requirements;
+using Section = DemaConsulting.ReqStream.Requirements.Section;
 
-namespace DemaConsulting.ReqStream;
+namespace DemaConsulting.ReqStream.Tracing;
 
 /// <summary>
 ///     Represents test metrics for a single test execution.
@@ -63,7 +66,7 @@ public class TraceMatrix
     /// <summary>
     ///     The requirements object used to build this trace matrix.
     /// </summary>
-    private readonly Requirements _requirements;
+    private readonly RequirementsDocument _requirements;
 
     /// <summary>
     ///     Initializes a new instance of the TraceMatrix class.
@@ -72,7 +75,7 @@ public class TraceMatrix
     /// <param name="testResultFiles">Paths to test result files (TRX or JUnit format).</param>
     /// <exception cref="ArgumentNullException">Thrown when requirements is null.</exception>
     /// <exception cref="FileNotFoundException">Thrown when a test result file does not exist.</exception>
-    public TraceMatrix(Requirements requirements, params string[] testResultFiles)
+    public TraceMatrix(RequirementsDocument requirements, params string[] testResultFiles)
     {
         ArgumentNullException.ThrowIfNull(requirements);
 

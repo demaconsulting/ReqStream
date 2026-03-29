@@ -19,6 +19,11 @@
 // SOFTWARE.
 
 using System.Reflection;
+using DemaConsulting.ReqStream.Cli;
+using DemaConsulting.ReqStream.Linting;
+using DemaConsulting.ReqStream.Tracing;
+using RequirementsDocument = DemaConsulting.ReqStream.Requirements.Requirements;
+using ValidationService = DemaConsulting.ReqStream.Validation.Validation;
 
 namespace DemaConsulting.ReqStream;
 
@@ -105,7 +110,7 @@ internal static class Program
         // Priority 3: Self-Validation
         if (context.Validate)
         {
-            Validation.Run(context);
+            ValidationService.Run(context);
             return;
         }
 
@@ -175,7 +180,7 @@ internal static class Program
 
         // Read requirements from files
         context.WriteLine($"Reading {context.RequirementsFiles.Count} requirements file(s)...");
-        var requirements = Requirements.Read(context.RequirementsFiles.ToArray());
+        var requirements = RequirementsDocument.Read(context.RequirementsFiles.ToArray());
         context.WriteLine("Requirements loaded successfully.");
 
         // Export requirements report if requested

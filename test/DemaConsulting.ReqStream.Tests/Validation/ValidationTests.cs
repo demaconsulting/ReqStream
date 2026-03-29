@@ -18,7 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.ReqStream.Tests;
+using DemaConsulting.ReqStream.Cli;
+using ValidationService = DemaConsulting.ReqStream.Validation.Validation;
+
+namespace DemaConsulting.ReqStream.Tests.Validation;
 
 /// <summary>
 /// Unit tests for the Validation class.
@@ -59,7 +62,7 @@ public class ValidationTests
         // Arrange - nothing to arrange; null is the input
 
         // Act + Assert - calling Run with null should throw ArgumentNullException
-        Assert.ThrowsExactly<ArgumentNullException>(() => Validation.Run(null!));
+        Assert.ThrowsExactly<ArgumentNullException>(() => ValidationService.Run(null!));
     }
 
     /// <summary>
@@ -74,7 +77,7 @@ public class ValidationTests
         // Act - run validation and dispose context to flush the log file
         using (var context = Context.Create(["--silent", "--log", logFile]))
         {
-            Validation.Run(context);
+            ValidationService.Run(context);
 
             // Validation should succeed with exit code 0
             Assert.AreEqual(0, context.ExitCode);
@@ -106,7 +109,7 @@ public class ValidationTests
         // Act - run validation and dispose context to flush output
         using (var context = Context.Create(["--silent", "--results", resultsFile]))
         {
-            Validation.Run(context);
+            ValidationService.Run(context);
 
             // Validation should succeed with exit code 0
             Assert.AreEqual(0, context.ExitCode);
@@ -131,7 +134,7 @@ public class ValidationTests
         // Act - run validation and dispose context to flush output
         using (var context = Context.Create(["--silent", "--results", resultsFile]))
         {
-            Validation.Run(context);
+            ValidationService.Run(context);
 
             // Validation should succeed with exit code 0
             Assert.AreEqual(0, context.ExitCode);
@@ -155,7 +158,7 @@ public class ValidationTests
 
         // Act - run validation and dispose context to flush output
         using var context = Context.Create(["--silent", "--results", resultsFile]);
-        Validation.Run(context);
+        ValidationService.Run(context);
 
         // Assert - exit code must be 1 indicating an error was reported for the unsupported format
         Assert.AreEqual(1, context.ExitCode);

@@ -20,9 +20,10 @@
 
 using System.Reflection;
 using System.Runtime.InteropServices;
+using DemaConsulting.ReqStream.Cli;
 using DemaConsulting.TestResults.IO;
 
-namespace DemaConsulting.ReqStream;
+namespace DemaConsulting.ReqStream.Validation;
 
 /// <summary>
 ///     Provides self-validation functionality for the ReqStream tool.

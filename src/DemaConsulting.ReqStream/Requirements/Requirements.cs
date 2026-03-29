@@ -22,7 +22,7 @@ using System.Diagnostics.CodeAnalysis;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace DemaConsulting.ReqStream;
+namespace DemaConsulting.ReqStream.Requirements;
 
 /// <summary>
 ///     Represents the complete requirements document tree.

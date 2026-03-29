@@ -18,40 +18,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.ReqStream;
+namespace DemaConsulting.ReqStream.Requirements;
 
 /// <summary>
-///     Represents a single requirement with its metadata.
+///     Represents a section containing requirements and/or child sections.
 /// </summary>
-public class Requirement
+public class Section
 {
     /// <summary>
-    ///     Gets or sets the unique identifier for this requirement.
-    /// </summary>
-    public string Id { get; set; } = string.Empty;
-
-    /// <summary>
-    ///     Gets or sets the title or description of this requirement.
+    ///     Gets or sets the title of this section.
     /// </summary>
     public string Title { get; set; } = string.Empty;
 
     /// <summary>
-    ///     Gets or sets the optional justification explaining why this requirement exists.
+    ///     Gets the list of requirements in this section.
     /// </summary>
-    public string? Justification { get; set; }
+    public List<Requirement> Requirements { get; } = [];
 
     /// <summary>
-    ///     Gets the list of test identifiers associated with this requirement.
+    ///     Gets the list of child sections.
     /// </summary>
-    public List<string> Tests { get; } = [];
-
-    /// <summary>
-    ///     Gets the list of child requirement identifiers.
-    /// </summary>
-    public List<string> Children { get; } = [];
-
-    /// <summary>
-    ///     Gets the list of tags associated with this requirement.
-    /// </summary>
-    public List<string> Tags { get; } = [];
+    public List<Section> Sections { get; } = [];
 }
