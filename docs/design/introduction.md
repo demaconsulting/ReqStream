@@ -57,24 +57,23 @@ Each unit is described in detail in its own chapter within this document.
 ## Folder Layout
 
 The source code folder structure mirrors the top-level subsystem breakdown above, giving
-reviewers an explicit navigation aid from design to code. Each subfolder carries its own
-sub-namespace under `DemaConsulting.ReqStream`:
+reviewers an explicit navigation aid from design to code:
 
 ```text
 src/DemaConsulting.ReqStream/
-├── Program.cs                  — DemaConsulting.ReqStream
+├── Program.cs                  — entry point and execution orchestrator
 ├── Cli/
-│   └── Context.cs              — DemaConsulting.ReqStream.Cli
+│   └── Context.cs              — command-line argument parser and I/O owner
 ├── Modeling/
-│   ├── Requirement.cs          — DemaConsulting.ReqStream.Modeling
-│   ├── Requirements.cs         — DemaConsulting.ReqStream.Modeling
-│   └── Section.cs              — DemaConsulting.ReqStream.Modeling
+│   ├── Requirement.cs          — single requirement with ID, title, and test links
+│   ├── Requirements.cs         — parsed requirements document with section tree
+│   └── Section.cs              — named group of requirements within a document
 ├── Tracing/
-│   └── TraceMatrix.cs          — DemaConsulting.ReqStream.Tracing
+│   └── TraceMatrix.cs          — test result loader and requirement-coverage analyzer
 ├── Linting/
-│   └── Linter.cs               — DemaConsulting.ReqStream.Linting
+│   └── Linter.cs               — structural linter for requirement YAML files
 └── SelfTest/
-    └── Validation.cs           — DemaConsulting.ReqStream.SelfTest
+    └── Validation.cs           — self-validation test runner
 ```
 
 The test project mirrors the same layout under `test/DemaConsulting.ReqStream.Tests/`.
