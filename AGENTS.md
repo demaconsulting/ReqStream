@@ -156,9 +156,8 @@ build.bat     # Windows
 
 ## Continuous Compliance Overview
 
-This repository follows the DEMA Consulting Continuous Compliance
-<https://github.com/demaconsulting/ContinuousCompliance> approach, which enforces quality and
-compliance gates on every CI/CD run instead of as a last-mile activity.
+This repository follows the DEMA Consulting [Continuous Compliance][continuous-compliance] approach, which enforces
+quality and compliance gates on every CI/CD run instead of as a last-mile activity.
 
 ### Core Principles
 
@@ -233,7 +232,7 @@ All stages must pass before merge. Pipeline fails immediately on:
 ## Continuous Compliance Requirements
 
 This repository follows continuous compliance practices from DEMA Consulting
-Continuous Compliance <https://github.com/demaconsulting/ContinuousCompliance>.
+[Continuous Compliance][continuous-compliance].
 
 ### Core Requirements Traceability Rules
 
@@ -267,3 +266,5 @@ Upon completion, create a report file at `.agent-logs/[agent-name]-[subject]-[un
 - Follow-up items, open questions, or TODOs
 
 Store agent logs in the `.agent-logs/` folder so they are ignored via `.gitignore` and excluded from linting and commits.
+
+[continuous-compliance]: https://github.com/demaconsulting/ContinuousCompliance
