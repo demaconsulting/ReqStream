@@ -2,7 +2,7 @@
 sections:
   - title: ReqStream Requirements
     sections:
-      - title: Test Integration
+      - title: Tracing
         requirements:
           - id: ReqStream-Test-ResultFiles
             title: The tool shall support processing test result files.

@@ -2,7 +2,7 @@
 sections:
   - title: ReqStream Requirements
     sections:
-      - title: Program Orchestration
+      - title: Program
         requirements:
           - id: ReqStream-Prog-Version
             title: The tool shall print version information and exit when the version flag is provided.

@@ -11,7 +11,7 @@ sections:
             justification: |
               Combining requirements processing, test result loading, report generation, and
               enforcement in a single invocation is the primary CI/CD use case. This system-level
-              requirement verifies that all subsystems — Requirements, TraceMatrix, and Program —
+              requirement verifies that all subsystems — Modeling, Tracing, and Program —
               work correctly when integrated together.
             tests:
               - ReqStream_FullPipeline_GeneratesAllReportsAndEnforces

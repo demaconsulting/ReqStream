@@ -2,7 +2,7 @@
 sections:
   - title: ReqStream Requirements
     sections:
-      - title: Command-Line Interface
+      - title: Cli
         requirements:
           - id: ReqStream-Cmd-Cli
             title: The tool shall provide a command-line interface.

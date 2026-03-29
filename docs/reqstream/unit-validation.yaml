@@ -2,7 +2,7 @@
 sections:
   - title: ReqStream Requirements
     sections:
-      - title: Validation
+      - title: SelfTest
         requirements:
           - id: ReqStream-Val-SelfValidation
             title: The tool shall support self-validation mode.

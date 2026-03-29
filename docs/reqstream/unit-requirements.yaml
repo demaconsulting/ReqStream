@@ -2,7 +2,7 @@
 sections:
   - title: ReqStream Requirements
     sections:
-      - title: Requirements File Processing
+      - title: Modeling
         requirements:
           - id: ReqStream-Req-YamlProcessing
             title: The tool shall process YAML requirements files.
