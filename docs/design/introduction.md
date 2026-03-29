@@ -54,6 +54,31 @@ ReqStream (System)
 
 Each unit is described in detail in its own chapter within this document.
 
+## Folder Layout
+
+The source code folder structure mirrors the top-level subsystem breakdown above, giving
+reviewers an explicit navigation aid from design to code. Each subfolder carries its own
+sub-namespace under `DemaConsulting.ReqStream`:
+
+```text
+src/DemaConsulting.ReqStream/
+├── Program.cs                  — DemaConsulting.ReqStream
+├── Cli/
+│   └── Context.cs              — DemaConsulting.ReqStream.Cli
+├── Requirements/
+│   ├── Requirement.cs          — DemaConsulting.ReqStream.Requirements
+│   ├── Requirements.cs         — DemaConsulting.ReqStream.Requirements
+│   └── Section.cs              — DemaConsulting.ReqStream.Requirements
+├── Tracing/
+│   └── TraceMatrix.cs          — DemaConsulting.ReqStream.Tracing
+├── Linting/
+│   └── Linter.cs               — DemaConsulting.ReqStream.Linting
+└── Validation/
+    └── Validation.cs           — DemaConsulting.ReqStream.Validation
+```
+
+The test project mirrors the same layout under `test/DemaConsulting.ReqStream.Tests/`.
+
 ## Document Conventions
 
 Throughout this document:
