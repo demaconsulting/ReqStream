@@ -59,24 +59,24 @@ reviews:
       - "src/**/Program.cs"
       - "test/**/ProgramTests.cs"
 
-  - id: ReqStream-Validation
-    title: Review of ReqStream Validation Unit
+  - id: ReqStream-SelfTest
+    title: Review of ReqStream SelfTest Unit
     paths:
       - "docs/reqstream/unit-validation.yaml"
       - "docs/design/validation.md"
-      - "src/**/Validation/Validation.cs"
-      - "test/**/Validation/ValidationTests.cs"
+      - "src/**/SelfTest/Validation.cs"
+      - "test/**/SelfTest/ValidationTests.cs"
 
-  - id: ReqStream-Requirements
-    title: Review of ReqStream Requirements Unit
+  - id: ReqStream-Modeling
+    title: Review of ReqStream Modeling Unit
     paths:
       - "docs/reqstream/unit-requirements.yaml"
       - "docs/design/requirements.md"
-      - "src/**/Requirements/Requirement.cs"
-      - "src/**/Requirements/Requirements.cs"
-      - "src/**/Requirements/Section.cs"
-      - "test/**/Requirements/RequirementsReadTests.cs"
-      - "test/**/Requirements/RequirementsExportTests.cs"
+      - "src/**/Modeling/Requirement.cs"
+      - "src/**/Modeling/Requirements.cs"
+      - "src/**/Modeling/Section.cs"
+      - "test/**/Modeling/RequirementsReadTests.cs"
+      - "test/**/Modeling/RequirementsExportTests.cs"
 
   - id: ReqStream-TraceMatrix
     title: Review of ReqStream TraceMatrix Unit

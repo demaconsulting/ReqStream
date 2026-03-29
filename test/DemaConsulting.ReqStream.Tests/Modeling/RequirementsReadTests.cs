@@ -18,9 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using RequirementsDocument = DemaConsulting.ReqStream.Requirements.Requirements;
+using DemaConsulting.ReqStream.Modeling;
 
-namespace DemaConsulting.ReqStream.Tests.Requirements;
+namespace DemaConsulting.ReqStream.Tests.Modeling;
 
 /// <summary>
 /// Unit tests for Requirements YAML reading functionality.
@@ -68,7 +68,7 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = RequirementsDocument.Read(filePath);
+        var requirements = Requirements.Read(filePath);
 
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
@@ -98,7 +98,7 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = RequirementsDocument.Read(filePath);
+        var requirements = Requirements.Read(filePath);
 
         Assert.IsNotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
@@ -128,7 +128,7 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = RequirementsDocument.Read(filePath);
+        var requirements = Requirements.Read(filePath);
 
         Assert.IsNotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
@@ -157,7 +157,7 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = RequirementsDocument.Read(filePath);
+        var requirements = Requirements.Read(filePath);
 
         Assert.IsNotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
@@ -190,7 +190,7 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = RequirementsDocument.Read(filePath);
+        var requirements = Requirements.Read(filePath);
 
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
@@ -224,7 +224,7 @@ mappings:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = RequirementsDocument.Read(filePath);
+        var requirements = Requirements.Read(filePath);
 
         Assert.IsNotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
@@ -262,7 +262,7 @@ sections:
         File.WriteAllText(mainPath, mainYaml);
         File.WriteAllText(includedPath, includedYaml);
 
-        var requirements = RequirementsDocument.Read(mainPath);
+        var requirements = Requirements.Read(mainPath);
 
         Assert.IsNotNull(requirements);
         Assert.HasCount(2, requirements.Sections);
@@ -300,7 +300,7 @@ sections:
         File.WriteAllText(mainPath, mainYaml);
         File.WriteAllText(includedPath, includedYaml);
 
-        var requirements = RequirementsDocument.Read(mainPath);
+        var requirements = Requirements.Read(mainPath);
 
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
@@ -328,7 +328,7 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => RequirementsDocument.Read(filePath));
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
         Assert.Contains("SYS-SEC-001", ex.Message);
         Assert.Contains("Duplicate requirement ID", ex.Message);
     }
@@ -364,7 +364,7 @@ includes:
         File.WriteAllText(pathA, fileA);
         File.WriteAllText(pathB, fileB);
 
-        var requirements = RequirementsDocument.Read(pathA);
+        var requirements = Requirements.Read(pathA);
 
         Assert.IsNotNull(requirements);
         Assert.HasCount(2, requirements.Sections);
@@ -378,7 +378,7 @@ includes:
     {
         var nonExistentPath = Path.Combine(_testDirectory, "nonexistent.yaml");
 
-        var ex = Assert.ThrowsExactly<FileNotFoundException>(() => RequirementsDocument.Read(nonExistentPath));
+        var ex = Assert.ThrowsExactly<FileNotFoundException>(() => Requirements.Read(nonExistentPath));
         Assert.Contains("Requirements file not found", ex.Message);
     }
 
@@ -393,7 +393,7 @@ includes:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = RequirementsDocument.Read(filePath);
+        var requirements = Requirements.Read(filePath);
 
         Assert.IsNotNull(requirements);
         Assert.IsEmpty(requirements.Sections);
@@ -440,7 +440,7 @@ mappings:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = RequirementsDocument.Read(filePath);
+        var requirements = Requirements.Read(filePath);
 
         Assert.IsNotNull(requirements);
         Assert.HasCount(2, requirements.Sections);
@@ -484,7 +484,7 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => RequirementsDocument.Read(filePath));
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
         Assert.Contains("Requirement ID cannot be blank", ex.Message);
         Assert.Contains("System Security", ex.Message);
         Assert.Contains(filePath, ex.Message);
@@ -506,7 +506,7 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => RequirementsDocument.Read(filePath));
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
         Assert.Contains("Requirement title cannot be blank", ex.Message);
         Assert.Contains("SYS-SEC-001", ex.Message);
         Assert.Contains(filePath, ex.Message);
@@ -528,7 +528,7 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => RequirementsDocument.Read(filePath));
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
         Assert.Contains("Section title cannot be blank", ex.Message);
         Assert.Contains(filePath, ex.Message);
     }
@@ -553,7 +553,7 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => RequirementsDocument.Read(filePath));
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
         Assert.Contains("Test name cannot be blank", ex.Message);
         Assert.Contains("SYS-SEC-001", ex.Message);
         Assert.Contains(filePath, ex.Message);
@@ -581,7 +581,7 @@ mappings:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => RequirementsDocument.Read(filePath));
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
         Assert.Contains("Test name cannot be blank", ex.Message);
         Assert.Contains("SYS-SEC-001", ex.Message);
         Assert.Contains(filePath, ex.Message);
@@ -608,7 +608,7 @@ mappings:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => RequirementsDocument.Read(filePath));
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
         Assert.Contains("Mapping requirement ID cannot be blank", ex.Message);
         Assert.Contains(filePath, ex.Message);
     }
@@ -631,7 +631,7 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => RequirementsDocument.Read(filePath));
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
         Assert.Contains("SYS-SEC-001", ex.Message);
         Assert.Contains("Duplicate requirement ID", ex.Message);
         Assert.Contains(filePath, ex.Message);
@@ -671,7 +671,7 @@ sections:
         File.WriteAllText(file2Path, file2Yaml);
         File.WriteAllText(file3Path, file3Yaml);
 
-        var requirements = RequirementsDocument.Read(file1Path, file2Path, file3Path);
+        var requirements = Requirements.Read(file1Path, file2Path, file3Path);
 
         Assert.IsNotNull(requirements);
         Assert.HasCount(3, requirements.Sections);
@@ -708,7 +708,7 @@ sections:
         File.WriteAllText(file1Path, file1Yaml);
         File.WriteAllText(file2Path, file2Yaml);
 
-        var requirements = RequirementsDocument.Read(file1Path, file2Path);
+        var requirements = Requirements.Read(file1Path, file2Path);
 
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
@@ -734,7 +734,7 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = RequirementsDocument.Read(filePath);
+        var requirements = Requirements.Read(filePath);
 
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
@@ -749,7 +749,7 @@ sections:
     [TestMethod]
     public void Requirements_Read_NoArguments_ThrowsArgumentException()
     {
-        var ex = Assert.ThrowsExactly<ArgumentException>(() => RequirementsDocument.Read());
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Requirements.Read());
         Assert.Contains("At least one file path must be provided", ex.Message);
     }
 
@@ -759,7 +759,7 @@ sections:
     [TestMethod]
     public void Requirements_Read_NullArgument_ThrowsArgumentException()
     {
-        var ex = Assert.ThrowsExactly<ArgumentException>(() => RequirementsDocument.Read(null!));
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Requirements.Read(null!));
         Assert.Contains("At least one file path must be provided", ex.Message);
     }
 
@@ -788,7 +788,7 @@ sections:
         File.WriteAllText(file1Path, file1Yaml);
         File.WriteAllText(file2Path, file2Yaml);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => RequirementsDocument.Read(file1Path, file2Path));
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(file1Path, file2Path));
         Assert.Contains("SYS-SEC-001", ex.Message);
         Assert.Contains("Duplicate requirement ID", ex.Message);
         Assert.Contains(file2Path, ex.Message);
@@ -813,7 +813,7 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = RequirementsDocument.Read(filePath);
+        var requirements = Requirements.Read(filePath);
 
         Assert.IsNotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
@@ -843,7 +843,7 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => RequirementsDocument.Read(filePath));
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
         Assert.Contains("Tag name cannot be blank", ex.Message);
         Assert.Contains("SYS-SEC-001", ex.Message);
         Assert.Contains(filePath, ex.Message);
@@ -871,7 +871,7 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => RequirementsDocument.Read(filePath));
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
         Assert.Contains("Circular requirement reference detected", ex.Message);
         Assert.Contains("REQ-A", ex.Message);
         Assert.Contains("REQ-B", ex.Message);
@@ -895,7 +895,7 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => RequirementsDocument.Read(filePath));
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
         Assert.Contains("Circular requirement reference detected", ex.Message);
         Assert.Contains("REQ-A", ex.Message);
     }

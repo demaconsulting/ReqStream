@@ -65,16 +65,16 @@ src/DemaConsulting.ReqStream/
 ├── Program.cs                  — DemaConsulting.ReqStream
 ├── Cli/
 │   └── Context.cs              — DemaConsulting.ReqStream.Cli
-├── Requirements/
-│   ├── Requirement.cs          — DemaConsulting.ReqStream.Requirements
-│   ├── Requirements.cs         — DemaConsulting.ReqStream.Requirements
-│   └── Section.cs              — DemaConsulting.ReqStream.Requirements
+├── Modeling/
+│   ├── Requirement.cs          — DemaConsulting.ReqStream.Modeling
+│   ├── Requirements.cs         — DemaConsulting.ReqStream.Modeling
+│   └── Section.cs              — DemaConsulting.ReqStream.Modeling
 ├── Tracing/
 │   └── TraceMatrix.cs          — DemaConsulting.ReqStream.Tracing
 ├── Linting/
 │   └── Linter.cs               — DemaConsulting.ReqStream.Linting
-└── Validation/
-    └── Validation.cs           — DemaConsulting.ReqStream.Validation
+└── SelfTest/
+    └── Validation.cs           — DemaConsulting.ReqStream.SelfTest
 ```
 
 The test project mirrors the same layout under `test/DemaConsulting.ReqStream.Tests/`.

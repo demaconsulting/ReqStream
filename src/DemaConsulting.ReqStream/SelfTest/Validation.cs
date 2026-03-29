@@ -23,7 +23,7 @@ using System.Runtime.InteropServices;
 using DemaConsulting.ReqStream.Cli;
 using DemaConsulting.TestResults.IO;
 
-namespace DemaConsulting.ReqStream.Validation;
+namespace DemaConsulting.ReqStream.SelfTest;
 
 /// <summary>
 ///     Provides self-validation functionality for the ReqStream tool.
