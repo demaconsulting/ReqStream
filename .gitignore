@@ -117,3 +117,6 @@ versionmark-*.json
 
 # Agent report files
 AGENT_REPORT_*.md
+
+# Agent log files
+.agent-logs/
