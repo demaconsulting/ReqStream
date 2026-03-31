@@ -1,0 +1,28 @@
+---
+# Tracing Subsystem Requirements
+#
+# PURPOSE:
+# - Define requirements for the ReqStream Tracing subsystem
+# - The Tracing subsystem spans TraceMatrix.cs (test result loading and mapping)
+# - Subsystem requirements describe the traceability and coverage enforcement behavior
+
+sections:
+  - title: Tracing Subsystem Requirements
+    requirements:
+      - id: ReqStream-Tracing-TestResults
+        title: The Tracing subsystem shall load test results from TRX and JUnit XML files.
+        justification: |
+          Supporting both TRX and JUnit XML formats ensures the tool works with the major
+          test frameworks used in .NET development, maximizing interoperability.
+        tests:
+          - TraceMatrix_Read_TrxFile_LoadsTestResults
+          - TraceMatrix_Read_JUnitFile_LoadsTestResults
+
+      - id: ReqStream-Tracing-Coverage
+        title: The Tracing subsystem shall map test results to requirements and determine coverage.
+        justification: |
+          Requirement traceability requires mapping each test execution to the requirements
+          it satisfies. This enables enforcement of full test coverage as a quality gate.
+        tests:
+          - TraceMatrix_GetSatisfied_AllTestsPassed_ReturnsAllRequirements
+          - TraceMatrix_GetSatisfied_SomeTestsFailed_ReturnsOnlyPassed

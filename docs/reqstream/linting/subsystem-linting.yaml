@@ -1,0 +1,20 @@
+---
+# Linting Subsystem Requirements
+#
+# PURPOSE:
+# - Define requirements for the ReqStream Linting subsystem
+# - The Linting subsystem spans Linter.cs (requirement YAML structural validation)
+# - Subsystem requirements describe the linting behavior for requirement files
+
+sections:
+  - title: Linting Subsystem Requirements
+    requirements:
+      - id: ReqStream-Linting-StructuralValidation
+        title: The Linting subsystem shall validate the structural integrity of requirement YAML files.
+        justification: |
+          Structural validation catches malformed requirement files early, before they cause
+          failures in downstream processing steps. This improves the user experience and
+          reduces debugging effort.
+        tests:
+          - Linter_Run_ValidRequirements_ReportsNoErrors
+          - Linter_Run_DuplicateIds_ReportsError

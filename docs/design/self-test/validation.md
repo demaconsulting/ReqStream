@@ -95,5 +95,5 @@ after the test completes, regardless of whether the test passes or fails.
 - [ReqStream Architecture][arch]
 - [ReqStream Repository][repo]
 
-[arch]: ../../ARCHITECTURE.md
+[arch]: ../../../ARCHITECTURE.md
 [repo]: https://github.com/demaconsulting/ReqStream

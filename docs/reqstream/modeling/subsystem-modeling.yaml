@@ -1,0 +1,29 @@
+---
+# Modeling Subsystem Requirements
+#
+# PURPOSE:
+# - Define requirements for the ReqStream Modeling subsystem
+# - The Modeling subsystem spans Requirements.cs, Section.cs, and Requirement.cs
+# - Subsystem requirements describe the YAML parsing and data model behavior
+
+sections:
+  - title: Modeling Subsystem Requirements
+    requirements:
+      - id: ReqStream-Modeling-YamlParsing
+        title: The Modeling subsystem shall parse requirement YAML files into a structured data model.
+        justification: |
+          YAML-based requirement files enable human-readable and version-control-friendly
+          requirements management. The Modeling subsystem must correctly parse these files
+          into a structured data model for use by the tracing and reporting subsystems.
+        tests:
+          - Requirements_Read_ValidYaml_ReturnsRequirements
+          - Requirements_Read_WithIncludes_MergesRequirements
+
+      - id: ReqStream-Modeling-Export
+        title: The Modeling subsystem shall export requirements to a Markdown report.
+        justification: |
+          Generating Markdown reports from requirements data enables documentation to be
+          produced automatically from the requirements files, reducing manual effort and
+          ensuring consistency.
+        tests:
+          - Requirements_Export_ValidRequirements_ReturnsMarkdown

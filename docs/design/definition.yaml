@@ -1,6 +1,11 @@
 ---
 resource-path:
   - docs/design
+  - docs/design/cli
+  - docs/design/linting
+  - docs/design/modeling
+  - docs/design/self-test
+  - docs/design/tracing
   - docs/template
 
 input-files:
@@ -8,11 +13,16 @@ input-files:
   - docs/design/introduction.md
   - docs/design/system.md
   - docs/design/program.md
-  - docs/design/context.md
-  - docs/design/validation.md
-  - docs/design/requirements.md
-  - docs/design/tracematrix.md
-  - docs/design/linter.md
+  - docs/design/cli/cli.md
+  - docs/design/cli/context.md
+  - docs/design/modeling/modeling.md
+  - docs/design/modeling/requirements.md
+  - docs/design/tracing/tracing.md
+  - docs/design/tracing/trace-matrix.md
+  - docs/design/linting/linting.md
+  - docs/design/linting/linter.md
+  - docs/design/self-test/self-test.md
+  - docs/design/self-test/validation.md
 
 template: template.html
 

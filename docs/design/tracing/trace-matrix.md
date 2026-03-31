@@ -123,5 +123,5 @@ test. The heading depth for requirement IDs is controlled by `depth`.
 - [ReqStream Architecture][arch]
 - [ReqStream Repository][repo]
 
-[arch]: ../../ARCHITECTURE.md
+[arch]: ../../../ARCHITECTURE.md
 [repo]: https://github.com/demaconsulting/ReqStream
