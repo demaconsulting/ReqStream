@@ -30,9 +30,9 @@ The `Linting` subsystem exposes the following interface to the rest of the tool:
 
 | Dependency     | Direction | Purpose                                                             |
 |----------------|-----------|---------------------------------------------------------------------|
-| `Context`      | Uses      | Reports linting errors via `Context.WriteError`.                   |
+| `Context`      | Uses      | Reports linting errors via `Context.WriteError`.                    |
 | `Requirements` | Uses      | Reads requirement data to validate structure.                       |
-| `Program`      | Used by   | Calls `Linter.Run` when `--lint` is set.                           |
+| `Program`      | Used by   | Calls `Linter.Run` when `--lint` is set.                            |
 
 ## References
 

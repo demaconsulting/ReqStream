@@ -16,7 +16,7 @@ The `Tracing` subsystem contains the following software unit:
 
 | Unit          | File                    | Responsibility                                                       |
 |---------------|-------------------------|----------------------------------------------------------------------|
-| `TraceMatrix` | `Tracing/TraceMatrix.cs` | Test result loading, requirement mapping, and coverage enforcement.  |
+| `TraceMatrix` | `Tracing/TraceMatrix.cs`| Test result loading, requirement mapping, and coverage enforcement.  |
 
 ## Interfaces
 

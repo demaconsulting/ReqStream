@@ -44,7 +44,7 @@ reviews:
   - id: ReqStream-Validation
     title: Review of ReqStream Validation Unit
     paths:
-      - "docs/reqstream/self-test/unit-validation.yaml" # requirements
+      - "docs/reqstream/self-test/unit-validation.yaml"  # requirements
       - "docs/design/self-test/validation.md"           # design
       - "src/**/SelfTest/Validation.cs"                 # implementation
       - "test/**/SelfTest/ValidationTests.cs"           # unit tests
@@ -52,7 +52,7 @@ reviews:
   - id: ReqStream-Modeling
     title: Review of ReqStream Modeling Unit
     paths:
-      - "docs/reqstream/modeling/unit-requirements.yaml" # requirements
+      - "docs/reqstream/modeling/unit-requirements.yaml"  # requirements
       - "docs/design/modeling/requirements.md"           # design
       - "src/**/Modeling/Requirement.cs"                 # implementation
       - "src/**/Modeling/Requirements.cs"                # implementation
@@ -63,7 +63,7 @@ reviews:
   - id: ReqStream-TraceMatrix
     title: Review of ReqStream TraceMatrix Unit
     paths:
-      - "docs/reqstream/tracing/unit-trace-matrix.yaml" # requirements
+      - "docs/reqstream/tracing/unit-trace-matrix.yaml"  # requirements
       - "docs/design/tracing/trace-matrix.md"           # design
       - "src/**/Tracing/TraceMatrix.cs"                 # implementation
       - "test/**/Tracing/TraceMatrixTests.cs"           # unit tests
@@ -90,7 +90,7 @@ reviews:
   - id: ReqStream-ModelingSubsystem
     title: Review of ReqStream Modeling subsystem (requirements data model)
     paths:
-      - "docs/reqstream/modeling/subsystem-modeling.yaml" # subsystem requirements
+      - "docs/reqstream/modeling/subsystem-modeling.yaml"  # subsystem requirements
       - "docs/design/modeling/modeling.md"                # subsystem design
       - "docs/design/modeling/requirements.md"            # Requirements unit design
 
@@ -111,7 +111,7 @@ reviews:
   - id: ReqStream-SelfTestSubsystem
     title: Review of ReqStream SelfTest subsystem (self-validation)
     paths:
-      - "docs/reqstream/self-test/subsystem-self-test.yaml" # subsystem requirements
+      - "docs/reqstream/self-test/subsystem-self-test.yaml"  # subsystem requirements
       - "docs/design/self-test/self-test.md"              # subsystem design
       - "docs/design/self-test/validation.md"             # Validation unit design
 

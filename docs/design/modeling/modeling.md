@@ -31,11 +31,11 @@ The `Modeling` subsystem exposes the following interface to the rest of the tool
 
 ## Interactions
 
-| Dependency    | Direction | Purpose                                                            |
+| Dependency    | Direction | Purpose                                                             |
 |---------------|-----------|---------------------------------------------------------------------|
-| `Context`     | Uses      | Receives file paths from `Context.RequirementsFiles`.              |
+| `Context`     | Uses      | Receives file paths from `Context.RequirementsFiles`.               |
 | `TraceMatrix` | Used by   | Receives the requirement tree to map test results to requirements.  |
-| `Program`     | Used by   | Calls `Requirements.Read` to load requirements.                    |
+| `Program`     | Used by   | Calls `Requirements.Read` to load requirements.                     |
 
 ## References
 

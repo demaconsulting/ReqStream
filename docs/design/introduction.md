@@ -54,7 +54,7 @@ Each unit is described in detail in its own chapter within this document.
 
 ## Folder Layout
 
-The design documents are organized into subsystem subfolders that mirror the top-level subsystem
+The design documents are organized into subsystem subdirectories that mirror the top-level subsystem
 breakdown above:
 
 ```text
