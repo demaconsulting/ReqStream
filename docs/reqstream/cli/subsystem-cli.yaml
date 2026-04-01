@@ -15,8 +15,14 @@ sections:
           A CLI interface enables automation in CI/CD pipelines and allows integration with scripts
           and build processes. This is essential for the tool's primary use case.
         tests:
-          - Context_Create_NoArguments_ReturnsDefaultContext
-          - Context_Create_MultipleArguments_ParsesAllCorrectly
+          - IntegrationTest_VersionFlag_OutputsVersion
+          - IntegrationTest_HelpFlag_OutputsUsageInformation
+          - IntegrationTest_UnknownArgument_ReturnsError
+        children:
+          - ReqStream-Cmd-Cli
+          - ReqStream-Cmd-Version
+          - ReqStream-Cmd-Help
+          - ReqStream-Cmd-InvalidArgs
 
       - id: ReqStream-Cli-Output
         title: The Cli subsystem shall provide output and error reporting channels.
@@ -24,5 +30,8 @@ sections:
           Centralized output routing ensures consistent formatting and allows output to be
           suppressed or redirected to a log file as needed.
         tests:
-          - Context_WriteError_NormalMode_WritesToConsole
-          - Context_Create_WithLogFile_WritesToLogFile
+          - IntegrationTest_SilentFlag_SuppressesOutput
+          - IntegrationTest_LogFlag_WritesOutputToFile
+        children:
+          - ReqStream-Cmd-ErrorOutput
+          - ReqStream-Log-FileOutput

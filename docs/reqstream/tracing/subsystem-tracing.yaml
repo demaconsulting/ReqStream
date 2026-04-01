@@ -15,8 +15,11 @@ sections:
           Supporting both TRX and JUnit XML formats ensures the tool works with the major
           test frameworks used in .NET development, maximizing interoperability.
         tests:
-          - TraceMatrix_Read_TrxFile_LoadsTestResults
-          - TraceMatrix_Read_JUnitFile_LoadsTestResults
+          - IntegrationTest_TraceMatrix_GeneratesMarkdown
+        children:
+          - ReqStream-Test-TrxFormat
+          - ReqStream-Test-JUnitFormat
+          - ReqStream-Test-ResultFiles
 
       - id: ReqStream-Tracing-Coverage
         title: The Tracing subsystem shall map test results to requirements and determine coverage.
@@ -24,5 +27,10 @@ sections:
           Requirement traceability requires mapping each test execution to the requirements
           it satisfies. This enables enforcement of full test coverage as a quality gate.
         tests:
-          - TraceMatrix_GetSatisfied_AllTestsPassed_ReturnsAllRequirements
-          - TraceMatrix_GetSatisfied_SomeTestsFailed_ReturnsOnlyPassed
+          - IntegrationTest_EnforcementMode_PassesWithTests
+          - IntegrationTest_EnforcementMode_FailsWithoutTests
+        children:
+          - ReqStream-Test-SourceFiltering
+          - ReqStream-Test-PlainTestNames
+          - ReqStream-Test-MixedTestNames
+          - ReqStream-Rpt-TraceMatrix

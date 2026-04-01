@@ -16,8 +16,12 @@ sections:
           requirements management. The Modeling subsystem must correctly parse these files
           into a structured data model for use by the tracing and reporting subsystems.
         tests:
-          - Requirements_Read_ValidYaml_ReturnsRequirements
-          - Requirements_Read_WithIncludes_MergesRequirements
+          - IntegrationTest_RequirementsReport_GeneratesMarkdown
+          - IntegrationTest_JustificationsReport_GeneratesMarkdown
+        children:
+          - ReqStream-Req-YamlProcessing
+          - ReqStream-Req-Includes
+          - ReqStream-Req-SectionMerging
 
       - id: ReqStream-Modeling-Export
         title: The Modeling subsystem shall export requirements to a Markdown report.
@@ -26,4 +30,8 @@ sections:
           produced automatically from the requirements files, reducing manual effort and
           ensuring consistency.
         tests:
-          - Requirements_Export_ValidRequirements_ReturnsMarkdown
+          - IntegrationTest_RequirementsReport_GeneratesMarkdown
+          - IntegrationTest_JustificationsReport_GeneratesMarkdown
+        children:
+          - ReqStream-Req-ParentChild
+          - ReqStream-Req-TestMappings

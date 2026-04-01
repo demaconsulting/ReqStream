@@ -15,6 +15,9 @@ sections:
               work correctly when integrated together.
             tests:
               - ReqStream_FullPipeline_GeneratesAllReportsAndEnforces
+            children:
+              - ReqStream-Modeling-YamlParsing
+              - ReqStream-Tracing-Coverage
 
           - id: ReqStream-Sys-SourceFilter
             title: >-
@@ -26,6 +29,8 @@ sections:
               requirements are satisfied only by test evidence from the appropriate source files.
             tests:
               - ReqStream_SourceFilter_MatchesTestsBySourceFile
+            children:
+              - ReqStream-Tracing-Coverage
 
           - id: ReqStream-Sys-EnforceMode
             title: >-
@@ -39,3 +44,5 @@ sections:
             tests:
               - ReqStream_EnforcementMode
               - ReqStream_EnforcementMode_FailsWhenRequirementLacksTestEvidence
+            children:
+              - ReqStream-Tracing-Coverage

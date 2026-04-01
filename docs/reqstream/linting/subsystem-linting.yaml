@@ -16,5 +16,10 @@ sections:
           failures in downstream processing steps. This improves the user experience and
           reduces debugging effort.
         tests:
-          - Linter_Run_ValidRequirements_ReportsNoErrors
-          - Linter_Run_DuplicateIds_ReportsError
+          - IntegrationTest_LintFlag_ValidFile_ReturnsSuccess
+          - IntegrationTest_LintFlag_InvalidFile_ReturnsError
+        children:
+          - ReqStream-Lint-DuplicateIds
+          - ReqStream-Lint-MalformedYaml
+          - ReqStream-Lint-MissingRequirementFields
+          - ReqStream-Lint-MultipleIssues

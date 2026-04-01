@@ -20,7 +20,9 @@ sections:
           without requiring a separate test harness.
         tests:
           - Validation_Run_WithSilentContext_CompletesSuccessfully
-          - Program_Run_WithValidateFlag_RunsValidation
+          - IntegrationTest_ValidateFlag_RunsValidation
+        children:
+          - ReqStream-Val-SelfValidation
 
       - id: ReqStream-SelfTest-ResultsOutput
         title: The tool shall write self-validation results to a standard test result file when --results is provided.
@@ -33,3 +35,7 @@ sections:
         tests:
           - Validation_Run_WithTrxResultsFile_WritesTrxFile
           - Validation_Run_WithXmlResultsFile_WritesXmlFile
+          - IntegrationTest_ValidateWithResults_GeneratesTrxFile
+          - IntegrationTest_ValidateWithResults_GeneratesJUnitFile
+        children:
+          - ReqStream-Val-EnforcementMode
