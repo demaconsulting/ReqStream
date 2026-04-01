@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using System.Diagnostics.CodeAnalysis;
+using DemaConsulting.ReqStream.Linting;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -70,6 +71,38 @@ public class Requirements : Section
 
         // Return the fully populated requirements tree
         return requirements;
+    }
+
+    /// <summary>
+    ///     Loads one or more requirements YAML files, performing linting and returning both the
+    ///     parsed Requirements and any lint issues found.
+    /// </summary>
+    /// <param name="paths">One or more paths to YAML files to load.</param>
+    /// <returns>
+    ///     A tuple of the parsed <see cref="Requirements"/> (or <c>null</c> if error-level lint
+    ///     issues were found) and a read-only list of <see cref="LintIssue"/> objects.
+    /// </returns>
+    /// <exception cref="ArgumentException">Thrown when no paths are provided.</exception>
+    public static (Requirements? Requirements, IReadOnlyList<LintIssue> Issues) Load(params string[] paths)
+    {
+        // Validate that at least one path is provided
+        if (paths == null || paths.Length == 0)
+        {
+            throw new ArgumentException("At least one file path must be provided", nameof(paths));
+        }
+
+        // Run linting first to collect structural issues
+        var issues = Linter.Lint(paths);
+
+        // If any error-level issues were found, loading cannot succeed
+        if (issues.Any(i => i.Severity == LintSeverity.Error))
+        {
+            return (null, issues);
+        }
+
+        // Linting passed - load the requirements model
+        var requirements = Read(paths);
+        return (requirements, issues);
     }
 
     /// <summary>

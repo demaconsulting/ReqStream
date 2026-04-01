@@ -54,6 +54,40 @@ public static class Linter
         new(StringComparer.Ordinal) { "id", "tests" };
 
     /// <summary>
+    ///     Lints a list of requirement files and returns all issues found.
+    /// </summary>
+    /// <param name="files">The list of requirement files to lint.</param>
+    /// <returns>A read-only list of lint issues found across all files and their includes.</returns>
+    public static IReadOnlyList<LintIssue> Lint(IReadOnlyList<string> files)
+    {
+        // Validate input
+        ArgumentNullException.ThrowIfNull(files);
+
+        // No files to lint
+        if (files.Count == 0)
+        {
+            return [];
+        }
+
+        // Collect issues
+        var issues = new List<LintIssue>();
+
+        // Track duplicate requirement IDs across all linted files: ID -> source file path
+        var seenIds = new Dictionary<string, string>(StringComparer.Ordinal);
+
+        // Track all visited files to avoid linting the same file twice (following includes)
+        var visitedFiles = new HashSet<string>(StringComparer.Ordinal);
+
+        // Lint each file, following includes
+        foreach (var file in files)
+        {
+            LintFile(issues, file, seenIds, visitedFiles);
+        }
+
+        return issues;
+    }
+
+    /// <summary>
     ///     Lints a list of requirement files and reports all issues found.
     /// </summary>
     /// <param name="context">The context for output.</param>
@@ -71,23 +105,15 @@ public static class Linter
             return;
         }
 
-        // Track duplicate requirement IDs across all linted files: ID -> source file path
-        var seenIds = new Dictionary<string, string>(StringComparer.Ordinal);
-
-        // Track all visited files to avoid linting the same file twice (following includes)
-        var visitedFiles = new HashSet<string>(StringComparer.Ordinal);
-
-        // Count total issues
-        var issueCount = 0;
-
-        // Lint each file, following includes
-        foreach (var file in files)
+        // Collect and report issues
+        var issues = Lint(files);
+        foreach (var issue in issues)
         {
-            issueCount += LintFile(context, file, seenIds, visitedFiles);
+            context.WriteError(issue.ToString());
         }
 
         // If no issues found, print success message using first file as root
-        if (issueCount == 0)
+        if (issues.Count == 0)
         {
             context.WriteLine($"{files[0]}: No issues found");
         }
@@ -96,13 +122,12 @@ public static class Linter
     /// <summary>
     ///     Lints a single requirements file, following includes.
     /// </summary>
-    /// <param name="context">The context for output.</param>
+    /// <param name="issues">The list to add lint issues to.</param>
     /// <param name="path">The path to the file to lint.</param>
     /// <param name="seenIds">Dictionary of requirement IDs already seen and the file they came from.</param>
     /// <param name="visitedFiles">Set of files already visited to avoid re-linting.</param>
-    /// <returns>The number of issues found in this file and its includes.</returns>
-    private static int LintFile(
-        Context context,
+    private static void LintFile(
+        List<LintIssue> issues,
         string path,
         Dictionary<string, string> seenIds,
         HashSet<string> visitedFiles)
@@ -115,23 +140,21 @@ public static class Linter
         }
         catch (Exception ex)
         {
-            context.WriteError($"{path}: error: Invalid file path: {ex.Message}");
-            return 1;
+            issues.Add(new LintIssue(path, LintSeverity.Error, $"Invalid file path: {ex.Message}"));
+            return;
         }
 
         // Skip already-visited files
         if (!visitedFiles.Add(fullPath))
         {
-            return 0;
+            return;
         }
-
-        var issueCount = 0;
 
         // Verify the file exists
         if (!File.Exists(fullPath))
         {
-            context.WriteError($"{path}: error: File not found");
-            return 1;
+            issues.Add(new LintIssue(path, LintSeverity.Error, "File not found"));
+            return;
         }
 
         // Read the file content
@@ -142,8 +165,8 @@ public static class Linter
         }
         catch (Exception ex)
         {
-            context.WriteError($"{path}: error: Failed to read file: {ex.Message}");
-            return 1;
+            issues.Add(new LintIssue(path, LintSeverity.Error, $"Failed to read file: {ex.Message}"));
+            return;
         }
 
         // Parse the YAML into a node tree
@@ -158,44 +181,43 @@ public static class Linter
             var location = ex is YamlException yamlEx
                 ? $"{path}({yamlEx.Start.Line},{yamlEx.Start.Column})"
                 : path;
-            context.WriteError($"{location}: error: Malformed YAML: {ex.Message}");
-            return 1;
+            issues.Add(new LintIssue(location, LintSeverity.Error, $"Malformed YAML: {ex.Message}"));
+            return;
         }
 
         // Empty documents are valid
         if (rawRoot == null)
         {
-            return 0;
+            return;
         }
 
         // Document root must be a mapping node
         if (rawRoot is not YamlMappingNode root)
         {
-            context.WriteError(
-                $"{path}({rawRoot.Start.Line},{rawRoot.Start.Column}): error: Document root must be a mapping");
-            return 1;
+            issues.Add(new LintIssue(
+                $"{path}({rawRoot.Start.Line},{rawRoot.Start.Column})",
+                LintSeverity.Error,
+                "Document root must be a mapping"));
+            return;
         }
 
         // Lint document root fields
-        issueCount += LintDocumentRoot(context, path, root, seenIds);
+        LintDocumentRoot(issues, path, root, seenIds);
 
         // Follow includes
-        issueCount += LintIncludes(context, fullPath, GetStringList(root, "includes"), seenIds, visitedFiles);
-
-        return issueCount;
+        LintIncludes(issues, fullPath, GetStringList(root, "includes"), seenIds, visitedFiles);
     }
 
     /// <summary>
     ///     Lints all included files referenced from a parent file.
     /// </summary>
-    /// <param name="context">The context for output.</param>
+    /// <param name="issues">The list to add lint issues to.</param>
     /// <param name="parentFullPath">The resolved full path of the parent file.</param>
     /// <param name="includes">The list of include paths, or null if none.</param>
     /// <param name="seenIds">Dictionary of requirement IDs already seen and the file they came from.</param>
     /// <param name="visitedFiles">Set of files already visited to avoid re-linting.</param>
-    /// <returns>The number of issues found in all included files.</returns>
-    private static int LintIncludes(
-        Context context,
+    private static void LintIncludes(
+        List<LintIssue> issues,
         string parentFullPath,
         List<string>? includes,
         Dictionary<string, string> seenIds,
@@ -203,18 +225,15 @@ public static class Linter
     {
         if (includes == null)
         {
-            return 0;
+            return;
         }
 
         var baseDirectory = Path.GetDirectoryName(parentFullPath) ?? string.Empty;
-        var issueCount = 0;
 
         foreach (var include in includes.Where(includePath => !string.IsNullOrWhiteSpace(includePath)))
         {
-            issueCount += LintFile(context, Path.Combine(baseDirectory, include), seenIds, visitedFiles);
+            LintFile(issues, Path.Combine(baseDirectory, include), seenIds, visitedFiles);
         }
-
-        return issueCount;
     }
 
     /// <summary>
@@ -240,139 +259,127 @@ public static class Linter
     /// <summary>
     ///     Lints the document root mapping node.
     /// </summary>
-    /// <param name="context">The context for output.</param>
+    /// <param name="issues">The list to add lint issues to.</param>
     /// <param name="path">The file path for error messages.</param>
     /// <param name="root">The root mapping node.</param>
     /// <param name="seenIds">Dictionary of requirement IDs already seen.</param>
-    /// <returns>The number of issues found.</returns>
-    private static int LintDocumentRoot(
-        Context context,
+    private static void LintDocumentRoot(
+        List<LintIssue> issues,
         string path,
         YamlMappingNode root,
         Dictionary<string, string> seenIds)
     {
-        var issueCount = 0;
-
         // Check for unknown fields at document root
         foreach (var key in root.Children.Keys.OfType<YamlScalarNode>())
         {
             var keyValue = key.Value ?? string.Empty;
             if (!KnownDocumentFields.Contains(keyValue))
             {
-                context.WriteError(
-                    $"{path}({key.Start.Line},{key.Start.Column}): error: Unknown field '{keyValue}'");
-                issueCount++;
+                issues.Add(new LintIssue(
+                    $"{path}({key.Start.Line},{key.Start.Column})",
+                    LintSeverity.Error,
+                    $"Unknown field '{keyValue}'"));
             }
         }
 
         // Lint sections
-        issueCount += LintDocumentSections(context, path, root, seenIds);
+        LintDocumentSections(issues, path, root, seenIds);
 
         // Lint mappings
-        issueCount += LintDocumentMappings(context, path, root);
-
-        return issueCount;
+        LintDocumentMappings(issues, path, root);
     }
 
     /// <summary>
     ///     Lints the sections sequence within a document root.
     /// </summary>
-    /// <param name="context">The context for output.</param>
+    /// <param name="issues">The list to add lint issues to.</param>
     /// <param name="path">The file path for error messages.</param>
     /// <param name="root">The root mapping node.</param>
     /// <param name="seenIds">Dictionary of requirement IDs already seen.</param>
-    /// <returns>The number of issues found.</returns>
-    private static int LintDocumentSections(
-        Context context,
+    private static void LintDocumentSections(
+        List<LintIssue> issues,
         string path,
         YamlMappingNode root,
         Dictionary<string, string> seenIds)
     {
-        var issueCount = 0;
-        var sections = GetSequenceChecked(context, path, root, "sections", ref issueCount);
+        var sections = GetSequenceChecked(issues, path, root, "sections");
         if (sections == null)
         {
-            return issueCount;
+            return;
         }
 
         foreach (var sectionNode in sections.Children)
         {
             if (sectionNode is YamlMappingNode sectionMapping)
             {
-                issueCount += LintSection(context, path, sectionMapping, seenIds);
+                LintSection(issues, path, sectionMapping, seenIds);
             }
             else
             {
-                context.WriteError(
-                    $"{path}({sectionNode.Start.Line},{sectionNode.Start.Column}): error: Section must be a mapping");
-                issueCount++;
+                issues.Add(new LintIssue(
+                    $"{path}({sectionNode.Start.Line},{sectionNode.Start.Column})",
+                    LintSeverity.Error,
+                    "Section must be a mapping"));
             }
         }
-
-        return issueCount;
     }
 
     /// <summary>
     ///     Lints the mappings sequence within a document root.
     /// </summary>
-    /// <param name="context">The context for output.</param>
+    /// <param name="issues">The list to add lint issues to.</param>
     /// <param name="path">The file path for error messages.</param>
     /// <param name="root">The root mapping node.</param>
-    /// <returns>The number of issues found.</returns>
-    private static int LintDocumentMappings(
-        Context context,
+    private static void LintDocumentMappings(
+        List<LintIssue> issues,
         string path,
         YamlMappingNode root)
     {
-        var issueCount = 0;
-        var mappings = GetSequenceChecked(context, path, root, "mappings", ref issueCount);
+        var mappings = GetSequenceChecked(issues, path, root, "mappings");
         if (mappings == null)
         {
-            return issueCount;
+            return;
         }
 
         foreach (var mappingNode in mappings.Children)
         {
             if (mappingNode is YamlMappingNode mappingMapping)
             {
-                issueCount += LintMapping(context, path, mappingMapping);
+                LintMapping(issues, path, mappingMapping);
             }
             else
             {
-                context.WriteError(
-                    $"{path}({mappingNode.Start.Line},{mappingNode.Start.Column}): error: Mapping must be a mapping node");
-                issueCount++;
+                issues.Add(new LintIssue(
+                    $"{path}({mappingNode.Start.Line},{mappingNode.Start.Column})",
+                    LintSeverity.Error,
+                    "Mapping must be a mapping node"));
             }
         }
-
-        return issueCount;
     }
 
     /// <summary>
     ///     Lints a section mapping node.
     /// </summary>
-    /// <param name="context">The context for output.</param>
+    /// <param name="issues">The list to add lint issues to.</param>
     /// <param name="path">The file path for error messages.</param>
     /// <param name="section">The section mapping node.</param>
     /// <param name="seenIds">Dictionary of requirement IDs already seen.</param>
-    /// <returns>The number of issues found.</returns>
-    private static int LintSection(
-        Context context,
+    private static void LintSection(
+        List<LintIssue> issues,
         string path,
         YamlMappingNode section,
         Dictionary<string, string> seenIds)
     {
-        var issueCount = 0;
-
         // Check for unknown fields in section
         foreach (var key in section.Children.Keys.OfType<YamlScalarNode>())
         {
             var keyValue = key.Value ?? string.Empty;
             if (!KnownSectionFields.Contains(keyValue))
             {
-                context.WriteError(
-                    $"{path}({key.Start.Line},{key.Start.Column}): error: Unknown field '{keyValue}' in section");
-                issueCount++;
+                issues.Add(new LintIssue(
+                    $"{path}({key.Start.Line},{key.Start.Column})",
+                    LintSeverity.Error,
+                    $"Unknown field '{keyValue}' in section"));
             }
         }
 
@@ -380,135 +387,127 @@ public static class Linter
         var titleNode = GetScalar(section, "title");
         if (titleNode == null)
         {
-            context.WriteError(
-                $"{path}({section.Start.Line},{section.Start.Column}): error: Section missing required field 'title'");
-            issueCount++;
+            issues.Add(new LintIssue(
+                $"{path}({section.Start.Line},{section.Start.Column})",
+                LintSeverity.Error,
+                "Section missing required field 'title'"));
         }
         else if (string.IsNullOrWhiteSpace(titleNode.Value))
         {
-            context.WriteError(
-                $"{path}({titleNode.Start.Line},{titleNode.Start.Column}): error: Section 'title' cannot be blank");
-            issueCount++;
+            issues.Add(new LintIssue(
+                $"{path}({titleNode.Start.Line},{titleNode.Start.Column})",
+                LintSeverity.Error,
+                "Section 'title' cannot be blank"));
         }
 
         // Lint requirements
-        issueCount += LintSectionRequirements(context, path, section, seenIds);
+        LintSectionRequirements(issues, path, section, seenIds);
 
         // Lint child sections
-        issueCount += LintSectionChildren(context, path, section, seenIds);
-
-        return issueCount;
+        LintSectionChildren(issues, path, section, seenIds);
     }
 
     /// <summary>
     ///     Lints the requirements sequence within a section.
     /// </summary>
-    /// <param name="context">The context for output.</param>
+    /// <param name="issues">The list to add lint issues to.</param>
     /// <param name="path">The file path for error messages.</param>
     /// <param name="section">The section mapping node.</param>
     /// <param name="seenIds">Dictionary of requirement IDs already seen.</param>
-    /// <returns>The number of issues found.</returns>
-    private static int LintSectionRequirements(
-        Context context,
+    private static void LintSectionRequirements(
+        List<LintIssue> issues,
         string path,
         YamlMappingNode section,
         Dictionary<string, string> seenIds)
     {
-        var issueCount = 0;
-        var requirements = GetSequenceChecked(context, path, section, "requirements", ref issueCount);
+        var requirements = GetSequenceChecked(issues, path, section, "requirements");
         if (requirements == null)
         {
-            return issueCount;
+            return;
         }
 
         foreach (var reqNode in requirements.Children)
         {
             if (reqNode is YamlMappingNode reqMapping)
             {
-                issueCount += LintRequirement(context, path, reqMapping, seenIds);
+                LintRequirement(issues, path, reqMapping, seenIds);
             }
             else
             {
-                context.WriteError(
-                    $"{path}({reqNode.Start.Line},{reqNode.Start.Column}): error: Requirement must be a mapping");
-                issueCount++;
+                issues.Add(new LintIssue(
+                    $"{path}({reqNode.Start.Line},{reqNode.Start.Column})",
+                    LintSeverity.Error,
+                    "Requirement must be a mapping"));
             }
         }
-
-        return issueCount;
     }
 
     /// <summary>
     ///     Lints the child sections sequence within a section.
     /// </summary>
-    /// <param name="context">The context for output.</param>
+    /// <param name="issues">The list to add lint issues to.</param>
     /// <param name="path">The file path for error messages.</param>
     /// <param name="section">The section mapping node.</param>
     /// <param name="seenIds">Dictionary of requirement IDs already seen.</param>
-    /// <returns>The number of issues found.</returns>
-    private static int LintSectionChildren(
-        Context context,
+    private static void LintSectionChildren(
+        List<LintIssue> issues,
         string path,
         YamlMappingNode section,
         Dictionary<string, string> seenIds)
     {
-        var issueCount = 0;
-        var sections = GetSequenceChecked(context, path, section, "sections", ref issueCount);
+        var sections = GetSequenceChecked(issues, path, section, "sections");
         if (sections == null)
         {
-            return issueCount;
+            return;
         }
 
         foreach (var childNode in sections.Children)
         {
             if (childNode is YamlMappingNode childMapping)
             {
-                issueCount += LintSection(context, path, childMapping, seenIds);
+                LintSection(issues, path, childMapping, seenIds);
             }
             else
             {
-                context.WriteError(
-                    $"{path}({childNode.Start.Line},{childNode.Start.Column}): error: Section must be a mapping");
-                issueCount++;
+                issues.Add(new LintIssue(
+                    $"{path}({childNode.Start.Line},{childNode.Start.Column})",
+                    LintSeverity.Error,
+                    "Section must be a mapping"));
             }
         }
-
-        return issueCount;
     }
 
     /// <summary>
     ///     Lints a requirement mapping node.
     /// </summary>
-    /// <param name="context">The context for output.</param>
+    /// <param name="issues">The list to add lint issues to.</param>
     /// <param name="path">The file path for error messages.</param>
     /// <param name="requirement">The requirement mapping node.</param>
     /// <param name="seenIds">Dictionary of requirement IDs already seen.</param>
-    /// <returns>The number of issues found.</returns>
-    private static int LintRequirement(
-        Context context,
+    private static void LintRequirement(
+        List<LintIssue> issues,
         string path,
         YamlMappingNode requirement,
         Dictionary<string, string> seenIds)
     {
-        var issueCount = 0;
-
         // Check for unknown fields in requirement
         foreach (var key in requirement.Children.Keys.OfType<YamlScalarNode>())
         {
             var keyValue = key.Value ?? string.Empty;
             if (!KnownRequirementFields.Contains(keyValue))
             {
-                context.WriteError(
-                    $"{path}({key.Start.Line},{key.Start.Column}): error: Unknown field '{keyValue}' in requirement");
-                issueCount++;
+                issues.Add(new LintIssue(
+                    $"{path}({key.Start.Line},{key.Start.Column})",
+                    LintSeverity.Error,
+                    $"Unknown field '{keyValue}' in requirement"));
             }
         }
 
         // Check required 'id' field
-        var reqId = LintRequirementId(context, path, requirement, seenIds, ref issueCount);
+        var reqId = LintRequirementId(issues, path, requirement, seenIds);
 
         // Check required 'title' field
-        issueCount += LintRequirementTitle(context, path, requirement, reqId);
+        LintRequirementTitle(issues, path, requirement, reqId);
 
         // Check tests list for blank entries
         var tests = GetSequence(requirement, "tests");
@@ -520,9 +519,10 @@ public static class Linter
                 .Select(s => s.Start);
             foreach (var start in blankTestStarts)
             {
-                context.WriteError(
-                    $"{path}({start.Line},{start.Column}): error: Test name cannot be blank");
-                issueCount++;
+                issues.Add(new LintIssue(
+                    $"{path}({start.Line},{start.Column})",
+                    LintSeverity.Error,
+                    "Test name cannot be blank"));
             }
         }
 
@@ -536,54 +536,54 @@ public static class Linter
                 .Select(s => s.Start);
             foreach (var start in blankTagStarts)
             {
-                context.WriteError(
-                    $"{path}({start.Line},{start.Column}): error: Tag name cannot be blank");
-                issueCount++;
+                issues.Add(new LintIssue(
+                    $"{path}({start.Line},{start.Column})",
+                    LintSeverity.Error,
+                    "Tag name cannot be blank"));
             }
         }
-
-        return issueCount;
     }
 
     /// <summary>
     ///     Validates the 'id' field of a requirement, checks for duplicates, and registers the ID.
     /// </summary>
-    /// <param name="context">The context for output.</param>
+    /// <param name="issues">The list to add lint issues to.</param>
     /// <param name="path">The file path for error messages.</param>
     /// <param name="requirement">The requirement mapping node.</param>
     /// <param name="seenIds">Dictionary of requirement IDs already seen and the file they came from.</param>
-    /// <param name="issueCount">Incremented for each issue found.</param>
     /// <returns>The requirement ID if it can be parsed, or null if the ID is missing or blank.</returns>
     private static string? LintRequirementId(
-        Context context,
+        List<LintIssue> issues,
         string path,
         YamlMappingNode requirement,
-        Dictionary<string, string> seenIds,
-        ref int issueCount)
+        Dictionary<string, string> seenIds)
     {
         var idNode = GetScalar(requirement, "id");
         if (idNode == null)
         {
-            context.WriteError(
-                $"{path}({requirement.Start.Line},{requirement.Start.Column}): error: Requirement missing required field 'id'");
-            issueCount++;
+            issues.Add(new LintIssue(
+                $"{path}({requirement.Start.Line},{requirement.Start.Column})",
+                LintSeverity.Error,
+                "Requirement missing required field 'id'"));
             return null;
         }
 
         if (string.IsNullOrWhiteSpace(idNode.Value))
         {
-            context.WriteError(
-                $"{path}({idNode.Start.Line},{idNode.Start.Column}): error: Requirement 'id' cannot be blank");
-            issueCount++;
+            issues.Add(new LintIssue(
+                $"{path}({idNode.Start.Line},{idNode.Start.Column})",
+                LintSeverity.Error,
+                "Requirement 'id' cannot be blank"));
             return null;
         }
 
         var reqId = idNode.Value;
         if (seenIds.TryGetValue(reqId, out var firstFile))
         {
-            context.WriteError(
-                $"{path}({idNode.Start.Line},{idNode.Start.Column}): error: Duplicate requirement ID '{reqId}' (first seen in {firstFile})");
-            issueCount++;
+            issues.Add(new LintIssue(
+                $"{path}({idNode.Start.Line},{idNode.Start.Column})",
+                LintSeverity.Error,
+                $"Duplicate requirement ID '{reqId}' (first seen in {firstFile})"));
             return reqId;
         }
 
@@ -594,13 +594,12 @@ public static class Linter
     /// <summary>
     ///     Validates the 'title' field of a requirement.
     /// </summary>
-    /// <param name="context">The context for output.</param>
+    /// <param name="issues">The list to add lint issues to.</param>
     /// <param name="path">The file path for error messages.</param>
     /// <param name="requirement">The requirement mapping node.</param>
     /// <param name="reqId">The requirement ID, used for error messages.</param>
-    /// <returns>The number of issues found.</returns>
-    private static int LintRequirementTitle(
-        Context context,
+    private static void LintRequirementTitle(
+        List<LintIssue> issues,
         string path,
         YamlMappingNode requirement,
         string? reqId)
@@ -609,44 +608,43 @@ public static class Linter
         if (titleNode == null)
         {
             var location = reqId != null ? $"requirement '{reqId}'" : "requirement";
-            context.WriteError(
-                $"{path}({requirement.Start.Line},{requirement.Start.Column}): error: {location} missing required field 'title'");
-            return 1;
+            issues.Add(new LintIssue(
+                $"{path}({requirement.Start.Line},{requirement.Start.Column})",
+                LintSeverity.Error,
+                $"{location} missing required field 'title'"));
+            return;
         }
 
         if (string.IsNullOrWhiteSpace(titleNode.Value))
         {
-            context.WriteError(
-                $"{path}({titleNode.Start.Line},{titleNode.Start.Column}): error: Requirement 'title' cannot be blank");
-            return 1;
+            issues.Add(new LintIssue(
+                $"{path}({titleNode.Start.Line},{titleNode.Start.Column})",
+                LintSeverity.Error,
+                "Requirement 'title' cannot be blank"));
         }
-
-        return 0;
     }
 
     /// <summary>
     ///     Lints a test mapping node.
     /// </summary>
-    /// <param name="context">The context for output.</param>
+    /// <param name="issues">The list to add lint issues to.</param>
     /// <param name="path">The file path for error messages.</param>
     /// <param name="mapping">The mapping node to lint.</param>
-    /// <returns>The number of issues found.</returns>
-    private static int LintMapping(
-        Context context,
+    private static void LintMapping(
+        List<LintIssue> issues,
         string path,
         YamlMappingNode mapping)
     {
-        var issueCount = 0;
-
         // Check for unknown fields in mapping
         foreach (var key in mapping.Children.Keys.OfType<YamlScalarNode>())
         {
             var keyValue = key.Value ?? string.Empty;
             if (!KnownMappingFields.Contains(keyValue))
             {
-                context.WriteError(
-                    $"{path}({key.Start.Line},{key.Start.Column}): error: Unknown field '{keyValue}' in mapping");
-                issueCount++;
+                issues.Add(new LintIssue(
+                    $"{path}({key.Start.Line},{key.Start.Column})",
+                    LintSeverity.Error,
+                    $"Unknown field '{keyValue}' in mapping"));
             }
         }
 
@@ -654,15 +652,17 @@ public static class Linter
         var idNode = GetScalar(mapping, "id");
         if (idNode == null)
         {
-            context.WriteError(
-                $"{path}({mapping.Start.Line},{mapping.Start.Column}): error: Mapping missing required field 'id'");
-            issueCount++;
+            issues.Add(new LintIssue(
+                $"{path}({mapping.Start.Line},{mapping.Start.Column})",
+                LintSeverity.Error,
+                "Mapping missing required field 'id'"));
         }
         else if (string.IsNullOrWhiteSpace(idNode.Value))
         {
-            context.WriteError(
-                $"{path}({idNode.Start.Line},{idNode.Start.Column}): error: Mapping 'id' cannot be blank");
-            issueCount++;
+            issues.Add(new LintIssue(
+                $"{path}({idNode.Start.Line},{idNode.Start.Column})",
+                LintSeverity.Error,
+                "Mapping 'id' cannot be blank"));
         }
 
         // Check tests list for blank entries
@@ -675,31 +675,28 @@ public static class Linter
                 .Select(s => s.Start);
             foreach (var start in blankTestStarts)
             {
-                context.WriteError(
-                    $"{path}({start.Line},{start.Column}): error: Test name cannot be blank in mapping");
-                issueCount++;
+                issues.Add(new LintIssue(
+                    $"{path}({start.Line},{start.Column})",
+                    LintSeverity.Error,
+                    "Test name cannot be blank in mapping"));
             }
         }
-
-        return issueCount;
     }
 
     /// <summary>
-    ///     Gets a sequence node from a mapping node by key, reporting a type mismatch error if the
+    ///     Gets a sequence node from a mapping node by key, adding a type-mismatch issue if the
     ///     key exists but the value is not a sequence.
     /// </summary>
-    /// <param name="context">The context for output.</param>
+    /// <param name="issues">The list to add lint issues to.</param>
     /// <param name="path">The file path for error messages.</param>
     /// <param name="mapping">The mapping node to search.</param>
     /// <param name="key">The key to look up.</param>
-    /// <param name="issues">Incremented by one when a type mismatch error is reported.</param>
     /// <returns>The sequence node, or null if not found or a type error was reported.</returns>
     private static YamlSequenceNode? GetSequenceChecked(
-        Context context,
+        List<LintIssue> issues,
         string path,
         YamlMappingNode mapping,
-        string key,
-        ref int issues)
+        string key)
     {
         var keyNode = new YamlScalarNode(key);
         if (!mapping.Children.TryGetValue(keyNode, out var value))
@@ -712,9 +709,10 @@ public static class Linter
             return seq;
         }
 
-        context.WriteError(
-            $"{path}({value.Start.Line},{value.Start.Column}): error: Field '{key}' must be a sequence");
-        issues++;
+        issues.Add(new LintIssue(
+            $"{path}({value.Start.Line},{value.Start.Column})",
+            LintSeverity.Error,
+            $"Field '{key}' must be a sequence"));
         return null;
     }
 

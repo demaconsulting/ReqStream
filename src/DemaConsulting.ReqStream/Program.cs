@@ -20,7 +20,6 @@
 
 using System.Reflection;
 using DemaConsulting.ReqStream.Cli;
-using DemaConsulting.ReqStream.Linting;
 using DemaConsulting.ReqStream.Modeling;
 using DemaConsulting.ReqStream.SelfTest;
 using DemaConsulting.ReqStream.Tracing;
@@ -117,7 +116,23 @@ internal static class Program
         // Priority 4: Lint requirements files
         if (context.Lint)
         {
-            Linter.Lint(context, context.RequirementsFiles);
+            if (context.RequirementsFiles.Count == 0)
+            {
+                context.WriteLine("No requirements files specified.");
+                return;
+            }
+
+            var (_, lintIssues) = Requirements.Load(context.RequirementsFiles.ToArray());
+            foreach (var issue in lintIssues)
+            {
+                context.WriteError(issue.ToString());
+            }
+
+            if (lintIssues.Count == 0)
+            {
+                context.WriteLine($"{context.RequirementsFiles[0]}: No issues found");
+            }
+
             return;
         }
 
@@ -180,7 +195,20 @@ internal static class Program
 
         // Read requirements from files
         context.WriteLine($"Reading {context.RequirementsFiles.Count} requirements file(s)...");
-        var requirements = Requirements.Read(context.RequirementsFiles.ToArray());
+        var (requirements, loadIssues) = Requirements.Load(context.RequirementsFiles.ToArray());
+
+        // Report any lint issues found during loading
+        foreach (var issue in loadIssues)
+        {
+            context.WriteError(issue.ToString());
+        }
+
+        // Abort if loading failed due to lint errors
+        if (requirements == null)
+        {
+            return;
+        }
+
         context.WriteLine("Requirements loaded successfully.");
 
         // Export requirements report if requested
