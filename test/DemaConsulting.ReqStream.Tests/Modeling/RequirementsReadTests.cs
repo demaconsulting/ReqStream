@@ -383,6 +383,29 @@ includes:
     }
 
     /// <summary>
+    /// Test that an invalid YAML content (schema error) throws an InvalidOperationException with the file location.
+    /// </summary>
+    [TestMethod]
+    public void Requirements_Read_InvalidYamlContent_ThrowsExceptionWithFileLocation()
+    {
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        text: ""This uses an invalid property name.""
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
+        Assert.Contains("YAML deserialization error", ex.Message);
+        Assert.Contains(filePath, ex.Message);
+        Assert.Contains("line", ex.Message);
+        Assert.Contains("col", ex.Message);
+    }
+
+    /// <summary>
     /// Test reading an empty YAML file.
     /// </summary>
     [TestMethod]
