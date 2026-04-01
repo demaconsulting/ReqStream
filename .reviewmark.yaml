@@ -136,6 +136,8 @@ reviews:
   - id: ReqStream-Design
     title: Review of ReqStream Software Design Document
     paths:
+      - "docs/reqstream/reqstream-system.yaml"            # system requirements
+      - "docs/reqstream/platform-requirements.yaml"       # platform requirements
       - "docs/design/**/*.md"                             # all design documents
 
   # Full requirements review
