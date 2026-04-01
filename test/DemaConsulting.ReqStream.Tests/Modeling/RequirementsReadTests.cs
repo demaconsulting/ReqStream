@@ -383,10 +383,10 @@ includes:
     }
 
     /// <summary>
-    /// Test that a malformed YAML file throws an InvalidOperationException with the file location.
+    /// Test that an invalid YAML content (schema error) throws an InvalidOperationException with the file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_MalformedYaml_ThrowsExceptionWithFileLocation()
+    public void Requirements_Read_InvalidYamlContent_ThrowsExceptionWithFileLocation()
     {
         var yamlContent = @"---
 sections:
@@ -399,7 +399,7 @@ sections:
         File.WriteAllText(filePath, yamlContent);
 
         var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
-        Assert.Contains("YAML formatting error", ex.Message);
+        Assert.Contains("YAML deserialization error", ex.Message);
         Assert.Contains(filePath, ex.Message);
         Assert.Contains("line", ex.Message);
         Assert.Contains("col", ex.Message);

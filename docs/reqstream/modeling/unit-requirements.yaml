@@ -31,14 +31,14 @@ sections:
               - Requirements_Read_DuplicateRequirementId_ExceptionIncludesFileLocation
 
           - id: ReqStream-Req-YamlErrorReporting
-            title: The tool shall report YAML formatting errors with the filename and location.
+            title: The tool shall report YAML deserialization errors with the filename and location.
             justification: |
               Clear error messages including the filename and line/column position allow users to quickly
               locate and fix issues in their requirements files without decoding internal type information.
             tags:
               - requirements
             tests:
-              - Requirements_Read_MalformedYaml_ThrowsExceptionWithFileLocation
+              - Requirements_Read_InvalidYamlContent_ThrowsExceptionWithFileLocation
 
           - id: ReqStream-Req-Hierarchy
             title: The tool shall support hierarchical sections and subsections.

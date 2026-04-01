@@ -47,7 +47,7 @@ public class Requirements : Section
     /// <returns>A Requirements object containing the parsed requirements from all files.</returns>
     /// <exception cref="ArgumentException">Thrown when no paths are provided.</exception>
     /// <exception cref="FileNotFoundException">Thrown when a specified file does not exist.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when duplicate requirement IDs are found, cyclic requirement references are found, YAML formatting errors are encountered, or validation fails.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when duplicate requirement IDs are found, cyclic requirement references are found, YAML deserialization errors are encountered, or validation fails.</exception>
     public static Requirements Read(params string[] paths)
     {
         // Validate that at least one path is provided
@@ -265,7 +265,7 @@ public class Requirements : Section
         catch (YamlException ex)
         {
             throw new InvalidOperationException(
-                $"YAML formatting error in '{fullPath}' at line {ex.Start.Line}, col {ex.Start.Column}: {ex.Message}",
+                $"YAML deserialization error in '{fullPath}' at line {ex.Start.Line}, col {ex.Start.Column}: {ex.Message}",
                 ex);
         }
 
