@@ -73,7 +73,7 @@ internal static class RequirementsLoader
         var issues = new List<LintIssue>();
         var requirements = new Requirements();
 
-        // seenIds tracks requirement IDs to detect duplicates: id -> first file path
+        // seenIds tracks requirement IDs to detect duplicates: id -> first "path(line,col)" location
         var seenIds = new Dictionary<string, string>(StringComparer.Ordinal);
 
         // allRequirements collects built requirement objects for cycle detection and mapping resolution
@@ -91,9 +91,7 @@ internal static class RequirementsLoader
         // Validate cycle-free requirement references on a best-effort basis, even if other errors exist
         if (allRequirements.Count > 0)
         {
-            // Pass a null path here to avoid incorrectly attributing cycles to the first root file.
-            // ValidateCycles can use more accurate per-requirement information if available.
-            ValidateCycles(allRequirements, issues, null);
+            ValidateCycles(allRequirements, issues);
         }
 
         // Return null requirements if any error-level issues were found
@@ -483,17 +481,17 @@ internal static class RequirementsLoader
                 LintSeverity.Error,
                 "Requirement 'id' cannot be blank"));
         }
-        else if (seenIds.TryGetValue(idNode.Value, out var firstFile))
+        else if (seenIds.TryGetValue(idNode.Value, out var firstLocation))
         {
             issues.Add(new LintIssue(
                 $"{path}({idNode.Start.Line},{idNode.Start.Column})",
                 LintSeverity.Error,
-                $"Duplicate requirement ID '{idNode.Value}' (first seen in {firstFile})"));
+                $"Duplicate requirement ID '{idNode.Value}' (first seen at {firstLocation})"));
         }
         else
         {
             reqId = idNode.Value;
-            seenIds[reqId] = path;
+            seenIds[reqId] = $"{path}({idNode.Start.Line},{idNode.Start.Column})";
         }
 
         // Extract and validate 'title'
@@ -587,7 +585,8 @@ internal static class RequirementsLoader
         {
             Id = reqId,
             Title = reqTitle,
-            Justification = justification
+            Justification = justification,
+            Location = seenIds[reqId]
         };
         requirement.Tests.AddRange(tests);
         requirement.Children.AddRange(children);
@@ -711,11 +710,9 @@ internal static class RequirementsLoader
     /// </summary>
     /// <param name="allRequirements">All built requirements, keyed by ID.</param>
     /// <param name="issues">The list to add lint issues to.</param>
-    /// <param name="path">The path used as the location in reported issues.</param>
     private static void ValidateCycles(
         Dictionary<string, Requirement> allRequirements,
-        List<LintIssue> issues,
-        string path)
+        List<LintIssue> issues)
     {
         var visiting = new HashSet<string>();
         var currentPath = new List<string>();
@@ -723,7 +720,7 @@ internal static class RequirementsLoader
 
         foreach (var reqId in allRequirements.Keys.Where(id => !visited.Contains(id)))
         {
-            ValidateCyclesFrom(reqId, allRequirements, issues, path, visiting, currentPath, visited);
+            ValidateCyclesFrom(reqId, allRequirements, issues, visiting, currentPath, visited);
         }
     }
 
@@ -733,7 +730,6 @@ internal static class RequirementsLoader
     /// <param name="reqId">The requirement ID to start from.</param>
     /// <param name="allRequirements">All built requirements, keyed by ID.</param>
     /// <param name="issues">The list to add lint issues to.</param>
-    /// <param name="path">The path used as the location in reported issues.</param>
     /// <param name="visiting">IDs currently on the active DFS stack.</param>
     /// <param name="currentPath">Ordered list of IDs on the active DFS path (for cycle reporting).</param>
     /// <param name="visited">IDs already fully processed.</param>
@@ -741,7 +737,6 @@ internal static class RequirementsLoader
         string reqId,
         Dictionary<string, Requirement> allRequirements,
         List<LintIssue> issues,
-        string path,
         HashSet<string> visiting,
         List<string> currentPath,
         HashSet<string> visited)
@@ -756,8 +751,11 @@ internal static class RequirementsLoader
             {
                 var cycleStart = currentPath.IndexOf(cycleId);
                 var cyclePath = string.Join(" -> ", currentPath.Skip(cycleStart).Append(cycleId));
+                var location = allRequirements.TryGetValue(cycleId, out var cycleReq) && cycleReq.Location != null
+                    ? cycleReq.Location
+                    : cycleId;
                 issues.Add(new LintIssue(
-                    path,
+                    location,
                     LintSeverity.Error,
                     $"Circular requirement reference detected: {cyclePath}"));
             }
@@ -765,7 +763,7 @@ internal static class RequirementsLoader
             {
                 foreach (var childId in requirement.Children.Where(id => !visited.Contains(id)))
                 {
-                    ValidateCyclesFrom(childId, allRequirements, issues, path, visiting, currentPath, visited);
+                    ValidateCyclesFrom(childId, allRequirements, issues, visiting, currentPath, visited);
                 }
             }
         }

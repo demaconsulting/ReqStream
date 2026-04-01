@@ -18,8 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.Diagnostics.CodeAnalysis;
-
 namespace DemaConsulting.ReqStream.Modeling;
 
 /// <summary>
@@ -34,8 +32,7 @@ public class Requirements : Section
     /// <param name="paths">One or more paths to YAML files to read.</param>
     /// <returns>A Requirements object containing the parsed requirements from all files.</returns>
     /// <exception cref="ArgumentException">Thrown when no paths are provided.</exception>
-    /// <exception cref="FileNotFoundException">Thrown when a specified file does not exist.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when any other error-level issue is found during loading.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when any error-level issue is found during loading.</exception>
     public static Requirements Read(params string[] paths)
     {
         var (requirements, issues) = Load(paths);
@@ -46,15 +43,6 @@ public class Requirements : Section
 
         // Throw an exception conveying the first error-level issue
         var firstError = issues.First(i => i.Severity == LintSeverity.Error);
-
-        // Preserve FileNotFoundException semantics for missing-file errors
-        if (firstError.Description == "File not found")
-        {
-            throw new FileNotFoundException(
-                $"Requirements file not found: {firstError.Location}",
-                firstError.Location);
-        }
-
         throw new InvalidOperationException(firstError.ToString());
     }
 

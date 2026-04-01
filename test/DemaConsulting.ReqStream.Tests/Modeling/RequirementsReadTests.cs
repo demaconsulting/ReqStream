@@ -378,8 +378,9 @@ includes:
     {
         var nonExistentPath = Path.Combine(_testDirectory, "nonexistent.yaml");
 
-        var ex = Assert.ThrowsExactly<FileNotFoundException>(() => Requirements.Read(nonExistentPath));
-        Assert.Contains("Requirements file not found", ex.Message);
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(nonExistentPath));
+        Assert.Contains("File not found", ex.Message);
+        Assert.Contains(nonExistentPath, ex.Message);
     }
 
     /// <summary>
