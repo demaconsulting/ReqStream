@@ -1,0 +1,37 @@
+---
+# Cli Subsystem Requirements
+#
+# PURPOSE:
+# - Define requirements for the ReqStream Cli subsystem
+# - The Cli subsystem spans Context.cs (command-line argument parsing and I/O)
+# - Subsystem requirements describe the externally visible command-line interface behavior
+
+sections:
+  - title: Cli Subsystem Requirements
+    requirements:
+      - id: ReqStream-Cli-Interface
+        title: The Cli subsystem shall provide a command-line interface for the tool.
+        justification: |
+          A CLI interface enables automation in CI/CD pipelines and allows integration with scripts
+          and build processes. This is essential for the tool's primary use case.
+        tests:
+          - IntegrationTest_VersionFlag_OutputsVersion
+          - IntegrationTest_HelpFlag_OutputsUsageInformation
+          - IntegrationTest_UnknownArgument_ReturnsError
+        children:
+          - ReqStream-Cmd-Cli
+          - ReqStream-Cmd-Version
+          - ReqStream-Cmd-Help
+          - ReqStream-Cmd-InvalidArgs
+
+      - id: ReqStream-Cli-Output
+        title: The Cli subsystem shall provide output and error reporting channels.
+        justification: |
+          Centralized output routing ensures consistent formatting and allows output to be
+          suppressed or redirected to a log file as needed.
+        tests:
+          - IntegrationTest_SilentFlag_SuppressesOutput
+          - IntegrationTest_LogFlag_WritesOutputToFile
+        children:
+          - ReqStream-Cmd-ErrorOutput
+          - ReqStream-Log-FileOutput

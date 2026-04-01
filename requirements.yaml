@@ -2,15 +2,23 @@
 includes:
   # System-level requirements
   - docs/reqstream/reqstream-system.yaml
-  # Program Orchestration subsystem (including Command-Line Interface)
+  # Program unit
   - docs/reqstream/unit-program.yaml
-  - docs/reqstream/unit-context.yaml
-  # Requirements subsystem (Requirements File Processing, Test Integration, Linting)
-  - docs/reqstream/unit-requirements.yaml
-  - docs/reqstream/unit-trace-matrix.yaml
-  - docs/reqstream/unit-linter.yaml
-  # Validation subsystem
-  - docs/reqstream/unit-validation.yaml
+  # Cli subsystem
+  - docs/reqstream/cli/subsystem-cli.yaml
+  - docs/reqstream/cli/unit-context.yaml
+  # Modeling subsystem
+  - docs/reqstream/modeling/subsystem-modeling.yaml
+  - docs/reqstream/modeling/unit-requirements.yaml
+  # Tracing subsystem
+  - docs/reqstream/tracing/subsystem-tracing.yaml
+  - docs/reqstream/tracing/unit-trace-matrix.yaml
+  # Linting subsystem
+  - docs/reqstream/linting/subsystem-linting.yaml
+  - docs/reqstream/linting/unit-linter.yaml
+  # SelfTest subsystem
+  - docs/reqstream/self-test/subsystem-self-test.yaml
+  - docs/reqstream/self-test/unit-validation.yaml
   # Platform support and OTS software
   - docs/reqstream/platform-requirements.yaml
   - docs/reqstream/ots-mstest.yaml

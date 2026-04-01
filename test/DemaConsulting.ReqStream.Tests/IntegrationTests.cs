@@ -18,9 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.ReqStream;
-using DemaConsulting.ReqStream.Cli;
-
 namespace DemaConsulting.ReqStream.Tests;
 
 /// <summary>
@@ -30,14 +27,18 @@ namespace DemaConsulting.ReqStream.Tests;
 [TestClass]
 public class IntegrationTests
 {
+    private string _dllPath = string.Empty;
     private string _testDirectory = string.Empty;
 
     /// <summary>
-    /// Initialize test by creating a temporary test directory.
+    /// Initialize test by locating the DLL and creating a temporary test directory.
     /// </summary>
     [TestInitialize]
     public void TestInitialize()
     {
+        _dllPath = Path.Combine(AppContext.BaseDirectory, "DemaConsulting.ReqStream.dll");
+        Assert.IsTrue(File.Exists(_dllPath), $"Could not find ReqStream DLL at {_dllPath}");
+
         _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
     }
@@ -93,29 +94,21 @@ public class IntegrationTests
         var justificationsFile = Path.Combine(_testDirectory, "justifications.md");
         var matrixFile = Path.Combine(_testDirectory, "matrix.md");
 
-        // Act: run the full pipeline
-        var originalDir = Directory.GetCurrentDirectory();
-        try
-        {
-            Directory.SetCurrentDirectory(_testDirectory);
+        // Act: run the full pipeline as an external process
+        var exitCode = Runner.RunInDirectory(
+            out var output,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--requirements", "requirements.yaml",
+            "--tests", "results.trx",
+            "--report", reportFile,
+            "--justifications", justificationsFile,
+            "--matrix", matrixFile,
+            "--enforce");
 
-            using var context = Context.Create([
-                "--requirements", "requirements.yaml",
-                "--tests", "results.trx",
-                "--report", reportFile,
-                "--justifications", justificationsFile,
-                "--matrix", matrixFile,
-                "--enforce"
-            ]);
-            Program.Run(context);
-
-            // Assert: enforcement passed (exit code 0)
-            Assert.AreEqual(0, context.ExitCode);
-        }
-        finally
-        {
-            Directory.SetCurrentDirectory(originalDir);
-        }
+        // Assert: enforcement passed (exit code 0)
+        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
 
         // Assert: all three output files were generated
         Assert.IsTrue(File.Exists(reportFile), "Requirements report should be generated.");
@@ -159,28 +152,18 @@ public class IntegrationTests
         var trxFile = Path.Combine(_testDirectory, "empty.trx");
         File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
 
-        // Act: run enforcement mode
-        var originalDir = Directory.GetCurrentDirectory();
-        int exitCode;
-        try
-        {
-            Directory.SetCurrentDirectory(_testDirectory);
-
-            using var context = Context.Create([
-                "--requirements", "requirements.yaml",
-                "--tests", "empty.trx",
-                "--enforce"
-            ]);
-            Program.Run(context);
-            exitCode = context.ExitCode;
-        }
-        finally
-        {
-            Directory.SetCurrentDirectory(originalDir);
-        }
+        // Act: run enforcement mode as an external process
+        var exitCode = Runner.RunInDirectory(
+            out var output,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--requirements", "requirements.yaml",
+            "--tests", "empty.trx",
+            "--enforce");
 
         // Assert: enforcement failed with a non-zero exit code
-        Assert.AreNotEqual(0, exitCode, "Enforcement should fail with non-zero exit code when a requirement lacks test evidence.");
+        Assert.AreNotEqual(0, exitCode, $"Enforcement should fail with non-zero exit code when a requirement lacks test evidence. Output: {output}");
     }
 
     /// <summary>
@@ -218,12 +201,10 @@ public class IntegrationTests
         var platformAFile = Path.Combine(_testDirectory, "platform-a.trx");
         File.WriteAllText(platformAFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(platformAResults));
 
-        // Arrange: create platform-b.trx without the platform-a test
+        // Arrange: create platform-b.trx with a failing test (same test name, different source)
         var platformBResults = new DemaConsulting.TestResults.TestResults { Name = "PlatformBRun" };
         platformBResults.Results.Add(new DemaConsulting.TestResults.TestResult
         {
-            // Include the same test name as in platform-a.trx, but with a failing outcome,
-            // so the test validates that the source-specific filter (platform-a@) is honored.
             Name = "PlatformTest1",
             ClassName = "PlatformTests",
             CodeBase = "Tests.dll",
@@ -233,26 +214,18 @@ public class IntegrationTests
         var platformBFile = Path.Combine(_testDirectory, "platform-b.trx");
         File.WriteAllText(platformBFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(platformBResults));
 
-        // Act: run enforcement using both result files
-        var originalDir = Directory.GetCurrentDirectory();
-        try
-        {
-            Directory.SetCurrentDirectory(_testDirectory);
+        // Act: run enforcement using both result files as external process
+        var exitCode = Runner.RunInDirectory(
+            out var output,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--requirements", "requirements.yaml",
+            "--tests", "platform-a.trx",
+            "--tests", "platform-b.trx",
+            "--enforce");
 
-            using var context = Context.Create([
-                "--requirements", "requirements.yaml",
-                "--tests", "platform-a.trx",
-                "--tests", "platform-b.trx",
-                "--enforce"
-            ]);
-            Program.Run(context);
-
-            // Assert: enforcement passed because platform-a.trx satisfies the source-filtered requirement
-            Assert.AreEqual(0, context.ExitCode);
-        }
-        finally
-        {
-            Directory.SetCurrentDirectory(originalDir);
-        }
+        // Assert: enforcement passed because platform-a.trx satisfies the source-filtered requirement
+        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
     }
 }

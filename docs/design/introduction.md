@@ -15,12 +15,12 @@ document does not restate requirements; it explains how they are realized.
 This document covers the detailed design of the following software units:
 
 - **Program** — entry point and execution orchestrator (`Program.cs`)
-- **Context** — command-line argument parser and I/O owner (`Context.cs`)
-- **Validation** — self-validation test runner (`Validation.cs`)
+- **Context** — command-line argument parser and I/O owner (`Cli/Context.cs`)
+- **Validation** — self-validation test runner (`SelfTest/Validation.cs`)
 - **Requirements, Section, and Requirement** — YAML parsing, section merging, validation, and export
-  (`Requirements.cs`, `Section.cs`, `Requirement.cs`)
-- **TraceMatrix** — test result loader and requirement-coverage analyzer (`TraceMatrix.cs`)
-- **Linter** — structural linter for requirement YAML files (`Linter.cs`)
+  (`Modeling/Requirements.cs`, `Modeling/Section.cs`, `Modeling/Requirement.cs`)
+- **TraceMatrix** — test result loader and requirement-coverage analyzer (`Tracing/TraceMatrix.cs`)
+- **Linter** — structural linter for requirement YAML files (`Linting/Linter.cs`)
 
 The following topics are out of scope:
 
@@ -53,6 +53,31 @@ ReqStream (System)
 Each unit is described in detail in its own chapter within this document.
 
 ## Folder Layout
+
+The design documents are organized into subsystem subdirectories that mirror the top-level subsystem
+breakdown above:
+
+```text
+docs/design/
+├── introduction.md                 — document introduction and architecture overview
+├── system.md                       — system integration design
+├── program.md                      — Program unit design
+├── cli/
+│   ├── cli.md                      — Cli subsystem design
+│   └── context.md                  — Context unit design
+├── modeling/
+│   ├── modeling.md                 — Modeling subsystem design
+│   └── requirements.md             — Requirements, Section, and Requirement units design
+├── tracing/
+│   ├── tracing.md                  — Tracing subsystem design
+│   └── trace-matrix.md             — TraceMatrix unit design
+├── linting/
+│   ├── linting.md                  — Linting subsystem design
+│   └── linter.md                   — Linter unit design
+└── self-test/
+    ├── self-test.md                — SelfTest subsystem design
+    └── validation.md               — Validation unit design
+```
 
 The source code folder structure mirrors the top-level subsystem breakdown above, giving
 reviewers an explicit navigation aid from design to code:

@@ -154,5 +154,5 @@ run with issues lists every problem without any misleading success message.
 - [ReqStream Architecture][arch]
 - [ReqStream Repository][repo]
 
-[arch]: ../../ARCHITECTURE.md
+[arch]: ../../../ARCHITECTURE.md
 [repo]: https://github.com/demaconsulting/ReqStream
