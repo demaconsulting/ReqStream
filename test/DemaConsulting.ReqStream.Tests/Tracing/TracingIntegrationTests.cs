@@ -62,6 +62,7 @@ public class TracingIntegrationTests
     [TestMethod]
     public void IntegrationTest_TraceMatrix_GeneratesMarkdown()
     {
+        // Arrange: create requirements file with one traceable requirement
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
@@ -74,6 +75,7 @@ public class TracingIntegrationTests
                       - TracingTest1
             """);
 
+        // Arrange: create TRX file with a passing test result matching the requirement
         var testResults = new DemaConsulting.TestResults.TestResults { Name = "TracingRun" };
         testResults.Results.Add(new DemaConsulting.TestResults.TestResult
         {
@@ -87,6 +89,8 @@ public class TracingIntegrationTests
         File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
 
         var matrixFile = Path.Combine(_testDirectory, "matrix.md");
+
+        // Act: invoke the tool to generate a trace matrix report
         var exitCode = Runner.RunInDirectory(
             out var output,
             _testDirectory,
@@ -96,6 +100,7 @@ public class TracingIntegrationTests
             "--tests", "results.trx",
             "--matrix", matrixFile);
 
+        // Assert: exit code is 0, matrix file exists, and contains the requirement ID
         Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
         Assert.IsTrue(File.Exists(matrixFile), "Trace matrix report should be generated.");
 
@@ -110,6 +115,7 @@ public class TracingIntegrationTests
     [TestMethod]
     public void IntegrationTest_EnforcementMode_PassesWithTests()
     {
+        // Arrange: create requirements file with one requirement to be satisfied
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
@@ -122,6 +128,7 @@ public class TracingIntegrationTests
                       - EnforcementTest1
             """);
 
+        // Arrange: create TRX file with a passing test result matching the requirement
         var testResults = new DemaConsulting.TestResults.TestResults { Name = "EnforcementRun" };
         testResults.Results.Add(new DemaConsulting.TestResults.TestResult
         {
@@ -134,6 +141,7 @@ public class TracingIntegrationTests
         var trxFile = Path.Combine(_testDirectory, "results.trx");
         File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
 
+        // Act: invoke the tool in enforcement mode
         var exitCode = Runner.RunInDirectory(
             out var output,
             _testDirectory,
@@ -143,6 +151,7 @@ public class TracingIntegrationTests
             "--tests", "results.trx",
             "--enforce");
 
+        // Assert: exit code is 0 because all requirements are satisfied
         Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
     }
 
@@ -153,6 +162,7 @@ public class TracingIntegrationTests
     [TestMethod]
     public void IntegrationTest_EnforcementMode_FailsWithoutTests()
     {
+        // Arrange: create requirements file with one requirement that has no matching test
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
@@ -165,10 +175,12 @@ public class TracingIntegrationTests
                       - MissingTest1
             """);
 
+        // Arrange: create TRX file with no test results (empty run)
         var testResults = new DemaConsulting.TestResults.TestResults { Name = "EmptyRun" };
         var trxFile = Path.Combine(_testDirectory, "empty.trx");
         File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
 
+        // Act: invoke the tool in enforcement mode with no matching test evidence
         var exitCode = Runner.RunInDirectory(
             out var output,
             _testDirectory,
@@ -178,6 +190,7 @@ public class TracingIntegrationTests
             "--tests", "empty.trx",
             "--enforce");
 
+        // Assert: exit code is non-zero because the requirement lacks test evidence
         Assert.AreNotEqual(0, exitCode, $"Expected non-zero exit code but got 0. Output: {output}");
     }
 }

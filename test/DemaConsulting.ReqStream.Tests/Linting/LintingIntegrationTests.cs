@@ -62,6 +62,7 @@ public class LintingIntegrationTests
     [TestMethod]
     public void IntegrationTest_LintFlag_ValidFile_ReturnsSuccess()
     {
+        // Arrange: create a structurally valid requirements YAML file with no duplicate IDs
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
@@ -74,6 +75,7 @@ public class LintingIntegrationTests
                       - LintTest1
             """);
 
+        // Act: invoke the tool with --lint flag on the valid requirements file
         var exitCode = Runner.RunInDirectory(
             out var output,
             _testDirectory,
@@ -82,6 +84,7 @@ public class LintingIntegrationTests
             "--requirements", "requirements.yaml",
             "--lint");
 
+        // Assert: exit code is 0 indicating no linting issues were found
         Assert.AreEqual(0, exitCode, $"Expected exit code 0 for valid file but got {exitCode}. Output: {output}");
     }
 
@@ -92,6 +95,7 @@ public class LintingIntegrationTests
     [TestMethod]
     public void IntegrationTest_LintFlag_InvalidFile_ReturnsError()
     {
+        // Arrange: create a requirements YAML file containing duplicate requirement IDs
         var reqFile = Path.Combine(_testDirectory, "invalid.yaml");
         File.WriteAllText(reqFile, """
             sections:
@@ -109,6 +113,7 @@ public class LintingIntegrationTests
                       - Test2
             """);
 
+        // Act: invoke the tool with --lint flag on the invalid requirements file
         var exitCode = Runner.RunInDirectory(
             out var output,
             _testDirectory,
@@ -117,6 +122,7 @@ public class LintingIntegrationTests
             "--requirements", "invalid.yaml",
             "--lint");
 
+        // Assert: exit code is non-zero indicating a linting error was detected
         Assert.AreNotEqual(0, exitCode, $"Expected non-zero exit code for invalid file but got 0. Output: {output}");
     }
 }

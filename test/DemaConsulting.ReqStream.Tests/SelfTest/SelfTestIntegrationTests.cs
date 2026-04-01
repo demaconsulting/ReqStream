@@ -61,7 +61,12 @@ public class SelfTestIntegrationTests
     [TestMethod]
     public void IntegrationTest_ValidateFlag_RunsValidation()
     {
+        // Arrange: no setup needed; self-validation uses the tool's built-in test suite
+
+        // Act: invoke the tool with --validate and --silent flags
         var exitCode = Runner.Run(out var output, "dotnet", _dllPath, "--validate", "--silent");
+
+        // Assert: exit code is 0 indicating all self-validation checks passed
         Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
     }
 
@@ -71,7 +76,10 @@ public class SelfTestIntegrationTests
     [TestMethod]
     public void IntegrationTest_ValidateWithResults_GeneratesTrxFile()
     {
+        // Arrange: define path for the TRX results output file
         var resultsFile = Path.Combine(_testDirectory, "validation-results.trx");
+
+        // Act: invoke the tool with --validate, --silent, and --results flags targeting a .trx path
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
@@ -80,6 +88,7 @@ public class SelfTestIntegrationTests
             "--silent",
             "--results", resultsFile);
 
+        // Assert: exit code is 0, TRX file was created, and contains the expected test run element
         Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
         Assert.IsTrue(File.Exists(resultsFile), $"Expected TRX results file at {resultsFile}");
 
@@ -93,7 +102,10 @@ public class SelfTestIntegrationTests
     [TestMethod]
     public void IntegrationTest_ValidateWithResults_GeneratesJUnitFile()
     {
+        // Arrange: define path for the JUnit XML results output file
         var resultsFile = Path.Combine(_testDirectory, "validation-results.xml");
+
+        // Act: invoke the tool with --validate, --silent, and --results flags targeting an .xml path
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
@@ -102,6 +114,7 @@ public class SelfTestIntegrationTests
             "--silent",
             "--results", resultsFile);
 
+        // Assert: exit code is 0, JUnit file was created, and contains the expected testsuite element
         Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
         Assert.IsTrue(File.Exists(resultsFile), $"Expected JUnit XML results file at {resultsFile}");
 

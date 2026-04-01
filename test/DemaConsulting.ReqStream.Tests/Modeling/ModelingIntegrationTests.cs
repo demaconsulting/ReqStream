@@ -61,6 +61,7 @@ public class ModelingIntegrationTests
     [TestMethod]
     public void IntegrationTest_RequirementsReport_GeneratesMarkdown()
     {
+        // Arrange: create a requirements file with one testable requirement
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
@@ -74,6 +75,8 @@ public class ModelingIntegrationTests
             """);
 
         var reportFile = Path.Combine(_testDirectory, "requirements.md");
+
+        // Act: invoke the tool to generate a requirements report
         var exitCode = Runner.RunInDirectory(
             out var output,
             _testDirectory,
@@ -82,6 +85,7 @@ public class ModelingIntegrationTests
             "--requirements", "requirements.yaml",
             "--report", reportFile);
 
+        // Assert: exit code is 0, report file exists, and contains the requirement ID and title
         Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
         Assert.IsTrue(File.Exists(reportFile), "Requirements report should be generated.");
 
@@ -96,6 +100,7 @@ public class ModelingIntegrationTests
     [TestMethod]
     public void IntegrationTest_JustificationsReport_GeneratesMarkdown()
     {
+        // Arrange: create a requirements file with one justified requirement
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
@@ -109,6 +114,8 @@ public class ModelingIntegrationTests
             """);
 
         var justificationsFile = Path.Combine(_testDirectory, "justifications.md");
+
+        // Act: invoke the tool to generate a justifications report
         var exitCode = Runner.RunInDirectory(
             out var output,
             _testDirectory,
@@ -117,6 +124,7 @@ public class ModelingIntegrationTests
             "--requirements", "requirements.yaml",
             "--justifications", justificationsFile);
 
+        // Assert: exit code is 0, report file exists, and contains the requirement ID and justification text
         Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
         Assert.IsTrue(File.Exists(justificationsFile), "Justifications report should be generated.");
 

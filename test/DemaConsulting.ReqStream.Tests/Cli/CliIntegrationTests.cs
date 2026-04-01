@@ -61,7 +61,12 @@ public class CliIntegrationTests
     [TestMethod]
     public void IntegrationTest_VersionFlag_OutputsVersion()
     {
+        // Arrange: no setup needed; --version requires no input files
+
+        // Act: invoke the tool with --version flag
         var exitCode = Runner.Run(out var output, "dotnet", _dllPath, "--version");
+
+        // Assert: exit code is 0 and output contains a version string
         Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
         Assert.IsFalse(string.IsNullOrWhiteSpace(output), "Expected non-empty version output.");
     }
@@ -72,7 +77,12 @@ public class CliIntegrationTests
     [TestMethod]
     public void IntegrationTest_HelpFlag_OutputsUsageInformation()
     {
+        // Arrange: no setup needed; --help requires no input files
+
+        // Act: invoke the tool with --help flag
         var exitCode = Runner.Run(out var output, "dotnet", _dllPath, "--help");
+
+        // Assert: exit code is 0 and output contains usage information
         Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
         Assert.Contains("Usage:", output);
         Assert.Contains("--version", output);
@@ -84,7 +94,12 @@ public class CliIntegrationTests
     [TestMethod]
     public void IntegrationTest_SilentFlag_SuppressesOutput()
     {
+        // Arrange: no setup needed; --silent suppresses output without requiring input files
+
+        // Act: invoke the tool with --silent flag
         var exitCode = Runner.Run(out var output, "dotnet", _dllPath, "--silent");
+
+        // Assert: exit code is 0 and no output is produced
         Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
         Assert.IsTrue(string.IsNullOrWhiteSpace(output), $"Expected no output with --silent but got: {output}");
     }
@@ -95,7 +110,12 @@ public class CliIntegrationTests
     [TestMethod]
     public void IntegrationTest_UnknownArgument_ReturnsError()
     {
+        // Arrange: no setup needed; an unrecognized argument should trigger an error response
+
+        // Act: invoke the tool with an unrecognized argument
         var exitCode = Runner.Run(out var output, "dotnet", _dllPath, "--unknown-argument-xyz");
+
+        // Assert: exit code is non-zero indicating the argument was rejected
         Assert.AreNotEqual(0, exitCode, $"Expected non-zero exit code for unknown argument. Output: {output}");
     }
 
@@ -105,8 +125,13 @@ public class CliIntegrationTests
     [TestMethod]
     public void IntegrationTest_LogFlag_WritesOutputToFile()
     {
+        // Arrange: define path for the log output file
         var logFile = Path.Combine(_testDirectory, "output.log");
+
+        // Act: invoke the tool with --log flag pointing to the target file
         var exitCode = Runner.Run(out var _, "dotnet", _dllPath, "--log", logFile);
+
+        // Assert: exit code is 0 and the log file was created
         Assert.AreEqual(0, exitCode);
         Assert.IsTrue(File.Exists(logFile), $"Expected log file at {logFile}");
     }
