@@ -696,4 +696,146 @@ mappings:
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Document root must be a mapping", errors);
     }
+
+    /// <summary>
+    /// Test that a non-scalar entry in the tests list of a requirement reports an error.
+    /// </summary>
+    [TestMethod]
+    public void Linter_Lint_WithNonScalarTestEntry_ReportsError()
+    {
+        var reqFile = Path.Combine(_testDirectory, "non-scalar-test.yaml");
+        File.WriteAllText(reqFile, @"sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Test requirement
+        tests:
+          - key: value
+");
+
+        var (exitCode, errors) = RunLint(reqFile);
+
+        Assert.AreEqual(1, exitCode);
+        Assert.Contains("Test entry must be a scalar value", errors);
+    }
+
+    /// <summary>
+    /// Test that a non-scalar entry in the children list of a requirement reports an error.
+    /// </summary>
+    [TestMethod]
+    public void Linter_Lint_WithNonScalarChildEntry_ReportsError()
+    {
+        var reqFile = Path.Combine(_testDirectory, "non-scalar-child.yaml");
+        File.WriteAllText(reqFile, @"sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Test requirement
+        children:
+          - key: value
+");
+
+        var (exitCode, errors) = RunLint(reqFile);
+
+        Assert.AreEqual(1, exitCode);
+        Assert.Contains("Child requirement reference must be a scalar string", errors);
+    }
+
+    /// <summary>
+    /// Test that a non-scalar entry in the tags list of a requirement reports an error.
+    /// </summary>
+    [TestMethod]
+    public void Linter_Lint_WithNonScalarTagEntry_ReportsError()
+    {
+        var reqFile = Path.Combine(_testDirectory, "non-scalar-tag.yaml");
+        File.WriteAllText(reqFile, @"sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Test requirement
+        tags:
+          - key: value
+");
+
+        var (exitCode, errors) = RunLint(reqFile);
+
+        Assert.AreEqual(1, exitCode);
+        Assert.Contains("Tag entry must be a scalar value", errors);
+    }
+
+    /// <summary>
+    /// Test that a non-scalar entry in the tests list of a mapping reports an error.
+    /// </summary>
+    [TestMethod]
+    public void Linter_Lint_WithNonScalarMappingTestEntry_ReportsError()
+    {
+        var reqFile = Path.Combine(_testDirectory, "non-scalar-mapping-test.yaml");
+        File.WriteAllText(reqFile, @"sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Test requirement
+mappings:
+  - id: REQ-001
+    tests:
+      - key: value
+");
+
+        var (exitCode, errors) = RunLint(reqFile);
+
+        Assert.AreEqual(1, exitCode);
+        Assert.Contains("Test entry must be a scalar value in mapping", errors);
+    }
+
+    /// <summary>
+    /// Test that a non-scalar entry in the includes list reports an error.
+    /// </summary>
+    [TestMethod]
+    public void Linter_Lint_WithNonScalarIncludeEntry_ReportsError()
+    {
+        var reqFile = Path.Combine(_testDirectory, "non-scalar-include.yaml");
+        File.WriteAllText(reqFile, @"includes:
+  - key: value
+");
+
+        var (exitCode, errors) = RunLint(reqFile);
+
+        Assert.AreEqual(1, exitCode);
+        Assert.Contains("Each 'includes' entry must be a scalar string", errors);
+    }
+
+    /// <summary>
+    /// Test that multiple cycles in the requirement children graph are all reported.
+    /// </summary>
+    [TestMethod]
+    public void Linter_Lint_WithMultipleCycles_ReportsAllCycles()
+    {
+        var reqFile = Path.Combine(_testDirectory, "multiple-cycles.yaml");
+        File.WriteAllText(reqFile, @"sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-A
+        title: Requirement A
+        children:
+          - REQ-B
+          - REQ-C
+      - id: REQ-B
+        title: Requirement B
+        children:
+          - REQ-A
+      - id: REQ-C
+        title: Requirement C
+        children:
+          - REQ-A
+");
+
+        var (exitCode, errors) = RunLint(reqFile);
+
+        Assert.AreEqual(1, exitCode);
+
+        // Both back-edges (REQ-B->REQ-A and REQ-C->REQ-A) should each be reported exactly once
+        var cycleCount = errors.Split(Environment.NewLine)
+            .Count(line => line.Contains("Circular requirement reference detected"));
+        Assert.AreEqual(2, cycleCount, $"Expected exactly 2 cycle errors, got {cycleCount}: {errors}");
+    }
 }

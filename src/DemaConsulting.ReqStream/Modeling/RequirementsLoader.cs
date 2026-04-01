@@ -198,13 +198,14 @@ internal static class RequirementsLoader
 
         // Follow include directives recursively
         var baseDirectory = Path.GetDirectoryName(fullPath) ?? string.Empty;
-        var includes = GetStringList(root, "includes");
-        if (includes != null)
+        var includes = GetValidatedStringList(
+            issues, path, root,
+            "includes",
+            "Each 'includes' entry must be a scalar string",
+            "Each 'includes' entry cannot be blank");
+        foreach (var include in includes)
         {
-            foreach (var include in includes.Where(s => !string.IsNullOrWhiteSpace(s)))
-            {
-                LoadFile(requirements, issues, Path.Combine(baseDirectory, include), seenIds, allRequirements, visitedFiles);
-            }
+            LoadFile(requirements, issues, Path.Combine(baseDirectory, include), seenIds, allRequirements, visitedFiles);
         }
     }
 
@@ -523,57 +524,25 @@ internal static class RequirementsLoader
         var justification = justificationNode?.Value;
 
         // Extract and validate 'tests' list
-        var tests = new List<string>();
-        var testsNode = GetSequence(node, "tests");
-        if (testsNode != null)
-        {
-            foreach (var testNode in testsNode.Children.OfType<YamlScalarNode>())
-            {
-                if (string.IsNullOrWhiteSpace(testNode.Value))
-                {
-                    issues.Add(new LintIssue(
-                        $"{path}({testNode.Start.Line},{testNode.Start.Column})",
-                        LintSeverity.Error,
-                        "Test name cannot be blank"));
-                }
-                else
-                {
-                    tests.Add(testNode.Value!);
-                }
-            }
-        }
+        var tests = GetValidatedStringList(
+            issues, path, node,
+            "tests",
+            "Test entry must be a scalar value",
+            "Test name cannot be blank");
 
-        // Extract 'children' list (requirement ID references for hierarchical decomposition)
-        var children = new List<string>();
-        var childrenNode = GetSequence(node, "children");
-        if (childrenNode != null)
-        {
-            children.AddRange(childrenNode.Children
-                .OfType<YamlScalarNode>()
-                .Where(s => s.Value != null)
-                .Select(s => s.Value!));
-        }
+        // Extract and validate 'children' list (requirement ID references for hierarchical decomposition)
+        var children = GetValidatedStringList(
+            issues, path, node,
+            "children",
+            "Child requirement reference must be a scalar string",
+            "Child requirement reference cannot be blank");
 
         // Extract and validate 'tags' list
-        var tags = new List<string>();
-        var tagsNode = GetSequence(node, "tags");
-        if (tagsNode != null)
-        {
-            foreach (var tagNode in tagsNode.Children.OfType<YamlScalarNode>())
-            {
-                if (string.IsNullOrWhiteSpace(tagNode.Value))
-                {
-                    issues.Add(new LintIssue(
-                        $"{path}({tagNode.Start.Line},{tagNode.Start.Column})",
-                        LintSeverity.Error,
-                        "Tag name cannot be blank"));
-                }
-                else
-                {
-                    tags.Add(tagNode.Value!);
-                }
-            }
-        }
+        var tags = GetValidatedStringList(
+            issues, path, node,
+            "tags",
+            "Tag entry must be a scalar value",
+            "Tag name cannot be blank");
 
         // Build the Requirement model object only when we have a valid id and title
         if (reqId == null || reqTitle == null)
@@ -681,26 +650,16 @@ internal static class RequirementsLoader
         // Resolve the referenced requirement (silently skip mappings to unknown IDs)
         allRequirements.TryGetValue(idNode.Value, out var requirement);
 
-        // Extract 'tests' and apply to the requirement
-        var testsNode = GetSequence(node, "tests");
-        if (testsNode == null)
-        {
-            return;
-        }
+        // Extract and validate 'tests', then apply to the requirement
+        var tests = GetValidatedStringList(
+            issues, path, node,
+            "tests",
+            "Test entry must be a scalar value in mapping",
+            "Test name cannot be blank in mapping");
 
-        foreach (var testNode in testsNode.Children.OfType<YamlScalarNode>())
+        if (requirement != null)
         {
-            if (string.IsNullOrWhiteSpace(testNode.Value))
-            {
-                issues.Add(new LintIssue(
-                    $"{path}({testNode.Start.Line},{testNode.Start.Column})",
-                    LintSeverity.Error,
-                    "Test name cannot be blank in mapping"));
-            }
-            else if (requirement != null)
-            {
-                requirement.Tests.Add(testNode.Value!);
-            }
+            requirement.Tests.AddRange(tests);
         }
     }
 
@@ -746,22 +705,21 @@ internal static class RequirementsLoader
 
         if (allRequirements.TryGetValue(reqId, out var requirement))
         {
-            var cycleId = requirement.Children.FirstOrDefault(visiting.Contains);
-            if (cycleId != null)
+            foreach (var childId in requirement.Children)
             {
-                var cycleStart = currentPath.IndexOf(cycleId);
-                var cyclePath = string.Join(" -> ", currentPath.Skip(cycleStart).Append(cycleId));
-                var location = allRequirements.TryGetValue(cycleId, out var cycleReq) && cycleReq.Location != null
-                    ? cycleReq.Location
-                    : cycleId;
-                issues.Add(new LintIssue(
-                    location,
-                    LintSeverity.Error,
-                    $"Circular requirement reference detected: {cyclePath}"));
-            }
-            else
-            {
-                foreach (var childId in requirement.Children.Where(id => !visited.Contains(id)))
+                if (visiting.Contains(childId))
+                {
+                    var cycleStart = currentPath.IndexOf(childId);
+                    var cyclePath = string.Join(" -> ", currentPath.Skip(cycleStart).Append(childId));
+                    var location = allRequirements.TryGetValue(childId, out var cycleReq) && cycleReq.Location != null
+                        ? cycleReq.Location
+                        : childId;
+                    issues.Add(new LintIssue(
+                        location,
+                        LintSeverity.Error,
+                        $"Circular requirement reference detected: {cyclePath}"));
+                }
+                else if (!visited.Contains(childId))
                 {
                     ValidateCyclesFrom(childId, allRequirements, issues, visiting, currentPath, visited);
                 }
@@ -800,18 +758,6 @@ internal static class RequirementsLoader
     }
 
     /// <summary>
-    ///     Gets a sequence node from a mapping node by key, without reporting an error on type mismatch.
-    /// </summary>
-    /// <param name="mapping">The mapping node to search.</param>
-    /// <param name="key">The key to look up.</param>
-    /// <returns>The sequence node, or null if not found or not a sequence.</returns>
-    private static YamlSequenceNode? GetSequence(YamlMappingNode mapping, string key)
-    {
-        var keyNode = new YamlScalarNode(key);
-        return mapping.Children.TryGetValue(keyNode, out var value) ? value as YamlSequenceNode : null;
-    }
-
-    /// <summary>
     ///     Gets a sequence node from a mapping node by key, adding a type-mismatch lint issue if
     ///     the key exists but its value is not a sequence.
     /// </summary>
@@ -845,23 +791,60 @@ internal static class RequirementsLoader
     }
 
     /// <summary>
-    ///     Gets a list of string values from a sequence within a mapping node.
+    ///     Gets a validated list of string values from a sequence field in a mapping node.
+    ///     Adds a type-mismatch lint issue if the field is not a sequence. Adds an error lint
+    ///     issue for each non-scalar entry. Optionally adds an error for blank entries.
     /// </summary>
+    /// <param name="issues">The list to add lint issues to.</param>
+    /// <param name="path">The file path for error locations.</param>
     /// <param name="mapping">The mapping node to search.</param>
     /// <param name="key">The key to look up.</param>
-    /// <returns>A list of string values, or null if the key is not found.</returns>
-    private static List<string>? GetStringList(YamlMappingNode mapping, string key)
+    /// <param name="nonScalarMessage">Error message to emit when an entry is not a scalar.</param>
+    /// <param name="blankMessage">Error message to emit when an entry is blank, or null to allow blanks.</param>
+    /// <returns>The list of valid string values (never null).</returns>
+    private static List<string> GetValidatedStringList(
+        List<LintIssue> issues,
+        string path,
+        YamlMappingNode mapping,
+        string key,
+        string nonScalarMessage,
+        string? blankMessage = null)
     {
-        var sequence = GetSequence(mapping, key);
+        var result = new List<string>();
+        var sequence = GetSequenceChecked(issues, path, mapping, key);
         if (sequence == null)
         {
-            return null;
+            return result;
         }
 
-        return sequence.Children
-            .OfType<YamlScalarNode>()
-            .Where(s => s.Value != null)
-            .Select(s => s.Value!)
-            .ToList();
+        foreach (var child in sequence.Children)
+        {
+            if (child is not YamlScalarNode scalar)
+            {
+                issues.Add(new LintIssue(
+                    $"{path}({child.Start.Line},{child.Start.Column})",
+                    LintSeverity.Error,
+                    nonScalarMessage));
+                continue;
+            }
+
+            if (blankMessage != null && string.IsNullOrWhiteSpace(scalar.Value))
+            {
+                issues.Add(new LintIssue(
+                    $"{path}({scalar.Start.Line},{scalar.Start.Column})",
+                    LintSeverity.Error,
+                    blankMessage));
+                continue;
+            }
+
+            // Use pattern matching to add only non-null values; null scalars (e.g. from '- ~'
+            // or '- null' in YAML) are silently skipped when blank reporting is not requested.
+            if (scalar.Value is { } value)
+            {
+                result.Add(value);
+            }
+        }
+
+        return result;
     }
 }

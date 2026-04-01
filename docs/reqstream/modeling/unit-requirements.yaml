@@ -317,3 +317,31 @@ sections:
               - lint
             tests:
               - LintIssue_ToString_FormatsCorrectly
+
+          - id: ReqStream-Lint-NonScalarListEntries
+            title: >-
+              The requirements loader shall report an error when a list field contains a non-scalar entry.
+            justification: |
+              List fields such as tests, children, tags, and includes must contain scalar string values.
+              Non-scalar entries (e.g. nested mappings) would be silently ignored without this check,
+              leading to missing coverage or include entries.
+            tags:
+              - lint
+            tests:
+              - Linter_Lint_WithNonScalarTestEntry_ReportsError
+              - Linter_Lint_WithNonScalarChildEntry_ReportsError
+              - Linter_Lint_WithNonScalarTagEntry_ReportsError
+              - Linter_Lint_WithNonScalarMappingTestEntry_ReportsError
+              - Linter_Lint_WithNonScalarIncludeEntry_ReportsError
+
+          - id: ReqStream-Lint-CircularReferences
+            title: >-
+              The requirements loader shall report an error when circular references are detected in the
+              requirement children graph.
+            justification: |
+              Circular requirement references would cause infinite loops during trace matrix generation.
+              All back-edges in the children graph must be reported, not just the first one found.
+            tags:
+              - lint
+            tests:
+              - Linter_Lint_WithMultipleCycles_ReportsAllCycles
