@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.ReqStream.Linting;
+namespace DemaConsulting.ReqStream.Modeling;
 
 /// <summary>
 ///     Severity level for a lint issue.

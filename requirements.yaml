@@ -13,9 +13,6 @@ includes:
   # Tracing subsystem
   - docs/reqstream/tracing/subsystem-tracing.yaml
   - docs/reqstream/tracing/unit-trace-matrix.yaml
-  # Linting subsystem
-  - docs/reqstream/linting/subsystem-linting.yaml
-  - docs/reqstream/linting/unit-linter.yaml
   # SelfTest subsystem
   - docs/reqstream/self-test/subsystem-self-test.yaml
   - docs/reqstream/self-test/unit-validation.yaml

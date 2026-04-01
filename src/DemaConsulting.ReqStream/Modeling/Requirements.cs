@@ -19,7 +19,6 @@
 // SOFTWARE.
 
 using System.Diagnostics.CodeAnalysis;
-using DemaConsulting.ReqStream.Linting;
 
 namespace DemaConsulting.ReqStream.Modeling;
 

@@ -2,7 +2,6 @@
 resource-path:
   - docs/design
   - docs/design/cli
-  - docs/design/linting
   - docs/design/modeling
   - docs/design/self-test
   - docs/design/tracing
@@ -19,8 +18,6 @@ input-files:
   - docs/design/modeling/requirements.md
   - docs/design/tracing/tracing.md
   - docs/design/tracing/trace-matrix.md
-  - docs/design/linting/linting.md
-  - docs/design/linting/linter.md
   - docs/design/self-test/self-test.md
   - docs/design/self-test/validation.md
 

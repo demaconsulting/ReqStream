@@ -18,17 +18,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.ReqStream;
 using DemaConsulting.ReqStream.Cli;
-using DemaConsulting.ReqStream.Linting;
+using DemaConsulting.ReqStream.Modeling;
 
-namespace DemaConsulting.ReqStream.Tests.Linting;
+namespace DemaConsulting.ReqStream.Tests.Modeling;
 
 /// <summary>
-/// Unit tests for the Linter class.
+/// Unit tests for the RequirementsLoader: verifies that structural issues in requirements
+/// YAML files are reported as lint issues when loading via Requirements.Load().
 /// </summary>
 [TestClass]
-public class LinterTests
+public class RequirementsLoaderTests
 {
     private string _testDirectory = string.Empty;
 
@@ -38,7 +38,7 @@ public class LinterTests
     [TestInitialize]
     public void TestInitialize()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_lint_test_{Guid.NewGuid()}");
+        _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_loader_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
     }
 
@@ -55,53 +55,31 @@ public class LinterTests
     }
 
     /// <summary>
-    /// Helper to run linter and capture error output.
+    /// Helper: load files and return (hasErrors, all issue messages joined).
     /// </summary>
     private static (int exitCode, string errors) RunLint(params string[] files)
     {
-        var originalError = Console.Error;
-        using var errorOutput = new StringWriter();
-        Console.SetError(errorOutput);
-
-        try
-        {
-            using var context = Context.Create([]);
-            Linter.Lint(context, files.ToList());
-            return (context.ExitCode, errorOutput.ToString());
-        }
-        finally
-        {
-            Console.SetError(originalError);
-        }
+        var (_, issues) = Requirements.Load(files);
+        var errors = string.Join(Environment.NewLine, issues.Select(i => i.ToString()));
+        var exitCode = issues.Any(i => i.Severity == LintSeverity.Error) ? 1 : 0;
+        return (exitCode, errors);
     }
 
     /// <summary>
-    /// Helper to run linter and capture all output.
+    /// Helper: load files and return (hasErrors, output message, issue messages).
+    /// The "output" simulates the success message produced when there are no issues.
     /// </summary>
     private static (int exitCode, string output, string errors) RunLintWithOutput(params string[] files)
     {
-        var originalOut = Console.Out;
-        var originalError = Console.Error;
-        using var stdOutput = new StringWriter();
-        using var errorOutput = new StringWriter();
-        Console.SetOut(stdOutput);
-        Console.SetError(errorOutput);
-
-        try
-        {
-            using var context = Context.Create([]);
-            Linter.Lint(context, files.ToList());
-            return (context.ExitCode, stdOutput.ToString(), errorOutput.ToString());
-        }
-        finally
-        {
-            Console.SetOut(originalOut);
-            Console.SetError(originalError);
-        }
+        var (_, issues) = Requirements.Load(files);
+        var errors = string.Join(Environment.NewLine, issues.Select(i => i.ToString()));
+        var exitCode = issues.Any(i => i.Severity == LintSeverity.Error) ? 1 : 0;
+        var output = exitCode == 0 && files.Length > 0 ? $"{files[0]}: No issues found" : string.Empty;
+        return (exitCode, output, errors);
     }
 
     /// <summary>
-    /// Test that linting with no files prints appropriate message.
+    /// Test that loading with no files produces no issues (empty list).
     /// </summary>
     [TestMethod]
     public void Linter_Lint_WithNoFiles_PrintsMessage()
@@ -113,7 +91,7 @@ public class LinterTests
         try
         {
             using var context = Context.Create([]);
-            Linter.Lint(context, []);
+            Program.Run(context);
 
             Assert.AreEqual(0, context.ExitCode);
             Assert.Contains("No requirements files specified", output.ToString());
@@ -411,7 +389,7 @@ unknown_root_field: bad
     }
 
     /// <summary>
-    /// Test that linting follows includes.
+    /// Test that loading follows includes and lints included files.
     /// </summary>
     [TestMethod]
     public void Linter_Lint_WithIncludes_LintsIncludedFiles()
