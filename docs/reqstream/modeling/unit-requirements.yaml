@@ -124,7 +124,9 @@ sections:
               - Requirements_Read_BlankMappingId_ThrowsExceptionWithFileLocation
 
           - id: ReqStream-Req-UnifiedLoad
-            title: The tool shall provide a unified load mechanism that simultaneously builds the requirements model and reports lint issues from a single YAML DOM tree walk.
+            title: >-
+              The tool shall provide a unified load mechanism that simultaneously builds the requirements model and
+              reports lint issues from a single YAML DOM tree walk.
             justification: |
               A single YAML DOM tree walk eliminates the drift that can occur between separate linting
               and loading implementations. Load failures automatically produce detailed lint-issue output,
@@ -154,7 +156,9 @@ sections:
               - Linter_Lint_WithMalformedYaml_ReportsError
 
           - id: ReqStream-Lint-UnknownDocumentField
-            title: The requirements loader shall report an error when the requirements document contains an unknown field.
+            title: >-
+              The requirements loader shall report an error when the requirements document contains an unknown
+              field.
             justification: |
               Unknown fields may indicate typos or outdated configuration that would otherwise be silently
               ignored, leading to unexpected behavior.
@@ -196,7 +200,9 @@ sections:
               - Linter_Lint_WithNestedSectionIssues_ReportsError
 
           - id: ReqStream-Lint-MissingRequirementFields
-            title: The requirements loader shall report an error when a requirement is missing or has a blank id or title field.
+            title: >-
+              The requirements loader shall report an error when a requirement is missing or has a blank id or
+              title field.
             justification: |
               The id and title fields are mandatory for all requirements. Missing or blank values cause downstream
               processing failures and produce incomplete reports.
