@@ -91,7 +91,9 @@ internal static class RequirementsLoader
         // Validate cycle-free requirement references on a best-effort basis, even if other errors exist
         if (allRequirements.Count > 0)
         {
-            ValidateCycles(allRequirements, issues, paths[0]);
+            // Pass a null path here to avoid incorrectly attributing cycles to the first root file.
+            // ValidateCycles can use more accurate per-requirement information if available.
+            ValidateCycles(allRequirements, issues, null);
         }
 
         // Return null requirements if any error-level issues were found
