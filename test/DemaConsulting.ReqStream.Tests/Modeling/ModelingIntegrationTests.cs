@@ -132,4 +132,75 @@ public class ModelingIntegrationTests
         Assert.Contains("Modeling-Test-Req2", content);
         Assert.Contains("This justification explains why the requirement is needed.", content);
     }
+
+    /// <summary>
+    /// Integration test verifying that linting a valid requirements file reports no issues
+    /// and exits with code 0.
+    /// </summary>
+    [TestMethod]
+    public void IntegrationTest_LintFlag_ValidFile_ReturnsSuccess()
+    {
+        // Arrange: create a structurally valid requirements YAML file with no duplicate IDs
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: Lint Test Requirements
+                requirements:
+                  - id: Lint-Test-Req1
+                    title: The system shall have a valid requirement.
+                    justification: Lint test justification.
+                    tests:
+                      - LintTest1
+            """);
+
+        // Act: invoke the tool with --lint flag on the valid requirements file
+        var exitCode = Runner.RunInDirectory(
+            out var output,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--requirements", "requirements.yaml",
+            "--lint");
+
+        // Assert: exit code is 0 indicating no linting issues were found
+        Assert.AreEqual(0, exitCode, $"Expected exit code 0 for valid file but got {exitCode}. Output: {output}");
+    }
+
+    /// <summary>
+    /// Integration test verifying that linting a requirements file with duplicate IDs
+    /// reports an error and exits with a non-zero code.
+    /// </summary>
+    [TestMethod]
+    public void IntegrationTest_LintFlag_InvalidFile_ReturnsError()
+    {
+        // Arrange: create a requirements YAML file containing duplicate requirement IDs
+        var reqFile = Path.Combine(_testDirectory, "invalid.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: Duplicate ID Test
+                requirements:
+                  - id: Lint-Duplicate-Req
+                    title: The first requirement.
+                    justification: First.
+                    tests:
+                      - Test1
+                  - id: Lint-Duplicate-Req
+                    title: The second requirement with duplicate ID.
+                    justification: Second.
+                    tests:
+                      - Test2
+            """);
+
+        // Act: invoke the tool with --lint flag on the invalid requirements file
+        var exitCode = Runner.RunInDirectory(
+            out var output,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--requirements", "invalid.yaml",
+            "--lint");
+
+        // Assert: exit code is non-zero indicating a linting error was detected
+        Assert.AreNotEqual(0, exitCode, $"Expected non-zero exit code for invalid file but got 0. Output: {output}");
+    }
 }

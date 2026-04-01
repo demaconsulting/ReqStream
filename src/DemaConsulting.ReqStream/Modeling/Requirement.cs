@@ -54,4 +54,9 @@ public class Requirement
     ///     Gets the list of tags associated with this requirement.
     /// </summary>
     public List<string> Tags { get; } = [];
+
+    /// <summary>
+    ///     Gets or sets the source location where this requirement is defined (e.g. "path(line,col)").
+    /// </summary>
+    public string? Location { get; set; }
 }

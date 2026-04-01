@@ -54,11 +54,15 @@ reviews:
     paths:
       - "docs/reqstream/modeling/unit-requirements.yaml"  # requirements
       - "docs/design/modeling/requirements.md"           # design
+      - "src/**/Modeling/LintIssue.cs"                   # implementation
       - "src/**/Modeling/Requirement.cs"                 # implementation
       - "src/**/Modeling/Requirements.cs"                # implementation
+      - "src/**/Modeling/RequirementsLoader.cs"          # implementation
       - "src/**/Modeling/Section.cs"                     # implementation
-      - "test/**/Modeling/RequirementsReadTests.cs"      # unit tests
       - "test/**/Modeling/RequirementsExportTests.cs"    # unit tests
+      - "test/**/Modeling/RequirementsLoadTests.cs"      # unit tests
+      - "test/**/Modeling/RequirementsLoaderTests.cs"    # unit tests
+      - "test/**/Modeling/RequirementsReadTests.cs"      # unit tests
 
   - id: ReqStream-TraceMatrix
     title: Review of ReqStream TraceMatrix Unit
@@ -69,14 +73,6 @@ reviews:
       - "test/**/Tracing/TraceMatrixTests.cs"           # unit tests
       - "test/**/Tracing/TraceMatrixReadTests.cs"       # unit tests
       - "test/**/Tracing/TraceMatrixExportTests.cs"     # unit tests
-
-  - id: ReqStream-Linter
-    title: Review of ReqStream Linter Unit
-    paths:
-      - "docs/reqstream/linting/unit-linter.yaml"       # requirements
-      - "docs/design/linting/linter.md"                 # design
-      - "src/**/Linting/Linter.cs"                      # implementation
-      - "test/**/Linting/LinterTests.cs"                # unit tests
 
   # Subsystem reviews
   - id: ReqStream-Cli
@@ -103,14 +99,6 @@ reviews:
       - "docs/design/tracing/tracing.md"                 # subsystem design
       - "docs/design/tracing/trace-matrix.md"            # TraceMatrix unit design
       - "test/**/Tracing/TracingIntegrationTests.cs"     # subsystem integration tests
-
-  - id: ReqStream-LintingSubsystem
-    title: Review of ReqStream Linting subsystem (requirements linting)
-    paths:
-      - "docs/reqstream/linting/subsystem-linting.yaml"  # subsystem requirements
-      - "docs/design/linting/linting.md"                 # subsystem design
-      - "docs/design/linting/linter.md"                  # Linter unit design
-      - "test/**/Linting/LintingIntegrationTests.cs"     # subsystem integration tests
 
   - id: ReqStream-SelfTestSubsystem
     title: Review of ReqStream SelfTest subsystem (self-validation)
