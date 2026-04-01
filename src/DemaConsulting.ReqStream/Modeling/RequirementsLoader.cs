@@ -88,8 +88,8 @@ internal static class RequirementsLoader
             LoadFile(requirements, issues, path, seenIds, allRequirements, visitedFiles);
         }
 
-        // Validate cycle-free requirement references (only if no errors found yet)
-        if (!issues.Any(i => i.Severity == LintSeverity.Error))
+        // Validate cycle-free requirement references on a best-effort basis, even if other errors exist
+        if (allRequirements.Count > 0)
         {
             ValidateCycles(allRequirements, issues, paths[0]);
         }
