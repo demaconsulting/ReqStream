@@ -399,10 +399,9 @@ sections:
         File.WriteAllText(filePath, yamlContent);
 
         var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
-        Assert.Contains("YAML deserialization error", ex.Message);
+        Assert.Contains("Unknown field 'text' in requirement", ex.Message);
         Assert.Contains(filePath, ex.Message);
-        Assert.Contains("line", ex.Message);
-        Assert.Contains("col", ex.Message);
+        Assert.Contains($"{filePath}(", ex.Message);
     }
 
     /// <summary>
@@ -508,8 +507,7 @@ sections:
         File.WriteAllText(filePath, yamlContent);
 
         var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
-        Assert.Contains("Requirement ID cannot be blank", ex.Message);
-        Assert.Contains("System Security", ex.Message);
+        Assert.Contains("Requirement 'id' cannot be blank", ex.Message);
         Assert.Contains(filePath, ex.Message);
     }
 
@@ -530,8 +528,7 @@ sections:
         File.WriteAllText(filePath, yamlContent);
 
         var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
-        Assert.Contains("Requirement title cannot be blank", ex.Message);
-        Assert.Contains("SYS-SEC-001", ex.Message);
+        Assert.Contains("Requirement 'title' cannot be blank", ex.Message);
         Assert.Contains(filePath, ex.Message);
     }
 
@@ -552,7 +549,7 @@ sections:
         File.WriteAllText(filePath, yamlContent);
 
         var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
-        Assert.Contains("Section title cannot be blank", ex.Message);
+        Assert.Contains("Section 'title' cannot be blank", ex.Message);
         Assert.Contains(filePath, ex.Message);
     }
 
@@ -578,7 +575,6 @@ sections:
 
         var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
         Assert.Contains("Test name cannot be blank", ex.Message);
-        Assert.Contains("SYS-SEC-001", ex.Message);
         Assert.Contains(filePath, ex.Message);
     }
 
@@ -606,7 +602,6 @@ mappings:
 
         var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
         Assert.Contains("Test name cannot be blank", ex.Message);
-        Assert.Contains("SYS-SEC-001", ex.Message);
         Assert.Contains(filePath, ex.Message);
     }
 
@@ -632,7 +627,7 @@ mappings:
         File.WriteAllText(filePath, yamlContent);
 
         var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
-        Assert.Contains("Mapping requirement ID cannot be blank", ex.Message);
+        Assert.Contains("Mapping 'id' cannot be blank", ex.Message);
         Assert.Contains(filePath, ex.Message);
     }
 
@@ -868,7 +863,6 @@ sections:
 
         var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
         Assert.Contains("Tag name cannot be blank", ex.Message);
-        Assert.Contains("SYS-SEC-001", ex.Message);
         Assert.Contains(filePath, ex.Message);
     }
 

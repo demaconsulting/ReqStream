@@ -162,3 +162,13 @@ sections:
               - lint
             tests:
               - Linter_Lint_WithBlankTagName_ReportsError
+
+          - id: ReqStream-Lint-IssueType
+            title: The linter shall represent each issue with a location, severity, and description.
+            justification: |
+              A structured issue type allows callers to programmatically inspect and report lint issues,
+              supporting both human-readable output and tooling integration.
+            tags:
+              - lint
+            tests:
+              - LintIssue_ToString_FormatsCorrectly

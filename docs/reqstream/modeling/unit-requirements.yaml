@@ -122,3 +122,22 @@ sections:
               - Requirements_Read_TestMappings_AppliesMappingsCorrectly
               - Requirements_Read_BlankTestNameInMapping_ThrowsExceptionWithFileLocation
               - Requirements_Read_BlankMappingId_ThrowsExceptionWithFileLocation
+
+          - id: ReqStream-Req-UnifiedLoad
+            title: The tool shall provide a unified load mechanism that simultaneously builds the requirements model and reports lint issues from a single YAML DOM tree walk.
+            justification: |
+              A single YAML DOM tree walk eliminates the drift that can occur between separate linting
+              and loading implementations. Load failures automatically produce detailed lint-issue output,
+              and the caller receives both the nullable requirements model and a complete list of issues
+              in one operation.
+            tags:
+              - requirements
+            tests:
+              - Requirements_Load_ValidFile_ReturnsRequirementsAndNoIssues
+              - Requirements_Load_WithLintError_ReturnsNullAndIssues
+              - Requirements_Load_MissingFile_ReturnsNullAndIssues
+              - Requirements_Load_MalformedYaml_ReturnsNullAndIssues
+              - Requirements_Load_WithMultipleLintErrors_ReportsAllIssues
+              - Requirements_Load_WithIncludes_LintsIncludedFiles
+              - LintIssue_ToString_FormatsCorrectly
+              - Requirements_Load_WithLintError_IssueIncludesLocation
