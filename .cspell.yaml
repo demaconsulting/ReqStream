@@ -53,6 +53,7 @@ words:
   - SBOM
   - slnx
   - snupkg
+  - Qube
   - sonarcloud
   - SonarMark
   - testname
