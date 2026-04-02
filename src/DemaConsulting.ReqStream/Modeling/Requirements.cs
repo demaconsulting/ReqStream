@@ -26,37 +26,16 @@ namespace DemaConsulting.ReqStream.Modeling;
 public class Requirements : Section
 {
     /// <summary>
-    ///     Reads one or more requirements YAML files and returns the parsed Requirements object.
-    ///     Throws an exception if any error-level issues are found during loading.
-    /// </summary>
-    /// <param name="paths">One or more paths to YAML files to read.</param>
-    /// <returns>A Requirements object containing the parsed requirements from all files.</returns>
-    /// <exception cref="ArgumentException">Thrown when no paths are provided.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when any error-level issue is found during loading.</exception>
-    public static Requirements Read(params string[] paths)
-    {
-        var (requirements, issues) = Load(paths);
-        if (requirements != null)
-        {
-            return requirements;
-        }
-
-        // Throw an exception conveying the first error-level issue
-        var firstError = issues.First(i => i.Severity == LintSeverity.Error);
-        throw new InvalidOperationException(firstError.ToString());
-    }
-
-    /// <summary>
     ///     Loads one or more requirements YAML files using a single YAML DOM tree walk that
     ///     simultaneously builds the requirements model and collects lint issues.
     /// </summary>
     /// <param name="paths">One or more paths to YAML files to load.</param>
     /// <returns>
-    ///     A tuple of the parsed <see cref="Requirements"/> (or <c>null</c> when error-level issues
-    ///     are present) and a read-only list of <see cref="LintIssue"/> objects.
+    ///     A <see cref="LoadResult"/> containing the parsed <see cref="Requirements"/> (or <c>null</c>
+    ///     when error-level issues are present) and all lint issues found during loading.
     /// </returns>
     /// <exception cref="ArgumentException">Thrown when no paths are provided.</exception>
-    public static (Requirements? Requirements, IReadOnlyList<LintIssue> Issues) Load(params string[] paths)
+    public static LoadResult Load(params string[] paths)
     {
         return RequirementsLoader.Load(paths);
     }

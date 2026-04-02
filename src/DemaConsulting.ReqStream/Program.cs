@@ -122,13 +122,10 @@ internal static class Program
                 return;
             }
 
-            var (_, lintIssues) = Requirements.Load(context.RequirementsFiles.ToArray());
-            foreach (var issue in lintIssues)
-            {
-                context.WriteError(issue.ToString());
-            }
+            var result = Requirements.Load(context.RequirementsFiles.ToArray());
+            result.ReportIssues(context);
 
-            if (lintIssues.Count == 0)
+            if (result.Issues.Count == 0)
             {
                 context.WriteLine("No issues found");
             }
@@ -195,19 +192,18 @@ internal static class Program
 
         // Read requirements from files
         context.WriteLine($"Reading {context.RequirementsFiles.Count} requirements file(s)...");
-        var (requirements, loadIssues) = Requirements.Load(context.RequirementsFiles.ToArray());
+        var result = Requirements.Load(context.RequirementsFiles.ToArray());
 
         // Report any lint issues found during loading
-        foreach (var issue in loadIssues)
-        {
-            context.WriteError(issue.ToString());
-        }
+        result.ReportIssues(context);
 
         // Abort if loading failed due to lint errors
-        if (requirements == null)
+        if (result.Requirements == null)
         {
             return;
         }
+
+        var requirements = result.Requirements;
 
         context.WriteLine("Requirements loaded successfully.");
 

@@ -59,11 +59,12 @@ internal static class RequirementsLoader
     /// </summary>
     /// <param name="paths">One or more paths to YAML files to load.</param>
     /// <returns>
-    ///     A tuple of the parsed <see cref="Requirements"/> (or <c>null</c> when error-level issues
-    ///     are present) and a read-only list of <see cref="LintIssue"/> objects describing all issues found.
+    ///     A <see cref="LoadResult"/> containing the parsed <see cref="Requirements"/> (or <c>null</c>
+    ///     when error-level issues are present) and a read-only list of <see cref="LintIssue"/> objects
+    ///     describing all issues found.
     /// </returns>
     /// <exception cref="ArgumentException">Thrown when no paths are provided.</exception>
-    internal static (Requirements? Requirements, IReadOnlyList<LintIssue> Issues) Load(string[] paths)
+    internal static LoadResult Load(string[] paths)
     {
         if (paths == null || paths.Length == 0)
         {
@@ -95,9 +96,8 @@ internal static class RequirementsLoader
         }
 
         // Return null requirements if any error-level issues were found
-        return issues.Any(i => i.Severity == LintSeverity.Error)
-            ? (null, issues)
-            : (requirements, issues);
+        var hasErrors = issues.Any(i => i.Severity == LintSeverity.Error);
+        return new LoadResult(hasErrors ? null : requirements, issues);
     }
 
     /// <summary>

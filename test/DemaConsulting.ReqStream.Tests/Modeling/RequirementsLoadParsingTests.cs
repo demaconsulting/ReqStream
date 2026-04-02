@@ -23,10 +23,10 @@ using DemaConsulting.ReqStream.Modeling;
 namespace DemaConsulting.ReqStream.Tests.Modeling;
 
 /// <summary>
-/// Unit tests for Requirements YAML reading functionality.
+/// Unit tests for Requirements YAML loading and model parsing functionality.
 /// </summary>
 [TestClass]
-public class RequirementsReadTests
+public class RequirementsLoadParsingTests
 {
     private string _testDirectory = string.Empty;
 
@@ -56,7 +56,7 @@ public class RequirementsReadTests
     /// Test reading a simple YAML file with a single requirement.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_SimpleRequirement_ParsesCorrectly()
+    public void Requirements_Load_SimpleRequirement_ParsesCorrectly()
     {
         var yamlContent = @"---
 sections:
@@ -68,7 +68,9 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = Requirements.Read(filePath);
+        var result = Requirements.Load(filePath);
+        Assert.IsFalse(result.HasErrors);
+        var requirements = result.Requirements;
 
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
@@ -82,7 +84,7 @@ sections:
     /// Test reading a requirement with tests.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_RequirementWithTests_ParsesTestsCorrectly()
+    public void Requirements_Load_RequirementWithTests_ParsesTestsCorrectly()
     {
         var yamlContent = @"---
 sections:
@@ -98,7 +100,9 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = Requirements.Read(filePath);
+        var result = Requirements.Load(filePath);
+        Assert.IsFalse(result.HasErrors);
+        var requirements = result.Requirements;
 
         Assert.IsNotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
@@ -113,7 +117,7 @@ sections:
     /// Test reading a requirement with child requirements.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_RequirementWithChildren_ParsesChildrenCorrectly()
+    public void Requirements_Load_RequirementWithChildren_ParsesChildrenCorrectly()
     {
         var yamlContent = @"---
 sections:
@@ -128,7 +132,9 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = Requirements.Read(filePath);
+        var result = Requirements.Load(filePath);
+        Assert.IsFalse(result.HasErrors);
+        var requirements = result.Requirements;
 
         Assert.IsNotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
@@ -142,7 +148,7 @@ sections:
     /// Test reading a requirement with justification.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_RequirementWithJustification_ParsesJustificationCorrectly()
+    public void Requirements_Load_RequirementWithJustification_ParsesJustificationCorrectly()
     {
         var yamlContent = @"---
 sections:
@@ -157,7 +163,9 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = Requirements.Read(filePath);
+        var result = Requirements.Load(filePath);
+        Assert.IsFalse(result.HasErrors);
+        var requirements = result.Requirements;
 
         Assert.IsNotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
@@ -172,7 +180,7 @@ sections:
     /// Test reading nested sections.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_NestedSections_ParsesHierarchyCorrectly()
+    public void Requirements_Load_NestedSections_ParsesHierarchyCorrectly()
     {
         var yamlContent = @"---
 sections:
@@ -190,7 +198,9 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = Requirements.Read(filePath);
+        var result = Requirements.Load(filePath);
+        Assert.IsFalse(result.HasErrors);
+        var requirements = result.Requirements;
 
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
@@ -206,7 +216,7 @@ sections:
     /// Test reading test mappings that are separate from requirements.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_TestMappings_AppliesMappingsCorrectly()
+    public void Requirements_Load_TestMappings_AppliesMappingsCorrectly()
     {
         var yamlContent = @"---
 sections:
@@ -224,7 +234,9 @@ mappings:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = Requirements.Read(filePath);
+        var result = Requirements.Load(filePath);
+        Assert.IsFalse(result.HasErrors);
+        var requirements = result.Requirements;
 
         Assert.IsNotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
@@ -238,7 +250,7 @@ mappings:
     /// Test reading a file with includes.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_WithIncludes_MergesFilesCorrectly()
+    public void Requirements_Load_WithIncludes_MergesFilesCorrectly()
     {
         var mainYaml = @"---
 sections:
@@ -262,7 +274,9 @@ sections:
         File.WriteAllText(mainPath, mainYaml);
         File.WriteAllText(includedPath, includedYaml);
 
-        var requirements = Requirements.Read(mainPath);
+        var result = Requirements.Load(mainPath);
+        Assert.IsFalse(result.HasErrors);
+        var requirements = result.Requirements;
 
         Assert.IsNotNull(requirements);
         Assert.HasCount(2, requirements.Sections);
@@ -276,7 +290,7 @@ sections:
     /// Test that identical sections are merged.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_IdenticalSections_MergesCorrectly()
+    public void Requirements_Load_IdenticalSections_MergesCorrectly()
     {
         var mainYaml = @"---
 sections:
@@ -300,7 +314,9 @@ sections:
         File.WriteAllText(mainPath, mainYaml);
         File.WriteAllText(includedPath, includedYaml);
 
-        var requirements = Requirements.Read(mainPath);
+        var result = Requirements.Load(mainPath);
+        Assert.IsFalse(result.HasErrors);
+        var requirements = result.Requirements;
 
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
@@ -314,7 +330,7 @@ sections:
     /// Test that duplicate requirement IDs throw an exception.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_DuplicateRequirementId_ThrowsException()
+    public void Requirements_Load_DuplicateRequirementId_ThrowsException()
     {
         var yamlContent = @"---
 sections:
@@ -328,16 +344,18 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
-        Assert.Contains("SYS-SEC-001", ex.Message);
-        Assert.Contains("Duplicate requirement ID", ex.Message);
+        var result = Requirements.Load(filePath);
+        Assert.IsTrue(result.HasErrors);
+        Assert.IsNull(result.Requirements);
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("SYS-SEC-001")));
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Duplicate requirement ID")));
     }
 
     /// <summary>
     /// Test that include loops are prevented.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_IncludeLoop_DoesNotCauseInfiniteLoop()
+    public void Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop()
     {
         var fileA = @"---
 sections:
@@ -364,7 +382,9 @@ includes:
         File.WriteAllText(pathA, fileA);
         File.WriteAllText(pathB, fileB);
 
-        var requirements = Requirements.Read(pathA);
+        var result = Requirements.Load(pathA);
+        Assert.IsFalse(result.HasErrors);
+        var requirements = result.Requirements;
 
         Assert.IsNotNull(requirements);
         Assert.HasCount(2, requirements.Sections);
@@ -374,20 +394,22 @@ includes:
     /// Test that file not found throws an exception.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_FileNotFound_ThrowsException()
+    public void Requirements_Load_FileNotFound_ThrowsException()
     {
         var nonExistentPath = Path.Combine(_testDirectory, "nonexistent.yaml");
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(nonExistentPath));
-        Assert.Contains("File not found", ex.Message);
-        Assert.Contains(nonExistentPath, ex.Message);
+        var result = Requirements.Load(nonExistentPath);
+        Assert.IsTrue(result.HasErrors);
+        Assert.IsNull(result.Requirements);
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("File not found")));
+        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(nonExistentPath)));
     }
 
     /// <summary>
     /// Test that an invalid YAML content (schema error) throws an InvalidOperationException with the file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_InvalidYamlContent_ThrowsExceptionWithFileLocation()
+    public void Requirements_Load_InvalidYamlContent_ThrowsExceptionWithFileLocation()
     {
         var yamlContent = @"---
 sections:
@@ -399,24 +421,28 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
-        Assert.Contains("Unknown field 'text' in requirement", ex.Message);
-        Assert.Contains(filePath, ex.Message);
-        Assert.Contains($"{filePath}(", ex.Message);
+        var result = Requirements.Load(filePath);
+        Assert.IsTrue(result.HasErrors);
+        Assert.IsNull(result.Requirements);
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Unknown field 'text' in requirement")));
+        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(filePath)));
+        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains($"{filePath}(")));
     }
 
     /// <summary>
     /// Test reading an empty YAML file.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_EmptyFile_ReturnsEmptyRequirements()
+    public void Requirements_Load_EmptyFile_ReturnsEmptyRequirements()
     {
         var yamlContent = @"---
 ";
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = Requirements.Read(filePath);
+        var result = Requirements.Load(filePath);
+        Assert.IsFalse(result.HasErrors);
+        var requirements = result.Requirements;
 
         Assert.IsNotNull(requirements);
         Assert.IsEmpty(requirements.Sections);
@@ -427,7 +453,7 @@ sections:
     /// Test reading a complex nested structure.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_ComplexStructure_ParsesCorrectly()
+    public void Requirements_Load_ComplexStructure_ParsesCorrectly()
     {
         var yamlContent = @"---
 sections:
@@ -463,7 +489,9 @@ mappings:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = Requirements.Read(filePath);
+        var result = Requirements.Load(filePath);
+        Assert.IsFalse(result.HasErrors);
+        var requirements = result.Requirements;
 
         Assert.IsNotNull(requirements);
         Assert.HasCount(2, requirements.Sections);
@@ -495,7 +523,7 @@ mappings:
     ///     Test that blank requirement ID throws an exception with file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_BlankRequirementId_ThrowsExceptionWithFileLocation()
+    public void Requirements_Load_BlankRequirementId_ThrowsExceptionWithFileLocation()
     {
         var yamlContent = @"---
 sections:
@@ -507,16 +535,18 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
-        Assert.Contains("Requirement 'id' cannot be blank", ex.Message);
-        Assert.Contains(filePath, ex.Message);
+        var result = Requirements.Load(filePath);
+        Assert.IsTrue(result.HasErrors);
+        Assert.IsNull(result.Requirements);
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Requirement 'id' cannot be blank")));
+        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(filePath)));
     }
 
     /// <summary>
     ///     Test that blank requirement title throws an exception with file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_BlankRequirementTitle_ThrowsExceptionWithFileLocation()
+    public void Requirements_Load_BlankRequirementTitle_ThrowsExceptionWithFileLocation()
     {
         var yamlContent = @"---
 sections:
@@ -528,16 +558,18 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
-        Assert.Contains("Requirement 'title' cannot be blank", ex.Message);
-        Assert.Contains(filePath, ex.Message);
+        var result = Requirements.Load(filePath);
+        Assert.IsTrue(result.HasErrors);
+        Assert.IsNull(result.Requirements);
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Requirement 'title' cannot be blank")));
+        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(filePath)));
     }
 
     /// <summary>
     ///     Test that blank section title throws an exception with file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_BlankSectionTitle_ThrowsExceptionWithFileLocation()
+    public void Requirements_Load_BlankSectionTitle_ThrowsExceptionWithFileLocation()
     {
         var yamlContent = @"---
 sections:
@@ -549,16 +581,18 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
-        Assert.Contains("Section 'title' cannot be blank", ex.Message);
-        Assert.Contains(filePath, ex.Message);
+        var result = Requirements.Load(filePath);
+        Assert.IsTrue(result.HasErrors);
+        Assert.IsNull(result.Requirements);
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Section 'title' cannot be blank")));
+        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(filePath)));
     }
 
     /// <summary>
     ///     Test that blank test name in requirement throws an exception with file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_BlankTestNameInRequirement_ThrowsExceptionWithFileLocation()
+    public void Requirements_Load_BlankTestNameInRequirement_ThrowsExceptionWithFileLocation()
     {
         var yamlContent = @"---
 sections:
@@ -574,16 +608,18 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
-        Assert.Contains("Test name cannot be blank", ex.Message);
-        Assert.Contains(filePath, ex.Message);
+        var result = Requirements.Load(filePath);
+        Assert.IsTrue(result.HasErrors);
+        Assert.IsNull(result.Requirements);
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Test name cannot be blank")));
+        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(filePath)));
     }
 
     /// <summary>
     ///     Test that blank test name in mapping throws an exception with file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_BlankTestNameInMapping_ThrowsExceptionWithFileLocation()
+    public void Requirements_Load_BlankTestNameInMapping_ThrowsExceptionWithFileLocation()
     {
         var yamlContent = @"---
 sections:
@@ -601,16 +637,18 @@ mappings:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
-        Assert.Contains("Test name cannot be blank", ex.Message);
-        Assert.Contains(filePath, ex.Message);
+        var result = Requirements.Load(filePath);
+        Assert.IsTrue(result.HasErrors);
+        Assert.IsNull(result.Requirements);
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Test name cannot be blank")));
+        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(filePath)));
     }
 
     /// <summary>
     ///     Test that blank mapping ID throws an exception with file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_BlankMappingId_ThrowsExceptionWithFileLocation()
+    public void Requirements_Load_BlankMappingId_ThrowsExceptionWithFileLocation()
     {
         var yamlContent = @"---
 sections:
@@ -627,16 +665,18 @@ mappings:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
-        Assert.Contains("Mapping 'id' cannot be blank", ex.Message);
-        Assert.Contains(filePath, ex.Message);
+        var result = Requirements.Load(filePath);
+        Assert.IsTrue(result.HasErrors);
+        Assert.IsNull(result.Requirements);
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Mapping 'id' cannot be blank")));
+        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(filePath)));
     }
 
     /// <summary>
     ///     Test that duplicate requirement ID message includes file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_DuplicateRequirementId_ExceptionIncludesFileLocation()
+    public void Requirements_Load_DuplicateRequirementId_ExceptionIncludesFileLocation()
     {
         var yamlContent = @"---
 sections:
@@ -650,17 +690,19 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
-        Assert.Contains("SYS-SEC-001", ex.Message);
-        Assert.Contains("Duplicate requirement ID", ex.Message);
-        Assert.Contains(filePath, ex.Message);
+        var result = Requirements.Load(filePath);
+        Assert.IsTrue(result.HasErrors);
+        Assert.IsNull(result.Requirements);
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("SYS-SEC-001")));
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Duplicate requirement ID")));
+        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(filePath)));
     }
 
     /// <summary>
     ///     Test reading multiple files with params array.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_MultipleFiles_MergesAllFiles()
+    public void Requirements_Load_MultipleFiles_MergesAllFiles()
     {
         var file1Yaml = @"---
 sections:
@@ -690,7 +732,9 @@ sections:
         File.WriteAllText(file2Path, file2Yaml);
         File.WriteAllText(file3Path, file3Yaml);
 
-        var requirements = Requirements.Read(file1Path, file2Path, file3Path);
+        var result = Requirements.Load(file1Path, file2Path, file3Path);
+        Assert.IsFalse(result.HasErrors);
+        var requirements = result.Requirements;
 
         Assert.IsNotNull(requirements);
         Assert.HasCount(3, requirements.Sections);
@@ -706,7 +750,7 @@ sections:
     ///     Test reading multiple files that merge sections.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_MultipleFilesWithSameSections_MergesSections()
+    public void Requirements_Load_MultipleFilesWithSameSections_MergesSections()
     {
         var file1Yaml = @"---
 sections:
@@ -727,7 +771,9 @@ sections:
         File.WriteAllText(file1Path, file1Yaml);
         File.WriteAllText(file2Path, file2Yaml);
 
-        var requirements = Requirements.Read(file1Path, file2Path);
+        var result = Requirements.Load(file1Path, file2Path);
+        Assert.IsFalse(result.HasErrors);
+        var requirements = result.Requirements;
 
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
@@ -741,7 +787,7 @@ sections:
     ///     Test reading single file with params array (backwards compatibility).
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_SingleFileWithParamsArray_WorksCorrectly()
+    public void Requirements_Load_SingleFileWithParamsArray_WorksCorrectly()
     {
         var yamlContent = @"---
 sections:
@@ -753,7 +799,9 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = Requirements.Read(filePath);
+        var result = Requirements.Load(filePath);
+        Assert.IsFalse(result.HasErrors);
+        var requirements = result.Requirements;
 
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
@@ -766,9 +814,9 @@ sections:
     ///     Test that calling Read with no arguments throws ArgumentException.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_NoArguments_ThrowsArgumentException()
+    public void Requirements_Load_NoArguments_ThrowsArgumentException()
     {
-        var ex = Assert.ThrowsExactly<ArgumentException>(() => Requirements.Read());
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Requirements.Load());
         Assert.Contains("At least one file path must be provided", ex.Message);
     }
 
@@ -776,9 +824,9 @@ sections:
     ///     Test that calling Read with null throws ArgumentException.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_NullArgument_ThrowsArgumentException()
+    public void Requirements_Load_NullArgument_ThrowsArgumentException()
     {
-        var ex = Assert.ThrowsExactly<ArgumentException>(() => Requirements.Read(null!));
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Requirements.Load(null!));
         Assert.Contains("At least one file path must be provided", ex.Message);
     }
 
@@ -786,7 +834,7 @@ sections:
     ///     Test that duplicate IDs across multiple files are detected.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_MultipleFilesWithDuplicateIds_ThrowsException()
+    public void Requirements_Load_MultipleFilesWithDuplicateIds_ThrowsException()
     {
         var file1Yaml = @"---
 sections:
@@ -807,17 +855,19 @@ sections:
         File.WriteAllText(file1Path, file1Yaml);
         File.WriteAllText(file2Path, file2Yaml);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(file1Path, file2Path));
-        Assert.Contains("SYS-SEC-001", ex.Message);
-        Assert.Contains("Duplicate requirement ID", ex.Message);
-        Assert.Contains(file2Path, ex.Message);
+        var result = Requirements.Load(file1Path, file2Path);
+        Assert.IsTrue(result.HasErrors);
+        Assert.IsNull(result.Requirements);
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("SYS-SEC-001")));
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Duplicate requirement ID")));
+        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(file2Path)));
     }
 
     /// <summary>
     ///     Test reading a requirement with tags.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_RequirementWithTags_ParsesTagsCorrectly()
+    public void Requirements_Load_RequirementWithTags_ParsesTagsCorrectly()
     {
         var yamlContent = @"---
 sections:
@@ -832,7 +882,9 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var requirements = Requirements.Read(filePath);
+        var result = Requirements.Load(filePath);
+        Assert.IsFalse(result.HasErrors);
+        var requirements = result.Requirements;
 
         Assert.IsNotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
@@ -846,7 +898,7 @@ sections:
     ///     Test that blank tag name throws an exception with file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_BlankTagName_ThrowsExceptionWithFileLocation()
+    public void Requirements_Load_BlankTagName_ThrowsExceptionWithFileLocation()
     {
         var yamlContent = @"---
 sections:
@@ -862,16 +914,18 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
-        Assert.Contains("Tag name cannot be blank", ex.Message);
-        Assert.Contains(filePath, ex.Message);
+        var result = Requirements.Load(filePath);
+        Assert.IsTrue(result.HasErrors);
+        Assert.IsNull(result.Requirements);
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Tag name cannot be blank")));
+        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(filePath)));
     }
 
     /// <summary>
     ///     Test that circular requirements (A -> B -> A) throw an exception at read time.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_CircularRequirements_ThrowsInvalidOperationException()
+    public void Requirements_Load_CircularRequirements_ThrowsInvalidOperationException()
     {
         var yamlContent = @"---
 sections:
@@ -889,17 +943,19 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
-        Assert.Contains("Circular requirement reference detected", ex.Message);
-        Assert.Contains("REQ-A", ex.Message);
-        Assert.Contains("REQ-B", ex.Message);
+        var result = Requirements.Load(filePath);
+        Assert.IsTrue(result.HasErrors);
+        Assert.IsNull(result.Requirements);
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Circular requirement reference detected")));
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("REQ-A")));
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("REQ-B")));
     }
 
     /// <summary>
     ///     Test that a self-referencing requirement (A -> A) throws an exception at read time.
     /// </summary>
     [TestMethod]
-    public void Requirements_Read_SelfReferencingRequirement_ThrowsInvalidOperationException()
+    public void Requirements_Load_SelfReferencingRequirement_ThrowsInvalidOperationException()
     {
         var yamlContent = @"---
 sections:
@@ -913,8 +969,10 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
-        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => Requirements.Read(filePath));
-        Assert.Contains("Circular requirement reference detected", ex.Message);
-        Assert.Contains("REQ-A", ex.Message);
+        var result = Requirements.Load(filePath);
+        Assert.IsTrue(result.HasErrors);
+        Assert.IsNull(result.Requirements);
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Circular requirement reference detected")));
+        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("REQ-A")));
     }
 }
