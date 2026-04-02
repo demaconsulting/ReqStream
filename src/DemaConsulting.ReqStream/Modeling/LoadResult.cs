@@ -18,6 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.ReqStream.Cli;
+
 namespace DemaConsulting.ReqStream.Modeling;
 
 /// <summary>
@@ -55,23 +57,22 @@ public sealed class LoadResult
     public bool HasErrors => Issues.Any(i => i.Severity == LintSeverity.Error);
 
     /// <summary>
-    ///     Reports all lint issues to the supplied output delegates.
-    ///     Warning-level issues are sent to <paramref name="writeMessage"/>;
-    ///     error-level issues are sent to <paramref name="writeError"/>.
+    ///     Reports all lint issues to the supplied context.
+    ///     Warning-level issues are sent to <see cref="Context.WriteLine"/>;
+    ///     error-level issues are sent to <see cref="Context.WriteError"/>.
     /// </summary>
-    /// <param name="writeMessage">Delegate for non-fatal (warning) messages.</param>
-    /// <param name="writeError">Delegate for fatal (error) messages.</param>
-    public void ReportIssues(Action<string> writeMessage, Action<string> writeError)
+    /// <param name="context">The context to report issues to.</param>
+    public void ReportIssues(Context context)
     {
         foreach (var issue in Issues)
         {
             if (issue.Severity == LintSeverity.Error)
             {
-                writeError(issue.ToString());
+                context.WriteError(issue.ToString());
             }
             else
             {
-                writeMessage(issue.ToString());
+                context.WriteLine(issue.ToString());
             }
         }
     }

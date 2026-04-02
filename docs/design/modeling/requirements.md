@@ -45,10 +45,10 @@ child references, applying test mappings, and exporting content to Markdown repo
 | `Requirements` | `Requirements?` | Parsed tree; `null` when error-level issues are present |
 | `Issues` | `IReadOnlyList<LintIssue>` | All lint issues collected during loading |
 | `HasErrors` | `bool` | `true` when any issue has `LintSeverity.Error` |
-| `ReportIssues(writeMessage, writeError)` | `void` | Routes each issue to the appropriate delegate |
+| `ReportIssues(context)` | `void` | Routes each issue to the context output |
 
-`ReportIssues` accepts two `Action<string>` delegates: `writeMessage` for warnings and `writeError`
-for errors. This keeps `LoadResult` free of any dependency on the `Cli` layer.
+`ReportIssues` accepts a `Context` argument. Warning-level issues are sent to `context.WriteLine`;
+error-level issues are sent to `context.WriteError`.
 
 ## YAML Intermediate Types
 

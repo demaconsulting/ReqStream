@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.ReqStream.Cli;
 using DemaConsulting.ReqStream.Modeling;
 
 namespace DemaConsulting.ReqStream.Tests.Modeling;
@@ -241,10 +242,10 @@ sections:
     }
 
     /// <summary>
-    /// Test that ReportIssues routes error-level issues to the writeError delegate.
+    /// Test that ReportIssues routes error-level issues to the context error output.
     /// </summary>
     [TestMethod]
-    public void LoadResult_ReportIssues_ErrorIssue_RoutesToWriteError()
+    public void LoadResult_ReportIssues_ErrorIssue_SetsContextError()
     {
         var yamlContent = @"---
 sections:
@@ -259,32 +260,32 @@ sections:
 
         var result = Requirements.Load(filePath);
 
-        var messages = new List<string>();
-        var errors = new List<string>();
-        result.ReportIssues(messages.Add, errors.Add);
+        var logFile = Path.Combine(_testDirectory, "report-issues-error.log");
+        using var context = Context.Create(["--silent", "--log", logFile]);
+        result.ReportIssues(context);
 
-        Assert.IsTrue(errors.Count > 0);
-        Assert.AreEqual(0, messages.Count);
-        Assert.IsTrue(errors.Any(e => e.Contains("unknown_field")));
+        Assert.AreEqual(1, context.ExitCode);
+        var log = File.ReadAllText(logFile);
+        Assert.IsTrue(log.Contains("unknown_field"));
     }
 
     /// <summary>
-    /// Test that ReportIssues routes warning-level issues to the writeMessage delegate.
+    /// Test that ReportIssues routes warning-level issues to context normal output.
     /// </summary>
     [TestMethod]
-    public void LoadResult_ReportIssues_WarningIssue_RoutesToWriteMessage()
+    public void LoadResult_ReportIssues_WarningIssue_DoesNotSetContextError()
     {
         var warningResult = new LoadResult(
             new Requirements(),
             [new LintIssue("file.yaml", LintSeverity.Warning, "A warning")]);
 
-        var messages = new List<string>();
-        var errors = new List<string>();
-        warningResult.ReportIssues(messages.Add, errors.Add);
+        var logFile = Path.Combine(_testDirectory, "report-issues-warning.log");
+        using var context = Context.Create(["--silent", "--log", logFile]);
+        warningResult.ReportIssues(context);
 
-        Assert.AreEqual(1, messages.Count);
-        Assert.AreEqual(0, errors.Count);
-        Assert.IsTrue(messages[0].Contains("A warning"));
+        Assert.AreEqual(0, context.ExitCode);
+        var log = File.ReadAllText(logFile);
+        Assert.IsTrue(log.Contains("A warning"));
     }
 
     /// <summary>
@@ -305,12 +306,12 @@ sections:
 
         var result = Requirements.Load(filePath);
 
-        var messages = new List<string>();
-        var errors = new List<string>();
-        result.ReportIssues(messages.Add, errors.Add);
+        var logFile = Path.Combine(_testDirectory, "report-issues-none.log");
+        using var context = Context.Create(["--silent", "--log", logFile]);
+        result.ReportIssues(context);
 
-        Assert.AreEqual(0, messages.Count);
-        Assert.AreEqual(0, errors.Count);
+        Assert.AreEqual(0, context.ExitCode);
+        Assert.AreEqual(string.Empty, File.ReadAllText(logFile));
     }
 
     /// <summary>

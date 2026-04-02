@@ -123,7 +123,7 @@ internal static class Program
             }
 
             var result = Requirements.Load(context.RequirementsFiles.ToArray());
-            result.ReportIssues(context.WriteLine, context.WriteError);
+            result.ReportIssues(context);
 
             if (result.Issues.Count == 0)
             {
@@ -195,7 +195,7 @@ internal static class Program
         var result = Requirements.Load(context.RequirementsFiles.ToArray());
 
         // Report any lint issues found during loading
-        result.ReportIssues(context.WriteLine, context.WriteError);
+        result.ReportIssues(context);
 
         // Abort if loading failed due to lint errors
         if (result.Requirements == null)
