@@ -77,7 +77,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = Requirements.Load(reqPath).Requirements!;
 
         // Create TRX file
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -139,7 +139,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = Requirements.Load(reqPath).Requirements!;
 
         // Create TRX file
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -187,7 +187,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = Requirements.Load(reqPath).Requirements!;
 
         // Create TRX file with one failure
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -244,7 +244,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = Requirements.Load(reqPath).Requirements!;
 
         // Create TRX file with only one test
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -298,7 +298,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = Requirements.Load(reqPath).Requirements!;
 
         // Create TRX file
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -355,7 +355,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = Requirements.Load(reqPath).Requirements!;
 
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements);
@@ -382,7 +382,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = Requirements.Load(reqPath).Requirements!;
 
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements);
@@ -415,7 +415,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = Requirements.Load(reqPath).Requirements!;
 
         // Create TRX file
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -460,7 +460,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = Requirements.Load(reqPath).Requirements!;
 
         // Create TraceMatrix with no test results
         var matrix = new TraceMatrix(requirements);
@@ -495,7 +495,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = Requirements.Load(reqPath).Requirements!;
 
         // Create TRX file
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -548,7 +548,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = Requirements.Load(reqPath).Requirements!;
 
         // Create test results
         var testResults = new DemaConsulting.TestResults.TestResults { Name = "TestRun" };
@@ -618,7 +618,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = Requirements.Load(reqPath).Requirements!;
 
         // Create test results
         var testResults = new DemaConsulting.TestResults.TestResults { Name = "TestRun" };
@@ -676,7 +676,7 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Read(reqPath);
+        var requirements = Requirements.Load(reqPath).Requirements!;
 
         var matrix = new TraceMatrix(requirements);
 

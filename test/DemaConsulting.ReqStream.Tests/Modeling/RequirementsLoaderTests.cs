@@ -59,9 +59,9 @@ public class RequirementsLoaderTests
     /// </summary>
     private static (int exitCode, string errors) RunLint(params string[] files)
     {
-        var (_, issues) = Requirements.Load(files);
-        var errors = string.Join(Environment.NewLine, issues.Select(i => i.ToString()));
-        var exitCode = issues.Any(i => i.Severity == LintSeverity.Error) ? 1 : 0;
+        var result = Requirements.Load(files);
+        var errors = string.Join(Environment.NewLine, result.Issues.Select(i => i.ToString()));
+        var exitCode = result.HasErrors ? 1 : 0;
         return (exitCode, errors);
     }
 
@@ -71,9 +71,9 @@ public class RequirementsLoaderTests
     /// </summary>
     private static (int exitCode, string output, string errors) RunLintWithOutput(params string[] files)
     {
-        var (_, issues) = Requirements.Load(files);
-        var errors = string.Join(Environment.NewLine, issues.Select(i => i.ToString()));
-        var exitCode = issues.Any(i => i.Severity == LintSeverity.Error) ? 1 : 0;
+        var result = Requirements.Load(files);
+        var errors = string.Join(Environment.NewLine, result.Issues.Select(i => i.ToString()));
+        var exitCode = result.HasErrors ? 1 : 0;
         var output = exitCode == 0 && files.Length > 0 ? $"{files[0]}: No issues found" : string.Empty;
         return (exitCode, output, errors);
     }

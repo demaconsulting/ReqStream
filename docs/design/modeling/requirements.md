@@ -2,10 +2,10 @@
 
 ## Overview
 
-The three classes `Requirements`, `Section`, and `Requirement` together form the domain model for
-requirement data in ReqStream. They are responsible for reading YAML files, merging hierarchical
-section trees, validating data integrity, preventing infinite include loops and circular child
-references, applying test mappings, and exporting content to Markdown reports.
+The classes `Requirements`, `Section`, `Requirement`, and `LoadResult` together form the domain
+model for requirement data in ReqStream. They are responsible for loading YAML files, merging
+hierarchical section trees, validating data integrity, preventing infinite include loops and circular
+child references, applying test mappings, and exporting content to Markdown reports.
 
 ## Data Model
 
@@ -34,14 +34,21 @@ references, applying test mappings, and exporting content to Markdown reports.
 
 ### `Requirements`
 
-`Requirements` extends `Section` and acts as the root of the tree. In addition to the properties
-inherited from `Section`, it maintains two private fields that span the lifetime of a load
-operation:
+`Requirements` extends `Section` and acts as the root of the tree.
 
-| Field | Type | Purpose |
-| ----- | ---- | ------- |
-| `_includedFiles` | `HashSet<string>` | Absolute paths of files already processed; prevents infinite include loops |
-| `_allRequirements` | `Dictionary<string, Requirement>` | Maps requirement ID to `Requirement`; detects duplicates |
+### `LoadResult`
+
+`LoadResult` encapsulates the outcome of a `Requirements.Load` call.
+
+| Member | Type | Notes |
+| ------ | ---- | ----- |
+| `Requirements` | `Requirements?` | Parsed tree; `null` when error-level issues are present |
+| `Issues` | `IReadOnlyList<LintIssue>` | All lint issues collected during loading |
+| `HasErrors` | `bool` | `true` when any issue has `LintSeverity.Error` |
+| `ReportIssues(writeMessage, writeError)` | `void` | Routes each issue to the appropriate delegate |
+
+`ReportIssues` accepts two `Action<string>` delegates: `writeMessage` for warnings and `writeError`
+for errors. This keeps `LoadResult` free of any dependency on the `Cli` layer.
 
 ## YAML Intermediate Types
 
@@ -55,34 +62,38 @@ YAML is deserialized into a set of intermediate types using `YamlDotNet` with th
 | `YamlRequirement` | `requirements[]` entries | Contains `id`, `title`, `justification`, `tests`, `children`, `tags` |
 | `YamlMapping` | `mappings[]` entries | Contains `id`, `tests` |
 
-These intermediate types are discarded after `ReadFile` completes; the resulting `Requirement`,
+These intermediate types are discarded after `LoadFile` completes; the resulting `Requirement`,
 `Section`, and `Requirements` objects are the only long-lived representations.
 
 ## Methods
 
-### `Requirements.Read(paths)`
+### `Requirements.Load(paths)`
 
-`Read` is the static factory method that constructs and returns a fully loaded `Requirements`
-instance. It calls `ReadFile` for each supplied path to merge content into the tree, then calls
-`ValidateCycles()` to confirm the child-requirement graph is acyclic before returning.
+`Load` is the single static factory method on `Requirements`. It delegates to
+`RequirementsLoader.Load` and returns a `LoadResult` containing:
 
-### `ReadFile(path)`
+- The parsed `Requirements` tree (or `null` if any error-level issues were found), and
+- The complete list of `LintIssue` objects collected during the walk.
 
-`ReadFile` loads a single YAML file and merges its content into the `Requirements` tree. Four
+Callers that need to abort on errors check `result.HasErrors` or `result.Requirements == null`.
+Callers that need to surface issues to the user call `result.ReportIssues(writeMessage, writeError)`.
+
+### `LoadFile(path)`
+
+`LoadFile` loads a single YAML file and merges its content into the `Requirements` tree. Four
 design points govern its behavior:
 
-- **Deduplication**: `path` is normalized to an absolute path and checked against `_includedFiles`
+- **Deduplication**: `path` is normalized to an absolute path and checked against `visitedFiles`
   before any work is done. If already present, the method returns immediately. This prevents
   infinite loops when files include each other directly or transitively.
 - **YAML deserialization**: the file text is deserialized into a `YamlDocument` using `YamlDotNet`
   with `HyphenatedNamingConvention`. An empty or `null` document is silently accepted.
 - **Validation and merging**: each section is validated (title must not be blank) and each
   requirement is validated (ID and title must not be blank; ID must not duplicate an entry already
-  in `_allRequirements`). Validated sections are merged into the tree via `MergeSection`. Mapping
-  entries append additional test IDs to already-registered requirements.
+  seen). Validated sections are merged into the tree via `MergeSection`. Mapping entries append
+  additional test IDs to already-registered requirements.
 - **Recursive includes**: each path in the document's `includes` block is resolved relative to the
-  current file's directory and passed to `ReadFile` recursively, enabling modular file
-  organization.
+  current file's directory and passed to `LoadFile` recursively, enabling modular file organization.
 
 ### `MergeSection(parent, yamlSection)`
 
@@ -111,10 +122,10 @@ references. It is called once after all files are loaded.
 **Algorithm** (per requirement):
 
 1. If the ID is in `visited`, return immediately.
-2. If the ID is in `visiting`, a cycle is detected; throw `InvalidOperationException` with the
-   cycle path formatted as `REQ-A -> REQ-B -> ... -> REQ-A`.
+2. If the ID is in `visiting`, a cycle is detected; add an error `LintIssue` with the cycle path
+   formatted as `REQ-A -> REQ-B -> ... -> REQ-A`.
 3. Add the ID to `visiting` and `path`.
-4. Recurse into each child ID present in `_allRequirements`.
+4. Recurse into each child ID present in `allRequirements`.
 5. Remove the ID from `visiting` and `path`; add it to `visited`.
 
 Because `ValidateCycles` runs before any downstream analysis, `TraceMatrix.CollectAllTests` can
@@ -141,16 +152,18 @@ matching tag are included in the output.
 | Test name | Blank entry in `tests` list | `Test name cannot be blank` |
 | Mapping ID | Blank | `Mapping requirement ID cannot be blank` |
 
-All validation errors throw `InvalidOperationException` and include the source file path for
-actionable debugging.
+All validation errors are reported as `LintSeverity.Error` `LintIssue` objects and include the
+source file path for actionable debugging. When any error-level issue is present, `LoadResult.Requirements`
+is `null` and `LoadResult.HasErrors` returns `true`.
 
 ## Interactions with Other Units
 
 | Unit | Nature of interaction |
 | ---- | --------------------- |
-| `Program` | Calls `Requirements.Read`; passes file paths from `Context.RequirementsFiles` |
+| `Program` | Calls `Requirements.Load`; passes file paths from `Context.RequirementsFiles`; |
+| | calls `result.ReportIssues(context.WriteLine, context.WriteError)` |
 | `TraceMatrix` | Receives the populated `Requirements` root and iterates the tree |
-| `Validation` | Exercises `Requirements.Read` with fixture YAML files in tests |
+| `Validation` | Exercises `Requirements.Load` with fixture YAML files in tests |
 
 ## References
 
