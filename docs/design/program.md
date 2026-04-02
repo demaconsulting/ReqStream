@@ -60,7 +60,7 @@ order; if a step applies, execution returns immediately without reaching later s
 | 2 | (always) | Call `PrintBanner` |
 | 3 | `context.Help` is `true` | Call `PrintHelp`; return |
 | 4 | `context.Validate` is `true` | Call `Validation.Run(context)`; return |
-| 5 | `context.Lint` is `true` | Call `Requirements.Load(context.RequirementsFiles)` and report any lint issues; return |
+| 5 | `context.Lint` is `true` | Call `Requirements.Load(context.RequirementsFiles)`; report lint issues; return |
 | 6 | (default) | Call `ProcessRequirements(context)` |
 
 ### `PrintBanner`
