@@ -78,7 +78,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         // Create Windows test results
         var windowsResults = new TestResults.TestResults { Name = "WindowsRun" };
@@ -144,7 +146,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         // Create Linux test results (should not match)
         var linuxResults = new TestResults.TestResults { Name = "LinuxRun" };
@@ -185,7 +189,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         // Create Windows test results
         var windowsResults = new TestResults.TestResults { Name = "WindowsRun" };
@@ -243,7 +249,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         // Create Windows test results
         var windowsResults = new TestResults.TestResults { Name = "WindowsRun" };
@@ -331,7 +339,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         // Create test results with uppercase WINDOWS in filename
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -374,7 +384,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         // Create test results with full filename containing ubuntu
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -422,7 +434,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         // Create test results with filename containing both windows and dotnet8
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -482,7 +496,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         // Create a Windows test result file containing the shared test
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -537,7 +553,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         // Create test results with one executed and one not-executed test
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -598,7 +616,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         // Create test results with only not-executed tests
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -657,7 +677,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         // Create test results with passed, failed, and not-executed tests
         var testResults = new TestResults.TestResults { Name = "TestRun" };

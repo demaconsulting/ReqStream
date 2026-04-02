@@ -75,7 +75,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         // Create TRX file using the TestResults library
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -132,7 +134,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         // Create first TRX file (Windows, passed)
         var testResults1 = new TestResults.TestResults { Name = "WindowsRun" };
@@ -202,7 +206,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         // Create TRX with multiple tests
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -290,7 +296,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         var nonExistentPath = Path.Combine(_testDirectory, "nonexistent.trx");
 
@@ -317,7 +325,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         // Create TRX with passed and failed tests
         var testResults = new TestResults.TestResults { Name = "TestRun" };
@@ -376,7 +386,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         // Create TraceMatrix with no files
         var matrix = new TraceMatrix(requirements);
@@ -408,7 +420,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         // Create JUnit file using the TestResults library
         var testResults = new TestResults.TestResults { Name = "DataTests" };
@@ -466,7 +480,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         // Create TRX file
         var trxResults = new TestResults.TestResults { Name = "TrxRun" };
@@ -529,7 +545,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         // Create JUnit file with passed and failed tests
         var testResults = new TestResults.TestResults { Name = "JUnitTestRun" };

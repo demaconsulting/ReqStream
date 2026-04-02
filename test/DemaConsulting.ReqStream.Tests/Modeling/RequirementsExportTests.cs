@@ -69,7 +69,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         requirements.Export(mdPath);
@@ -97,7 +99,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         requirements.Export(mdPath, depth: 3);
@@ -127,7 +131,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         requirements.Export(mdPath);
@@ -157,7 +163,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         requirements.Export(mdPath);
@@ -183,7 +191,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         var ex = Assert.ThrowsExactly<ArgumentException>(() => requirements.Export(null!));
         Assert.Contains("File path cannot be null or empty", ex.Message);
@@ -204,7 +214,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         var ex = Assert.ThrowsExactly<ArgumentException>(() => requirements.Export(string.Empty));
         Assert.Contains("File path cannot be null or empty", ex.Message);
@@ -229,7 +241,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         requirements.Export(mdPath);
@@ -251,7 +265,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         requirements.Export(mdPath);
@@ -284,7 +300,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         var mdPath = Path.Combine(_testDirectory, "justifications.md");
         requirements.ExportJustifications(mdPath);
@@ -316,7 +334,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         var mdPath = Path.Combine(_testDirectory, "justifications.md");
         requirements.ExportJustifications(mdPath, depth: 2);
@@ -342,7 +362,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         var mdPath = Path.Combine(_testDirectory, "justifications.md");
         requirements.ExportJustifications(mdPath);
@@ -393,7 +415,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         var mdPath = Path.Combine(_testDirectory, "justifications.md");
         requirements.ExportJustifications(mdPath);
@@ -432,7 +456,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         var filterTags = new HashSet<string> { "security" };
@@ -472,7 +498,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         var filterTags = new HashSet<string> { "security", "data-integrity" };
@@ -502,7 +530,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         var filterTags = new HashSet<string> { "performance" };
@@ -535,7 +565,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         requirements.Export(mdPath);
@@ -570,7 +602,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         var mdPath = Path.Combine(_testDirectory, "justifications.md");
         var filterTags = new HashSet<string> { "security" };
@@ -607,7 +641,9 @@ sections:
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
-        var requirements = Requirements.Load(reqPath).Requirements!;
+        var loadResult = Requirements.Load(reqPath);
+        Assert.IsNotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
 
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         var filterTags = new HashSet<string> { "security" };

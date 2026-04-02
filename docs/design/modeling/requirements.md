@@ -76,7 +76,7 @@ These intermediate types are discarded after `LoadFile` completes; the resulting
 - The complete list of `LintIssue` objects collected during the walk.
 
 Callers that need to abort on errors check `result.HasErrors` or `result.Requirements == null`.
-Callers that need to surface issues to the user call `result.ReportIssues(writeMessage, writeError)`.
+Callers that need to surface issues to the user call `result.ReportIssues(context)`.
 
 ### `LoadFile(path)`
 
@@ -161,7 +161,7 @@ is `null` and `LoadResult.HasErrors` returns `true`.
 | Unit | Nature of interaction |
 | ---- | --------------------- |
 | `Program` | Calls `Requirements.Load`; passes file paths from `Context.RequirementsFiles`; |
-| | calls `result.ReportIssues(context.WriteLine, context.WriteError)` |
+| | calls `result.ReportIssues(context)` |
 | `TraceMatrix` | Receives the populated `Requirements` root and iterates the tree |
 | `Validation` | Exercises `Requirements.Load` with fixture YAML files in tests |
 
