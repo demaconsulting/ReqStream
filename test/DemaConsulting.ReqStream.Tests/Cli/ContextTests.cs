@@ -64,13 +64,18 @@ public class ContextTests
         Assert.IsFalse(context.Help);
         Assert.IsFalse(context.Silent);
         Assert.IsFalse(context.Validate);
+        Assert.IsFalse(context.Lint);
         Assert.IsEmpty(context.RequirementsFiles);
         Assert.IsEmpty(context.TestFiles);
         Assert.IsNull(context.FilterTags);
+        Assert.IsNull(context.ResultsFile);
+        Assert.IsFalse(context.Enforce);
         Assert.IsNull(context.RequirementsReport);
         Assert.AreEqual(1, context.ReportDepth);
         Assert.IsNull(context.Matrix);
         Assert.AreEqual(1, context.MatrixDepth);
+        Assert.IsNull(context.JustificationsFile);
+        Assert.AreEqual(1, context.JustificationsDepth);
         Assert.AreEqual(0, context.ExitCode);
     }
 
@@ -633,5 +638,89 @@ public class ContextTests
         Assert.HasCount(1, context.FilterTags);
         Assert.Contains("security", context.FilterTags);
         Assert.AreEqual(0, context.ExitCode);
+    }
+
+    /// <summary>
+    /// Test creating a context with multiple --filter arguments merges into one set.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_MultipleFilterArguments_MergesIntoSingleSet()
+    {
+        using var context = Context.Create(["--filter", "tag1", "--filter", "tag2"]);
+
+        Assert.IsNotNull(context.FilterTags);
+        Assert.HasCount(2, context.FilterTags);
+        Assert.Contains("tag1", context.FilterTags);
+        Assert.Contains("tag2", context.FilterTags);
+        Assert.AreEqual(0, context.ExitCode);
+    }
+
+    /// <summary>
+    /// Test creating a context with lint flag.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_LintFlag_SetsLintProperty()
+    {
+        using var context = Context.Create(["--lint"]);
+
+        Assert.IsTrue(context.Lint);
+        Assert.AreEqual(0, context.ExitCode);
+    }
+
+    /// <summary>
+    /// Test creating a context with justifications file.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_JustificationsFile_SetsJustificationsFileProperty()
+    {
+        using var context = Context.Create(["--justifications", "justifications.md"]);
+
+        Assert.AreEqual("justifications.md", context.JustificationsFile);
+        Assert.AreEqual(0, context.ExitCode);
+    }
+
+    /// <summary>
+    /// Test creating a context with missing justifications filename.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_MissingJustificationsFilename_ThrowsException()
+    {
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--justifications"]));
+        Assert.Contains("--justifications requires a filename argument", ex.Message);
+    }
+
+    /// <summary>
+    /// Test creating a context with justifications depth.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_JustificationsDepth_SetsJustificationsDepthProperty()
+    {
+        using var context = Context.Create(["--justifications-depth", "3"]);
+
+        Assert.AreEqual(3, context.JustificationsDepth);
+        Assert.AreEqual(0, context.ExitCode);
+    }
+
+    /// <summary>
+    /// Test creating a context with missing justifications depth argument.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_MissingJustificationsDepth_ThrowsException()
+    {
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--justifications-depth"]));
+        Assert.Contains("--justifications-depth requires a depth argument", ex.Message);
+    }
+
+    /// <summary>
+    /// Test creating a context with invalid justifications depth.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_InvalidJustificationsDepth_ThrowsException()
+    {
+        var ex1 = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--justifications-depth", "invalid"]));
+        Assert.Contains("--justifications-depth requires a positive integer", ex1.Message);
+
+        var ex2 = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--justifications-depth", "0"]));
+        Assert.Contains("--justifications-depth requires a positive integer", ex2.Message);
     }
 }

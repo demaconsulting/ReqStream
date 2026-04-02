@@ -37,5 +37,3 @@ sections:
           - Validation_Run_WithXmlResultsFile_WritesXmlFile
           - IntegrationTest_ValidateWithResults_GeneratesTrxFile
           - IntegrationTest_ValidateWithResults_GeneratesJUnitFile
-        children:
-          - ReqStream-Val-EnforcementMode

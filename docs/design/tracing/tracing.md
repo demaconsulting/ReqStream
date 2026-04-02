@@ -26,7 +26,7 @@ The `Tracing` subsystem exposes the following interface to the rest of the tool:
 |----------------------------|-----------|---------------------------------------------------------------------|
 | `TraceMatrix` constructor  | Outbound  | Loads test results and maps them to the provided requirements.      |
 | `TraceMatrix.Export`       | Outbound  | Exports the trace matrix to a Markdown report.                      |
-| `TraceMatrix.GetSatisfied` | Outbound  | Returns the count of requirements satisfied by passing tests.       |
+| `TraceMatrix.CalculateSatisfiedRequirements` | Outbound  | Returns the count of satisfied and total requirements covered by passing tests. |
 
 ## Interactions
 
