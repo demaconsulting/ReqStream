@@ -3,7 +3,7 @@
 ## Overview
 
 This chapter describes how the ReqStream software units work together as an integrated system.
-Where the unit chapters (Program, Context, Validation, Requirements, TraceMatrix, Linter) each
+Where the unit chapters (Program, Context, Validation, Requirements, TraceMatrix) each
 describe one component in isolation, this chapter focuses on the end-to-end data flow, the
 coordination points between units, and the integrated scenarios that the units collectively
 enable.
@@ -16,8 +16,8 @@ processing invocation:
 | Source | Data | Destination |
 | ------ | ---- | ----------- |
 | CLI arguments | Parsed options | `Context` |
-| `Context.RequirementsFiles` | Glob-expanded file paths | `Requirements.Read` |
-| `Requirements.Read` | Requirement tree | `Program.ProcessRequirements` |
+| `Context.RequirementsFiles` | Glob-expanded file paths | `Requirements.Load` |
+| `Requirements.Load` | Requirement tree | `Program.ProcessRequirements` |
 | `Context.TestFiles` | Glob-expanded file paths | `TraceMatrix` constructor |
 | Requirement tree | Requirements | `TraceMatrix` constructor |
 | `TraceMatrix` | Coverage data | `Program.EnforceRequirementsCoverage` |
@@ -30,7 +30,7 @@ non-validate, non-lint) invocation:
 
 1. **Argument parsing** — `Context.Create(args)` parses all CLI flags and expands any glob
    patterns in `--requirements` and `--tests` arguments.
-2. **Requirements loading** — `Requirements.Read(context.RequirementsFiles)` reads and merges all
+2. **Requirements loading** — `Requirements.Load(context.RequirementsFiles)` reads and merges all
    YAML requirements files into a single requirement tree. Files listed via `includes` are resolved
    recursively.
 3. **Report generation** — if `--report` is set, the requirements report is exported. If
@@ -78,7 +78,7 @@ so that the evidence can be fed back into ReqStream's own requirements enforceme
 | ------------ | ----------- | --------- | ------- |
 | `Program` | `Context` | `Main` | Parses CLI arguments; owns output and exit code |
 | `Program` | `Validation` | `Run` | Runs self-validation suite when `--validate` is set |
-| `Program` | `Linter` | `Run` | Lints requirements files when `--lint` is set |
+| `Program` | `Requirements` | `Run` | Loads and lints requirements files when `--lint` is set |
 | `Program` | `Requirements` | `ProcessRequirements` | Reads and merges YAML requirement files |
 | `Program` | `TraceMatrix` | `ProcessRequirements` | Loads test results and maps them to requirements |
 | `Validation` | `Program` | test methods | Invokes `Program.Run` to exercise the full pipeline |

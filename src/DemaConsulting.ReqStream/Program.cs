@@ -130,7 +130,7 @@ internal static class Program
 
             if (lintIssues.Count == 0)
             {
-                context.WriteLine($"{context.RequirementsFiles[0]}: No issues found");
+                context.WriteLine("No issues found");
             }
 
             return;

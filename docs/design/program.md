@@ -5,7 +5,7 @@
 `Program` is the entry point of the ReqStream executable. It owns the top-level execution flow,
 dispatches to the appropriate subsystem based on the parsed command-line options, and establishes the
 error-handling boundary for the entire process. All meaningful work is delegated to `Context`,
-`Validation`, `Linter`, `Requirements`, and `TraceMatrix`; `Program` itself contains no domain logic.
+`Validation`, `Requirements`, and `TraceMatrix`; `Program` itself contains no domain logic.
 
 ## Properties
 
@@ -60,7 +60,7 @@ order; if a step applies, execution returns immediately without reaching later s
 | 2 | (always) | Call `PrintBanner` |
 | 3 | `context.Help` is `true` | Call `PrintHelp`; return |
 | 4 | `context.Validate` is `true` | Call `Validation.Run(context)`; return |
-| 5 | `context.Lint` is `true` | Call `Linter.Lint(context, context.RequirementsFiles)`; return |
+| 5 | `context.Lint` is `true` | Call `Requirements.Load(context.RequirementsFiles)`; report lint issues; return |
 | 6 | (default) | Call `ProcessRequirements(context)` |
 
 ### `PrintBanner`
@@ -77,7 +77,7 @@ argument, grouped logically. It is only called when `--help` is present.
 ### `ProcessRequirements`
 
 `ProcessRequirements` orchestrates the normal (non-version, non-help, non-validate, non-lint) run.
-It begins by calling `Requirements.Read(context.RequirementsFiles)` to build the parsed requirement
+It begins by calling `Requirements.Load(context.RequirementsFiles)` to build the parsed requirement
 tree. It then conditionally generates the requirements report (if `--report` is set) and the
 justifications report (if `--justifications` is set). If `--tests` files are provided, a
 `TraceMatrix` is constructed from the requirement tree and the test result files to enable coverage
@@ -103,8 +103,7 @@ internal error flag and eventually produces a non-zero exit code.
 | ---- | --------------------- |
 | `Context` | Created in `Main`; passed to all subsystems; owns output and exit code |
 | `Validation` | Called by `Run` when `--validate` is present |
-| `Linter` | Called by `Run` when `--lint` is present |
-| `Requirements` | Constructed in `ProcessRequirements`; provides the requirement tree |
+| `Requirements` | Constructed in `ProcessRequirements`; provides the requirement tree; also used for linting |
 | `TraceMatrix` | Constructed in `ProcessRequirements` when test files are present |
 
 ## References

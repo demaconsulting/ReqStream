@@ -48,7 +48,7 @@ outcome `Passed` or `Failed`.
 | -------------- | ---------- |
 | `.trx` | TRX serializer (`DemaConsulting.TestResults.IO`) |
 | `.xml` | JUnit serializer (`DemaConsulting.TestResults.IO`) |
-| Any other | Throws `ArgumentException` |
+| Any other | Reports error via `context.WriteError` and returns |
 
 The serializer is invoked with the assembled `TestResults` object and the resolved output path.
 
@@ -86,9 +86,8 @@ after the test completes, regardless of whether the test passes or fails.
 | ---- | --------------------- |
 | `Context` | Reads `ResultsFile`, `Version`, `Silent`; calls `WriteLine` for headers and summary |
 | `Program` | `Run` internally exercises `Program.Run` or individual workflow methods |
-| `Requirements` | Tests exercise `Requirements.Read` with fixture YAML files |
+| `Requirements` | Tests exercise `Requirements.Load` with fixture YAML files |
 | `TraceMatrix` | Tests exercise `TraceMatrix` construction with fixture test-result files |
-| `Linter` | `RunLintTest` exercises `Linter.Lint` with fixture YAML files |
 
 ## References
 
