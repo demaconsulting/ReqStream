@@ -135,13 +135,3 @@ reviews:
       - "requirements.yaml"                             # root requirements file
       - "docs/reqstream/**/*.yaml"                      # all requirements files
 
-  # OTS review
-  - id: ReqStream-OTS
-    title: Review of ReqStream OTS Software Requirements
-    paths:
-      - "docs/reqstream/ots/mstest.yaml"                # MSTest requirements
-      - "docs/reqstream/ots/buildmark.yaml"             # BuildMark requirements
-      - "docs/reqstream/ots/versionmark.yaml"           # VersionMark requirements
-      - "docs/reqstream/ots/sarifmark.yaml"             # SarifMark requirements
-      - "docs/reqstream/ots/sonarmark.yaml"             # SonarMark requirements
-      - "docs/reqstream/ots/reviewmark.yaml"            # ReviewMark requirements
