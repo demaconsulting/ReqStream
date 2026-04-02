@@ -134,4 +134,3 @@ reviews:
     paths:
       - "requirements.yaml"                             # root requirements file
       - "docs/reqstream/**/*.yaml"                      # all requirements files
-
