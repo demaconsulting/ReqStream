@@ -20,7 +20,6 @@ This document covers the detailed design of the following software units:
 - **Requirements, Section, and Requirement** — YAML parsing, section merging, validation, and export
   (`Modeling/Requirements.cs`, `Modeling/Section.cs`, `Modeling/Requirement.cs`)
 - **TraceMatrix** — test result loader and requirement-coverage analyzer (`Tracing/TraceMatrix.cs`)
-- **Linter** — structural linter for requirement YAML files (`Linting/Linter.cs`)
 
 The following topics are out of scope:
 
@@ -44,8 +43,6 @@ ReqStream (System)
 │   └── Requirement (Unit)
 ├── Tracing (Subsystem)
 │   └── TraceMatrix (Unit)
-├── Linting (Subsystem)
-│   └── Linter (Unit)
 └── SelfTest (Subsystem)
     └── Validation (Unit)
 ```
@@ -71,9 +68,6 @@ docs/design/
 ├── tracing/
 │   ├── tracing.md                  — Tracing subsystem design
 │   └── trace-matrix.md             — TraceMatrix unit design
-├── linting/
-│   ├── linting.md                  — Linting subsystem design
-│   └── linter.md                   — Linter unit design
 └── self-test/
     ├── self-test.md                — SelfTest subsystem design
     └── validation.md               — Validation unit design
@@ -88,13 +82,12 @@ src/DemaConsulting.ReqStream/
 ├── Cli/
 │   └── Context.cs              — command-line argument parser and I/O owner
 ├── Modeling/
+│   ├── LintIssue.cs            — lint issue severity and data model
 │   ├── Requirement.cs          — single requirement with ID, title, and test links
 │   ├── Requirements.cs         — parsed requirements document with section tree
 │   └── Section.cs              — named group of requirements within a document
 ├── Tracing/
 │   └── TraceMatrix.cs          — test result loader and requirement-coverage analyzer
-├── Linting/
-│   └── Linter.cs               — structural linter for requirement YAML files
 └── SelfTest/
     └── Validation.cs           — self-validation test runner
 ```

@@ -1,26 +1,26 @@
 ---
 includes:
   # System-level requirements
-  - docs/reqstream/reqstream-system.yaml
+  - docs/reqstream/system.yaml
   # Program unit
-  - docs/reqstream/unit-program.yaml
+  - docs/reqstream/program.yaml
   # Cli subsystem
-  - docs/reqstream/cli/subsystem-cli.yaml
-  - docs/reqstream/cli/unit-context.yaml
+  - docs/reqstream/cli/cli.yaml
+  - docs/reqstream/cli/context.yaml
   # Modeling subsystem
-  - docs/reqstream/modeling/subsystem-modeling.yaml
-  - docs/reqstream/modeling/unit-requirements.yaml
+  - docs/reqstream/modeling/modeling.yaml
+  - docs/reqstream/modeling/requirements.yaml
   # Tracing subsystem
-  - docs/reqstream/tracing/subsystem-tracing.yaml
-  - docs/reqstream/tracing/unit-trace-matrix.yaml
+  - docs/reqstream/tracing/tracing.yaml
+  - docs/reqstream/tracing/trace-matrix.yaml
   # SelfTest subsystem
-  - docs/reqstream/self-test/subsystem-self-test.yaml
-  - docs/reqstream/self-test/unit-validation.yaml
+  - docs/reqstream/self-test/self-test.yaml
+  - docs/reqstream/self-test/validation.yaml
   # Platform support and OTS software
   - docs/reqstream/platform-requirements.yaml
-  - docs/reqstream/ots-mstest.yaml
-  - docs/reqstream/ots-buildmark.yaml
-  - docs/reqstream/ots-versionmark.yaml
-  - docs/reqstream/ots-sarifmark.yaml
-  - docs/reqstream/ots-sonarmark.yaml
-  - docs/reqstream/ots-reviewmark.yaml
+  - docs/reqstream/ots/mstest.yaml
+  - docs/reqstream/ots/buildmark.yaml
+  - docs/reqstream/ots/versionmark.yaml
+  - docs/reqstream/ots/sarifmark.yaml
+  - docs/reqstream/ots/sonarmark.yaml
+  - docs/reqstream/ots/reviewmark.yaml
