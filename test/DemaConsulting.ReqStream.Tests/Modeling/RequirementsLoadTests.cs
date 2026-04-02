@@ -261,10 +261,14 @@ sections:
         var result = Requirements.Load(filePath);
 
         var logFile = Path.Combine(_testDirectory, "report-issues-error.log");
-        using var context = Context.Create(["--silent", "--log", logFile]);
-        result.ReportIssues(context);
+        int exitCode;
+        using (var context = Context.Create(["--silent", "--log", logFile]))
+        {
+            result.ReportIssues(context);
+            exitCode = context.ExitCode;
+        }
 
-        Assert.AreEqual(1, context.ExitCode);
+        Assert.AreEqual(1, exitCode);
         var log = File.ReadAllText(logFile);
         Assert.IsTrue(log.Contains("unknown_field"));
     }
@@ -280,10 +284,14 @@ sections:
             [new LintIssue("file.yaml", LintSeverity.Warning, "A warning")]);
 
         var logFile = Path.Combine(_testDirectory, "report-issues-warning.log");
-        using var context = Context.Create(["--silent", "--log", logFile]);
-        warningResult.ReportIssues(context);
+        int exitCode;
+        using (var context = Context.Create(["--silent", "--log", logFile]))
+        {
+            warningResult.ReportIssues(context);
+            exitCode = context.ExitCode;
+        }
 
-        Assert.AreEqual(0, context.ExitCode);
+        Assert.AreEqual(0, exitCode);
         var log = File.ReadAllText(logFile);
         Assert.IsTrue(log.Contains("A warning"));
     }
@@ -307,10 +315,14 @@ sections:
         var result = Requirements.Load(filePath);
 
         var logFile = Path.Combine(_testDirectory, "report-issues-none.log");
-        using var context = Context.Create(["--silent", "--log", logFile]);
-        result.ReportIssues(context);
+        int exitCode;
+        using (var context = Context.Create(["--silent", "--log", logFile]))
+        {
+            result.ReportIssues(context);
+            exitCode = context.ExitCode;
+        }
 
-        Assert.AreEqual(0, context.ExitCode);
+        Assert.AreEqual(0, exitCode);
         Assert.AreEqual(string.Empty, File.ReadAllText(logFile));
     }
 
