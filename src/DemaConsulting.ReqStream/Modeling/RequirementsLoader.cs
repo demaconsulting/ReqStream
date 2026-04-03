@@ -707,6 +707,15 @@ internal static class RequirementsLoader
         {
             foreach (var childId in requirement.Children)
             {
+                if (!allRequirements.ContainsKey(childId))
+                {
+                    issues.Add(new LintIssue(
+                        requirement.Location ?? reqId,
+                        LintSeverity.Error,
+                        $"Requirement '{reqId}' references unknown child '{childId}'"));
+                    continue;
+                }
+
                 if (visiting.Contains(childId))
                 {
                     var cycleStart = currentPath.IndexOf(childId);

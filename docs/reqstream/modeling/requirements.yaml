@@ -345,3 +345,16 @@ sections:
               - lint
             tests:
               - Linter_Lint_WithMultipleCycles_ReportsAllCycles
+
+          - id: ReqStream-Lint-UnknownChildReference
+            title: >-
+              The requirements loader shall report an error when a requirement references a child
+              requirement ID that does not exist.
+            justification: |
+              References to non-existent child requirement IDs indicate typos or stale references.
+              Reporting these as errors ensures that requirement hierarchies remain consistent and
+              prevents silent failures in trace matrix generation.
+            tags:
+              - lint
+            tests:
+              - Requirements_Load_WithMissingChild_ReportsError
