@@ -128,6 +128,10 @@ sections:
         children:
           - ""AUTH-001""
           - ""AUTH-002""
+      - id: ""AUTH-001""
+        title: ""The system shall validate user credentials.""
+      - id: ""AUTH-002""
+        title: ""The system shall reject invalid credentials.""
 ";
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);

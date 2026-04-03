@@ -153,7 +153,7 @@ sections:
             tags:
               - lint
             tests:
-              - Linter_Lint_WithMalformedYaml_ReportsError
+              - RequirementsLoader_Load_WithMalformedYaml_ReportsError
 
           - id: ReqStream-Lint-UnknownDocumentField
             title: >-
@@ -165,7 +165,7 @@ sections:
             tags:
               - lint
             tests:
-              - Linter_Lint_WithUnknownDocumentField_ReportsError
+              - RequirementsLoader_Load_WithUnknownDocumentField_ReportsError
 
           - id: ReqStream-Lint-UnknownSectionField
             title: The requirements loader shall report an error when a section contains an unknown field.
@@ -175,7 +175,7 @@ sections:
             tags:
               - lint
             tests:
-              - Linter_Lint_WithUnknownSectionField_ReportsError
+              - RequirementsLoader_Load_WithUnknownSectionField_ReportsError
 
           - id: ReqStream-Lint-MissingSectionTitle
             title: The requirements loader shall report an error when a section is missing the required title field.
@@ -185,8 +185,8 @@ sections:
             tags:
               - lint
             tests:
-              - Linter_Lint_WithSectionMissingTitle_ReportsError
-              - Linter_Lint_WithBlankSectionTitle_ReportsError
+              - RequirementsLoader_Load_WithSectionMissingTitle_ReportsError
+              - RequirementsLoader_Load_WithBlankSectionTitle_ReportsError
 
           - id: ReqStream-Lint-UnknownRequirementField
             title: The requirements loader shall report an error when a requirement contains an unknown field.
@@ -196,8 +196,8 @@ sections:
             tags:
               - lint
             tests:
-              - Linter_Lint_WithUnknownRequirementField_ReportsError
-              - Linter_Lint_WithNestedSectionIssues_ReportsError
+              - RequirementsLoader_Load_WithUnknownRequirementField_ReportsError
+              - RequirementsLoader_Load_WithNestedSectionIssues_ReportsError
 
           - id: ReqStream-Lint-MissingRequirementFields
             title: >-
@@ -209,10 +209,10 @@ sections:
             tags:
               - lint
             tests:
-              - Linter_Lint_WithRequirementMissingId_ReportsError
-              - Linter_Lint_WithRequirementMissingTitle_ReportsError
-              - Linter_Lint_WithBlankRequirementId_ReportsError
-              - Linter_Lint_WithBlankRequirementTitle_ReportsError
+              - RequirementsLoader_Load_WithRequirementMissingId_ReportsError
+              - RequirementsLoader_Load_WithRequirementMissingTitle_ReportsError
+              - RequirementsLoader_Load_WithBlankRequirementId_ReportsError
+              - RequirementsLoader_Load_WithBlankRequirementTitle_ReportsError
 
           - id: ReqStream-Lint-DuplicateIds
             title: The requirements loader shall report an error when duplicate requirement IDs are found.
@@ -222,8 +222,8 @@ sections:
             tags:
               - lint
             tests:
-              - Linter_Lint_WithDuplicateIds_ReportsError
-              - Linter_Lint_WithDuplicateIdsAcrossFiles_ReportsError
+              - RequirementsLoader_Load_WithDuplicateIds_ReportsError
+              - RequirementsLoader_Load_WithDuplicateIdsAcrossFiles_ReportsError
 
           - id: ReqStream-Lint-MultipleIssues
             title: The requirements loader shall report all issues found rather than stopping at the first issue.
@@ -233,7 +233,7 @@ sections:
             tags:
               - lint
             tests:
-              - Linter_Lint_WithMultipleIssues_ReportsAllIssues
+              - RequirementsLoader_Load_WithMultipleIssues_ReportsAllIssues
 
           - id: ReqStream-Lint-FollowsIncludes
             title: The requirements loader shall follow include directives and load all included files.
@@ -243,7 +243,7 @@ sections:
             tags:
               - lint
             tests:
-              - Linter_Lint_WithIncludes_LintsIncludedFiles
+              - RequirementsLoader_Load_WithIncludes_LintsIncludedFiles
 
           - id: ReqStream-Lint-NoIssuesMessage
             title: The requirements loader shall report a no-issues result when no problems are found.
@@ -253,8 +253,8 @@ sections:
             tags:
               - lint
             tests:
-              - Linter_Lint_WithValidFile_ReportsNoIssues
-              - Linter_Lint_WithEmptyFile_ReportsNoIssues
+              - RequirementsLoader_Load_WithValidFile_ReportsNoIssues
+              - RequirementsLoader_Load_WithEmptyFile_ReportsNoIssues
 
           - id: ReqStream-Lint-ErrorFormat
             title: "The requirements loader shall format errors as \"[location]: [severity]: [description]\"."
@@ -264,7 +264,7 @@ sections:
             tags:
               - lint
             tests:
-              - Linter_Lint_ErrorFormat_IncludesFileAndLocation
+              - RequirementsLoader_Load_ErrorFormat_IncludesFileAndLocation
 
           - id: ReqStream-Lint-UnknownMappingField
             title: The requirements loader shall report an error when a test mapping contains an unknown field.
@@ -274,7 +274,7 @@ sections:
             tags:
               - lint
             tests:
-              - Linter_Lint_WithUnknownMappingField_ReportsError
+              - RequirementsLoader_Load_WithUnknownMappingField_ReportsError
 
           - id: ReqStream-Lint-MissingMappingId
             title: The requirements loader shall report an error when a test mapping is missing or has a blank id field.
@@ -284,8 +284,8 @@ sections:
             tags:
               - lint
             tests:
-              - Linter_Lint_WithMappingMissingId_ReportsError
-              - Linter_Lint_WithBlankMappingId_ReportsError
+              - RequirementsLoader_Load_WithMappingMissingId_ReportsError
+              - RequirementsLoader_Load_WithBlankMappingId_ReportsError
 
           - id: ReqStream-Lint-BlankTestName
             title: The requirements loader shall report an error when a test name in a requirement or mapping is blank.
@@ -295,8 +295,8 @@ sections:
             tags:
               - lint
             tests:
-              - Linter_Lint_WithBlankTestName_ReportsError
-              - Linter_Lint_WithBlankMappingTestName_ReportsError
+              - RequirementsLoader_Load_WithBlankTestName_ReportsError
+              - RequirementsLoader_Load_WithBlankMappingTestName_ReportsError
 
           - id: ReqStream-Lint-BlankTagName
             title: The requirements loader shall report an error when a tag name in a requirement is blank.
@@ -306,7 +306,7 @@ sections:
             tags:
               - lint
             tests:
-              - Linter_Lint_WithBlankTagName_ReportsError
+              - RequirementsLoader_Load_WithBlankTagName_ReportsError
 
           - id: ReqStream-Lint-IssueType
             title: The requirements loader shall represent each issue with a location, severity, and description.
@@ -328,11 +328,11 @@ sections:
             tags:
               - lint
             tests:
-              - Linter_Lint_WithNonScalarTestEntry_ReportsError
-              - Linter_Lint_WithNonScalarChildEntry_ReportsError
-              - Linter_Lint_WithNonScalarTagEntry_ReportsError
-              - Linter_Lint_WithNonScalarMappingTestEntry_ReportsError
-              - Linter_Lint_WithNonScalarIncludeEntry_ReportsError
+              - RequirementsLoader_Load_WithNonScalarTestEntry_ReportsError
+              - RequirementsLoader_Load_WithNonScalarChildEntry_ReportsError
+              - RequirementsLoader_Load_WithNonScalarTagEntry_ReportsError
+              - RequirementsLoader_Load_WithNonScalarMappingTestEntry_ReportsError
+              - RequirementsLoader_Load_WithNonScalarIncludeEntry_ReportsError
 
           - id: ReqStream-Lint-CircularReferences
             title: >-
@@ -344,4 +344,17 @@ sections:
             tags:
               - lint
             tests:
-              - Linter_Lint_WithMultipleCycles_ReportsAllCycles
+              - RequirementsLoader_Load_WithMultipleCycles_ReportsAllCycles
+
+          - id: ReqStream-Lint-UnknownChildReference
+            title: >-
+              The requirements loader shall report an error when a requirement references a child
+              requirement ID that does not exist.
+            justification: |
+              References to non-existent child requirement IDs indicate typos or stale references.
+              Reporting these as errors ensures that requirement hierarchies remain consistent and
+              prevents silent failures in trace matrix generation.
+            tags:
+              - lint
+            tests:
+              - RequirementsLoader_Load_WithUnknownChildReference_ReportsError

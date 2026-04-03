@@ -82,7 +82,7 @@ public class RequirementsLoaderTests
     /// Test that loading with no files produces no issues (empty list).
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithNoFiles_PrintsMessage()
+    public void RequirementsLoader_Load_WithNoFiles_PrintsMessage()
     {
         var originalOut = Console.Out;
         using var output = new StringWriter();
@@ -106,7 +106,7 @@ public class RequirementsLoaderTests
     /// Test that a valid requirements file produces no issues.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithValidFile_ReportsNoIssues()
+    public void RequirementsLoader_Load_WithValidFile_ReportsNoIssues()
     {
         var reqFile = Path.Combine(_testDirectory, "valid.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -131,7 +131,7 @@ public class RequirementsLoaderTests
     /// Test that a file that doesn't exist reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithMissingFile_ReportsError()
+    public void RequirementsLoader_Load_WithMissingFile_ReportsError()
     {
         var (exitCode, errors) = RunLint("/nonexistent/path/missing.yaml");
 
@@ -144,7 +144,7 @@ public class RequirementsLoaderTests
     /// Test that malformed YAML reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithMalformedYaml_ReportsError()
+    public void RequirementsLoader_Load_WithMalformedYaml_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "malformed.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -164,7 +164,7 @@ public class RequirementsLoaderTests
     /// Test that an empty YAML file produces no issues.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithEmptyFile_ReportsNoIssues()
+    public void RequirementsLoader_Load_WithEmptyFile_ReportsNoIssues()
     {
         var reqFile = Path.Combine(_testDirectory, "empty.yaml");
         File.WriteAllText(reqFile, string.Empty);
@@ -180,7 +180,7 @@ public class RequirementsLoaderTests
     /// Test that an unknown field at document root reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithUnknownDocumentField_ReportsError()
+    public void RequirementsLoader_Load_WithUnknownDocumentField_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "unknown-field.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -198,7 +198,7 @@ unknown_field: value
     /// Test that a section missing the title field reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithSectionMissingTitle_ReportsError()
+    public void RequirementsLoader_Load_WithSectionMissingTitle_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "missing-title.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -217,7 +217,7 @@ unknown_field: value
     /// Test that a section with a blank title reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithBlankSectionTitle_ReportsError()
+    public void RequirementsLoader_Load_WithBlankSectionTitle_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "blank-title.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -237,7 +237,7 @@ unknown_field: value
     /// Test that a section with an unknown field reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithUnknownSectionField_ReportsError()
+    public void RequirementsLoader_Load_WithUnknownSectionField_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "unknown-section-field.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -255,7 +255,7 @@ unknown_field: value
     /// Test that a requirement missing the id field reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithRequirementMissingId_ReportsError()
+    public void RequirementsLoader_Load_WithRequirementMissingId_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "missing-id.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -274,7 +274,7 @@ unknown_field: value
     /// Test that a requirement missing the title field reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithRequirementMissingTitle_ReportsError()
+    public void RequirementsLoader_Load_WithRequirementMissingTitle_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "missing-req-title.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -293,7 +293,7 @@ unknown_field: value
     /// Test that a requirement with an unknown field reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithUnknownRequirementField_ReportsError()
+    public void RequirementsLoader_Load_WithUnknownRequirementField_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "unknown-req-field.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -314,7 +314,7 @@ unknown_field: value
     /// Test that duplicate requirement IDs report an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithDuplicateIds_ReportsError()
+    public void RequirementsLoader_Load_WithDuplicateIds_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "duplicates.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -336,7 +336,7 @@ unknown_field: value
     /// Test that duplicate IDs across multiple files report an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithDuplicateIdsAcrossFiles_ReportsError()
+    public void RequirementsLoader_Load_WithDuplicateIdsAcrossFiles_ReportsError()
     {
         var reqFile1 = Path.Combine(_testDirectory, "file1.yaml");
         File.WriteAllText(reqFile1, @"sections:
@@ -364,7 +364,7 @@ unknown_field: value
     /// Test that multiple issues are all reported.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithMultipleIssues_ReportsAllIssues()
+    public void RequirementsLoader_Load_WithMultipleIssues_ReportsAllIssues()
     {
         var reqFile = Path.Combine(_testDirectory, "multiple-issues.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -392,7 +392,7 @@ unknown_root_field: bad
     /// Test that loading follows includes and lints included files.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithIncludes_LintsIncludedFiles()
+    public void RequirementsLoader_Load_WithIncludes_LintsIncludedFiles()
     {
         var includedFile = Path.Combine(_testDirectory, "included.yaml");
         File.WriteAllText(includedFile, @"sections:
@@ -423,7 +423,7 @@ sections:
     /// Test that --lint via Program.Run works correctly.
     /// </summary>
     [TestMethod]
-    public void Linter_ProgramRun_WithLintFlag_RunsLinter()
+    public void Program_Run_WithLintFlag_RunsLinter()
     {
         var reqFile = Path.Combine(_testDirectory, "valid.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -459,7 +459,7 @@ sections:
     /// Test that a mapping with an unknown field reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithUnknownMappingField_ReportsError()
+    public void RequirementsLoader_Load_WithUnknownMappingField_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "unknown-mapping-field.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -484,7 +484,7 @@ mappings:
     /// Test that a mapping missing id reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithMappingMissingId_ReportsError()
+    public void RequirementsLoader_Load_WithMappingMissingId_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "mapping-missing-id.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -507,7 +507,7 @@ mappings:
     /// Test that a nested section with issues is linted.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithNestedSectionIssues_ReportsError()
+    public void RequirementsLoader_Load_WithNestedSectionIssues_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "nested.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -532,7 +532,7 @@ mappings:
     /// Test that error format includes file path and line/column info.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_ErrorFormat_IncludesFileAndLocation()
+    public void RequirementsLoader_Load_ErrorFormat_IncludesFileAndLocation()
     {
         var reqFile = Path.Combine(_testDirectory, "format-test.yaml");
         File.WriteAllText(reqFile, @"unknown_field: value
@@ -552,7 +552,7 @@ mappings:
     /// Test that a requirement with a blank id reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithBlankRequirementId_ReportsError()
+    public void RequirementsLoader_Load_WithBlankRequirementId_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "blank-req-id.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -572,7 +572,7 @@ mappings:
     /// Test that a requirement with a blank title reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithBlankRequirementTitle_ReportsError()
+    public void RequirementsLoader_Load_WithBlankRequirementTitle_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "blank-req-title.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -592,7 +592,7 @@ mappings:
     /// Test that a mapping with a blank id reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithBlankMappingId_ReportsError()
+    public void RequirementsLoader_Load_WithBlankMappingId_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "blank-mapping-id.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -616,7 +616,7 @@ mappings:
     /// Test that a blank test name in a requirement reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithBlankTestName_ReportsError()
+    public void RequirementsLoader_Load_WithBlankTestName_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "blank-test-name.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -638,7 +638,7 @@ mappings:
     /// Test that a blank tag name in a requirement reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithBlankTagName_ReportsError()
+    public void RequirementsLoader_Load_WithBlankTagName_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "blank-tag-name.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -660,7 +660,7 @@ mappings:
     /// Test that a mapping with a blank test name reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithBlankMappingTestName_ReportsError()
+    public void RequirementsLoader_Load_WithBlankMappingTestName_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "blank-mapping-test-name.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -684,7 +684,7 @@ mappings:
     /// Test that a requirements file with a non-mapping root (e.g. a top-level sequence) reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithNonMappingRoot_ReportsError()
+    public void RequirementsLoader_Load_WithNonMappingRoot_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "non-mapping-root.yaml");
         File.WriteAllText(reqFile, @"- item1
@@ -701,7 +701,7 @@ mappings:
     /// Test that a non-scalar entry in the tests list of a requirement reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithNonScalarTestEntry_ReportsError()
+    public void RequirementsLoader_Load_WithNonScalarTestEntry_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "non-scalar-test.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -723,7 +723,7 @@ mappings:
     /// Test that a non-scalar entry in the children list of a requirement reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithNonScalarChildEntry_ReportsError()
+    public void RequirementsLoader_Load_WithNonScalarChildEntry_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "non-scalar-child.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -745,7 +745,7 @@ mappings:
     /// Test that a non-scalar entry in the tags list of a requirement reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithNonScalarTagEntry_ReportsError()
+    public void RequirementsLoader_Load_WithNonScalarTagEntry_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "non-scalar-tag.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -767,7 +767,7 @@ mappings:
     /// Test that a non-scalar entry in the tests list of a mapping reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithNonScalarMappingTestEntry_ReportsError()
+    public void RequirementsLoader_Load_WithNonScalarMappingTestEntry_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "non-scalar-mapping-test.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -791,7 +791,7 @@ mappings:
     /// Test that a non-scalar entry in the includes list reports an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithNonScalarIncludeEntry_ReportsError()
+    public void RequirementsLoader_Load_WithNonScalarIncludeEntry_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "non-scalar-include.yaml");
         File.WriteAllText(reqFile, @"includes:
@@ -808,7 +808,7 @@ mappings:
     /// Test that multiple cycles in the requirement children graph are all reported.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithMultipleCycles_ReportsAllCycles()
+    public void RequirementsLoader_Load_WithMultipleCycles_ReportsAllCycles()
     {
         var reqFile = Path.Combine(_testDirectory, "multiple-cycles.yaml");
         File.WriteAllText(reqFile, @"sections:
@@ -837,5 +837,29 @@ mappings:
         var cycleCount = errors.Split(Environment.NewLine)
             .Count(line => line.Contains("Circular requirement reference detected"));
         Assert.AreEqual(2, cycleCount, $"Expected exactly 2 cycle errors, got {cycleCount}: {errors}");
+    }
+
+    /// <summary>
+    /// Test that a child reference to a non-existent requirement ID is reported as an error.
+    /// </summary>
+    [TestMethod]
+    public void RequirementsLoader_Load_WithUnknownChildReference_ReportsError()
+    {
+        var reqFile = Path.Combine(_testDirectory, "unknown-child.yaml");
+        File.WriteAllText(reqFile, @"sections:
+  - title: Test Section
+    requirements:
+      - id: PARENT
+        title: Parent Requirement
+        children:
+          - NONEXISTENT
+");
+
+        var (exitCode, errors) = RunLint(reqFile);
+
+        Assert.AreEqual(1, exitCode);
+        Assert.IsTrue(errors.Contains("PARENT"), $"Expected 'PARENT' in errors: {errors}");
+        Assert.IsTrue(errors.Contains("NONEXISTENT"), $"Expected 'NONEXISTENT' in errors: {errors}");
+        Assert.IsTrue(errors.Contains("unknown child"), $"Expected 'unknown child' in errors: {errors}");
     }
 }
