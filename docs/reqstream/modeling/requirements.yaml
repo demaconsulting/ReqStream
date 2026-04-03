@@ -357,4 +357,4 @@ sections:
             tags:
               - lint
             tests:
-              - Requirements_Load_WithMissingChild_ReportsError
+              - Linter_Lint_WithUnknownChildReference_ReportsError

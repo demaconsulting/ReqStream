@@ -838,4 +838,26 @@ mappings:
             .Count(line => line.Contains("Circular requirement reference detected"));
         Assert.AreEqual(2, cycleCount, $"Expected exactly 2 cycle errors, got {cycleCount}: {errors}");
     }
+
+    /// <summary>
+    /// Test that a child reference to a non-existent requirement ID is reported as an error.
+    /// </summary>
+    [TestMethod]
+    public void Linter_Lint_WithUnknownChildReference_ReportsError()
+    {
+        var reqFile = Path.Combine(_testDirectory, "unknown-child.yaml");
+        File.WriteAllText(reqFile, @"sections:
+  - title: Test Section
+    requirements:
+      - id: PARENT
+        title: Parent Requirement
+        children:
+          - NONEXISTENT
+");
+
+        var (exitCode, errors) = RunLint(reqFile);
+
+        Assert.AreEqual(1, exitCode);
+        Assert.Contains("NONEXISTENT", errors);
+    }
 }
