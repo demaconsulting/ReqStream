@@ -71,5 +71,5 @@ sections:
               - cli
               - requirements
             tests:
-              - Linter_ProgramRun_WithLintFlag_RunsLinter
+              - Program_Run_WithLintFlag_RunsLinter
               - ReqStream_Lint

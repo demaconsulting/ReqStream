@@ -707,7 +707,7 @@ internal static class RequirementsLoader
         {
             foreach (var childId in requirement.Children)
             {
-                if (!allRequirements.ContainsKey(childId))
+                if (!allRequirements.TryGetValue(childId, out var childReq))
                 {
                     issues.Add(new LintIssue(
                         requirement.Location ?? reqId,
@@ -720,9 +720,7 @@ internal static class RequirementsLoader
                 {
                     var cycleStart = currentPath.IndexOf(childId);
                     var cyclePath = string.Join(" -> ", currentPath.Skip(cycleStart).Append(childId));
-                    var location = allRequirements.TryGetValue(childId, out var cycleReq) && cycleReq.Location != null
-                        ? cycleReq.Location
-                        : childId;
+                    var location = childReq.Location ?? childId;
                     issues.Add(new LintIssue(
                         location,
                         LintSeverity.Error,
