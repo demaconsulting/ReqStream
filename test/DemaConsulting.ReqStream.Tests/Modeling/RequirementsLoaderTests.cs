@@ -843,7 +843,7 @@ mappings:
     /// Test that a child reference to a non-existent requirement ID is reported as an error.
     /// </summary>
     [TestMethod]
-    public void Linter_Lint_WithUnknownChildReference_ReportsError()
+    public void RequirementsLoader_Load_WithUnknownChildReference_ReportsError()
     {
         var reqFile = Path.Combine(_testDirectory, "unknown-child.yaml");
         File.WriteAllText(reqFile, @"sections:
