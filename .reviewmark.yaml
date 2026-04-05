@@ -10,6 +10,7 @@ needs-review:
   - "**/*.cs"                    # All C# source and test files
   - "docs/reqstream/**/*.yaml"   # Requirements files
   - "docs/design/**/*.md"        # Design documents
+  - "docs/user_guide/**/*.md"    # User guide
   - "!**/obj/**"                 # Exclude build output
   - "!**/bin/**"                 # Exclude build output
 
@@ -35,7 +36,7 @@ reviews:
     title: Review that Advertised Features Match System Design
     paths:
       - "README.md"                                         # user-facing documentation
-      - "docs/guide/**/*.md"                                # user guide
+      - "docs/user_guide/**/*.md"                           # user guide
       - "docs/reqstream/reqstream/reqstream.yaml"           # system requirements
       - "docs/design/introduction.md"                       # design introduction
       - "docs/design/reqstream/reqstream.md"                # system design

@@ -16,7 +16,8 @@ existing files and to know where to make new files.
 │   ├── design/
 │   ├── requirements_doc/
 │   ├── requirements_report/
-│   └── reqstream/
+│   ├── reqstream/
+│   └── user_guide/
 ├── src/
 │   └── <project>/
 └── test/
