@@ -563,9 +563,6 @@ sections:
     }
 
     /// <summary>
-    /// Test enforcement with failed tests fails.
-    /// </summary>
-    /// <summary>
     /// Test Run with lint flag lints requirements files.
     /// </summary>
     [TestMethod]
@@ -604,7 +601,7 @@ sections:
         // Check log contains expected lint output (after context is disposed to flush log)
         Assert.IsTrue(File.Exists(logFile), "Log file should exist");
         var logContent = File.ReadAllText(logFile);
-        Assert.Contains("No issues found", logContent);
+        StringAssert.Contains(logContent, "No issues found");
     }
 
     /// <summary>
