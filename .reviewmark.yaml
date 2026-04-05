@@ -6,16 +6,14 @@
 # Patterns identifying all files that require review.
 # Processed in order; prefix a pattern with '!' to exclude.
 needs-review:
-  - "requirements.yaml"                    # Root requirements file
-  - "README.md"                            # User-facing documentation
-  - "**/*.cs"                              # All C# source and test files
-  - "docs/reqstream/**/*.yaml"             # Requirements files
-  - "docs/design/**/*.md"                  # Design documents
-  - "docs/user_guide/**/*.md"              # User guide markdown
-  - "docs/user_guide/title.txt"            # User guide title
-  - "docs/user_guide/definition.yaml"      # User guide Pandoc definition
-  - "!**/obj/**"                           # Exclude build output
-  - "!**/bin/**"                           # Exclude build output
+  - "requirements.yaml"          # Root requirements file
+  - "README.md"                  # User-facing documentation
+  - "**/*.cs"                    # All C# source and test files
+  - "docs/reqstream/**/*.yaml"   # Requirements files
+  - "docs/design/**/*.md"        # Design documents
+  - "docs/user_guide/**/*.md"    # User guide
+  - "!**/obj/**"                 # Exclude build output
+  - "!**/bin/**"                 # Exclude build output
 
 # Evidence source: review data and index.json are located in the 'reviews' branch
 # of this repository, accessed through the GitHub public HTTPS raw content access.
