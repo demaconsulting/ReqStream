@@ -1,23 +1,23 @@
 ---
 includes:
   # System-level requirements
-  - docs/reqstream/system.yaml
+  - docs/reqstream/reqstream/reqstream.yaml
   # Program unit
-  - docs/reqstream/program.yaml
+  - docs/reqstream/reqstream/program.yaml
   # Cli subsystem
-  - docs/reqstream/cli/cli.yaml
-  - docs/reqstream/cli/context.yaml
+  - docs/reqstream/reqstream/cli/cli.yaml
+  - docs/reqstream/reqstream/cli/context.yaml
   # Modeling subsystem
-  - docs/reqstream/modeling/modeling.yaml
-  - docs/reqstream/modeling/requirements.yaml
+  - docs/reqstream/reqstream/modeling/modeling.yaml
+  - docs/reqstream/reqstream/modeling/requirements.yaml
   # Tracing subsystem
-  - docs/reqstream/tracing/tracing.yaml
-  - docs/reqstream/tracing/trace-matrix.yaml
+  - docs/reqstream/reqstream/tracing/tracing.yaml
+  - docs/reqstream/reqstream/tracing/trace-matrix.yaml
   # SelfTest subsystem
-  - docs/reqstream/self-test/self-test.yaml
-  - docs/reqstream/self-test/validation.yaml
+  - docs/reqstream/reqstream/self-test/self-test.yaml
+  - docs/reqstream/reqstream/self-test/validation.yaml
   # Platform support and OTS software
-  - docs/reqstream/platform-requirements.yaml
+  - docs/reqstream/reqstream/platform-requirements.yaml
   - docs/reqstream/ots/mstest.yaml
   - docs/reqstream/ots/buildmark.yaml
   - docs/reqstream/ots/versionmark.yaml

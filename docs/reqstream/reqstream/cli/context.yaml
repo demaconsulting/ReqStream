@@ -23,7 +23,6 @@ sections:
             tags:
               - cli
             tests:
-              - Program_Run_WithVersionFlag_PrintsVersion
               - Context_Create_VersionFlag_SetsVersionProperty
 
           - id: ReqStream-Cmd-Help
@@ -34,7 +33,6 @@ sections:
             tags:
               - cli
             tests:
-              - Program_Run_WithHelpFlag_PrintsHelp
               - Context_Create_HelpFlags_SetsHelpProperty
 
           - id: ReqStream-Cmd-ErrorOutput

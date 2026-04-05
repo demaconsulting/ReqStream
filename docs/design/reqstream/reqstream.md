@@ -88,5 +88,5 @@ so that the evidence can be fed back into ReqStream's own requirements enforceme
 - [ReqStream Architecture][arch]
 - [ReqStream Repository][repo]
 
-[arch]: ../../ARCHITECTURE.md
+[arch]: ../../../ARCHITECTURE.md
 [repo]: https://github.com/demaconsulting/ReqStream

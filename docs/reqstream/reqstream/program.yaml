@@ -72,4 +72,3 @@ sections:
               - requirements
             tests:
               - Program_Run_WithLintFlag_RunsLinter
-              - ReqStream_Lint

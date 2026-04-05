@@ -111,5 +111,5 @@ internal error flag and eventually produces a non-zero exit code.
 - [ReqStream Architecture][arch]
 - [ReqStream Repository][repo]
 
-[arch]: ../../ARCHITECTURE.md
+[arch]: ../../../ARCHITECTURE.md
 [repo]: https://github.com/demaconsulting/ReqStream

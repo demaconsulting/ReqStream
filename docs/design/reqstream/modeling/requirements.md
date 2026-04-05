@@ -170,5 +170,5 @@ is `null` and `LoadResult.HasErrors` returns `true`.
 - [ReqStream Architecture][arch]
 - [ReqStream Repository][repo]
 
-[arch]: ../../../ARCHITECTURE.md
+[arch]: ../../../../ARCHITECTURE.md
 [repo]: https://github.com/demaconsulting/ReqStream

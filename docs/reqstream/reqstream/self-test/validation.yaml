@@ -1,0 +1,17 @@
+---
+sections:
+  - title: ReqStream Requirements
+    sections:
+      - title: SelfTest
+        requirements:
+          - id: ReqStream-Val-SelfValidation
+            title: The tool shall support self-validation mode.
+            justification: |
+              Self-validation ensures the tool's own integrity and serves as a smoke test for
+              installation and configuration issues.
+            tags:
+              - validation
+            tests:
+              - Validation_Run_WithSilentContext_CompletesSuccessfully
+              - Validation_Run_WithTrxResultsFile_WritesTrxFile
+              - Validation_Run_WithXmlResultsFile_WritesXmlFile

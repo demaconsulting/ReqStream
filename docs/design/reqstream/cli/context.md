@@ -97,5 +97,5 @@ via an early return path.
 - [ReqStream Architecture][arch]
 - [ReqStream Repository][repo]
 
-[arch]: ../../../ARCHITECTURE.md
+[arch]: ../../../../ARCHITECTURE.md
 [repo]: https://github.com/demaconsulting/ReqStream

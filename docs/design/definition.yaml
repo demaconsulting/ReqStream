@@ -1,25 +1,26 @@
 ---
 resource-path:
   - docs/design
-  - docs/design/cli
-  - docs/design/modeling
-  - docs/design/self-test
-  - docs/design/tracing
+  - docs/design/reqstream
+  - docs/design/reqstream/cli
+  - docs/design/reqstream/modeling
+  - docs/design/reqstream/self-test
+  - docs/design/reqstream/tracing
   - docs/template
 
 input-files:
   - docs/design/title.txt
   - docs/design/introduction.md
-  - docs/design/system.md
-  - docs/design/program.md
-  - docs/design/cli/cli.md
-  - docs/design/cli/context.md
-  - docs/design/modeling/modeling.md
-  - docs/design/modeling/requirements.md
-  - docs/design/tracing/tracing.md
-  - docs/design/tracing/trace-matrix.md
-  - docs/design/self-test/self-test.md
-  - docs/design/self-test/validation.md
+  - docs/design/reqstream/reqstream.md
+  - docs/design/reqstream/program.md
+  - docs/design/reqstream/cli/cli.md
+  - docs/design/reqstream/cli/context.md
+  - docs/design/reqstream/modeling/modeling.md
+  - docs/design/reqstream/modeling/requirements.md
+  - docs/design/reqstream/tracing/tracing.md
+  - docs/design/reqstream/tracing/trace-matrix.md
+  - docs/design/reqstream/self-test/self-test.md
+  - docs/design/reqstream/self-test/validation.md
 
 template: template.html
 

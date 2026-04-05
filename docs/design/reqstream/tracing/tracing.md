@@ -41,5 +41,5 @@ The `Tracing` subsystem exposes the following interface to the rest of the tool:
 - [ReqStream Architecture][arch]
 - [ReqStream Repository][repo]
 
-[arch]: ../../../ARCHITECTURE.md
+[arch]: ../../../../ARCHITECTURE.md
 [repo]: https://github.com/demaconsulting/ReqStream
