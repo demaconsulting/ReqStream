@@ -19,17 +19,17 @@ sections:
           - IntegrationTest_HelpFlag_OutputsUsageInformation
           - IntegrationTest_UnknownArgument_ReturnsError
         children:
-          - ReqStream-Cmd-Cli
-          - ReqStream-Cmd-Version
-          - ReqStream-Cmd-Help
-          - ReqStream-Cmd-InvalidArgs
-          - ReqStream-Cmd-Validate
-          - ReqStream-Cmd-Enforce
-          - ReqStream-Req-GlobPatterns
-          - ReqStream-Req-TestGlobPatterns
-          - ReqStream-Cmd-ReportDepth
-          - ReqStream-Cmd-MatrixDepth
-          - ReqStream-Cmd-TagFilter
+          - ReqStream-Command-Cli
+          - ReqStream-Command-Version
+          - ReqStream-Command-Help
+          - ReqStream-Command-InvalidArgs
+          - ReqStream-Command-Validate
+          - ReqStream-Command-Enforce
+          - ReqStream-Requirements-GlobPatterns
+          - ReqStream-Requirements-TestGlobPatterns
+          - ReqStream-Command-ReportDepth
+          - ReqStream-Command-MatrixDepth
+          - ReqStream-Command-TagFilter
 
       - id: ReqStream-Cli-Output
         title: The Cli subsystem shall provide output and error reporting channels.
@@ -40,5 +40,5 @@ sections:
           - IntegrationTest_SilentFlag_SuppressesOutput
           - IntegrationTest_LogFlag_WritesOutputToFile
         children:
-          - ReqStream-Cmd-ErrorOutput
-          - ReqStream-Log-FileOutput
+          - ReqStream-Command-ErrorOutput
+          - ReqStream-Logging-FileOutput

@@ -19,9 +19,9 @@ sections:
           - IntegrationTest_RequirementsReport_GeneratesMarkdown
           - IntegrationTest_JustificationsReport_GeneratesMarkdown
         children:
-          - ReqStream-Req-YamlProcessing
-          - ReqStream-Req-Includes
-          - ReqStream-Req-SectionMerging
+          - ReqStream-Requirements-YamlProcessing
+          - ReqStream-Requirements-Includes
+          - ReqStream-Requirements-SectionMerging
 
       - id: ReqStream-Modeling-Export
         title: The Modeling subsystem shall export requirements to a Markdown report.
@@ -33,8 +33,8 @@ sections:
           - IntegrationTest_RequirementsReport_GeneratesMarkdown
           - IntegrationTest_JustificationsReport_GeneratesMarkdown
         children:
-          - ReqStream-Req-ParentChild
-          - ReqStream-Req-TestMappings
+          - ReqStream-Requirements-ParentChild
+          - ReqStream-Requirements-TestMappings
           - ReqStream-Report-MarkdownExport
           - ReqStream-Report-HeaderDepth
           - ReqStream-Report-Justifications

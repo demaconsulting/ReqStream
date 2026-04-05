@@ -4,7 +4,7 @@ sections:
     sections:
       - title: Modeling
         requirements:
-          - id: ReqStream-Req-YamlProcessing
+          - id: ReqStream-Requirements-YamlProcessing
             title: The tool shall process YAML requirements files.
             justification: |
               YAML provides a human-readable, version-control-friendly format for managing requirements.
@@ -15,7 +15,7 @@ sections:
               - Requirements_Load_SimpleRequirement_ParsesCorrectly
               - Requirements_Load_ComplexStructure_ParsesCorrectly
 
-          - id: ReqStream-Req-Validation
+          - id: ReqStream-Requirements-Validation
             title: The tool shall validate requirements file structure.
             justification: |
               Early validation prevents runtime errors and ensures requirements data integrity, catching
@@ -29,7 +29,7 @@ sections:
               - Requirements_Load_DuplicateRequirementId_ThrowsException
               - Requirements_Load_DuplicateRequirementId_ExceptionIncludesFileLocation
 
-          - id: ReqStream-Req-YamlErrorReporting
+          - id: ReqStream-Requirements-YamlErrorReporting
             title: The tool shall report YAML deserialization errors with the filename and location.
             justification: |
               Clear error messages including the filename and line/column position allow users to quickly
@@ -39,7 +39,7 @@ sections:
             tests:
               - Requirements_Load_InvalidYamlContent_ThrowsExceptionWithFileLocation
 
-          - id: ReqStream-Req-Hierarchy
+          - id: ReqStream-Requirements-Hierarchy
             title: The tool shall support hierarchical sections and subsections.
             justification: |
               Hierarchical organization allows requirements to be grouped logically by system components,
@@ -50,7 +50,7 @@ sections:
               - Requirements_Load_NestedSections_ParsesHierarchyCorrectly
               - Requirements_Export_NestedSections_CreatesHierarchy
 
-          - id: ReqStream-Req-Includes
+          - id: ReqStream-Requirements-Includes
             title: The tool shall support file includes in requirements files.
             justification: |
               File includes enable modular requirements management, allowing teams to organize requirements
@@ -62,7 +62,7 @@ sections:
               - Requirements_Load_MultipleFiles_MergesAllFiles
               - Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop
 
-          - id: ReqStream-Req-SectionMerging
+          - id: ReqStream-Requirements-SectionMerging
             title: The tool shall merge sections with the same hierarchy path.
             justification: |
               Section merging allows multiple files to contribute to the same logical section, supporting
@@ -75,7 +75,7 @@ sections:
 
       - title: Requirements Definition
         requirements:
-          - id: ReqStream-Req-UniqueIds
+          - id: ReqStream-Requirements-UniqueIds
             title: The tool shall require each requirement to have a unique identifier.
             justification: |
               Unique identifiers enable unambiguous referencing of requirements in documentation, test
@@ -87,7 +87,7 @@ sections:
               - Requirements_Load_BlankRequirementId_ThrowsExceptionWithFileLocation
               - Requirements_Load_MultipleFilesWithDuplicateIds_ThrowsException
 
-          - id: ReqStream-Req-RequiredTitle
+          - id: ReqStream-Requirements-RequiredTitle
             title: The tool shall require each requirement to have a title.
             justification: |
               Titles provide human-readable descriptions of requirements, making them understandable to
@@ -97,7 +97,7 @@ sections:
             tests:
               - Requirements_Load_BlankRequirementTitle_ThrowsExceptionWithFileLocation
 
-          - id: ReqStream-Req-ParentChild
+          - id: ReqStream-Requirements-ParentChild
             title: The tool shall support parent-child relationships between requirements.
             justification: |
               Parent-child relationships enable hierarchical requirement decomposition, allowing high-level
@@ -107,7 +107,7 @@ sections:
             tests:
               - Requirements_Load_RequirementWithChildren_ParsesChildrenCorrectly
 
-          - id: ReqStream-Req-TestMappings
+          - id: ReqStream-Requirements-TestMappings
             title: The tool shall support test mappings for requirements.
             justification: |
               Test mappings establish traceability between requirements and tests, enabling verification
@@ -121,7 +121,7 @@ sections:
               - Requirements_Load_BlankTestNameInMapping_ThrowsExceptionWithFileLocation
               - Requirements_Load_BlankMappingId_ThrowsExceptionWithFileLocation
 
-          - id: ReqStream-Req-UnifiedLoad
+          - id: ReqStream-Requirements-UnifiedLoad
             title: >-
               The tool shall provide a unified load mechanism that simultaneously builds the requirements model and
               reports lint issues from a single YAML DOM tree walk.

@@ -4,7 +4,7 @@ sections:
     sections:
       - title: System Integration
         requirements:
-          - id: ReqStream-Sys-FullPipeline
+          - id: ReqStream-System-FullPipeline
             title: >-
               The system shall process requirements files, load test results, generate reports, and
               enforce coverage in a single invocation.
@@ -19,7 +19,7 @@ sections:
               - ReqStream-Modeling-YamlParsing
               - ReqStream-Tracing-Coverage
 
-          - id: ReqStream-Sys-SourceFilter
+          - id: ReqStream-System-SourceFilter
             title: >-
               The system shall support source-specific test matching to restrict coverage evidence
               to tests from named result files.
@@ -32,7 +32,7 @@ sections:
             children:
               - ReqStream-Tracing-Coverage
 
-          - id: ReqStream-Sys-EnforceMode
+          - id: ReqStream-System-EnforceMode
             title: >-
               The system shall exit with a non-zero code when enforcement mode is active and any
               requirement lacks passing test evidence.
