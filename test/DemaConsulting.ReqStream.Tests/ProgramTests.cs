@@ -563,7 +563,49 @@ sections:
     }
 
     /// <summary>
-    /// Test enforcement with failed tests fails.
+    /// Test Run with lint flag lints requirements files.
+    /// </summary>
+    [TestMethod]
+    public void Program_Run_WithLintFlag_RunsLinter()
+    {
+        // Create a valid requirements file
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, @"
+sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Test Requirement
+");
+
+        var logFile = Path.Combine(_testDirectory, "lint.log");
+
+        // Save current directory and change to test directory
+        var originalDir = Directory.GetCurrentDirectory();
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory);
+
+            using (var context = Context.Create(["--lint", "--requirements", "*.yaml", "--silent", "--log", logFile]))
+            {
+                Program.Run(context);
+
+                Assert.AreEqual(0, context.ExitCode);
+            }
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+
+        // Check log contains expected lint output (after context is disposed to flush log)
+        Assert.IsTrue(File.Exists(logFile), "Log file should exist");
+        var logContent = File.ReadAllText(logFile);
+        StringAssert.Contains(logContent, "No issues found");
+    }
+
+    /// <summary>
+    /// Test Run with enforcement mode and failed tests fails.
     /// </summary>
     [TestMethod]
     public void Program_Run_WithEnforcementAndFailedTests_Fails()
