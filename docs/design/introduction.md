@@ -56,21 +56,22 @@ breakdown above:
 
 ```text
 docs/design/
-├── introduction.md                 — document introduction and architecture overview
-├── system.md                       — system integration design
-├── program.md                      — Program unit design
-├── cli/
-│   ├── cli.md                      — Cli subsystem design
-│   └── context.md                  — Context unit design
-├── modeling/
-│   ├── modeling.md                 — Modeling subsystem design
-│   └── requirements.md             — Requirements, Section, and Requirement units design
-├── tracing/
-│   ├── tracing.md                  — Tracing subsystem design
-│   └── trace-matrix.md             — TraceMatrix unit design
-└── self-test/
-    ├── self-test.md                — SelfTest subsystem design
-    └── validation.md               — Validation unit design
+├── introduction.md                         — document introduction and architecture overview
+└── reqstream/
+    ├── reqstream.md                        — system integration design
+    ├── program.md                          — Program unit design
+    ├── cli/
+    │   ├── cli.md                          — Cli subsystem design
+    │   └── context.md                      — Context unit design
+    ├── modeling/
+    │   ├── modeling.md                     — Modeling subsystem design
+    │   └── requirements.md                 — Requirements, Section, and Requirement units design
+    ├── tracing/
+    │   ├── tracing.md                      — Tracing subsystem design
+    │   └── trace-matrix.md                 — TraceMatrix unit design
+    └── self-test/
+        ├── self-test.md                    — SelfTest subsystem design
+        └── validation.md                   — Validation unit design
 ```
 
 The source code folder structure mirrors the top-level subsystem breakdown above, giving

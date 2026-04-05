@@ -1,16 +1,24 @@
-# ReviewMark File Review Standards
+# ReviewMark Usage Standard
 
-This document defines DEMA Consulting standards for managing file reviews using
-ReviewMark within Continuous Compliance environments.
+## Purpose
 
-# Core Purpose
+ReviewMark manages file review status enforcement and formal review processes. It tracks which files need
+review, organizes them into review-sets, and generates review plans and reports.
 
-ReviewMark automates file review tracking using cryptographic fingerprints to
-ensure:
+## Key Commands
 
-- Every file requiring review is covered by a current, valid review
-- Reviews become stale when files change, triggering re-review
-- Complete audit trail of review coverage for regulatory compliance
+- **Lint Configuration**: `dotnet reviewmark --lint`
+- **Elaborate Review-Set**: `dotnet reviewmark --elaborate {review-set}`
+- **Generate Plan**: `dotnet reviewmark --plan docs/code_review_plan/plan.md`
+- **Generate Report**: `dotnet reviewmark --report docs/code_review_report/report.md`
+
+## Repository Structure
+
+Required repository items for ReviewMark operation:
+
+- `.reviewmark.yaml` - Configuration for review-sets, file-patterns, and review evidence-source.
+- `docs/code_review_plan/` - Review planning artifacts
+- `docs/code_review_report/` - Review status reports
 
 # Review Definition Structure
 
@@ -19,142 +27,142 @@ Configure reviews in `.reviewmark.yaml` at repository root:
 ```yaml
 # Patterns identifying all files that require review
 needs-review:
-  # Include core development artifacts
-  - "requirements.yaml"          # Root requirements file
-  - "docs/reqstream/**/*.yaml"   # Requirements files
-  - "docs/design/**/*.md"        # Design documentation
-  - "**/*.cs"                    # All C# source and test files
+  # Include source code (adjust file extensions for your repo)
+  - "**/*.cs"           # C# source files
+  - "**/*.cpp"          # C++ source files
+  - "**/*.hpp"          # C++ header files
+  - "!**/bin/**"        # Generated source in build outputs
+  - "!**/obj/**"        # Generated source in build intermediates
 
-  # Exclude build output and generated content
-  - "!**/obj/**"                 # Exclude build output
-  - "!**/bin/**"                 # Exclude binary output
-  - "!**/generated/**"           # Exclude auto-generated files
+  # Include requirement files
+  - "requirements.yaml"        # Root requirements file
+  - "docs/reqstream/**/*.yaml" # Requirements files
+
+  # Include critical documentation files
+  - "README.md"                                 # Root level README
+  - "docs/user_guide/**/*.md"                   # User guide
+  - "docs/design/**/*.md"                       # Design documentation
 
 # Source of review evidence
 evidence-source:
   type: none
-
-# Named review-sets grouping related files
-reviews:
-  - id: MyProduct-PasswordValidator
-    title: Password Validator Unit Review
-    paths:
-      - "docs/reqstream/authentication/password-validator.yaml"
-      - "docs/design/authentication/password-validator.md"
-      - "src/{ProjectName}/Authentication/PasswordValidator.cs"
-      - "test/{ProjectName}.Tests/Authentication/PasswordValidatorTests.cs"
-
-  - id: MyProduct-AllRequirements
-    title: All Requirements Review
-    paths:
-      - "requirements.yaml"
-      - "docs/reqstream/**/*.yaml"
 ```
+
+# Review-Set Design Principles
+
+When constructing review-sets, follow these principles to maintain manageable scope and effective compliance evidence:
+
+- **Hierarchical Scope**: Higher-level reviews exclude lower-level implementation details, relying instead on design
+  documents to describe what components they use. System reviews exclude subsystem/unit details, subsystem reviews
+  exclude unit source code, only unit reviews include actual implementation.
+- **Single Focus**: Each review-set proves one specific compliance question (user promises, system architecture,
+  design consistency, etc.)
+- **Context Management**: Keep file counts manageable to prevent context overflow while maintaining complete coverage
+  through the hierarchy
 
 # Review-Set Organization
 
-Organize review-sets using standard patterns to ensure comprehensive coverage
-and consistent review processes:
+Organize review-sets using these standard patterns to ensure comprehensive coverage
+while keeping each review manageable in scope:
 
-## [Project]-System Review
+**Note**: File path patterns shown below use C# naming conventions (PascalCase, `.cs` extensions).
+Other languages should adapt these patterns to their conventions (e.g., C++ might use
+`snake_case` with `.cpp`/`.hpp` extensions).
 
-Reviews system integration and operational validation:
+## `Purpose` Review (only one per repository)
 
-- **Files**: System requirements (`docs/reqstream/system.yaml`), design introduction
-  (`docs/design/introduction.md`), system design (`docs/design/system.md`),
-  integration tests
-- **Purpose**: Validates system operates as designed and meets overall requirements
-- **Example**: `TemplateTool-System`
+Reviews user-facing capabilities and system promises:
 
-## [Product]-Design Review
+- **Purpose**: Proves that the systems provide the capabilities the user is being told about
+- **Title**: "Review that Advertised Features Match System Design"
+- **Scope**: Excludes subsystem and unit files, relying on system-level design documents
+  to describe what subsystems and units they use
+- **File Path Patterns**:
+  - README: `README.md`
+  - User guide: `docs/user_guide/**/*.md`
+  - System requirements: `docs/reqstream/{system-name}/{system-name}.yaml`
+  - Design introduction: `docs/design/introduction.md`
+  - System design: `docs/design/{system-name}/{system-name}.md`
+
+## `{System}-Architecture` Review (one per system)
+
+Reviews system architecture and operational validation:
+
+- **Purpose**: Proves that the system is designed and tested to satisfy its requirements
+- **Title**: "Review that {System} Architecture Satisfies Requirements"
+- **Scope**: Excludes subsystem and unit files, relying on system-level design to describe
+  what subsystems and units it uses
+- **File Path Patterns**:
+  - System requirements: `docs/reqstream/{system-name}/{system-name}.yaml`
+  - Design introduction: `docs/design/introduction.md`
+  - System design: `docs/design/{system-name}/{system-name}.md`
+  - System integration tests: `test/{SystemName}.Tests/{SystemName}Tests.cs`
+
+## `{System}-Design` Review (one per system)
 
 Reviews architectural and design consistency:
 
-- **Files**: System requirements, platform requirements, all design documents under `docs/design/`
-- **Purpose**: Ensures design completeness and architectural coherence
-- **Example**: `MyProduct-Design`
+- **Purpose**: Proves the system design is consistent and complete
+- **Title**: "Review that {System} Design is Consistent and Complete"
+- **Scope**: Only brings in top-level requirements and relies on brevity of design documentation
+- **File Path Patterns**:
+  - System requirements: `docs/reqstream/{system-name}/{system-name}.yaml`
+  - Platform requirements: `docs/reqstream/{system-name}/platform-requirements.yaml`
+  - Design introduction: `docs/design/introduction.md`
+  - System design files: `docs/design/{system-name}/**/*.md`
 
-## [Product]-AllRequirements Review
+## `{System}-AllRequirements` Review (one per system)
 
 Reviews requirements quality and traceability:
 
-- **Files**: All requirement files including root `requirements.yaml` and all files under `docs/reqstream/`
-- **Purpose**: Validates requirements structure, IDs, justifications, and test linkage
-- **Example**: `MyProduct-AllRequirements`
+- **Purpose**: Proves the requirements are consistent and complete
+- **Title**: "Review that All {System} Requirements are Complete"
+- **Scope**: Only brings in requirements files to keep review manageable
+- **File Path Patterns**:
+  - Root requirements: `requirements.yaml`
+  - System requirements: `docs/reqstream/{system-name}/**/*.yaml`
+  - OTS requirements: `docs/reqstream/ots/**/*.yaml` (if applicable)
 
-## [Product]-[Unit] Review
-
-Reviews individual software unit implementation:
-
-- **Files**: Unit requirements, design documents, source code, unit tests
-- **Purpose**: Validates unit meets requirements and is properly implemented
-- **File Path Pattern**:
-  - Requirements: `docs/reqstream/{subsystem-name}/{unit-name}.yaml` or `docs/reqstream/{unit-name}.yaml`
-  - Design: `docs/design/{subsystem-name}/{unit-name}.md` or `docs/design/{unit-name}.md`
-  - Source: `src/{ProjectName}/{SubsystemName}/{UnitName}.cs`
-  - Tests: `test/{ProjectName}.Tests/{SubsystemName}/{UnitName}Tests.cs`
-- **Example**: `MyProduct-PasswordValidator`, `MyProduct-ConfigParser`
-
-## [Product]-[Subsystem] Review
+## `{System}-{Subsystem}` Review (one per subsystem)
 
 Reviews subsystem architecture and interfaces:
 
-- **Files**: Subsystem requirements, design documents, integration tests (usually no source code)
-- **Purpose**: Validates subsystem behavior and interface compliance
-- **File Path Pattern**:
-  - Requirements: `docs/reqstream/{subsystem-name}/{subsystem-name}.yaml`
-  - Design: `docs/design/{subsystem-name}/{subsystem-name}.md`
-  - Tests: `test/{ProjectName}.Tests/{SubsystemName}Integration/` or similar
-- **Example**: `MyProduct-Authentication`, `MyProduct-DataLayer`
+- **Purpose**: Proves that the subsystem is designed and tested to satisfy its requirements
+- **Title**: "Review that {System} {Subsystem} Satisfies Subsystem Requirements"
+- **Scope**: Excludes units under the subsystem, relying on subsystem design to describe
+  what units it uses
+- **File Path Patterns**:
+  - Requirements: `docs/reqstream/{system-name}/{subsystem-name}/{subsystem-name}.yaml`
+  - Design: `docs/design/{system-name}/{subsystem-name}/{subsystem-name}.md`
+  - Tests: `test/{SystemName}.Tests/{SubsystemName}/{SubsystemName}Tests.cs`
 
-## [Product]-OTS Review
+## `{System}-{Subsystem}-{Unit}` Review (one per unit)
 
-Reviews OTS (Off-The-Shelf) software integration:
+Reviews individual software unit implementation:
 
-- **Files**: OTS requirements and integration test evidence
-- **Purpose**: Validates OTS components meet integration requirements
-- **File Path Pattern**:
-  - Requirements: `docs/reqstream/ots/{ots-name}.yaml`
-  - Tests: Integration tests proving OTS functionality
-- **Example**: `MyProduct-SystemTextJson`, `MyProduct-EntityFramework`
-
-# File Pattern Best Practices
-
-Use "include-then-exclude" approach for `needs-review` patterns because it
-ensures comprehensive coverage while removing unwanted files:
-
-1. **Start broad**: Include all files of potential interest with generous patterns
-2. **Exclude overreach**: Use `!` patterns to remove build output, generated files, and temporary files
-3. **Test patterns**: Verify patterns match intended files using `dotnet reviewmark --elaborate`
-
-**Order matters**: Patterns are processed sequentially, excludes override earlier includes.
-
-# ReviewMark Commands
-
-Essential ReviewMark commands for Continuous Compliance:
-
-```bash
-# Lint review configuration for issues (run before use)
-dotnet reviewmark --lint
-
-# Generate review plan and report (use in CI/CD)
-dotnet reviewmark \
-  --plan docs/code_review_plan/plan.md \
-  --report docs/code_review_report/report.md \
-  --enforce
-```
+- **Purpose**: Proves the unit is designed, implemented, and tested to satisfy its requirements
+- **Title**: "Review that {System} {Subsystem} {Unit} Implementation is Correct"
+- **Scope**: Complete unit review including all artifacts
+- **File Path Patterns**:
+  - Requirements: `docs/reqstream/{system-name}/{subsystem-name}/{unit-name}.yaml` or
+    `docs/reqstream/{system-name}/{unit-name}.yaml`
+  - Design: `docs/design/{system-name}/{subsystem-name}/{unit-name}.md` or
+    `docs/design/{system-name}/{unit-name}.md`
+  - Source: `src/{SystemName}/{SubsystemName}/{UnitName}.cs` or `src/{SystemName}/{UnitName}.cs`
+  - Tests: `test/{SystemName}.Tests/{SubsystemName}/{UnitName}Tests.cs` or
+    `test/{SystemName}.Tests/{UnitName}Tests.cs`
 
 # Quality Checks
 
 Before submitting ReviewMark configuration, verify:
 
 - [ ] `.reviewmark.yaml` exists at repository root with proper structure
-- [ ] `needs-review` patterns cover requirements, design, code, and tests with proper exclusions
-- [ ] Each review-set has unique `id` and groups architecturally related files
+- [ ] Review-set organization follows the standard hierarchy patterns
+- [ ] Purpose review-set includes README.md, user guide, system requirements, design introduction, and system design files
+- [ ] System-level reviews follow hierarchical scope principle (exclude subsystem/unit details)
+- [ ] Subsystem reviews follow hierarchical scope principle (exclude unit source code)
+- [ ] Only unit reviews include actual source code files
+- [ ] Each review-set focuses on a single compliance question (single focus principle)
 - [ ] File patterns use correct glob syntax and match intended files
-- [ ] File paths reflect current naming conventions (kebab-case design/requirements folders, PascalCase source folders)
+- [ ] Review-set file counts remain manageable (context management principle)
 - [ ] Evidence source properly configured (`none` for dev, `url` for production)
-- [ ] Environment variables used for credentials (never hardcoded)
-- [ ] ReviewMark enforcement configured: `dotnet reviewmark --enforce`
-- [ ] Generated documents accessible for compliance auditing
-- [ ] Review-set organization follows standard patterns ([Product]-[Unit], [Product]-Design, etc.)

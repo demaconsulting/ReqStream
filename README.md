@@ -574,5 +574,5 @@ For information about reporting security vulnerabilities, please see our [Securi
 [mstest]: https://github.com/microsoft/testfx
 [github-actions]: https://github.com/features/actions
 [sonarcloud]: https://sonarcloud.io
-[link-guide]: https://github.com/demaconsulting/ReqStream/blob/main/docs/guide/guide.md
+[link-guide]: https://github.com/demaconsulting/ReqStream/blob/main/docs/user_guide/introduction.md
 [link-continuous-compliance]: https://github.com/demaconsulting/ContinuousCompliance

@@ -7,9 +7,11 @@
 # Processed in order; prefix a pattern with '!' to exclude.
 needs-review:
   - "requirements.yaml"          # Root requirements file
+  - "README.md"                  # User-facing documentation
   - "**/*.cs"                    # All C# source and test files
   - "docs/reqstream/**/*.yaml"   # Requirements files
   - "docs/design/**/*.md"        # Design documents
+  - "docs/user_guide/**/*.md"    # User guide
   - "!**/obj/**"                 # Exclude build output
   - "!**/bin/**"                 # Exclude build output
 
@@ -21,116 +23,126 @@ evidence-source:
   type: url
   location: https://raw.githubusercontent.com/demaconsulting/ReqStream/reviews/index.json
 
-# Review sets grouping files by logical unit of review.
-# Each review-set groups requirements, source, and tests for a coherent software unit
-# so that an AI-assisted review can verify consistency across the full evidence chain.
+# Review sets following the standard hierarchy from reviewmark-usage.md:
+# - Purpose (one per repo): user-facing capabilities and system promises
+# - {System}-Architecture (one per system): system requirements and integration tests
+# - {System}-Design (one per system): all design documentation
+# - {System}-AllRequirements (one per system): all requirements for consistency review
+# - {System}-{Subsystem} (one per subsystem): subsystem requirements and integration tests
+# - {System}-{Subsystem}-{Unit} / {System}-{Unit} (one per unit): full unit artifact set
 reviews:
-  - id: ReqStream-Program
-    title: Review of ReqStream Program Unit
-    paths:
-      - "docs/reqstream/program.yaml"                   # requirements
-      - "docs/design/program.md"                        # design
-      - "src/**/Program.cs"                             # implementation
-      - "test/**/ProgramTests.cs"                       # unit tests
 
-  - id: ReqStream-Context
-    title: Review of ReqStream Context Unit
+  # ── Purpose Review ────────────────────────────────────────────────────────────
+  - id: Purpose
+    title: Review that Advertised Features Match System Design
     paths:
-      - "docs/reqstream/cli/context.yaml"               # requirements
-      - "docs/design/cli/context.md"                    # design
-      - "src/**/Cli/Context.cs"                         # implementation
-      - "test/**/Cli/ContextTests.cs"                   # unit tests
+      - "README.md"                                         # user-facing documentation
+      - "docs/user_guide/**/*.md"                           # user guide
+      - "docs/reqstream/reqstream/reqstream.yaml"           # system requirements
+      - "docs/design/introduction.md"                       # design introduction
+      - "docs/design/reqstream/reqstream.md"                # system design
 
-  - id: ReqStream-Validation
-    title: Review of ReqStream Validation Unit
+  # ── System Reviews ────────────────────────────────────────────────────────────
+  - id: ReqStream-Architecture
+    title: Review that ReqStream Architecture Satisfies Requirements
     paths:
-      - "docs/reqstream/self-test/validation.yaml"      # requirements
-      - "docs/design/self-test/validation.md"           # design
-      - "src/**/SelfTest/Validation.cs"                 # implementation
-      - "test/**/SelfTest/ValidationTests.cs"           # unit tests
+      - "docs/reqstream/reqstream/reqstream.yaml"           # system requirements
+      - "docs/design/introduction.md"                       # design introduction
+      - "docs/design/reqstream/reqstream.md"                # system design
+      - "test/**/IntegrationTests.cs"                       # system integration tests
+      - "test/**/Runner.cs"                                 # test runner infrastructure
+      - "test/**/AssemblyInfo.cs"                           # test infrastructure
+
+  - id: ReqStream-Design
+    title: Review that ReqStream Design is Consistent and Complete
+    paths:
+      - "docs/reqstream/reqstream/reqstream.yaml"           # system requirements
+      - "docs/reqstream/reqstream/platform-requirements.yaml"  # platform requirements
+      - "docs/design/introduction.md"                       # design introduction
+      - "docs/design/reqstream/**/*.md"                     # all system design documents
+
+  - id: ReqStream-AllRequirements
+    title: Review that All ReqStream Requirements are Complete
+    paths:
+      - "requirements.yaml"                                 # root requirements file
+      - "docs/reqstream/reqstream/**/*.yaml"                # all system requirements files
+      - "docs/reqstream/ots/**/*.yaml"                      # OTS requirements files
+
+  # ── Subsystem Reviews ─────────────────────────────────────────────────────────
+  - id: ReqStream-Cli
+    title: Review that ReqStream Cli Subsystem Satisfies Subsystem Requirements
+    paths:
+      - "docs/reqstream/reqstream/cli/cli.yaml"             # subsystem requirements
+      - "docs/design/reqstream/cli/cli.md"                  # subsystem design
+      - "test/**/Cli/CliIntegrationTests.cs"                # subsystem integration tests
 
   - id: ReqStream-Modeling
-    title: Review of ReqStream Modeling Unit
+    title: Review that ReqStream Modeling Subsystem Satisfies Subsystem Requirements
     paths:
-      - "docs/reqstream/modeling/requirements.yaml"     # requirements
-      - "docs/design/modeling/requirements.md"          # design
-      - "src/**/Modeling/LintIssue.cs"                  # implementation
-      - "src/**/Modeling/Requirement.cs"                # implementation
-      - "src/**/Modeling/Requirements.cs"               # implementation
-      - "src/**/Modeling/RequirementsLoader.cs"         # implementation
-      - "src/**/Modeling/Section.cs"                    # implementation
-      - "test/**/Modeling/RequirementsExportTests.cs"   # unit tests
-      - "test/**/Modeling/RequirementsLoadTests.cs"     # unit tests
-      - "test/**/Modeling/RequirementsLoaderTests.cs"   # unit tests
-      - "test/**/Modeling/RequirementsReadTests.cs"     # unit tests
+      - "docs/reqstream/reqstream/modeling/modeling.yaml"   # subsystem requirements
+      - "docs/design/reqstream/modeling/modeling.md"        # subsystem design
+      - "test/**/Modeling/ModelingIntegrationTests.cs"      # subsystem integration tests
 
-  - id: ReqStream-TraceMatrix
-    title: Review of ReqStream TraceMatrix Unit
+  - id: ReqStream-Tracing
+    title: Review that ReqStream Tracing Subsystem Satisfies Subsystem Requirements
     paths:
-      - "docs/reqstream/tracing/trace-matrix.yaml"      # requirements
-      - "docs/design/tracing/trace-matrix.md"           # design
-      - "src/**/Tracing/TraceMatrix.cs"                 # implementation
-      - "test/**/Tracing/TraceMatrixTests.cs"           # unit tests
-      - "test/**/Tracing/TraceMatrixReadTests.cs"       # unit tests
-      - "test/**/Tracing/TraceMatrixExportTests.cs"     # unit tests
+      - "docs/reqstream/reqstream/tracing/tracing.yaml"     # subsystem requirements
+      - "docs/design/reqstream/tracing/tracing.md"          # subsystem design
+      - "test/**/Tracing/TracingIntegrationTests.cs"        # subsystem integration tests
 
-  # Subsystem reviews
-  - id: ReqStream-Cli
-    title: Review of ReqStream Cli subsystem (command-line interface)
+  - id: ReqStream-SelfTest
+    title: Review that ReqStream SelfTest Subsystem Satisfies Subsystem Requirements
     paths:
-      - "docs/reqstream/cli/cli.yaml"                   # subsystem requirements
-      - "docs/design/cli/cli.md"                        # subsystem design
-      - "docs/design/cli/context.md"                    # Context unit design
-      - "docs/design/program.md"                        # Program unit design
-      - "test/**/Cli/CliIntegrationTests.cs"            # subsystem integration tests
+      - "docs/reqstream/reqstream/self-test/self-test.yaml"  # subsystem requirements
+      - "docs/design/reqstream/self-test/self-test.md"      # subsystem design
+      - "test/**/SelfTest/SelfTestIntegrationTests.cs"      # subsystem integration tests
 
-  - id: ReqStream-ModelingSubsystem
-    title: Review of ReqStream Modeling subsystem (requirements data model)
+  # ── Unit Reviews ──────────────────────────────────────────────────────────────
+  - id: ReqStream-Program
+    title: Review that ReqStream Program Unit Implementation is Correct
     paths:
-      - "docs/reqstream/modeling/modeling.yaml"         # subsystem requirements
-      - "docs/design/modeling/modeling.md"              # subsystem design
-      - "docs/design/modeling/requirements.md"          # Requirements unit design
-      - "test/**/Modeling/ModelingIntegrationTests.cs"  # subsystem integration tests
+      - "docs/reqstream/reqstream/program.yaml"             # unit requirements
+      - "docs/design/reqstream/program.md"                  # unit design
+      - "src/**/Program.cs"                                 # implementation
+      - "test/**/ProgramTests.cs"                           # unit tests
 
-  - id: ReqStream-TracingSubsystem
-    title: Review of ReqStream Tracing subsystem (test result tracing)
+  - id: ReqStream-Cli-Context
+    title: Review that ReqStream Cli Context Unit Implementation is Correct
     paths:
-      - "docs/reqstream/tracing/tracing.yaml"           # subsystem requirements
-      - "docs/design/tracing/tracing.md"                # subsystem design
-      - "docs/design/tracing/trace-matrix.md"           # TraceMatrix unit design
-      - "test/**/Tracing/TracingIntegrationTests.cs"    # subsystem integration tests
+      - "docs/reqstream/reqstream/cli/context.yaml"         # unit requirements
+      - "docs/design/reqstream/cli/context.md"              # unit design
+      - "src/**/Cli/Context.cs"                             # implementation
+      - "test/**/Cli/ContextTests.cs"                       # unit tests
 
-  - id: ReqStream-SelfTestSubsystem
-    title: Review of ReqStream SelfTest subsystem (self-validation)
+  - id: ReqStream-Modeling-Requirements
+    title: Review that ReqStream Modeling Requirements Unit Implementation is Correct
     paths:
-      - "docs/reqstream/self-test/self-test.yaml"       # subsystem requirements
-      - "docs/design/self-test/self-test.md"            # subsystem design
-      - "docs/design/self-test/validation.md"           # Validation unit design
-      - "test/**/SelfTest/SelfTestIntegrationTests.cs"  # subsystem integration tests
+      - "docs/reqstream/reqstream/modeling/requirements.yaml"  # unit requirements
+      - "docs/design/reqstream/modeling/requirements.md"    # unit design
+      - "src/**/Modeling/LintIssue.cs"                      # implementation
+      - "src/**/Modeling/Requirement.cs"                    # implementation
+      - "src/**/Modeling/Requirements.cs"                   # implementation
+      - "src/**/Modeling/RequirementsLoader.cs"             # implementation
+      - "src/**/Modeling/Section.cs"                        # implementation
+      - "test/**/Modeling/RequirementsExportTests.cs"       # unit tests
+      - "test/**/Modeling/RequirementsLoadParsingTests.cs"  # unit tests
+      - "test/**/Modeling/RequirementsLoadTests.cs"         # unit tests
+      - "test/**/Modeling/RequirementsLoaderTests.cs"       # unit tests
 
-  # System review - covers system-level behavior validated through integration tests
-  - id: ReqStream-System
-    title: Review of ReqStream system-level behavior and integration
+  - id: ReqStream-Tracing-TraceMatrix
+    title: Review that ReqStream Tracing TraceMatrix Unit Implementation is Correct
     paths:
-      - "docs/reqstream/system.yaml"                    # system requirements
-      - "docs/reqstream/platform-requirements.yaml"     # platform requirements
-      - "docs/design/introduction.md"                   # design introduction and architecture
-      - "docs/design/system.md"                         # system integration design
-      - "test/**/IntegrationTests.cs"                   # integration tests
-      - "test/**/Runner.cs"                             # test runner infrastructure
-      - "test/**/AssemblyInfo.cs"                       # test infrastructure
+      - "docs/reqstream/reqstream/tracing/trace-matrix.yaml"  # unit requirements
+      - "docs/design/reqstream/tracing/trace-matrix.md"     # unit design
+      - "src/**/Tracing/TraceMatrix.cs"                     # implementation
+      - "test/**/Tracing/TraceMatrixTests.cs"               # unit tests
+      - "test/**/Tracing/TraceMatrixReadTests.cs"           # unit tests
+      - "test/**/Tracing/TraceMatrixExportTests.cs"         # unit tests
 
-  # Design review - all design documents
-  - id: ReqStream-Design
-    title: Review of ReqStream Software Design Document
+  - id: ReqStream-SelfTest-Validation
+    title: Review that ReqStream SelfTest Validation Unit Implementation is Correct
     paths:
-      - "docs/reqstream/system.yaml"                    # system requirements
-      - "docs/reqstream/platform-requirements.yaml"     # platform requirements
-      - "docs/design/**/*.md"                           # all design documents
-
-  # Full requirements review
-  - id: ReqStream-AllRequirements
-    title: Review of All ReqStream Requirements for Consistency
-    paths:
-      - "requirements.yaml"                             # root requirements file
-      - "docs/reqstream/**/*.yaml"                      # all requirements files
+      - "docs/reqstream/reqstream/self-test/validation.yaml"  # unit requirements
+      - "docs/design/reqstream/self-test/validation.md"     # unit design
+      - "src/**/SelfTest/Validation.cs"                     # implementation
+      - "test/**/SelfTest/ValidationTests.cs"               # unit tests

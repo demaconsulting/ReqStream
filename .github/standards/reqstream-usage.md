@@ -30,15 +30,17 @@ the source code structure because reviewers need clear navigation from
 requirements to design to implementation:
 
 ```text
-requirements.yaml                  # Root file (includes only)
+requirements.yaml                   # Root file (includes only)
 docs/reqstream/
-├── system.yaml                    # System-level requirements
-├── platform-requirements.yaml     # Platform support requirements
-├── {subsystem-name}/              # Subsystem requirements (kebab-case folders)
-│   └── {subsystem-name}.yaml      # Requirements for this subsystem
-├── {unit-name}.yaml               # Unit requirements (for top-level units)
-└── ots/                           # OTS software item requirements
-    └── {ots-name}.yaml            # Requirements for OTS components
+├── {system-name}/                  # System-level requirements folder (one per system)
+│   ├── {system-name}.yaml          # System-level requirements
+│   ├── platform-requirements.yaml  # Platform support requirements
+│   ├── {subsystem-name}/           # Subsystem requirements (kebab-case folders)
+│   │   ├── {subsystem-name}.yaml   # Requirements for this subsystem
+│   │   └── {unit-name}.yaml        # Requirements for units within this subsystem
+│   └── {unit-name}.yaml            # Requirements for top-level units (outside subsystems)
+└── ots/                            # OTS software items folder
+    └── {ots-name}.yaml             # Requirements for OTS components
 ```
 
 The folder structure MUST mirror the source code organization to maintain
@@ -56,18 +58,31 @@ only flow downward in the hierarchy to maintain clear traceability:
 This prevents circular dependencies and ensures clear hierarchical relationships
 for compliance auditing.
 
+# Test Linkage Hierarchy
+
+Requirements MUST link to tests at their own level to maintain proper test scope:
+
+- **System requirements** → link ONLY to system-level integration tests
+- **Subsystem requirements** → link ONLY to subsystem-level tests
+- **Unit requirements** → link ONLY to unit-level tests
+
+Lower-level tests validate implementation details, while higher-level requirements
+are validated through integration behavior at their architectural level.
+
 # Requirements File Format
 
 ```yaml
 sections:
   - title: Functional Requirements
     requirements:
-      - id: Project-Subsystem-Feature
+      - id: System-Subsystem-Feature
         title: The system shall perform the required function.
         justification: |
           Business rationale explaining why this requirement exists.
           Include regulatory or standard references where applicable.
-        tests:
+        children:  # Links to child requirements (optional)
+          - ChildSystem-Feature-Behavior
+        tests:     # Links to test methods (required)
           - TestMethodName
           - windows@PlatformSpecificTest  # Source filter for platform evidence
 ```
@@ -88,7 +103,7 @@ sections:
     sections:
       - title: System.Text.Json
         requirements:
-          - id: Project-SystemTextJson-ReadJson
+          - id: TemplateTool-SystemTextJson-ReadJson
             title: System.Text.Json shall be able to read JSON files.
             tests:
               - JsonReaderTests.TestReadValidJson
@@ -96,7 +111,7 @@ sections:
 
 # Semantic IDs (MANDATORY)
 
-Use meaningful IDs following `Project-Section-ShortDesc` pattern because
+Use meaningful IDs following `System-Section-ShortDesc` pattern because
 auditors need to understand requirements without cross-referencing:
 
 - **Good**: `TemplateTool-Core-DisplayHelp`
@@ -127,12 +142,6 @@ dotnet reqstream \
   --requirements requirements.yaml \
   --lint
 
-# Enforce requirements traceability (use in CI/CD)
-dotnet reqstream \
-  --requirements requirements.yaml \
-  --tests "artifacts/**/*.trx" \
-  --enforce
-
 # Generate requirements report
 dotnet reqstream \
   --requirements requirements.yaml \
@@ -154,7 +163,7 @@ dotnet reqstream \
 
 Before submitting requirements, verify:
 
-- [ ] All requirements have semantic IDs (`Project-Section-Feature` pattern)
+- [ ] All requirements have semantic IDs (`System-Section-Feature` pattern)
 - [ ] Every requirement links to at least one passing test
 - [ ] Platform-specific requirements use source filters (`platform@TestName`)
 - [ ] Requirements specify observable behavior (WHAT), not implementation (HOW)
@@ -162,6 +171,7 @@ Before submitting requirements, verify:
 - [ ] Files organized under `docs/reqstream/` following folder structure patterns
 - [ ] Subsystem folders use kebab-case naming matching source code
 - [ ] OTS requirements placed in `ots/` subfolder
+- [ ] Every software unit has requirements file, design doc, and tests
 - [ ] Valid YAML syntax passes yamllint validation
 - [ ] ReqStream enforcement passes: `dotnet reqstream --enforce`
 - [ ] Test result formats compatible (TRX, JUnit XML)
