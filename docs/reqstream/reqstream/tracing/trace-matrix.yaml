@@ -119,7 +119,7 @@ sections:
 
       - title: Reporting
         requirements:
-          - id: ReqStream-Rpt-TraceMatrix
+          - id: ReqStream-Report-TraceMatrix
             title: The tool shall export trace matrices to markdown format.
             justification: |
               Trace matrix export provides visibility into test coverage and requirement satisfaction,
@@ -132,7 +132,7 @@ sections:
               - TraceMatrix_Export_WithNoTests_ShowsNotSatisfied
               - TraceMatrix_Export_WithNotExecutedTests_ShowsNotExecuted
 
-          - id: ReqStream-Rpt-TraceMatrixDepth
+          - id: ReqStream-Report-TraceMatrixDepth
             title: The tool shall support configurable markdown header depth for trace matrices.
             justification: |
               Configurable header depth allows trace matrices to be embedded in larger documents while
@@ -142,7 +142,7 @@ sections:
             tests:
               - TraceMatrix_Export_WithCustomDepth_UsesCorrectHeaderLevel
 
-          - id: ReqStream-Rpt-TagFiltering
+          - id: ReqStream-Report-TagFiltering
             title: The tool shall support filtering trace matrix output by requirement tags.
             justification: |
               Tag-based filtering enables selective trace matrix export and coverage enforcement for
