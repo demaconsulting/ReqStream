@@ -13,7 +13,6 @@ sections:
               - requirements
             tests:
               - Requirements_Load_SimpleRequirement_ParsesCorrectly
-              - Program_Run_WithRequirementsFiles_ProcessesSuccessfully
               - Requirements_Load_ComplexStructure_ParsesCorrectly
 
           - id: ReqStream-Req-Validation
@@ -107,7 +106,6 @@ sections:
               - requirements
             tests:
               - Requirements_Load_RequirementWithChildren_ParsesChildrenCorrectly
-              - TraceMatrix_Export_WithChildRequirements_ConsidersChildTests
 
           - id: ReqStream-Req-TestMappings
             title: The tool shall support test mappings for requirements.
@@ -358,3 +356,63 @@ sections:
               - lint
             tests:
               - RequirementsLoader_Load_WithUnknownChildReference_ReportsError
+
+      - title: Reporting
+        requirements:
+          - id: ReqStream-Rpt-MarkdownExport
+            title: The tool shall export requirements to markdown format.
+            justification: |
+              Markdown export enables requirements to be included in documentation, wikis, and other
+              human-readable formats for stakeholder communication.
+            tags:
+              - reporting
+            tests:
+              - Requirements_Export_SimpleRequirements_CreatesMarkdownFile
+              - Requirements_Export_MultipleSections_ExportsAll
+              - Requirements_Export_EmptyRequirements_CreatesEmptyFile
+
+          - id: ReqStream-Rpt-HeaderDepth
+            title: The tool shall support configurable markdown header depth for requirements reports.
+            justification: |
+              Configurable header depth allows requirements reports to be embedded in larger documents
+              while maintaining proper document structure.
+            tags:
+              - reporting
+            tests:
+              - Requirements_Export_WithCustomDepth_UsesCorrectHeaderLevel
+
+          - id: ReqStream-Rpt-Justifications
+            title: The tool shall export requirement justifications to markdown format.
+            justification: |
+              Justification export enables stakeholders to understand the rationale behind
+              requirements, supporting design reviews, audits, and compliance activities.
+            tags:
+              - reporting
+            tests:
+              - Requirements_ExportJustifications_WithJustifications_CreatesMarkdownFile
+              - Requirements_ExportJustifications_WithoutJustifications_CreatesHeadersOnly
+              - Requirements_ExportJustifications_NestedSections_CreatesHierarchy
+
+          - id: ReqStream-Rpt-JustificationsDepth
+            title: >-
+              The tool shall support configurable markdown header depth for justification
+              reports.
+            justification: |
+              Configurable header depth allows justification reports to be embedded in larger
+              documents while maintaining proper document structure.
+            tags:
+              - reporting
+            tests:
+              - Requirements_ExportJustifications_WithCustomDepth_UsesCorrectHeaderLevel
+
+          - id: ReqStream-Rpt-TagFilterExport
+            title: The tool shall support filtering requirements by tags during export.
+            justification: |
+              Tag-based filtering enables selective export of requirement subsets for focused reports,
+              security audits, compliance documentation, and targeted reviews.
+            tags:
+              - reporting
+            tests:
+              - Requirements_Export_WithFilterTags_ExportsOnlyMatchingRequirements
+              - Requirements_Export_WithMultipleFilterTags_ExportsRequirementsMatchingAnyTag
+              - Requirements_ExportJustifications_WithFilterTags_ExportsOnlyMatchingRequirements

@@ -67,6 +67,16 @@ sections:
             tests:
               - Context_Create_WithRequirementsPattern_ExpandsGlobPattern
 
+          - id: ReqStream-Req-TestGlobPatterns
+            title: The tool shall support glob patterns for test result files.
+            justification: |
+              Glob patterns for test result files simplify CI/CD configuration by enabling flexible
+              specification of multiple test result files across different runs and platforms.
+            tags:
+              - cli
+            tests:
+              - Context_Create_WithTestsPattern_ExpandsGlobPattern
+
           - id: ReqStream-Cmd-Validate
             title: The tool shall accept a validate flag to trigger self-validation mode.
             justification: |
@@ -97,6 +107,39 @@ sections:
               - cli
             tests:
               - Context_WriteError_NormalMode_WritesToConsole
+
+          - id: ReqStream-Cmd-ReportDepth
+            title: The tool shall support configurable markdown header depth for requirements reports.
+            justification: |
+              Configurable header depth allows requirements reports to be embedded in larger documents
+              while maintaining proper document structure.
+            tags:
+              - cli
+            tests:
+              - Context_Create_ReportDepth_SetsReportDepthProperty
+
+          - id: ReqStream-Cmd-MatrixDepth
+            title: The tool shall support configurable markdown header depth for trace matrices.
+            justification: |
+              Configurable header depth allows trace matrices to be embedded in larger documents while
+              maintaining proper document structure.
+            tags:
+              - cli
+            tests:
+              - Context_Create_MatrixDepth_SetsMatrixDepthProperty
+
+          - id: ReqStream-Cmd-TagFilter
+            title: The tool shall support filtering requirements output by tags.
+            justification: |
+              Tag-based filtering enables selective export of requirement subsets for focused reports,
+              security audits, compliance documentation, and targeted reviews.
+            tags:
+              - cli
+            tests:
+              - Context_Create_FilterArgument_ParsesTagsCorrectly
+              - Context_Create_FilterArgumentWithSpaces_TrimsAndParsesTagsCorrectly
+              - Context_Create_FilterSingleTag_ParsesCorrectly
+              - Context_Create_MultipleFilterArguments_MergesIntoSingleSet
 
       - title: Logging
         requirements:

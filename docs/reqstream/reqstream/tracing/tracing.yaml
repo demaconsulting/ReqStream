@@ -34,3 +34,5 @@ sections:
           - ReqStream-Test-PlainTestNames
           - ReqStream-Test-MixedTestNames
           - ReqStream-Rpt-TraceMatrix
+          - ReqStream-Rpt-TraceMatrixDepth
+          - ReqStream-Rpt-TagFiltering

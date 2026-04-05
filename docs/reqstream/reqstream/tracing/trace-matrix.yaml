@@ -15,6 +15,7 @@ sections:
               - TraceMatrix_WithNoFiles_CreatesEmptyMatrix
               - TraceMatrix_MissingFile_ThrowsFileNotFoundException
               - TraceMatrix_WithMultipleFiles_AggregatesResults
+              - TraceMatrix_Export_WithChildRequirements_ConsidersChildTests
 
           - id: ReqStream-Test-TrxFormat
             title: The tool shall support TRX format test results.
@@ -46,7 +47,6 @@ sections:
             tags:
               - testing
             tests:
-              - Context_Create_WithTestsPattern_ExpandsGlobPattern
               - TraceMatrix_WithMixedFormats_ProcessesBoth
 
           - id: ReqStream-Test-SourceFiltering
@@ -119,30 +119,6 @@ sections:
 
       - title: Reporting
         requirements:
-          - id: ReqStream-Rpt-MarkdownExport
-            title: The tool shall export requirements to markdown format.
-            justification: |
-              Markdown export enables requirements to be included in documentation, wikis, and other
-              human-readable formats for stakeholder communication.
-            tags:
-              - reporting
-            tests:
-              - Program_Run_WithRequirementsExport_GeneratesReport
-              - Requirements_Export_SimpleRequirements_CreatesMarkdownFile
-              - Requirements_Export_MultipleSections_ExportsAll
-              - Requirements_Export_EmptyRequirements_CreatesEmptyFile
-
-          - id: ReqStream-Rpt-HeaderDepth
-            title: The tool shall support configurable markdown header depth for requirements reports.
-            justification: |
-              Configurable header depth allows requirements reports to be embedded in larger documents
-              while maintaining proper document structure.
-            tags:
-              - reporting
-            tests:
-              - Context_Create_ReportDepth_SetsReportDepthProperty
-              - Requirements_Export_WithCustomDepth_UsesCorrectHeaderLevel
-
           - id: ReqStream-Rpt-TraceMatrix
             title: The tool shall export trace matrices to markdown format.
             justification: |
@@ -151,7 +127,6 @@ sections:
             tags:
               - reporting
             tests:
-              - Program_Run_WithTraceMatrixExport_GeneratesMatrix
               - TraceMatrix_Export_SimpleTraceMatrix_CreatesMarkdownFile
               - TraceMatrix_Export_WithFailedTests_ShowsFailures
               - TraceMatrix_Export_WithNoTests_ShowsNotSatisfied
@@ -165,47 +140,16 @@ sections:
             tags:
               - reporting
             tests:
-              - Context_Create_MatrixDepth_SetsMatrixDepthProperty
               - TraceMatrix_Export_WithCustomDepth_UsesCorrectHeaderLevel
 
           - id: ReqStream-Rpt-TagFiltering
-            title: The tool shall support filtering requirements by tags.
+            title: The tool shall support filtering trace matrix output by requirement tags.
             justification: |
-              Tag-based filtering enables selective export of requirement subsets for focused reports,
-              security audits, compliance documentation, and targeted reviews.
+              Tag-based filtering enables selective trace matrix export and coverage enforcement for
+              requirement subsets, supporting focused compliance reviews and targeted builds.
             tags:
               - reporting
             tests:
-              - Context_Create_FilterArgument_ParsesTagsCorrectly
-              - Context_Create_FilterArgumentWithSpaces_TrimsAndParsesTagsCorrectly
-              - Context_Create_FilterSingleTag_ParsesCorrectly
-              - Requirements_Export_WithFilterTags_ExportsOnlyMatchingRequirements
-              - Requirements_Export_WithMultipleFilterTags_ExportsRequirementsMatchingAnyTag
-              - Requirements_ExportJustifications_WithFilterTags_ExportsOnlyMatchingRequirements
               - TraceMatrix_Export_WithFilterTags_ExportsOnlyMatchingRequirements
               - TraceMatrix_CalculateSatisfiedRequirements_WithFilterTags_CountsOnlyMatchingRequirements
               - TraceMatrix_GetUnsatisfiedRequirements_WithFilterTags_ReturnsOnlyMatchingRequirements
-
-          - id: ReqStream-Rpt-Justifications
-            title: The tool shall export requirement justifications to markdown format.
-            justification: |
-              Justification export enables stakeholders to understand the rationale behind
-              requirements, supporting design reviews, audits, and compliance activities.
-            tags:
-              - reporting
-            tests:
-              - Requirements_ExportJustifications_WithJustifications_CreatesMarkdownFile
-              - Requirements_ExportJustifications_WithoutJustifications_CreatesHeadersOnly
-              - Requirements_ExportJustifications_NestedSections_CreatesHierarchy
-
-          - id: ReqStream-Rpt-JustificationsDepth
-            title: >-
-              The tool shall support configurable markdown header depth for justification
-              reports.
-            justification: |
-              Configurable header depth allows justification reports to be embedded in larger
-              documents while maintaining proper document structure.
-            tags:
-              - reporting
-            tests:
-              - Requirements_ExportJustifications_WithCustomDepth_UsesCorrectHeaderLevel

@@ -35,3 +35,8 @@ sections:
         children:
           - ReqStream-Req-ParentChild
           - ReqStream-Req-TestMappings
+          - ReqStream-Rpt-MarkdownExport
+          - ReqStream-Rpt-HeaderDepth
+          - ReqStream-Rpt-Justifications
+          - ReqStream-Rpt-JustificationsDepth
+          - ReqStream-Rpt-TagFilterExport
