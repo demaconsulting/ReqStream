@@ -23,6 +23,8 @@ sections:
           - ReqStream-Cmd-Version
           - ReqStream-Cmd-Help
           - ReqStream-Cmd-InvalidArgs
+          - ReqStream-Cmd-Validate
+          - ReqStream-Cmd-Enforce
 
       - id: ReqStream-Cli-Output
         title: The Cli subsystem shall provide output and error reporting channels.
