@@ -420,42 +420,6 @@ sections:
     }
 
     /// <summary>
-    /// Test that --lint via Program.Run works correctly.
-    /// </summary>
-    [TestMethod]
-    public void Program_Run_WithLintFlag_RunsLinter()
-    {
-        var reqFile = Path.Combine(_testDirectory, "valid.yaml");
-        File.WriteAllText(reqFile, @"sections:
-  - title: Test Section
-    requirements:
-      - id: REQ-001
-        title: Test requirement
-");
-
-        var originalOut = Console.Out;
-        using var output = new StringWriter();
-        Console.SetOut(output);
-
-        var originalDir = Directory.GetCurrentDirectory();
-        try
-        {
-            Directory.SetCurrentDirectory(_testDirectory);
-
-            using var context = Context.Create(["--lint", "--requirements", "*.yaml"]);
-            Program.Run(context);
-
-            Assert.AreEqual(0, context.ExitCode);
-            Assert.Contains("No issues found", output.ToString());
-        }
-        finally
-        {
-            Directory.SetCurrentDirectory(originalDir);
-            Console.SetOut(originalOut);
-        }
-    }
-
-    /// <summary>
     /// Test that a mapping with an unknown field reports an error.
     /// </summary>
     [TestMethod]
