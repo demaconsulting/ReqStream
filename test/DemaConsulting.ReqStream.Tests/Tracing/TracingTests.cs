@@ -21,11 +21,11 @@
 namespace DemaConsulting.ReqStream.Tests.Tracing;
 
 /// <summary>
-/// Integration tests for the Tracing subsystem, testing test result loading, trace matrix
+/// Tests for the Tracing subsystem, testing test result loading, trace matrix
 /// generation, and enforcement through the full tool executable.
 /// </summary>
 [TestClass]
-public class TracingIntegrationTests
+public class TracingTests
 {
     private string _dllPath = string.Empty;
     private string _testDirectory = string.Empty;
@@ -56,11 +56,11 @@ public class TracingIntegrationTests
     }
 
     /// <summary>
-    /// Integration test verifying that a trace matrix Markdown file is generated correctly
+    /// Test verifying that a trace matrix Markdown file is generated correctly
     /// from requirements and TRX test results.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_TraceMatrix_GeneratesMarkdown()
+    public void Test_TraceMatrix_GeneratesMarkdown()
     {
         // Arrange: create requirements file with one traceable requirement
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
@@ -109,11 +109,11 @@ public class TracingIntegrationTests
     }
 
     /// <summary>
-    /// Integration test verifying that enforcement mode passes when all requirements have
+    /// Test verifying that enforcement mode passes when all requirements have
     /// passing test evidence.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_EnforcementMode_PassesWithTests()
+    public void Test_EnforcementMode_PassesWithTests()
     {
         // Arrange: create requirements file with one requirement to be satisfied
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
@@ -156,11 +156,11 @@ public class TracingIntegrationTests
     }
 
     /// <summary>
-    /// Integration test verifying that enforcement mode fails when a requirement has no
+    /// Test verifying that enforcement mode fails when a requirement has no
     /// passing test evidence.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_EnforcementMode_FailsWithoutTests()
+    public void Test_EnforcementMode_FailsWithoutTests()
     {
         // Arrange: create requirements file with one requirement that has no matching test
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");

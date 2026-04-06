@@ -74,28 +74,28 @@ reviews:
     paths:
       - "docs/reqstream/reqstream/cli/cli.yaml"             # subsystem requirements
       - "docs/design/reqstream/cli/cli.md"                  # subsystem design
-      - "test/**/Cli/CliIntegrationTests.cs"                # subsystem integration tests
+      - "test/**/Cli/CliTests.cs"                          # subsystem tests
 
   - id: ReqStream-Modeling
     title: Review that ReqStream Modeling Subsystem Satisfies Subsystem Requirements
     paths:
       - "docs/reqstream/reqstream/modeling/modeling.yaml"   # subsystem requirements
       - "docs/design/reqstream/modeling/modeling.md"        # subsystem design
-      - "test/**/Modeling/ModelingIntegrationTests.cs"      # subsystem integration tests
+      - "test/**/Modeling/ModelingTests.cs"                # subsystem tests
 
   - id: ReqStream-Tracing
     title: Review that ReqStream Tracing Subsystem Satisfies Subsystem Requirements
     paths:
       - "docs/reqstream/reqstream/tracing/tracing.yaml"     # subsystem requirements
       - "docs/design/reqstream/tracing/tracing.md"          # subsystem design
-      - "test/**/Tracing/TracingIntegrationTests.cs"        # subsystem integration tests
+      - "test/**/Tracing/TracingTests.cs"                  # subsystem tests
 
   - id: ReqStream-SelfTest
     title: Review that ReqStream SelfTest Subsystem Satisfies Subsystem Requirements
     paths:
       - "docs/reqstream/reqstream/self-test/self-test.yaml"  # subsystem requirements
       - "docs/design/reqstream/self-test/self-test.md"      # subsystem design
-      - "test/**/SelfTest/SelfTestIntegrationTests.cs"      # subsystem integration tests
+      - "test/**/SelfTest/SelfTestTests.cs"                # subsystem tests
 
   # ── Unit Reviews ──────────────────────────────────────────────────────────────
   - id: ReqStream-Program

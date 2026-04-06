@@ -21,11 +21,11 @@
 namespace DemaConsulting.ReqStream.Tests.Modeling;
 
 /// <summary>
-/// Integration tests for the Modeling subsystem, testing requirements loading and export
+/// Tests for the Modeling subsystem, testing requirements loading and export
 /// through the full tool executable.
 /// </summary>
 [TestClass]
-public class ModelingIntegrationTests
+public class ModelingTests
 {
     private string _dllPath = string.Empty;
     private string _testDirectory = string.Empty;
@@ -56,10 +56,10 @@ public class ModelingIntegrationTests
     }
 
     /// <summary>
-    /// Integration test verifying that a requirements report Markdown file is generated correctly.
+    /// Test verifying that a requirements report Markdown file is generated correctly.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_RequirementsReport_GeneratesMarkdown()
+    public void Test_RequirementsReport_GeneratesMarkdown()
     {
         // Arrange: create a requirements file with one testable requirement
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
@@ -95,10 +95,10 @@ public class ModelingIntegrationTests
     }
 
     /// <summary>
-    /// Integration test verifying that a justifications report Markdown file is generated correctly.
+    /// Test verifying that a justifications report Markdown file is generated correctly.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_JustificationsReport_GeneratesMarkdown()
+    public void Test_JustificationsReport_GeneratesMarkdown()
     {
         // Arrange: create a requirements file with one justified requirement
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
@@ -134,11 +134,11 @@ public class ModelingIntegrationTests
     }
 
     /// <summary>
-    /// Integration test verifying that linting a valid requirements file reports no issues
+    /// Test verifying that linting a valid requirements file reports no issues
     /// and exits with code 0.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_LintFlag_ValidFile_ReturnsSuccess()
+    public void Test_LintFlag_ValidFile_ReturnsSuccess()
     {
         // Arrange: create a structurally valid requirements YAML file with no duplicate IDs
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
@@ -167,11 +167,11 @@ public class ModelingIntegrationTests
     }
 
     /// <summary>
-    /// Integration test verifying that linting a requirements file with duplicate IDs
+    /// Test verifying that linting a requirements file with duplicate IDs
     /// reports an error and exits with a non-zero code.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_LintFlag_InvalidFile_ReturnsError()
+    public void Test_LintFlag_InvalidFile_ReturnsError()
     {
         // Arrange: create a requirements YAML file containing duplicate requirement IDs
         var reqFile = Path.Combine(_testDirectory, "invalid.yaml");

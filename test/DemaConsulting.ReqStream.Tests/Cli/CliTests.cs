@@ -21,11 +21,11 @@
 namespace DemaConsulting.ReqStream.Tests.Cli;
 
 /// <summary>
-/// Integration tests for the Cli subsystem, exercising command-line interface features
+/// Tests for the Cli subsystem, exercising command-line interface features
 /// through the full tool executable.
 /// </summary>
 [TestClass]
-public class CliIntegrationTests
+public class CliTests
 {
     private string _dllPath = string.Empty;
     private string _testDirectory = string.Empty;
@@ -56,10 +56,10 @@ public class CliIntegrationTests
     }
 
     /// <summary>
-    /// Integration test verifying that --version outputs a version string and exits with code 0.
+    /// Test verifying that --version outputs a version string and exits with code 0.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_VersionFlag_OutputsVersion()
+    public void Test_VersionFlag_OutputsVersion()
     {
         // Arrange: no setup needed; --version requires no input files
 
@@ -72,10 +72,10 @@ public class CliIntegrationTests
     }
 
     /// <summary>
-    /// Integration test verifying that --help outputs usage information and exits with code 0.
+    /// Test verifying that --help outputs usage information and exits with code 0.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_HelpFlag_OutputsUsageInformation()
+    public void Test_HelpFlag_OutputsUsageInformation()
     {
         // Arrange: no setup needed; --help requires no input files
 
@@ -89,10 +89,10 @@ public class CliIntegrationTests
     }
 
     /// <summary>
-    /// Integration test verifying that --silent suppresses all output.
+    /// Test verifying that --silent suppresses all output.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_SilentFlag_SuppressesOutput()
+    public void Test_SilentFlag_SuppressesOutput()
     {
         // Arrange: no setup needed; --silent suppresses output without requiring input files
 
@@ -105,10 +105,10 @@ public class CliIntegrationTests
     }
 
     /// <summary>
-    /// Integration test verifying that an unknown argument causes a non-zero exit code.
+    /// Test verifying that an unknown argument causes a non-zero exit code.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_UnknownArgument_ReturnsError()
+    public void Test_UnknownArgument_ReturnsError()
     {
         // Arrange: no setup needed; an unrecognized argument should trigger an error response
 
@@ -120,10 +120,10 @@ public class CliIntegrationTests
     }
 
     /// <summary>
-    /// Integration test verifying that --log writes output to the specified file.
+    /// Test verifying that --log writes output to the specified file.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_LogFlag_WritesOutputToFile()
+    public void Test_LogFlag_WritesOutputToFile()
     {
         // Arrange: define path for the log output file
         var logFile = Path.Combine(_testDirectory, "output.log");

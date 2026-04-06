@@ -21,11 +21,11 @@
 namespace DemaConsulting.ReqStream.Tests.SelfTest;
 
 /// <summary>
-/// Integration tests for the SelfTest subsystem, exercising the self-validation mechanism
+/// Tests for the SelfTest subsystem, exercising the self-validation mechanism
 /// through the full tool executable.
 /// </summary>
 [TestClass]
-public class SelfTestIntegrationTests
+public class SelfTestTests
 {
     private string _dllPath = string.Empty;
     private string _testDirectory = string.Empty;
@@ -56,10 +56,10 @@ public class SelfTestIntegrationTests
     }
 
     /// <summary>
-    /// Integration test verifying that --validate runs the self-validation suite successfully.
+    /// Test verifying that --validate runs the self-validation suite successfully.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_ValidateFlag_RunsValidation()
+    public void Test_ValidateFlag_RunsValidation()
     {
         // Arrange: no setup needed; self-validation uses the tool's built-in test suite
 
@@ -71,10 +71,10 @@ public class SelfTestIntegrationTests
     }
 
     /// <summary>
-    /// Integration test verifying that --validate with --results generates a TRX results file.
+    /// Test verifying that --validate with --results generates a TRX results file.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_ValidateWithResults_GeneratesTrxFile()
+    public void Test_ValidateWithResults_GeneratesTrxFile()
     {
         // Arrange: define path for the TRX results output file
         var resultsFile = Path.Combine(_testDirectory, "validation-results.trx");
@@ -97,10 +97,10 @@ public class SelfTestIntegrationTests
     }
 
     /// <summary>
-    /// Integration test verifying that --validate with --results generates a JUnit XML results file.
+    /// Test verifying that --validate with --results generates a JUnit XML results file.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_ValidateWithResults_GeneratesJUnitFile()
+    public void Test_ValidateWithResults_GeneratesJUnitFile()
     {
         // Arrange: define path for the JUnit XML results output file
         var resultsFile = Path.Combine(_testDirectory, "validation-results.xml");
