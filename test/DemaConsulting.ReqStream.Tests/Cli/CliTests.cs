@@ -84,7 +84,7 @@ public class CliTests
     }
 
     /// <summary>
-    /// Test that an unrecognised argument throws an ArgumentException.
+    /// Test that an unrecognized argument throws an ArgumentException.
     /// </summary>
     [TestMethod]
     public void Cli_Interface_UnknownArgument_ThrowsArgumentException()

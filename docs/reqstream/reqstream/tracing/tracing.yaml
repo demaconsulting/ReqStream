@@ -16,6 +16,7 @@ sections:
           test frameworks used in .NET development, maximizing interoperability.
         tests:
           - Tracing_TestResults_TrxFile_LoadsTestResults
+          - Tracing_TestResults_JUnitFile_LoadsTestResults
         children:
           - ReqStream-Test-TrxFormat
           - ReqStream-Test-JUnitFormat

@@ -101,6 +101,49 @@ public class TracingTests
     }
 
     /// <summary>
+    /// Test that a JUnit XML results file is loaded and its test results are accessible via the trace matrix.
+    /// </summary>
+    [TestMethod]
+    public void Tracing_TestResults_JUnitFile_LoadsTestResults()
+    {
+        // Arrange: create a requirements file with one traceable requirement
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: Tracing Test Requirements
+                requirements:
+                  - id: Tracing-Test-Req2
+                    title: The system shall be traced by JUnit tests.
+                    justification: Tracing JUnit test justification.
+                    tests:
+                      - TracingJUnitTest1
+            """);
+        var loadResult = Requirements.Load(reqFile);
+        Assert.IsNotNull(loadResult.Requirements);
+
+        // Arrange: create a JUnit XML file with a passing test result
+        var testResults = new TestResults.TestResults { Name = "TracingJUnitRun" };
+        testResults.Results.Add(new TestResult
+        {
+            Name = "TracingJUnitTest1",
+            ClassName = "TracingTests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+        var junitFile = Path.Combine(_testDirectory, "results.xml");
+        File.WriteAllText(junitFile, JUnitSerializer.Serialize(testResults));
+
+        // Act: create a trace matrix loading the JUnit XML file
+        var matrix = new TraceMatrix(loadResult.Requirements, junitFile);
+
+        // Assert: the test result was loaded with one pass and zero fails
+        var result = matrix.GetTestResult("TracingJUnitTest1");
+        Assert.AreEqual(1, result.Passes);
+        Assert.AreEqual(0, result.Fails);
+    }
+
+    /// <summary>
     /// Test that all requirements are satisfied when every required test has a passing result.
     /// </summary>
     [TestMethod]
