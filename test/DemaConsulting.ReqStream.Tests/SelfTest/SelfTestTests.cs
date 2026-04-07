@@ -18,27 +18,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.ReqStream.Cli;
+using DemaConsulting.ReqStream.SelfTest;
+
 namespace DemaConsulting.ReqStream.Tests.SelfTest;
 
 /// <summary>
-/// Integration tests for the SelfTest subsystem, exercising the self-validation mechanism
-/// through the full tool executable.
+/// Tests for the SelfTest subsystem, proving the Validation class is sufficient to
+/// implement the SelfTest subsystem requirements.
 /// </summary>
 [TestClass]
-public class SelfTestIntegrationTests
+public class SelfTestTests
 {
-    private string _dllPath = string.Empty;
     private string _testDirectory = string.Empty;
 
     /// <summary>
-    /// Initialize test by locating the DLL and creating a temporary test directory.
+    /// Initialize test by creating a temporary test directory.
     /// </summary>
     [TestInitialize]
     public void TestInitialize()
     {
-        _dllPath = Path.Combine(AppContext.BaseDirectory, "DemaConsulting.ReqStream.dll");
-        Assert.IsTrue(File.Exists(_dllPath), $"Could not find ReqStream DLL at {_dllPath}");
-
         _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_self_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
     }
@@ -56,68 +55,57 @@ public class SelfTestIntegrationTests
     }
 
     /// <summary>
-    /// Integration test verifying that --validate runs the self-validation suite successfully.
+    /// Test that self-validation runs successfully and reports no failures.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_ValidateFlag_RunsValidation()
+    public void SelfTest_Qualification_Run_PassesAllTests()
     {
-        // Arrange: no setup needed; self-validation uses the tool's built-in test suite
+        // Arrange: create a silent context to suppress console output during validation
+        using var context = Context.Create(["--silent"]);
 
-        // Act: invoke the tool with --validate and --silent flags
-        var exitCode = Runner.Run(out var output, "dotnet", _dllPath, "--validate", "--silent");
+        // Act: run self-validation
+        Validation.Run(context);
 
         // Assert: exit code is 0 indicating all self-validation checks passed
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
+        Assert.AreEqual(0, context.ExitCode);
     }
 
     /// <summary>
-    /// Integration test verifying that --validate with --results generates a TRX results file.
+    /// Test that self-validation writes a TRX results file when the results path has a .trx extension.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_ValidateWithResults_GeneratesTrxFile()
+    public void SelfTest_ResultsOutput_TrxResultsPath_WritesTrxFile()
     {
         // Arrange: define path for the TRX results output file
         var resultsFile = Path.Combine(_testDirectory, "validation-results.trx");
+        using var context = Context.Create(["--silent", "--results", resultsFile]);
 
-        // Act: invoke the tool with --validate, --silent, and --results flags targeting a .trx path
-        var exitCode = Runner.Run(
-            out var output,
-            "dotnet",
-            _dllPath,
-            "--validate",
-            "--silent",
-            "--results", resultsFile);
+        // Act: run self-validation
+        Validation.Run(context);
 
-        // Assert: exit code is 0, TRX file was created, and contains the expected test run element
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
+        // Assert: exit code is 0 and TRX file was created with expected content
+        Assert.AreEqual(0, context.ExitCode);
         Assert.IsTrue(File.Exists(resultsFile), $"Expected TRX results file at {resultsFile}");
-
         var content = File.ReadAllText(resultsFile);
         Assert.Contains("TestRun", content);
     }
 
     /// <summary>
-    /// Integration test verifying that --validate with --results generates a JUnit XML results file.
+    /// Test that self-validation writes a JUnit XML results file when the results path has a .xml extension.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_ValidateWithResults_GeneratesJUnitFile()
+    public void SelfTest_ResultsOutput_XmlResultsPath_WritesJUnitFile()
     {
         // Arrange: define path for the JUnit XML results output file
         var resultsFile = Path.Combine(_testDirectory, "validation-results.xml");
+        using var context = Context.Create(["--silent", "--results", resultsFile]);
 
-        // Act: invoke the tool with --validate, --silent, and --results flags targeting an .xml path
-        var exitCode = Runner.Run(
-            out var output,
-            "dotnet",
-            _dllPath,
-            "--validate",
-            "--silent",
-            "--results", resultsFile);
+        // Act: run self-validation
+        Validation.Run(context);
 
-        // Assert: exit code is 0, JUnit file was created, and contains the expected testsuite element
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
+        // Assert: exit code is 0 and JUnit XML file was created with expected content
+        Assert.AreEqual(0, context.ExitCode);
         Assert.IsTrue(File.Exists(resultsFile), $"Expected JUnit XML results file at {resultsFile}");
-
         var content = File.ReadAllText(resultsFile);
         Assert.Contains("testsuite", content);
     }

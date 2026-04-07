@@ -15,9 +15,9 @@ sections:
           A CLI interface enables automation in CI/CD pipelines and allows integration with scripts
           and build processes. This is essential for the tool's primary use case.
         tests:
-          - IntegrationTest_VersionFlag_OutputsVersion
-          - IntegrationTest_HelpFlag_OutputsUsageInformation
-          - IntegrationTest_UnknownArgument_ReturnsError
+          - Cli_Interface_VersionFlag_SetsVersionProperty
+          - Cli_Interface_HelpFlag_SetsHelpProperty
+          - Cli_Interface_UnknownArgument_ThrowsArgumentException
         children:
           - ReqStream-Command-Cli
           - ReqStream-Command-Version
@@ -37,8 +37,8 @@ sections:
           Centralized output routing ensures consistent formatting and allows output to be
           suppressed or redirected to a log file as needed.
         tests:
-          - IntegrationTest_SilentFlag_SuppressesOutput
-          - IntegrationTest_LogFlag_WritesOutputToFile
+          - Cli_Output_SilentFlag_SetsSilentProperty
+          - Cli_Output_LogFlag_WritesOutputToLogFile
         children:
           - ReqStream-Command-ErrorOutput
           - ReqStream-Logging-FileOutput
