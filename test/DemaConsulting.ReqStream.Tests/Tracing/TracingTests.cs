@@ -18,27 +18,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.ReqStream.Modeling;
+using DemaConsulting.ReqStream.Tracing;
+using DemaConsulting.TestResults;
+using DemaConsulting.TestResults.IO;
+using TestResult = DemaConsulting.TestResults.TestResult;
+
 namespace DemaConsulting.ReqStream.Tests.Tracing;
 
 /// <summary>
-/// Tests for the Tracing subsystem, testing test result loading, trace matrix
-/// generation, and enforcement through the full tool executable.
+/// Tests for the Tracing subsystem, proving the TraceMatrix class is sufficient to
+/// implement the Tracing subsystem requirements.
 /// </summary>
 [TestClass]
 public class TracingTests
 {
-    private string _dllPath = string.Empty;
     private string _testDirectory = string.Empty;
 
     /// <summary>
-    /// Initialize test by locating the DLL and creating a temporary test directory.
+    /// Initialize test by creating a temporary test directory.
     /// </summary>
     [TestInitialize]
     public void TestInitialize()
     {
-        _dllPath = Path.Combine(AppContext.BaseDirectory, "DemaConsulting.ReqStream.dll");
-        Assert.IsTrue(File.Exists(_dllPath), $"Could not find ReqStream DLL at {_dllPath}");
-
         _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_tracing_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
     }
@@ -56,13 +58,12 @@ public class TracingTests
     }
 
     /// <summary>
-    /// Test verifying that a trace matrix Markdown file is generated correctly
-    /// from requirements and TRX test results.
+    /// Test that a TRX results file is loaded and its test results are accessible via the trace matrix.
     /// </summary>
     [TestMethod]
-    public void Test_TraceMatrix_GeneratesMarkdown()
+    public void Tracing_TestResults_TrxFile_LoadsTestResults()
     {
-        // Arrange: create requirements file with one traceable requirement
+        // Arrange: create a requirements file with one traceable requirement
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
@@ -74,48 +75,38 @@ public class TracingTests
                     tests:
                       - TracingTest1
             """);
+        var loadResult = Requirements.Load(reqFile);
+        Assert.IsNotNull(loadResult.Requirements);
 
-        // Arrange: create TRX file with a passing test result matching the requirement
-        var testResults = new DemaConsulting.TestResults.TestResults { Name = "TracingRun" };
-        testResults.Results.Add(new DemaConsulting.TestResults.TestResult
+        // Arrange: create a TRX file with a passing test result
+        var testResults = new TestResults.TestResults { Name = "TracingRun" };
+        testResults.Results.Add(new TestResult
         {
             Name = "TracingTest1",
             ClassName = "TracingTests",
             CodeBase = "Tests.dll",
-            Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
+            Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
         var trxFile = Path.Combine(_testDirectory, "results.trx");
-        File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
+        File.WriteAllText(trxFile, TrxSerializer.Serialize(testResults));
 
-        var matrixFile = Path.Combine(_testDirectory, "matrix.md");
+        // Act: create a trace matrix loading the TRX file
+        var matrix = new TraceMatrix(loadResult.Requirements, trxFile);
 
-        // Act: invoke the tool to generate a trace matrix report
-        var exitCode = Runner.RunInDirectory(
-            out var output,
-            _testDirectory,
-            "dotnet",
-            _dllPath,
-            "--requirements", "requirements.yaml",
-            "--tests", "results.trx",
-            "--matrix", matrixFile);
-
-        // Assert: exit code is 0, matrix file exists, and contains the requirement ID
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
-        Assert.IsTrue(File.Exists(matrixFile), "Trace matrix report should be generated.");
-
-        var content = File.ReadAllText(matrixFile);
-        Assert.Contains("Tracing-Test-Req1", content);
+        // Assert: the test result was loaded with one pass and zero fails
+        var result = matrix.GetTestResult("TracingTest1");
+        Assert.AreEqual(1, result.Passes);
+        Assert.AreEqual(0, result.Fails);
     }
 
     /// <summary>
-    /// Test verifying that enforcement mode passes when all requirements have
-    /// passing test evidence.
+    /// Test that all requirements are satisfied when every required test has a passing result.
     /// </summary>
     [TestMethod]
-    public void Test_EnforcementMode_PassesWithTests()
+    public void Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied()
     {
-        // Arrange: create requirements file with one requirement to be satisfied
+        // Arrange: create a requirements file with one requirement to be satisfied
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
@@ -127,42 +118,37 @@ public class TracingTests
                     tests:
                       - EnforcementTest1
             """);
+        var loadResult = Requirements.Load(reqFile);
+        Assert.IsNotNull(loadResult.Requirements);
 
-        // Arrange: create TRX file with a passing test result matching the requirement
-        var testResults = new DemaConsulting.TestResults.TestResults { Name = "EnforcementRun" };
-        testResults.Results.Add(new DemaConsulting.TestResults.TestResult
+        // Arrange: create a TRX file with a passing test result matching the requirement
+        var testResults = new TestResults.TestResults { Name = "EnforcementRun" };
+        testResults.Results.Add(new TestResult
         {
             Name = "EnforcementTest1",
             ClassName = "EnforcementTests",
             CodeBase = "Tests.dll",
-            Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
+            Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
         var trxFile = Path.Combine(_testDirectory, "results.trx");
-        File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
+        File.WriteAllText(trxFile, TrxSerializer.Serialize(testResults));
 
-        // Act: invoke the tool in enforcement mode
-        var exitCode = Runner.RunInDirectory(
-            out var output,
-            _testDirectory,
-            "dotnet",
-            _dllPath,
-            "--requirements", "requirements.yaml",
-            "--tests", "results.trx",
-            "--enforce");
+        // Act: build the trace matrix and check unsatisfied requirements
+        var matrix = new TraceMatrix(loadResult.Requirements, trxFile);
+        var unsatisfied = matrix.GetUnsatisfiedRequirements();
 
-        // Assert: exit code is 0 because all requirements are satisfied
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
+        // Assert: no unsatisfied requirements
+        Assert.HasCount(0, unsatisfied);
     }
 
     /// <summary>
-    /// Test verifying that enforcement mode fails when a requirement has no
-    /// passing test evidence.
+    /// Test that a requirement is unsatisfied when its required test has no matching result.
     /// </summary>
     [TestMethod]
-    public void Test_EnforcementMode_FailsWithoutTests()
+    public void Tracing_Coverage_WithMissingTests_RequirementIsUnsatisfied()
     {
-        // Arrange: create requirements file with one requirement that has no matching test
+        // Arrange: create a requirements file with one requirement whose test will not be present
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
@@ -174,23 +160,20 @@ public class TracingTests
                     tests:
                       - MissingTest1
             """);
+        var loadResult = Requirements.Load(reqFile);
+        Assert.IsNotNull(loadResult.Requirements);
 
-        // Arrange: create TRX file with no test results (empty run)
-        var testResults = new DemaConsulting.TestResults.TestResults { Name = "EmptyRun" };
+        // Arrange: create a TRX file with no test results (empty run)
+        var testResults = new TestResults.TestResults { Name = "EmptyRun" };
         var trxFile = Path.Combine(_testDirectory, "empty.trx");
-        File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
+        File.WriteAllText(trxFile, TrxSerializer.Serialize(testResults));
 
-        // Act: invoke the tool in enforcement mode with no matching test evidence
-        var exitCode = Runner.RunInDirectory(
-            out var output,
-            _testDirectory,
-            "dotnet",
-            _dllPath,
-            "--requirements", "requirements.yaml",
-            "--tests", "empty.trx",
-            "--enforce");
+        // Act: build the trace matrix and check unsatisfied requirements
+        var matrix = new TraceMatrix(loadResult.Requirements, trxFile);
+        var unsatisfied = matrix.GetUnsatisfiedRequirements();
 
-        // Assert: exit code is non-zero because the requirement lacks test evidence
-        Assert.AreNotEqual(0, exitCode, $"Expected non-zero exit code but got 0. Output: {output}");
+        // Assert: the requirement is listed as unsatisfied
+        Assert.HasCount(1, unsatisfied);
+        Assert.Contains("Tracing-Enforce-Unsatisfied", unsatisfied);
     }
 }

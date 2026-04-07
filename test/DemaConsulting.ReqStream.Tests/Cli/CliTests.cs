@@ -18,27 +18,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.ReqStream.Cli;
+
 namespace DemaConsulting.ReqStream.Tests.Cli;
 
 /// <summary>
-/// Tests for the Cli subsystem, exercising command-line interface features
-/// through the full tool executable.
+/// Tests for the Cli subsystem, proving the Context class is sufficient to implement
+/// the Cli subsystem requirements.
 /// </summary>
 [TestClass]
 public class CliTests
 {
-    private string _dllPath = string.Empty;
     private string _testDirectory = string.Empty;
 
     /// <summary>
-    /// Initialize test by locating the DLL and creating a temporary test directory.
+    /// Initialize test by creating a temporary test directory.
     /// </summary>
     [TestInitialize]
     public void TestInitialize()
     {
-        _dllPath = Path.Combine(AppContext.BaseDirectory, "DemaConsulting.ReqStream.dll");
-        Assert.IsTrue(File.Exists(_dllPath), $"Could not find ReqStream DLL at {_dllPath}");
-
         _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_cli_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
     }
@@ -56,83 +54,80 @@ public class CliTests
     }
 
     /// <summary>
-    /// Test verifying that --version outputs a version string and exits with code 0.
+    /// Test that the --version flag sets the Version property on the context.
     /// </summary>
     [TestMethod]
-    public void Test_VersionFlag_OutputsVersion()
+    public void Cli_Interface_VersionFlag_SetsVersionProperty()
     {
-        // Arrange: no setup needed; --version requires no input files
+        // Arrange: nothing to arrange - the --version flag alone is the input
 
-        // Act: invoke the tool with --version flag
-        var exitCode = Runner.Run(out var output, "dotnet", _dllPath, "--version");
+        // Act: create a context with the --version flag
+        using var context = Context.Create(["--version"]);
 
-        // Assert: exit code is 0 and output contains a version string
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
-        Assert.IsFalse(string.IsNullOrWhiteSpace(output), "Expected non-empty version output.");
+        // Assert: the Version property is true
+        Assert.IsTrue(context.Version);
     }
 
     /// <summary>
-    /// Test verifying that --help outputs usage information and exits with code 0.
+    /// Test that the --help flag sets the Help property on the context.
     /// </summary>
     [TestMethod]
-    public void Test_HelpFlag_OutputsUsageInformation()
+    public void Cli_Interface_HelpFlag_SetsHelpProperty()
     {
-        // Arrange: no setup needed; --help requires no input files
+        // Arrange: nothing to arrange - the --help flag alone is the input
 
-        // Act: invoke the tool with --help flag
-        var exitCode = Runner.Run(out var output, "dotnet", _dllPath, "--help");
+        // Act: create a context with the --help flag
+        using var context = Context.Create(["--help"]);
 
-        // Assert: exit code is 0 and output contains usage information
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
-        Assert.Contains("Usage:", output);
-        Assert.Contains("--version", output);
+        // Assert: the Help property is true
+        Assert.IsTrue(context.Help);
     }
 
     /// <summary>
-    /// Test verifying that --silent suppresses all output.
+    /// Test that an unrecognised argument throws an ArgumentException.
     /// </summary>
     [TestMethod]
-    public void Test_SilentFlag_SuppressesOutput()
+    public void Cli_Interface_UnknownArgument_ThrowsArgumentException()
     {
-        // Arrange: no setup needed; --silent suppresses output without requiring input files
+        // Arrange: nothing to arrange - the unknown argument is the input
 
-        // Act: invoke the tool with --silent flag
-        var exitCode = Runner.Run(out var output, "dotnet", _dllPath, "--silent");
-
-        // Assert: exit code is 0 and no output is produced
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
-        Assert.IsTrue(string.IsNullOrWhiteSpace(output), $"Expected no output with --silent but got: {output}");
+        // Act + Assert: creating a context with an unknown argument throws ArgumentException
+        Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--unknown-argument-xyz"]));
     }
 
     /// <summary>
-    /// Test verifying that an unknown argument causes a non-zero exit code.
+    /// Test that the --silent flag sets the Silent property on the context.
     /// </summary>
     [TestMethod]
-    public void Test_UnknownArgument_ReturnsError()
+    public void Cli_Output_SilentFlag_SetsSilentProperty()
     {
-        // Arrange: no setup needed; an unrecognized argument should trigger an error response
+        // Arrange: nothing to arrange - the --silent flag alone is the input
 
-        // Act: invoke the tool with an unrecognized argument
-        var exitCode = Runner.Run(out var output, "dotnet", _dllPath, "--unknown-argument-xyz");
+        // Act: create a context with the --silent flag
+        using var context = Context.Create(["--silent"]);
 
-        // Assert: exit code is non-zero indicating the argument was rejected
-        Assert.AreNotEqual(0, exitCode, $"Expected non-zero exit code for unknown argument. Output: {output}");
+        // Assert: the Silent property is true
+        Assert.IsTrue(context.Silent);
     }
 
     /// <summary>
-    /// Test verifying that --log writes output to the specified file.
+    /// Test that the --log flag causes output to be written to the specified file.
     /// </summary>
     [TestMethod]
-    public void Test_LogFlag_WritesOutputToFile()
+    public void Cli_Output_LogFlag_WritesOutputToLogFile()
     {
         // Arrange: define path for the log output file
         var logFile = Path.Combine(_testDirectory, "output.log");
 
-        // Act: invoke the tool with --log flag pointing to the target file
-        var exitCode = Runner.Run(out var _, "dotnet", _dllPath, "--log", logFile);
+        // Act: create a context with the --log flag, write a message, then dispose to flush
+        using (var context = Context.Create(["--silent", "--log", logFile]))
+        {
+            context.WriteLine("test output message");
+        }
 
-        // Assert: exit code is 0 and the log file was created
-        Assert.AreEqual(0, exitCode);
+        // Assert: log file exists and contains the written message
         Assert.IsTrue(File.Exists(logFile), $"Expected log file at {logFile}");
+        var content = File.ReadAllText(logFile);
+        Assert.Contains("test output message", content);
     }
 }

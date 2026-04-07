@@ -19,7 +19,7 @@ sections:
           summary, enabling quality assurance teams to obtain tool qualification evidence
           without requiring a separate test harness.
         tests:
-          - IntegrationTest_ValidateFlag_RunsValidation
+          - SelfTest_Qualification_Run_PassesAllTests
         children:
           - ReqStream-Validation-SelfValidation
 
@@ -32,5 +32,5 @@ sections:
           directly into pipeline tooling and traceability reports without additional
           conversion steps, satisfying audit trail requirements.
         tests:
-          - IntegrationTest_ValidateWithResults_GeneratesTrxFile
-          - IntegrationTest_ValidateWithResults_GeneratesJUnitFile
+          - SelfTest_ResultsOutput_TrxResultsPath_WritesTrxFile
+          - SelfTest_ResultsOutput_XmlResultsPath_WritesJUnitFile

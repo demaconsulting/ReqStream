@@ -18,27 +18,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.ReqStream.Modeling;
+
 namespace DemaConsulting.ReqStream.Tests.Modeling;
 
 /// <summary>
-/// Tests for the Modeling subsystem, testing requirements loading and export
-/// through the full tool executable.
+/// Tests for the Modeling subsystem, proving the Requirements class is sufficient to
+/// implement the Modeling subsystem requirements.
 /// </summary>
 [TestClass]
 public class ModelingTests
 {
-    private string _dllPath = string.Empty;
     private string _testDirectory = string.Empty;
 
     /// <summary>
-    /// Initialize test by locating the DLL and creating a temporary test directory.
+    /// Initialize test by creating a temporary test directory.
     /// </summary>
     [TestInitialize]
     public void TestInitialize()
     {
-        _dllPath = Path.Combine(AppContext.BaseDirectory, "DemaConsulting.ReqStream.dll");
-        Assert.IsTrue(File.Exists(_dllPath), $"Could not find ReqStream DLL at {_dllPath}");
-
         _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_modeling_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
     }
@@ -56,12 +54,12 @@ public class ModelingTests
     }
 
     /// <summary>
-    /// Test verifying that a requirements report Markdown file is generated correctly.
+    /// Test that loading a valid YAML file produces a requirements model with no errors.
     /// </summary>
     [TestMethod]
-    public void Test_RequirementsReport_GeneratesMarkdown()
+    public void Modeling_YamlParsing_ValidFile_LoadsRequirements()
     {
-        // Arrange: create a requirements file with one testable requirement
+        // Arrange: create a valid requirements YAML file
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
@@ -74,71 +72,21 @@ public class ModelingTests
                       - SomeTest
             """);
 
-        var reportFile = Path.Combine(_testDirectory, "requirements.md");
+        // Act: load the requirements file
+        var result = Requirements.Load(reqFile);
 
-        // Act: invoke the tool to generate a requirements report
-        var exitCode = Runner.RunInDirectory(
-            out var output,
-            _testDirectory,
-            "dotnet",
-            _dllPath,
-            "--requirements", "requirements.yaml",
-            "--report", reportFile);
-
-        // Assert: exit code is 0, report file exists, and contains the requirement ID and title
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
-        Assert.IsTrue(File.Exists(reportFile), "Requirements report should be generated.");
-
-        var content = File.ReadAllText(reportFile);
-        Assert.Contains("Modeling-Test-Req1", content);
-        Assert.Contains("The system shall have a testable requirement.", content);
+        // Assert: requirements loaded successfully with no errors
+        Assert.IsNotNull(result.Requirements);
+        Assert.IsFalse(result.HasErrors);
+        Assert.HasCount(1, result.Requirements.Sections);
+        Assert.AreEqual("Modeling-Test-Req1", result.Requirements.Sections[0].Requirements[0].Id);
     }
 
     /// <summary>
-    /// Test verifying that a justifications report Markdown file is generated correctly.
+    /// Test that loading a valid YAML file produces no lint issues.
     /// </summary>
     [TestMethod]
-    public void Test_JustificationsReport_GeneratesMarkdown()
-    {
-        // Arrange: create a requirements file with one justified requirement
-        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(reqFile, """
-            sections:
-              - title: Modeling Test Requirements
-                requirements:
-                  - id: Modeling-Test-Req2
-                    title: The system shall have a justified requirement.
-                    justification: This justification explains why the requirement is needed.
-                    tests:
-                      - SomeTest
-            """);
-
-        var justificationsFile = Path.Combine(_testDirectory, "justifications.md");
-
-        // Act: invoke the tool to generate a justifications report
-        var exitCode = Runner.RunInDirectory(
-            out var output,
-            _testDirectory,
-            "dotnet",
-            _dllPath,
-            "--requirements", "requirements.yaml",
-            "--justifications", justificationsFile);
-
-        // Assert: exit code is 0, report file exists, and contains the requirement ID and justification text
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
-        Assert.IsTrue(File.Exists(justificationsFile), "Justifications report should be generated.");
-
-        var content = File.ReadAllText(justificationsFile);
-        Assert.Contains("Modeling-Test-Req2", content);
-        Assert.Contains("This justification explains why the requirement is needed.", content);
-    }
-
-    /// <summary>
-    /// Test verifying that linting a valid requirements file reports no issues
-    /// and exits with code 0.
-    /// </summary>
-    [TestMethod]
-    public void Test_LintFlag_ValidFile_ReturnsSuccess()
+    public void Modeling_YamlParsing_ValidFile_ReturnsNoLintIssues()
     {
         // Arrange: create a structurally valid requirements YAML file with no duplicate IDs
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
@@ -153,25 +101,19 @@ public class ModelingTests
                       - LintTest1
             """);
 
-        // Act: invoke the tool with --lint flag on the valid requirements file
-        var exitCode = Runner.RunInDirectory(
-            out var output,
-            _testDirectory,
-            "dotnet",
-            _dllPath,
-            "--requirements", "requirements.yaml",
-            "--lint");
+        // Act: load the requirements file
+        var result = Requirements.Load(reqFile);
 
-        // Assert: exit code is 0 indicating no linting issues were found
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 for valid file but got {exitCode}. Output: {output}");
+        // Assert: no lint issues reported
+        Assert.IsFalse(result.HasErrors);
+        Assert.HasCount(0, result.Issues);
     }
 
     /// <summary>
-    /// Test verifying that linting a requirements file with duplicate IDs
-    /// reports an error and exits with a non-zero code.
+    /// Test that loading a YAML file with duplicate requirement IDs reports a lint error.
     /// </summary>
     [TestMethod]
-    public void Test_LintFlag_InvalidFile_ReturnsError()
+    public void Modeling_YamlParsing_DuplicateIds_DetectsLintError()
     {
         // Arrange: create a requirements YAML file containing duplicate requirement IDs
         var reqFile = Path.Combine(_testDirectory, "invalid.yaml");
@@ -191,16 +133,76 @@ public class ModelingTests
                       - Test2
             """);
 
-        // Act: invoke the tool with --lint flag on the invalid requirements file
-        var exitCode = Runner.RunInDirectory(
-            out var output,
-            _testDirectory,
-            "dotnet",
-            _dllPath,
-            "--requirements", "invalid.yaml",
-            "--lint");
+        // Act: load the requirements file
+        var result = Requirements.Load(reqFile);
 
-        // Assert: exit code is non-zero indicating a linting error was detected
-        Assert.AreNotEqual(0, exitCode, $"Expected non-zero exit code for invalid file but got 0. Output: {output}");
+        // Assert: an error-level lint issue was detected
+        Assert.IsTrue(result.HasErrors);
+    }
+
+    /// <summary>
+    /// Test that a requirements Markdown report is generated correctly.
+    /// </summary>
+    [TestMethod]
+    public void Modeling_Export_Requirements_GeneratesMarkdownFile()
+    {
+        // Arrange: create a requirements file with one testable requirement
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: Modeling Test Requirements
+                requirements:
+                  - id: Modeling-Test-Req1
+                    title: The system shall have a testable requirement.
+                    justification: Test justification.
+                    tests:
+                      - SomeTest
+            """);
+        var loadResult = Requirements.Load(reqFile);
+        Assert.IsNotNull(loadResult.Requirements);
+
+        var reportFile = Path.Combine(_testDirectory, "requirements.md");
+
+        // Act: export the requirements to a Markdown file
+        loadResult.Requirements.Export(reportFile);
+
+        // Assert: report file exists and contains the requirement ID and title
+        Assert.IsTrue(File.Exists(reportFile), "Requirements report should be generated.");
+        var content = File.ReadAllText(reportFile);
+        Assert.Contains("Modeling-Test-Req1", content);
+        Assert.Contains("The system shall have a testable requirement.", content);
+    }
+
+    /// <summary>
+    /// Test that a justifications Markdown report is generated correctly.
+    /// </summary>
+    [TestMethod]
+    public void Modeling_Export_Justifications_GeneratesMarkdownFile()
+    {
+        // Arrange: create a requirements file with one justified requirement
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: Modeling Test Requirements
+                requirements:
+                  - id: Modeling-Test-Req2
+                    title: The system shall have a justified requirement.
+                    justification: This justification explains why the requirement is needed.
+                    tests:
+                      - SomeTest
+            """);
+        var loadResult = Requirements.Load(reqFile);
+        Assert.IsNotNull(loadResult.Requirements);
+
+        var justificationsFile = Path.Combine(_testDirectory, "justifications.md");
+
+        // Act: export the justifications to a Markdown file
+        loadResult.Requirements.ExportJustifications(justificationsFile);
+
+        // Assert: report file exists and contains the requirement ID and justification text
+        Assert.IsTrue(File.Exists(justificationsFile), "Justifications report should be generated.");
+        var content = File.ReadAllText(justificationsFile);
+        Assert.Contains("Modeling-Test-Req2", content);
+        Assert.Contains("This justification explains why the requirement is needed.", content);
     }
 }
