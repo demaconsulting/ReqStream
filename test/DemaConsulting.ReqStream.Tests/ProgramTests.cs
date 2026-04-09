@@ -598,10 +598,112 @@ sections:
             Directory.SetCurrentDirectory(originalDir);
         }
 
-        // Check log contains expected lint output (after context is disposed to flush log)
+        // When lint finds no issues, the log should be empty (no banner, no summary line)
         Assert.IsTrue(File.Exists(logFile), "Log file should exist");
         var logContent = File.ReadAllText(logFile);
-        StringAssert.Contains(logContent, "No issues found");
+        Assert.AreEqual(string.Empty, logContent.Trim(), "Lint with no issues should produce no output");
+    }
+
+    /// <summary>
+    /// Test Run with lint flag does not print the banner.
+    /// </summary>
+    [TestMethod]
+    public void Program_Run_WithLintFlag_SuppressesBanner()
+    {
+        // Create a valid requirements file
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, @"
+sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Test Requirement
+");
+
+        var originalOut = Console.Out;
+        using var output = new StringWriter();
+        Console.SetOut(output);
+
+        var originalDir = Directory.GetCurrentDirectory();
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory);
+
+            using var context = Context.Create(["--lint", "--requirements", "*.yaml"]);
+            Program.Run(context);
+
+            Assert.AreEqual(0, context.ExitCode);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+            Console.SetOut(originalOut);
+        }
+
+        // Banner and summary should not appear in output
+        var outputText = output.ToString();
+        Assert.IsFalse(outputText.Contains("ReqStream version"), "Banner should be suppressed during lint");
+        Assert.IsFalse(outputText.Contains("Copyright"), "Banner should be suppressed during lint");
+        Assert.IsFalse(outputText.Contains("No issues found"), "Summary line should be suppressed during lint");
+        Assert.AreEqual(string.Empty, outputText.Trim(), "Output should be empty for clean lint");
+    }
+
+    /// <summary>
+    /// Test Run with lint flag only outputs issue lines (no banner, no summary) when issues are found.
+    /// </summary>
+    [TestMethod]
+    public void Program_Run_WithLintFlag_OnlyOutputsIssues()
+    {
+        // Create a valid requirements file
+        var validFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(validFile, @"
+sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Test Requirement
+");
+
+        // Create a second file with a duplicate ID to cause a lint issue
+        var badFile = Path.Combine(_testDirectory, "bad-requirements.yaml");
+        File.WriteAllText(badFile, @"
+sections:
+  - title: Bad Section
+    requirements:
+      - id: REQ-001
+        title: Duplicate Requirement
+");
+
+        var logFile = Path.Combine(_testDirectory, "lint-issues.log");
+
+        var originalDir = Directory.GetCurrentDirectory();
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory);
+
+            using (var context = Context.Create([
+                "--lint",
+                "--requirements", "requirements.yaml",
+                "--requirements", "bad-requirements.yaml",
+                "--silent",
+                "--log", logFile]))
+            {
+                Program.Run(context);
+
+                Assert.AreEqual(1, context.ExitCode, "Lint with duplicate IDs should fail");
+            }
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+
+        // Log should contain the duplicate-ID issue but not the banner or summary
+        Assert.IsTrue(File.Exists(logFile), "Log file should exist");
+        var logContent = File.ReadAllText(logFile);
+        StringAssert.Contains(logContent, "REQ-001", "Issue about duplicate ID should appear in output");
+        Assert.IsFalse(logContent.Contains("ReqStream version"), "Banner should not appear in lint output");
+        Assert.IsFalse(logContent.Contains("No issues found"), "Summary line should not appear in lint output");
     }
 
     /// <summary>

@@ -631,12 +631,12 @@ docs/requirements/other.yaml(10,1): error: Section missing required field 'title
 
 **Example output when no issues are found:**
 
-```text
-requirements.yaml: No issues found
-```
+When no issues are found, `--lint` produces **no output** and exits with code `0`. This makes it easy
+to integrate into lint scripts where silence means success.
 
 The exit code is `0` when no issues are found, and `1` when any issues are reported — making `--lint`
-suitable for use in CI/CD quality gates.
+suitable for use in CI/CD quality gates. The application banner is also suppressed during lint so that
+only actionable issue lines appear in the output.
 
 **Issues detected by the linter:**
 
