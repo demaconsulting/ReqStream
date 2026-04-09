@@ -57,7 +57,7 @@ order; if a step applies, execution returns immediately without reaching later s
 | Priority | Condition | Action |
 | -------- | --------- | ------ |
 | 1 | `context.Version` is `true` | Print version string only; return |
-| 2 | (always) | Call `PrintBanner` |
+| 2 | `context.Lint` is `false` | Call `PrintBanner` |
 | 3 | `context.Help` is `true` | Call `PrintHelp`; return |
 | 4 | `context.Validate` is `true` | Call `Validation.Run(context)`; return |
 | 5 | `context.Lint` is `true` | Call `Requirements.Load(context.RequirementsFiles)`; report lint issues; return |
@@ -67,7 +67,9 @@ order; if a step applies, execution returns immediately without reaching later s
 
 `PrintBanner` writes three lines to `context`: the tool name with version string, the copyright
 notice, and a blank line. It is called at priority step 2 for all invocations except version
-queries, so that every non-trivial invocation identifies the running version.
+queries and lint runs, so that every non-trivial invocation identifies the running version.
+The banner is suppressed during lint to keep output clean for lint script integration — only
+actionable issue lines are emitted.
 
 ### `PrintHelp`
 

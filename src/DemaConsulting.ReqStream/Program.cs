@@ -96,8 +96,11 @@ internal static class Program
             return;
         }
 
-        // Print application banner
-        PrintBanner(context);
+        // Print application banner (suppressed during lint for cleaner script integration)
+        if (!context.Lint)
+        {
+            PrintBanner(context);
+        }
 
         // Priority 2: Help
         if (context.Help)
@@ -124,11 +127,6 @@ internal static class Program
 
             var result = Requirements.Load(context.RequirementsFiles.ToArray());
             result.ReportIssues(context);
-
-            if (result.Issues.Count == 0)
-            {
-                context.WriteLine("No issues found");
-            }
 
             return;
         }

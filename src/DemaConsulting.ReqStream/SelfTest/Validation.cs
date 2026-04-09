@@ -549,10 +549,10 @@ public static class Validation
 
                 logContent = File.ReadAllText(logFile);
 
-                if (exitCode != 0 || !logContent.Contains("No issues found"))
+                if (exitCode != 0 || !string.IsNullOrEmpty(logContent.Trim()))
                 {
                     test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
-                    test.ErrorMessage = "Lint of valid file should succeed with 'No issues found'";
+                    test.ErrorMessage = "Lint of valid file should succeed with no output";
                     context.WriteError($"✗ ReqStream_Lint - Failed: {test.ErrorMessage}");
                     FinalizeTestResult(test, startTime, testResults);
                     return;
