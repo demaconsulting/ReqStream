@@ -64,6 +64,18 @@ A `filepart@testname` entry matches only test result files whose names contain `
 requirements to enforce that platform-specific requirements are satisfied by evidence from the
 correct platform.
 
+## Lint Flow
+
+When `--lint` is specified, `Program.Run` loads the requirements files via
+`Requirements.Load(context.RequirementsFiles)` and reports any lint issues. The lint flow differs
+from normal processing in two important ways:
+
+1. **No banner** — `PrintBanner` is suppressed so that only actionable issue lines appear in the
+   output, making it straightforward to integrate `--lint` into editor tooling or CI scripts that
+   treat non-empty output as failure.
+2. **No summary** — when no issues are found the tool exits silently with code `0`; when issues are
+   found each issue line is written to the output and the tool exits with code `1`.
+
 ## Self-Validation Flow
 
 When `--validate` is specified, `Program.Run` delegates entirely to `Validation.Run(context)`.
