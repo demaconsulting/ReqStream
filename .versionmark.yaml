@@ -49,10 +49,9 @@ tools:
     command: dotnet tool list
     regex: '(?i)demaconsulting\.sonarmark\s+(?<version>\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?)'
 
-  # ReqStream (DemaConsulting.ReqStream from dotnet tool list --global)
-  # Note: ReqStream is installed globally in integration-test and build-docs jobs
+  # ReqStream (DemaConsulting.ReqStream from dotnet tool list)
   reqstream:
-    command: dotnet tool list --global
+    command: dotnet tool list
     regex: '(?i)demaconsulting\.reqstream\s+(?<version>\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?)'
 
   # BuildMark (DemaConsulting.BuildMark from dotnet tool list)

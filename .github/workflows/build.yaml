@@ -438,15 +438,6 @@ jobs:
       - name: Install npm dependencies
         run: npm install
 
-      - name: Install ReqStream from build
-        shell: bash
-        run: |
-          echo "Installing ReqStream version ${{ inputs.version }}"
-          dotnet tool install --global \
-            --add-source packages \
-            --version ${{ inputs.version }} \
-            DemaConsulting.ReqStream
-
       - name: Restore Tools
         run: dotnet tool restore
 
@@ -469,7 +460,7 @@ jobs:
       # Downstream projects: Add any additional self-validation steps here.
 
       - name: Run ReqStream self-validation
-        run: reqstream --validate --results artifacts/reqstream-self-validation.trx
+        run: dotnet reqstream --validate --results artifacts/reqstream-self-validation.trx
 
       - name: Run BuildMark self-validation
         run: dotnet buildmark --validate --results artifacts/buildmark-self-validation.trx
@@ -492,7 +483,7 @@ jobs:
 
       - name: Generate Requirements Report, Justifications, and Trace Matrix
         run: >
-          reqstream
+          dotnet reqstream
           --requirements requirements.yaml
           --tests "artifacts/**/*.trx"
           --report docs/requirements_doc/requirements.md
