@@ -415,12 +415,6 @@ jobs:
           merge-multiple: true
         continue-on-error: true
 
-      - name: Download packages artifact
-        uses: actions/download-artifact@v8
-        with:
-          name: packages-ubuntu-latest
-          path: packages
-
       # === INSTALL DEPENDENCIES ===
       # This section installs all required dependencies and tools for document generation.
       # Downstream projects: Add any additional dependency installations here.
