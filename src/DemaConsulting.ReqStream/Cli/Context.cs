@@ -197,6 +197,7 @@ public sealed class Context : IDisposable
                     lint = true;
                     break;
 
+                case "--result":
                 case "--results":
                     // Ensure argument has a value
                     if (i >= args.Length)

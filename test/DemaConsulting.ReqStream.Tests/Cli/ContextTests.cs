@@ -150,6 +150,18 @@ public class ContextTests
     }
 
     /// <summary>
+    /// Test creating a context with result flag (alias) and filename.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_ResultFlag_SetsResultsFileProperty()
+    {
+        using var context = Context.Create(["--result", "results.trx"]);
+
+        Assert.AreEqual("results.trx", context.ResultsFile);
+        Assert.AreEqual(0, context.ExitCode);
+    }
+
+    /// <summary>
     /// Test creating a context with missing results filename.
     /// </summary>
     [TestMethod]
@@ -157,6 +169,16 @@ public class ContextTests
     {
         var ex = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--results"]));
         Assert.Contains("--results requires a filename argument", ex.Message);
+    }
+
+    /// <summary>
+    /// Test creating a context with missing result (alias) filename.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_MissingResultFilename_ThrowsException()
+    {
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--result"]));
+        Assert.Contains("--result requires a filename argument", ex.Message);
     }
 
     /// <summary>
