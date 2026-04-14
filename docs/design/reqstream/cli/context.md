@@ -37,7 +37,7 @@ when the enclosing `using` block in `Program.Main` exits.
 | `Matrix` | `string?` | `--matrix` | Destination path for trace matrix report |
 | `MatrixDepth` | `int` | `--matrix-depth` | Heading depth for trace matrix report (overrides `Depth`) |
 | `JustificationsFile` | `string?` | `--justifications` | Destination path for justifications report |
-| `JustificationsDepth` | `int` | `--justifications-depth` | Heading depth for justifications report (overrides `Depth`) |
+| `JustificationsDepth` | `int` | `--justifications-depth` | Heading depth for justifications (overrides `Depth`) |
 | `ExitCode` | `int` | — | Computed: `_hasErrors ? 1 : 0` |
 
 ## Methods
