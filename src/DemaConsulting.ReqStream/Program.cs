@@ -162,16 +162,17 @@ internal static class Program
         context.WriteLine("  --results <file>           Write validation results to file (TRX or JUnit format)");
         context.WriteLine("  --lint                     Lint requirements files for issues");
         context.WriteLine("  --log <file>               Write output to log file");
+        context.WriteLine("  --depth <depth>            Default markdown header depth for all reports (default: 1)");
         context.WriteLine("  --requirements <pattern>   Requirements files glob pattern");
         context.WriteLine("  --report <file>            Export requirements to markdown file");
-        context.WriteLine("  --report-depth <depth>     Markdown header depth for requirements report (default: 1)");
+        context.WriteLine("  --report-depth <depth>     Markdown header depth for requirements report (overrides --depth)");
         context.WriteLine("  --filter <tags>            Filter requirements by comma-separated tags");
         context.WriteLine("  --justifications <file>    Export justifications to markdown file");
         context.WriteLine("  --justifications-depth <depth>");
-        context.WriteLine("                             Markdown header depth for justifications (default: 1)");
+        context.WriteLine("                             Markdown header depth for justifications (overrides --depth)");
         context.WriteLine("  --tests <pattern>          Test result files glob pattern (TRX or JUnit)");
         context.WriteLine("  --matrix <file>            Export trace matrix to markdown file");
-        context.WriteLine("  --matrix-depth <depth>     Markdown header depth for trace matrix (default: 1)");
+        context.WriteLine("  --matrix-depth <depth>     Markdown header depth for trace matrix (overrides --depth)");
         context.WriteLine("  --enforce                  Fail if requirements are not fully tested");
     }
 

@@ -90,6 +90,11 @@ public sealed class Context : IDisposable
     public List<string> TestFiles { get; private init; } = [];
 
     /// <summary>
+    ///     Gets the default markdown header depth for all reports.
+    /// </summary>
+    public int Depth { get; private init; } = 1;
+
+    /// <summary>
     ///     Gets the requirements report output file path.
     /// </summary>
     public string? RequirementsReport { get; private init; }
@@ -157,13 +162,14 @@ public sealed class Context : IDisposable
 
         // Initialize optional parameters
         string? requirementsReport = null;
-        var reportDepth = 1;
+        int? reportDepth = null;
         string? matrix = null;
-        var matrixDepth = 1;
+        int? matrixDepth = null;
         string? justificationsFile = null;
-        var justificationsDepth = 1;
+        int? justificationsDepth = null;
         string? logFile = null;
         string? resultsFile = null;
+        var depth = 1;
 
         // Parse command-line arguments
         int i = 0;
@@ -195,6 +201,21 @@ public sealed class Context : IDisposable
 
                 case "--lint":
                     lint = true;
+                    break;
+
+                case "--depth":
+                    // Ensure argument has a value
+                    if (i >= args.Length)
+                    {
+                        throw new ArgumentException($"{arg} requires a depth argument", nameof(args));
+                    }
+
+                    // Parse and validate depth value
+                    if (!int.TryParse(args[i++], out depth) || depth < 1)
+                    {
+                        throw new ArgumentException($"{arg} requires a positive integer", nameof(args));
+                    }
+
                     break;
 
                 case "--result":
@@ -277,11 +298,12 @@ public sealed class Context : IDisposable
                     }
 
                     // Parse and validate depth value
-                    if (!int.TryParse(args[i++], out reportDepth) || reportDepth < 1)
+                    if (!int.TryParse(args[i++], out var parsedReportDepth) || parsedReportDepth < 1)
                     {
                         throw new ArgumentException($"{arg} requires a positive integer", nameof(args));
                     }
 
+                    reportDepth = parsedReportDepth;
                     break;
 
                 case "--matrix":
@@ -302,11 +324,12 @@ public sealed class Context : IDisposable
                     }
 
                     // Parse and validate depth value
-                    if (!int.TryParse(args[i++], out matrixDepth) || matrixDepth < 1)
+                    if (!int.TryParse(args[i++], out var parsedMatrixDepth) || parsedMatrixDepth < 1)
                     {
                         throw new ArgumentException($"{arg} requires a positive integer", nameof(args));
                     }
 
+                    matrixDepth = parsedMatrixDepth;
                     break;
 
                 case "--justifications":
@@ -327,11 +350,12 @@ public sealed class Context : IDisposable
                     }
 
                     // Parse and validate depth value
-                    if (!int.TryParse(args[i++], out justificationsDepth) || justificationsDepth < 1)
+                    if (!int.TryParse(args[i++], out var parsedJustificationsDepth) || parsedJustificationsDepth < 1)
                     {
                         throw new ArgumentException($"{arg} requires a positive integer", nameof(args));
                     }
 
+                    justificationsDepth = parsedJustificationsDepth;
                     break;
 
                 default:
@@ -353,11 +377,12 @@ public sealed class Context : IDisposable
             RequirementsFiles = requirementsFiles,
             TestFiles = testFiles,
             RequirementsReport = requirementsReport,
-            ReportDepth = reportDepth,
+            Depth = depth,
+            ReportDepth = reportDepth ?? depth,
             Matrix = matrix,
-            MatrixDepth = matrixDepth,
+            MatrixDepth = matrixDepth ?? depth,
             JustificationsFile = justificationsFile,
-            JustificationsDepth = justificationsDepth
+            JustificationsDepth = justificationsDepth ?? depth
         };
 
         // Open log file if specified
