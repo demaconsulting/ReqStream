@@ -128,6 +128,19 @@ sections:
             tests:
               - Context_Create_MatrixDepth_SetsMatrixDepthProperty
 
+          - id: ReqStream-Command-Depth
+            title: The tool shall support a default markdown header depth that applies to all reports.
+            justification: |
+              A single default depth argument simplifies configuration when all reports are embedded
+              at the same level in a larger document, while still allowing per-report overrides.
+            tags:
+              - cli
+            tests:
+              - Context_Create_Depth_SetsAllDepths
+              - Context_Create_SpecificDepthOverridesDefaultDepth
+              - Context_Create_MissingDepth_ThrowsException
+              - Context_Create_InvalidDepth_ThrowsException
+
           - id: ReqStream-Command-TagFilter
             title: The tool shall support filtering requirements output by tags.
             justification: |

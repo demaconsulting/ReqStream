@@ -99,14 +99,15 @@ Options:
   --results <file>                 Write validation results to file (TRX or JUnit format)
   --log <file>                     Write output to log file
   --lint                           Lint requirements files for structural issues
+  --depth <depth>                  Default markdown header depth for all reports (default: 1)
   --requirements <pattern>         Requirements files glob pattern
   --report <file>                  Export requirements to markdown file
-  --report-depth <depth>           Markdown header depth for requirements report (default: 1)
+  --report-depth <depth>           Markdown header depth for requirements report (overrides --depth)
   --tests <pattern>                Test result files glob pattern (TRX or JUnit)
   --matrix <file>                  Export trace matrix to markdown file
-  --matrix-depth <depth>           Markdown header depth for trace matrix (default: 1)
+  --matrix-depth <depth>           Markdown header depth for trace matrix (overrides --depth)
   --justifications <file>          Export requirement justifications to markdown file
-  --justifications-depth <depth>   Markdown header depth for justifications (default: 1)
+  --justifications-depth <depth>   Markdown header depth for justifications (overrides --depth)
   --filter <tags>                  Comma-separated list of tags to filter requirements
   --enforce                        Fail if requirements are not fully tested
 ```
@@ -464,14 +465,19 @@ in case of physical storage theft or unauthorized access to storage media.
 
 ### Configuring Header Depth
 
-Use the `--justifications-depth` option to control the markdown header depth (default: 1):
+Use the `--depth` option to set the default markdown header depth for all reports (default: 1). Individual
+report depths can be overridden with `--report-depth`, `--matrix-depth`, or `--justifications-depth`:
 
 ```bash
-reqstream --requirements "**/*.yaml" --justifications justifications.md --justifications-depth 2
+reqstream --requirements "**/*.yaml" --justifications justifications.md --depth 2
 ```
 
-This adjusts the header levels in the output, useful when embedding the justifications document in larger
-documentation structures.
+```bash
+reqstream --requirements "**/*.yaml" --justifications justifications.md --depth 2 --justifications-depth 3
+```
+
+This adjusts the header levels in the output, useful when embedding the reports in larger documentation
+structures.
 
 ## Development
 

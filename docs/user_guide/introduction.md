@@ -530,15 +530,16 @@ ReqStream supports the following command-line options:
 | `--results <file>` | Write validation test results to a file (TRX or JUnit format, use .trx or .xml extension) |
 | `--lint` | Lint requirements files for structural issues |
 | `--log <file>` | Write output to specified log file |
+| `--depth <depth>` | Default starting header depth for all reports (default: 1) |
 | `--requirements <pattern>` | Glob pattern for requirements YAML files |
 | `--report <file>` | Export requirements to markdown file |
-| `--report-depth <depth>` | Starting header depth for requirements report (default: 1) |
+| `--report-depth <depth>` | Starting header depth for requirements report (overrides `--depth`) |
 | `--filter <tags>` | Comma-separated list of tags to filter requirements by |
 | `--tests <pattern>` | Glob pattern for test result files (TRX or JUnit format) |
 | `--matrix <file>` | Export trace matrix to markdown file |
-| `--matrix-depth <depth>` | Starting header depth for trace matrix (default: 1) |
+| `--matrix-depth <depth>` | Starting header depth for trace matrix (overrides `--depth`) |
 | `--justifications <file>` | Export justifications to markdown file |
-| `--justifications-depth <depth>` | Starting header depth for justifications (default: 1) |
+| `--justifications-depth <depth>` | Starting header depth for justifications (overrides `--depth`) |
 | `--enforce` | Fail if requirements are not fully tested |
 
 ## Examples
@@ -680,10 +681,9 @@ reqstream --requirements "docs/**/*.yaml" \
 ```bash
 reqstream --requirements "docs/**/*.yaml" \
           --report requirements.md \
-          --report-depth 2 \
           --tests "test-results/**/*.trx" \
           --matrix matrix.md \
-          --matrix-depth 1
+          --depth 2
 ```
 
 **Silent mode for CI/CD:**
@@ -890,25 +890,25 @@ reqstream --requirements "docs/**/*.yaml" \
 
 **Control header depth:**
 
-The `--report-depth`, `--matrix-depth`, and `--justifications-depth` options control the starting markdown header
-level:
+Use `--depth` to set a single default header depth for all reports, or use `--report-depth`,
+`--matrix-depth`, and `--justifications-depth` to override the depth for individual reports:
 
 ```bash
-# Start requirements with ## (level 2) instead of # (level 1)
-reqstream --requirements "docs/**/*.yaml" \
-          --report requirements.md \
-          --report-depth 2
-
-# Start trace matrix sections with ### (level 3)
+# Set all reports to start at ## (level 2)
 reqstream --requirements "docs/**/*.yaml" \
           --tests "test-results/**/*.trx" \
+          --report requirements.md \
           --matrix matrix.md \
-          --matrix-depth 3
-
-# Start justifications sections with ## (level 2)
-reqstream --requirements "docs/**/*.yaml" \
           --justifications justifications.md \
-          --justifications-depth 2
+          --depth 2
+
+# Set default depth to 2 but override trace matrix to level 3
+reqstream --requirements "docs/**/*.yaml" \
+          --tests "test-results/**/*.trx" \
+          --report requirements.md \
+          --matrix matrix.md \
+          --depth 2 \
+          --matrix-depth 3
 ```
 
 This is useful when embedding generated reports into larger documents.
@@ -1393,8 +1393,9 @@ without `--tests`, the tool will report an error asking you to specify test resu
 
 **Q: Can I customize the markdown format of reports?**
 
-A: Currently, ReqStream uses a fixed markdown format. You can control the header depth with `--report-depth` and
-`--matrix-depth`, but other formatting is not customizable.
+A: Currently, ReqStream uses a fixed markdown format. You can control the header depth with `--depth`
+(applies to all reports) or `--report-depth`, `--matrix-depth`, and `--justifications-depth` to override
+individual reports, but other formatting is not customizable.
 
 **Q: Can I export to formats other than markdown?**
 

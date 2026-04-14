@@ -85,7 +85,7 @@ public static class Validation
     /// <param name="context">The context for output.</param>
     private static void PrintValidationHeader(Context context)
     {
-        context.WriteLine("# DEMA Consulting ReqStream");
+        context.WriteLine($"{new string('#', context.Depth)} DEMA Consulting ReqStream");
         context.WriteLine("");
         context.WriteLine("| Information         | Value                                              |");
         context.WriteLine("| :------------------ | :------------------------------------------------- |");
