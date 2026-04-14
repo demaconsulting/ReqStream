@@ -32,11 +32,12 @@ when the enclosing `using` block in `Program.Main` exits.
 | `RequirementsFiles` | `List<string>` | `--requirements` | Expanded list of requirement file paths |
 | `TestFiles` | `List<string>` | `--tests` | Expanded list of test-result file paths |
 | `RequirementsReport` | `string?` | `--report` | Destination path for requirements report |
-| `ReportDepth` | `int` | `--report-depth` | Heading depth for requirements report |
+| `Depth` | `int` | `--depth` | Default heading depth for all reports (default: 1) |
+| `ReportDepth` | `int` | `--report-depth` | Heading depth for requirements report (overrides `Depth`) |
 | `Matrix` | `string?` | `--matrix` | Destination path for trace matrix report |
-| `MatrixDepth` | `int` | `--matrix-depth` | Heading depth for trace matrix report |
+| `MatrixDepth` | `int` | `--matrix-depth` | Heading depth for trace matrix report (overrides `Depth`) |
 | `JustificationsFile` | `string?` | `--justifications` | Destination path for justifications report |
-| `JustificationsDepth` | `int` | `--justifications-depth` | Heading depth for justifications report |
+| `JustificationsDepth` | `int` | `--justifications-depth` | Heading depth for justifications report (overrides `Depth`) |
 | `ExitCode` | `int` | — | Computed: `_hasErrors ? 1 : 0` |
 
 ## Methods
@@ -54,6 +55,10 @@ rather than an unhandled exception.
 arguments merge into the same set. `--requirements` and `--tests` values are passed to
 `ExpandGlobPattern` and appended to the respective file lists. If `--log` is specified, the named
 file is opened for writing and assigned to `_logWriter` before the method returns.
+
+`--depth` sets the default heading depth (`Depth`). The per-report depth arguments
+(`--report-depth`, `--matrix-depth`, `--justifications-depth`) override this default if
+specified; otherwise each report inherits the value of `Depth`.
 
 ### `ExpandGlobPattern(pattern)`
 
