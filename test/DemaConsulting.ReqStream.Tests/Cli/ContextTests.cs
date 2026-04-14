@@ -71,6 +71,7 @@ public class ContextTests
         Assert.IsNull(context.ResultsFile);
         Assert.IsFalse(context.Enforce);
         Assert.IsNull(context.RequirementsReport);
+        Assert.AreEqual(1, context.Depth);
         Assert.AreEqual(1, context.ReportDepth);
         Assert.IsNull(context.Matrix);
         Assert.AreEqual(1, context.MatrixDepth);
@@ -744,5 +745,58 @@ public class ContextTests
 
         var ex2 = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--justifications-depth", "0"]));
         Assert.Contains("--justifications-depth requires a positive integer", ex2.Message);
+    }
+
+    /// <summary>
+    /// Test creating a context with depth flag sets all report depths.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_Depth_SetsAllDepths()
+    {
+        using var context = Context.Create(["--depth", "2"]);
+
+        Assert.AreEqual(2, context.Depth);
+        Assert.AreEqual(2, context.ReportDepth);
+        Assert.AreEqual(2, context.MatrixDepth);
+        Assert.AreEqual(2, context.JustificationsDepth);
+        Assert.AreEqual(0, context.ExitCode);
+    }
+
+    /// <summary>
+    /// Test that specific depth flags override the default depth.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_SpecificDepthOverridesDefaultDepth()
+    {
+        using var context = Context.Create(["--depth", "2", "--report-depth", "3"]);
+
+        Assert.AreEqual(2, context.Depth);
+        Assert.AreEqual(3, context.ReportDepth);
+        Assert.AreEqual(2, context.MatrixDepth);
+        Assert.AreEqual(2, context.JustificationsDepth);
+        Assert.AreEqual(0, context.ExitCode);
+    }
+
+    /// <summary>
+    /// Test creating a context with missing depth argument.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_MissingDepth_ThrowsException()
+    {
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--depth"]));
+        Assert.Contains("--depth requires a depth argument", ex.Message);
+    }
+
+    /// <summary>
+    /// Test creating a context with invalid depth.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_InvalidDepth_ThrowsException()
+    {
+        var ex1 = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--depth", "invalid"]));
+        Assert.Contains("--depth requires a positive integer", ex1.Message);
+
+        var ex2 = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--depth", "0"]));
+        Assert.Contains("--depth requires a positive integer", ex2.Message);
     }
 }
