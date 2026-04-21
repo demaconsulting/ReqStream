@@ -106,22 +106,21 @@ flowchart TD
     tests[Test Result Files]
     args[CLI Arguments]
     ctx[Context<br/>options & output]
-    req[Requirements<br/>parsed tree]
+    req[Requirements.Load<br/>parsed tree + lint issues]
     tm[TraceMatrix<br/>coverage analysis]
-    lint[Linter<br/>YAML structural checks]
+    issues[Lint Issues<br/>warnings · errors]
     reports[Markdown Reports<br/>requirements · justifications · trace matrix]
     exit[Exit Code<br/>0 = pass · 1 = fail]
 
     yaml --> req
-    yaml --> lint
     tests --> tm
     args --> ctx
     ctx --> req
-    ctx --> lint
     req --> tm
+    req --> issues
     tm --> reports
     tm --> exit
-    lint --> exit
+    issues --> exit
 ```
 
 ## Design Decisions
