@@ -107,10 +107,8 @@ Throughout this document:
 
 ## References
 
-- [ReqStream Architecture][arch]
-- [ReqStream User Guide][guide]
+- [ReqStream System Design][arch]
 - [ReqStream Repository][repo]
 
-[arch]: ../../ARCHITECTURE.md
-[guide]: ../../README.md
+[arch]: reqstream/reqstream.md
 [repo]: https://github.com/demaconsulting/ReqStream

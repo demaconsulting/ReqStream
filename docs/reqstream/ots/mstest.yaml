@@ -1,8 +1,12 @@
 ---
+# MSTest OTS Software Requirements
+#
+# Requirements for the MSTest testing framework functionality.
+
 sections:
-  - title: ReqStream Requirements
+  - title: OTS Software Requirements
     sections:
-      - title: OTS Software
+      - title: MSTest Requirements
         requirements:
           - id: ReqStream-OTS-MSTest
             title: MSTest shall execute unit tests and report results.

@@ -14,59 +14,27 @@ language: en
 
 # Project-specific technical terms and tool names
 words:
-  - antipatterns
-  - Antipatterns
-  - Blockquotes
   - buildmark
-  - BuildMark
-  - camelcase
-  - CodeQL
-  - copilot
-  - cspell
-  - csproj
-  - dcterms
   - DEMA
-  - DemaConsulting
-  - demaconsulting
-  - dependabot
-  - Dependabot
-  - dotnet
-  - editorconfig
-  - filepart
-  - gitattributes
+  - Dema
+  - fileassert
   - hotspots
-  - markdownlint
-  - MSTest
-  - nameof
-  - nuget
-  - NuGet
-  - nupkg
+  - mstest
+  - pandoc
   - Pandoc
-  - pagetitle
-  - passwordvalidator
   - reqstream
-  - ReqStream
   - reviewmark
-  - ReviewMark
   - SARIF
-  - SarifMark
-  - SBOM
-  - slnx
-  - snupkg
-  - Qube
-  - sonarcloud
-  - SonarMark
+  - Sarif
+  - sarifmark
+  - sonarmark
   - testname
   - tracematrix
-  - Triaging
   - venv
   - versionmark
-  - VersionMark
-  - Weasyprint
+  - Weasy
   - weasyprint
-  - xunit
-  - YAML
-  - yamllint
+  - yamlfix
 
 # Exclude common build artifacts, dependencies, and vendored third-party code
 ignorePaths:

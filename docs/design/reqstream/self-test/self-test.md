@@ -35,8 +35,8 @@ The `SelfTest` subsystem exposes the following interface to the rest of the tool
 
 ## References
 
-- [ReqStream Architecture][arch]
+- [ReqStream System Design][arch]
 - [ReqStream Repository][repo]
 
-[arch]: ../../../../ARCHITECTURE.md
+[arch]: ../reqstream.md
 [repo]: https://github.com/demaconsulting/ReqStream
