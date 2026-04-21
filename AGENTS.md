@@ -9,6 +9,7 @@
 │   ├── design/
 │   ├── requirements_doc/
 │   ├── requirements_report/
+│   ├── user_guide/
 │   └── reqstream/
 ├── src/
 │   └── DemaConsulting.ReqStream/
