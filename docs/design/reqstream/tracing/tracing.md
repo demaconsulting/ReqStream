@@ -22,11 +22,13 @@ The `Tracing` subsystem contains the following software unit:
 
 The `Tracing` subsystem exposes the following interface to the rest of the tool:
 
-| Interface                                    | Direction | Description                                       |
-|----------------------------------------------|-----------|---------------------------------------------------|
-| `TraceMatrix` constructor                    | Outbound  | Loads test results and maps them to requirements. |
-| `TraceMatrix.Export`                         | Outbound  | Exports the trace matrix to a Markdown report.    |
-| `TraceMatrix.CalculateSatisfiedRequirements` | Outbound  | Returns satisfied and total requirement counts.   |
+| Interface                                    | Direction | Description                                               |
+|----------------------------------------------|-----------|-----------------------------------------------------------|
+| `TraceMatrix` constructor                    | Outbound  | Loads test results and maps them to requirements.         |
+| `TraceMatrix.Export`                         | Outbound  | Exports the trace matrix to a Markdown report.            |
+| `TraceMatrix.CalculateSatisfiedRequirements` | Outbound  | Returns satisfied and total requirement counts.           |
+| `TraceMatrix.GetUnsatisfiedRequirements`     | Outbound  | Returns IDs of requirements not covered by passing tests. |
+| `TraceMatrix.GetTestResult`                  | Outbound  | Returns pass/fail counts for a named test across results. |
 
 ## Interactions
 

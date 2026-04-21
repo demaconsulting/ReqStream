@@ -51,13 +51,13 @@ system or process supervisor captures the full stack trace for unexpected failur
 
 ### `Run(context)`
 
-`Run` implements the priority-ordered dispatch shown in the table below. Each step is attempted in
-order; if a step applies, execution returns immediately without reaching later steps.
+`Run` implements the priority-ordered dispatch shown in the table below. Return steps exit
+immediately; the banner step (row 2) prints the banner and then falls through to the next step.
 
 | Priority | Condition | Action |
 | -------- | --------- | ------ |
 | 1 | `context.Version` is `true` | Print version string only; return |
-| 2 | `context.Lint` is `false` | Call `PrintBanner` |
+| 2 | `context.Lint` is `false` | Call `PrintBanner` (no return; falls through to next step) |
 | 3 | `context.Help` is `true` | Call `PrintHelp`; return |
 | 4 | `context.Validate` is `true` | Call `Validation.Run(context)`; return |
 | 5 | `context.Lint` is `true` | Call `Requirements.Load(context.RequirementsFiles)`; report lint issues; return |

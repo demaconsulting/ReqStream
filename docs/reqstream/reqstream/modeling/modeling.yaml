@@ -25,7 +25,7 @@ sections:
           - ReqStream-Requirements-SectionMerging
 
       - id: ReqStream-Modeling-Export
-        title: The Modeling subsystem shall export requirements to a Markdown report.
+        title: The Modeling subsystem shall export requirements and justifications to Markdown reports.
         justification: |
           Generating Markdown reports from requirements data enables documentation to be
           produced automatically from the requirements files, reducing manual effort and
