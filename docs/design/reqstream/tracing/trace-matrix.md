@@ -75,6 +75,20 @@ files. If the test name is not found in `_testExecutions`, the method returns `T
 ensuring callers always receive a valid object. See the [Test Name Format Summary](#test-name-format-summary)
 table for a quick reference of both formats.
 
+### `GetAllTestResults()`
+
+`GetAllTestResults` returns a read-only dictionary mapping each test name (referenced by any
+requirement in the tree) to its aggregated `TestMetrics`. Only tests that have been executed at
+least once (`Executed > 0`) are included in the result. This provides `Program` with a summary of
+all executed tests referenced in the requirements.
+
+### `GetUnsatisfiedRequirements(filterTags)`
+
+`GetUnsatisfiedRequirements` returns a list of requirement IDs that are not satisfied (subject to
+`filterTags` filtering). A requirement is unsatisfied if it has no tests or if any of its tests
+have not been executed or have failed. This is the inverse of `IsRequirementSatisfied` applied
+across all requirements in the tree.
+
 ### `CalculateSatisfiedRequirements(filterTags)`
 
 `CalculateSatisfiedRequirements` iterates every requirement in the tree (subject to `filterTags`

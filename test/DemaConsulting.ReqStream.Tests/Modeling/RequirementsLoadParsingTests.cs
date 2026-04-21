@@ -331,10 +331,10 @@ sections:
     }
 
     /// <summary>
-    /// Test that duplicate requirement IDs throw an exception.
+    /// Test that duplicate requirement IDs report an error issue.
     /// </summary>
     [TestMethod]
-    public void Requirements_Load_DuplicateRequirementId_ThrowsException()
+    public void Requirements_Load_DuplicateRequirementId_ReportsError()
     {
         var yamlContent = @"---
 sections:
@@ -395,10 +395,10 @@ includes:
     }
 
     /// <summary>
-    /// Test that file not found throws an exception.
+    /// Test that a missing file reports an error issue.
     /// </summary>
     [TestMethod]
-    public void Requirements_Load_FileNotFound_ThrowsException()
+    public void Requirements_Load_FileNotFound_ReportsError()
     {
         var nonExistentPath = Path.Combine(_testDirectory, "nonexistent.yaml");
 
@@ -413,7 +413,7 @@ includes:
     /// Test that an invalid YAML content (schema error) throws an InvalidOperationException with the file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Load_InvalidYamlContent_ThrowsExceptionWithFileLocation()
+    public void Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation()
     {
         var yamlContent = @"---
 sections:
@@ -524,10 +524,10 @@ mappings:
     }
 
     /// <summary>
-    ///     Test that blank requirement ID throws an exception with file location.
+    ///     Test that a blank requirement ID reports an error issue with file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Load_BlankRequirementId_ThrowsExceptionWithFileLocation()
+    public void Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation()
     {
         var yamlContent = @"---
 sections:
@@ -547,10 +547,10 @@ sections:
     }
 
     /// <summary>
-    ///     Test that blank requirement title throws an exception with file location.
+    ///     Test that a blank requirement title reports an error issue with file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Load_BlankRequirementTitle_ThrowsExceptionWithFileLocation()
+    public void Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation()
     {
         var yamlContent = @"---
 sections:
@@ -570,10 +570,10 @@ sections:
     }
 
     /// <summary>
-    ///     Test that blank section title throws an exception with file location.
+    ///     Test that a blank section title reports an error issue with file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Load_BlankSectionTitle_ThrowsExceptionWithFileLocation()
+    public void Requirements_Load_BlankSectionTitle_ReportsErrorWithFileLocation()
     {
         var yamlContent = @"---
 sections:
@@ -593,10 +593,10 @@ sections:
     }
 
     /// <summary>
-    ///     Test that blank test name in requirement throws an exception with file location.
+    ///     Test that a blank test name in a requirement reports an error issue with file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Load_BlankTestNameInRequirement_ThrowsExceptionWithFileLocation()
+    public void Requirements_Load_BlankTestNameInRequirement_ReportsErrorWithFileLocation()
     {
         var yamlContent = @"---
 sections:
@@ -620,10 +620,10 @@ sections:
     }
 
     /// <summary>
-    ///     Test that blank test name in mapping throws an exception with file location.
+    ///     Test that a blank test name in a mapping reports an error issue with file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Load_BlankTestNameInMapping_ThrowsExceptionWithFileLocation()
+    public void Requirements_Load_BlankTestNameInMapping_ReportsErrorWithFileLocation()
     {
         var yamlContent = @"---
 sections:
@@ -649,10 +649,10 @@ mappings:
     }
 
     /// <summary>
-    ///     Test that blank mapping ID throws an exception with file location.
+    ///     Test that a blank mapping ID reports an error issue with file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Load_BlankMappingId_ThrowsExceptionWithFileLocation()
+    public void Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation()
     {
         var yamlContent = @"---
 sections:
@@ -680,7 +680,7 @@ mappings:
     ///     Test that duplicate requirement ID message includes file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Load_DuplicateRequirementId_ExceptionIncludesFileLocation()
+    public void Requirements_Load_DuplicateRequirementId_ErrorIncludesFileLocation()
     {
         var yamlContent = @"---
 sections:
@@ -838,7 +838,7 @@ sections:
     ///     Test that duplicate IDs across multiple files are detected.
     /// </summary>
     [TestMethod]
-    public void Requirements_Load_MultipleFilesWithDuplicateIds_ThrowsException()
+    public void Requirements_Load_MultipleFilesWithDuplicateIds_ReportsError()
     {
         var file1Yaml = @"---
 sections:
@@ -899,10 +899,10 @@ sections:
     }
 
     /// <summary>
-    ///     Test that blank tag name throws an exception with file location.
+    ///     Test that a blank tag name reports an error issue with file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Load_BlankTagName_ThrowsExceptionWithFileLocation()
+    public void Requirements_Load_BlankTagName_ReportsErrorWithFileLocation()
     {
         var yamlContent = @"---
 sections:
@@ -956,10 +956,10 @@ sections:
     }
 
     /// <summary>
-    ///     Test that a self-referencing requirement (A -> A) throws an exception at read time.
+    ///     Test that a self-referencing requirement (A -> A) reports an error issue at load time.
     /// </summary>
     [TestMethod]
-    public void Requirements_Load_SelfReferencingRequirement_ThrowsInvalidOperationException()
+    public void Requirements_Load_SelfReferencingRequirement_ReportsCircularReferenceError()
     {
         var yamlContent = @"---
 sections:

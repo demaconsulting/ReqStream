@@ -15,3 +15,25 @@ sections:
               - Validation_Run_WithSilentContext_CompletesSuccessfully
               - Validation_Run_WithTrxResultsFile_WritesTrxFile
               - Validation_Run_WithXmlResultsFile_WritesXmlFile
+
+          - id: ReqStream-Validation-NullContext
+            title: The tool shall reject a null context in self-validation mode.
+            justification: |
+              Null argument guards prevent undefined behavior and produce clear error messages
+              when the API is misused.
+            tags:
+              - validation
+            tests:
+              - Validation_Run_WithNullContext_ThrowsArgumentNullException
+
+          - id: ReqStream-Validation-UnsupportedResultsFormat
+            title: >-
+              The tool shall report an error when the self-validation results file has an
+              unsupported extension.
+            justification: |
+              Reporting an error for unsupported file extensions prevents silent data loss and
+              guides users to specify a supported format (.trx or .xml).
+            tags:
+              - validation
+            tests:
+              - Validation_Run_WithInvalidResultsExtension_ReportsError

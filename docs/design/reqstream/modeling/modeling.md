@@ -14,28 +14,29 @@ them into a unified requirement tree, and exposes that tree to the rest of the t
 
 The `Modeling` subsystem contains the following software units:
 
-| Unit           | File                       | Responsibility                                               |
-|----------------|----------------------------|--------------------------------------------------------------|
-| `Requirements` | `Modeling/Requirements.cs` | YAML parsing, section merging, and requirements document.    |
-| `Section`      | `Modeling/Section.cs`      | Named group of requirements within a requirements document.  |
-| `Requirement`  | `Modeling/Requirement.cs`  | Single requirement with ID, title, tags, and test links.     |
+| Unit           | File                       | Responsibility                                                         |
+|----------------|----------------------------|------------------------------------------------------------------------|
+| `Requirements` | `Modeling/Requirements.cs` | YAML parsing, section merging, and requirements document.              |
+| `Section`      | `Modeling/Section.cs`      | Named group of requirements within a requirements document.            |
+| `Requirement`  | `Modeling/Requirement.cs`  | Single requirement with ID, title, tags, and test links.               |
 
 ## Interfaces
 
 The `Modeling` subsystem exposes the following interface to the rest of the tool:
 
-| Interface              | Direction | Description                                                           |
-|------------------------|-----------|-----------------------------------------------------------------------|
-| `Requirements.Read`    | Outbound  | Reads and merges YAML requirement files into a requirement tree.      |
-| `Requirements.Export`  | Outbound  | Exports requirements to a Markdown report.                            |
+| Interface                          | Direction | Description                                                         |
+|------------------------------------|-----------|---------------------------------------------------------------------|
+| `Requirements.Load`                | Outbound  | Reads and merges YAML requirement files into a requirement tree.    |
+| `Requirements.Export`              | Outbound  | Exports requirements to a Markdown report.                          |
+| `Requirements.ExportJustifications`| Outbound  | Exports requirement justifications to a Markdown report.            |
 
 ## Interactions
 
-| Dependency    | Direction | Purpose                                                             |
-|---------------|-----------|---------------------------------------------------------------------|
-| `Context`     | Uses      | Receives file paths from `Context.RequirementsFiles`.               |
-| `TraceMatrix` | Used by   | Receives the requirement tree to map test results to requirements.  |
-| `Program`     | Used by   | Calls `Requirements.Read` to load requirements.                     |
+| Dependency                         | Direction | Purpose                                                             |
+|------------------------------------|-----------|---------------------------------------------------------------------|
+| `Context`                          | Uses      | Receives file paths from `Context.RequirementsFiles`.               |
+| `TraceMatrix`                      | Used by   | Receives the requirement tree to map test results to requirements.  |
+| `Program`                          | Used by   | Calls `Requirements.Load` to load requirements.                     |
 
 ## References
 

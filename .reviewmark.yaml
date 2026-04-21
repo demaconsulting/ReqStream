@@ -114,6 +114,7 @@ reviews:
       - "docs/reqstream/reqstream/modeling/requirements.yaml"  # unit requirements
       - "docs/design/reqstream/modeling/requirements.md"    # unit design
       - "src/**/Modeling/LintIssue.cs"                      # implementation
+      - "src/**/Modeling/LoadResult.cs"                     # implementation
       - "src/**/Modeling/Requirement.cs"                    # implementation
       - "src/**/Modeling/Requirements.cs"                   # implementation
       - "src/**/Modeling/RequirementsLoader.cs"             # implementation
