@@ -68,13 +68,13 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ inputs.version }}
-          artifacts: artifacts/**
+          artifacts: artifacts/*
           bodyFile: artifacts/build_notes.md
           generateReleaseNotes: false
 
       - name: Publish to NuGet.org
         if: inputs.publish == 'publish'
-        run: |
+        run: |-
           set -e
           dotnet nuget push artifacts/*.nupkg \
             --api-key ${{ secrets.DEMACONSULTINGNUGETKEY }} \

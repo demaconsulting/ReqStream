@@ -1,8 +1,12 @@
 ---
+# SarifMark OTS Software Requirements
+#
+# Requirements for the SarifMark SARIF report processing tool functionality.
+
 sections:
-  - title: ReqStream Requirements
+  - title: OTS Software Requirements
     sections:
-      - title: OTS Software
+      - title: SarifMark Requirements
         requirements:
           - id: ReqStream-OTS-SarifMark
             title: SarifMark shall convert CodeQL SARIF results into a markdown report.

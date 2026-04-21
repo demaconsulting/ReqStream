@@ -88,8 +88,8 @@ dotnet_naming_style.pascal_case.capitalization = pascal_case
 dotnet_sort_system_directives_first = true
 dotnet_separate_import_directive_groups = false
 
-# Code quality
-dotnet_code_quality_unused_parameters = all:warning
+# Code quality - set to suggestion to not break existing code
+dotnet_code_quality_unused_parameters = all:suggestion
 
 # Nullable reference types
 csharp_nullable_reference_types = enable

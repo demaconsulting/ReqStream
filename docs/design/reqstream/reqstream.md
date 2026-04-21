@@ -95,10 +95,77 @@ so that the evidence can be fed back into ReqStream's own requirements enforceme
 | `Program` | `TraceMatrix` | `ProcessRequirements` | Loads test results and maps them to requirements |
 | `Validation` | `Program` | test methods | Invokes `Program.Run` to exercise the full pipeline |
 
+## Component Interaction Diagram
+
+The following diagram shows the data flow between units during a standard requirements processing
+invocation:
+
+```mermaid
+flowchart TD
+    yaml[YAML Files]
+    tests[Test Result Files]
+    args[CLI Arguments]
+    ctx[Context<br/>options & output]
+    req[Requirements<br/>parsed tree]
+    tm[TraceMatrix<br/>coverage analysis]
+    lint[Linter<br/>YAML structural checks]
+    reports[Markdown Reports<br/>requirements · justifications · trace matrix]
+    exit[Exit Code<br/>0 = pass · 1 = fail]
+
+    yaml --> req
+    yaml --> lint
+    tests --> tm
+    args --> ctx
+    ctx --> req
+    ctx --> lint
+    req --> tm
+    tm --> reports
+    tm --> exit
+    lint --> exit
+```
+
+## Design Decisions
+
+### Separation of Concerns
+
+Each unit owns a clearly bounded responsibility and never reaches across boundaries:
+
+- `Context` owns CLI argument handling and output; it never touches YAML or test results
+- `Requirements` owns YAML parsing and merging; it never touches test results or reports
+- `TraceMatrix` owns test result analysis; it receives an already-validated requirements tree
+- `Program` owns execution flow; it delegates all work to the other units
+
+### Why Sections Are Merged by Title
+
+Title-based merging enables modular requirements management without any explicit namespace or import
+declaration. Multiple files can contribute to the same logical section; requirements, mappings, and
+justifications can live in separate files owned by separate teams. A repository can organize files
+by feature, component, or responsibility and still produce one coherent requirement tree.
+
+### Immutable Data Structures
+
+Properties prevent modification after construction; collections allow population during construction
+but not replacement. `TestMetrics` and `TestExecution` are immutable records. This removes an entire
+class of concurrency and aliasing bugs and makes the data model easy to reason about.
+
+### Error Context and Testability
+
+Validation and parsing errors always include the source file path for actionable debugging. Static
+factory methods (`Context.Create`, `Requirements.Load`) decouple construction from consumers. Public
+satisfaction-calculation methods and clear parsing/analysis separation enable direct unit testing
+without mocking or fixtures.
+
+### Key Architectural Patterns
+
+| Pattern | Usage |
+| ------- | ----- |
+| Factory | `Context.Create(args)` and `Requirements.Load(paths)` encapsulate object construction |
+| Composite | `Section` trees enable recursive traversal for export and satisfaction calculation |
+| Strategy | Test result parsing tries TRX first, then JUnit; name matching tries source-specific first, then plain |
+| Disposable | `Context` implements `IDisposable` for deterministic log file cleanup |
+
 ## References
 
-- [ReqStream Architecture][arch]
 - [ReqStream Repository][repo]
 
-[arch]: ../../../ARCHITECTURE.md
 [repo]: https://github.com/demaconsulting/ReqStream

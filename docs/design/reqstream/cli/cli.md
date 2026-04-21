@@ -38,8 +38,8 @@ to all subsystems that need to produce output.
 
 ## References
 
-- [ReqStream Architecture][arch]
+- [ReqStream System Design][arch]
 - [ReqStream Repository][repo]
 
-[arch]: ../../../../ARCHITECTURE.md
+[arch]: ../reqstream.md
 [repo]: https://github.com/demaconsulting/ReqStream

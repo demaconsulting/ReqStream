@@ -8,7 +8,6 @@ input-files:
   - docs/build_notes/introduction.md
   - docs/build_notes.md
   - docs/build_notes/versions.md
-
 template: template.html
 
 table-of-contents: true

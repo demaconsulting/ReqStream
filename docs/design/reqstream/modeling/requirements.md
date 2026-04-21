@@ -167,8 +167,8 @@ is `null` and `LoadResult.HasErrors` returns `true`.
 
 ## References
 
-- [ReqStream Architecture][arch]
+- [ReqStream System Design][arch]
 - [ReqStream Repository][repo]
 
-[arch]: ../../../../ARCHITECTURE.md
+[arch]: ../reqstream.md
 [repo]: https://github.com/demaconsulting/ReqStream

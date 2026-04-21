@@ -6,12 +6,12 @@
 # Patterns identifying all files that require review.
 # Processed in order; prefix a pattern with '!' to exclude.
 needs-review:
-  - "requirements.yaml"          # Root requirements file
-  - "README.md"                  # User-facing documentation
+  - "README.md"                  # Project readme
   - "**/*.cs"                    # All C# source and test files
+  - "requirements.yaml"          # Root requirements file
   - "docs/reqstream/**/*.yaml"   # Requirements files
+  - "docs/user_guide/**/*.md"    # User guide documents
   - "docs/design/**/*.md"        # Design documents
-  - "docs/user_guide/**/*.md"    # User guide
   - "!**/obj/**"                 # Exclude build output
   - "!**/bin/**"                 # Exclude build output
 
@@ -23,13 +23,7 @@ evidence-source:
   type: url
   location: https://raw.githubusercontent.com/demaconsulting/ReqStream/reviews/index.json
 
-# Review sets following the standard hierarchy from reviewmark-usage.md:
-# - Purpose (one per repo): user-facing capabilities and system promises
-# - {System}-Architecture (one per system): system requirements and integration tests
-# - {System}-Design (one per system): all design documentation
-# - {System}-AllRequirements (one per system): all requirements for consistency review
-# - {System}-{Subsystem} (one per subsystem): subsystem requirements and integration tests
-# - {System}-{Subsystem}-{Unit} / {System}-{Unit} (one per unit): full unit artifact set
+# Review sets following standardized patterns for hierarchical compliance coverage
 reviews:
 
   # ── Purpose Review ────────────────────────────────────────────────────────────

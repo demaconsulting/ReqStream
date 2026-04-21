@@ -21,7 +21,6 @@ input-files:
   - docs/design/reqstream/tracing/trace-matrix.md
   - docs/design/reqstream/self-test/self-test.md
   - docs/design/reqstream/self-test/validation.md
-
 template: template.html
 
 table-of-contents: true

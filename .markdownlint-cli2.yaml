@@ -11,6 +11,7 @@
 # - Do not relax rules to accommodate existing non-compliant files
 # - Consistency across repositories is critical for documentation quality
 
+# Disable the banner message (e.g., version info) on stdout
 noBanner: true
 
 # Disable the progress indicator on stdout
