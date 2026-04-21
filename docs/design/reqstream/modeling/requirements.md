@@ -50,20 +50,22 @@ child references, applying test mappings, and exporting content to Markdown repo
 `ReportIssues` accepts a `Context` argument. Warning-level issues are sent to `context.WriteLine`;
 error-level issues are sent to `context.WriteError`.
 
-## YAML Intermediate Types
+## YAML DOM Traversal
 
-YAML is deserialized into a set of intermediate types using `YamlDotNet` with the
-`HyphenatedNamingConvention`:
+YAML is parsed using `YamlDotNet`'s `RepresentationModel` (DOM) API. `RequirementsLoader` reads
+the raw YAML text into a `YamlStream`, then walks the resulting node tree directly:
 
-| Intermediate type | Maps to | Notes |
-| ----------------- | ------- | ----- |
-| `YamlDocument` | Top-level document | Contains `sections`, `mappings`, `includes` |
-| `YamlSection` | `sections[]` entries | Contains `title`, `requirements`, `sections` |
-| `YamlRequirement` | `requirements[]` entries | Contains `id`, `title`, `justification`, `tests`, `children`, `tags` |
-| `YamlMapping` | `mappings[]` entries | Contains `id`, `tests` |
+| DOM node type | Used for |
+| ------------- | -------- |
+| `YamlMappingNode` | Document root, section entries, requirement entries, mapping entries |
+| `YamlSequenceNode` | `sections`, `requirements`, `mappings`, `tests`, `children`, `tags` arrays |
+| `YamlScalarNode` | Individual field values (titles, IDs, test names, etc.) |
 
-These intermediate types are discarded after `LoadFile` completes; the resulting `Requirement`,
-`Section`, and `Requirements` objects are the only long-lived representations.
+`RequirementsLoader` maintains static `HashSet<string>` sets of known field names for each
+structural level (`KnownDocumentFields`, `KnownSectionFields`, `KnownRequirementFields`,
+`KnownMappingFields`) to detect and report unknown fields. There are no intermediate C# model
+classes; each DOM node is consumed directly and converted to the long-lived `Requirement`,
+`Section`, and `Requirements` objects during the walk.
 
 ## Methods
 
@@ -86,8 +88,8 @@ design points govern its behavior:
 - **Deduplication**: `path` is normalized to an absolute path and checked against `visitedFiles`
   before any work is done. If already present, the method returns immediately. This prevents
   infinite loops when files include each other directly or transitively.
-- **YAML deserialization**: the file text is deserialized into a `YamlDocument` using `YamlDotNet`
-  with `HyphenatedNamingConvention`. An empty or `null` document is silently accepted.
+- **YAML parsing**: the file text is parsed into a `YamlStream` using `YamlDotNet`'s
+  `RepresentationModel` DOM API. An empty or `null` root node is silently accepted.
 - **Validation and merging**: each section is validated (title must not be blank) and each
   requirement is validated (ID and title must not be blank; ID must not duplicate an entry already
   seen). Validated sections are merged into the tree via `MergeSection`. Mapping entries append
@@ -95,10 +97,10 @@ design points govern its behavior:
 - **Recursive includes**: each path in the document's `includes` block is resolved relative to the
   current file's directory and passed to `LoadFile` recursively, enabling modular file organization.
 
-### `MergeSection(parent, yamlSection)`
+### `MergeSection(parent, sectionNode)`
 
 `MergeSection` integrates a newly parsed section into an existing section tree. If `parent.Sections`
-already contains a section whose `Title` matches `yamlSection.Title`, the incoming requirements are
+already contains a section whose `Title` matches the incoming section title, the incoming requirements are
 appended to that existing section and child sections are recursively merged. If no match is found, a
 new `Section` is created and appended to `parent.Sections`.
 
@@ -119,14 +121,15 @@ references. It is called once after all files are loaded.
 | `path` | `List<string>` | Ordered IDs on the current stack; used to build the error message |
 | `visited` | `HashSet<string>` | IDs whose entire sub-tree is confirmed cycle-free; skipped on future encounters |
 
-**Algorithm** (per requirement):
+**Algorithm** (applied via `ValidateCyclesFrom` for each unvisited requirement):
 
-1. If the ID is in `visited`, return immediately.
-2. If the ID is in `visiting`, a cycle is detected; add an error `LintIssue` with the cycle path
-   formatted as `REQ-A -> REQ-B -> ... -> REQ-A`.
-3. Add the ID to `visiting` and `path`.
-4. Recurse into each child ID present in `allRequirements`.
-5. Remove the ID from `visiting` and `path`; add it to `visited`.
+1. Add the current ID to `visiting` and `currentPath`.
+2. For each child ID of the current requirement:
+   a. If the child ID is not in `allRequirements`, report an error: unknown child reference.
+   b. If the child ID is in `visiting`, a cycle is detected; add an error `LintIssue` with the
+      cycle path formatted as `REQ-A -> REQ-B -> ... -> REQ-A`.
+   c. If the child ID is not in `visited`, recurse into it.
+3. Remove the current ID from `visiting` and `currentPath`; add it to `visited`.
 
 Because `ValidateCycles` runs before any downstream analysis, `TraceMatrix.CollectAllTests` can
 recurse through child requirements without its own cycle guard.
@@ -145,12 +148,12 @@ matching tag are included in the output.
 
 | Check | Condition | Error text |
 | ----- | --------- | ---------- |
-| Section title | Blank | `Section title cannot be blank` |
-| Requirement ID | Blank | `Requirement ID cannot be blank` |
-| Requirement ID | Duplicate | `Duplicate requirement ID found: '{id}'` |
-| Requirement title | Blank | `Requirement title cannot be blank` |
+| Section title | Blank | `Section 'title' cannot be blank` |
+| Requirement ID | Blank | `Requirement 'id' cannot be blank` |
+| Requirement ID | Duplicate | `Duplicate requirement ID '{id}' (first seen at {location})` |
+| Requirement title | Blank | `Requirement 'title' cannot be blank` |
 | Test name | Blank entry in `tests` list | `Test name cannot be blank` |
-| Mapping ID | Blank | `Mapping requirement ID cannot be blank` |
+| Mapping ID | Blank | `Mapping 'id' cannot be blank` |
 
 All validation errors are reported as `LintSeverity.Error` `LintIssue` objects and include the
 source file path for actionable debugging. When any error-level issue is present, `LoadResult.Requirements`

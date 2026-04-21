@@ -23,11 +23,11 @@ sections:
             tags:
               - requirements
             tests:
-              - Requirements_Load_BlankSectionTitle_ThrowsExceptionWithFileLocation
-              - Requirements_Load_BlankRequirementId_ThrowsExceptionWithFileLocation
-              - Requirements_Load_BlankRequirementTitle_ThrowsExceptionWithFileLocation
-              - Requirements_Load_DuplicateRequirementId_ThrowsException
-              - Requirements_Load_DuplicateRequirementId_ExceptionIncludesFileLocation
+              - Requirements_Load_BlankSectionTitle_ReportsErrorWithFileLocation
+              - Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation
+              - Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation
+              - Requirements_Load_DuplicateRequirementId_ReportsError
+              - Requirements_Load_DuplicateRequirementId_ErrorIncludesFileLocation
 
           - id: ReqStream-Requirements-YamlErrorReporting
             title: The tool shall report YAML deserialization errors with the filename and location.
@@ -37,7 +37,7 @@ sections:
             tags:
               - requirements
             tests:
-              - Requirements_Load_InvalidYamlContent_ThrowsExceptionWithFileLocation
+              - Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation
 
           - id: ReqStream-Requirements-Hierarchy
             title: The tool shall support hierarchical sections and subsections.
@@ -83,9 +83,9 @@ sections:
             tags:
               - requirements
             tests:
-              - Requirements_Load_DuplicateRequirementId_ThrowsException
-              - Requirements_Load_BlankRequirementId_ThrowsExceptionWithFileLocation
-              - Requirements_Load_MultipleFilesWithDuplicateIds_ThrowsException
+              - Requirements_Load_DuplicateRequirementId_ReportsError
+              - Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation
+              - Requirements_Load_MultipleFilesWithDuplicateIds_ReportsError
 
           - id: ReqStream-Requirements-RequiredTitle
             title: The tool shall require each requirement to have a title.
@@ -95,7 +95,7 @@ sections:
             tags:
               - requirements
             tests:
-              - Requirements_Load_BlankRequirementTitle_ThrowsExceptionWithFileLocation
+              - Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation
 
           - id: ReqStream-Requirements-ParentChild
             title: The tool shall support parent-child relationships between requirements.
@@ -116,10 +116,10 @@ sections:
               - requirements
             tests:
               - Requirements_Load_RequirementWithTests_ParsesTestsCorrectly
-              - Requirements_Load_BlankTestNameInRequirement_ThrowsExceptionWithFileLocation
+              - Requirements_Load_BlankTestNameInRequirement_ReportsErrorWithFileLocation
               - Requirements_Load_TestMappings_AppliesMappingsCorrectly
-              - Requirements_Load_BlankTestNameInMapping_ThrowsExceptionWithFileLocation
-              - Requirements_Load_BlankMappingId_ThrowsExceptionWithFileLocation
+              - Requirements_Load_BlankTestNameInMapping_ReportsErrorWithFileLocation
+              - Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation
 
           - id: ReqStream-Requirements-UnifiedLoad
             title: >-
