@@ -193,7 +193,7 @@ unknown_root_field: bad
         var result = Requirements.Load(filePath);
 
         Assert.IsNull(result.Requirements);
-        Assert.IsGreaterThanOrEqualTo(result.Issues.Count, 4);
+        Assert.IsGreaterThanOrEqualTo(4, result.Issues.Count);
         Assert.Contains(i => i.Description.Contains("Unknown field 'unknown_section_field'"), result.Issues);
         Assert.Contains(i => i.Description.Contains("Requirement missing required field 'id'"), result.Issues);
         Assert.Contains(i => i.Description.Contains("Duplicate requirement ID 'REQ-001'"), result.Issues);
