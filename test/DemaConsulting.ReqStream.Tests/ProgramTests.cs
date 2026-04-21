@@ -586,12 +586,10 @@ sections:
         {
             Directory.SetCurrentDirectory(_testDirectory);
 
-            using (var context = Context.Create(["--lint", "--requirements", "*.yaml", "--silent", "--log", logFile]))
-            {
-                Program.Run(context);
+            using var context = Context.Create(["--lint", "--requirements", "*.yaml", "--silent", "--log", logFile]);
+            Program.Run(context);
 
-                Assert.AreEqual(0, context.ExitCode);
-            }
+            Assert.AreEqual(0, context.ExitCode);
         }
         finally
         {
@@ -642,9 +640,9 @@ sections:
 
         // Banner and summary should not appear in output
         var outputText = output.ToString();
-        Assert.IsFalse(outputText.Contains("ReqStream version"), "Banner should be suppressed during lint");
-        Assert.IsFalse(outputText.Contains("Copyright"), "Banner should be suppressed during lint");
-        Assert.IsFalse(outputText.Contains("No issues found"), "Summary line should be suppressed during lint");
+        Assert.DoesNotContain("ReqStream version", outputText, "Banner should be suppressed during lint");
+        Assert.DoesNotContain("Copyright", outputText, "Banner should be suppressed during lint");
+        Assert.DoesNotContain("No issues found", outputText, "Summary line should be suppressed during lint");
         Assert.AreEqual(string.Empty, outputText.Trim(), "Output should be empty for clean lint");
     }
 
@@ -681,17 +679,15 @@ sections:
         {
             Directory.SetCurrentDirectory(_testDirectory);
 
-            using (var context = Context.Create([
+            using var context = Context.Create([
                 "--lint",
                 "--requirements", "requirements.yaml",
                 "--requirements", "bad-requirements.yaml",
                 "--silent",
-                "--log", logFile]))
-            {
-                Program.Run(context);
+                "--log", logFile]);
+            Program.Run(context);
 
-                Assert.AreEqual(1, context.ExitCode, "Lint with duplicate IDs should fail");
-            }
+            Assert.AreEqual(1, context.ExitCode, "Lint with duplicate IDs should fail");
         }
         finally
         {
@@ -701,9 +697,9 @@ sections:
         // Log should contain the duplicate-ID issue but not the banner or summary
         Assert.IsTrue(File.Exists(logFile), "Log file should exist");
         var logContent = File.ReadAllText(logFile);
-        StringAssert.Contains(logContent, "REQ-001", "Issue about duplicate ID should appear in output");
-        Assert.IsFalse(logContent.Contains("ReqStream version"), "Banner should not appear in lint output");
-        Assert.IsFalse(logContent.Contains("No issues found"), "Summary line should not appear in lint output");
+        Assert.Contains("REQ-001", logContent, "Issue about duplicate ID should appear in output");
+        Assert.DoesNotContain("ReqStream version", logContent, "Banner should not appear in lint output");
+        Assert.DoesNotContain("No issues found", logContent, "Summary line should not appear in lint output");
     }
 
     /// <summary>

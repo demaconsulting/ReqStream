@@ -822,8 +822,8 @@ mappings:
         var (exitCode, errors) = RunLint(reqFile);
 
         Assert.AreEqual(1, exitCode);
-        Assert.IsTrue(errors.Contains("PARENT"), $"Expected 'PARENT' in errors: {errors}");
-        Assert.IsTrue(errors.Contains("NONEXISTENT"), $"Expected 'NONEXISTENT' in errors: {errors}");
-        Assert.IsTrue(errors.Contains("unknown child"), $"Expected 'unknown child' in errors: {errors}");
+        Assert.Contains("PARENT", errors, $"Expected 'PARENT' in errors: {errors}");
+        Assert.Contains("NONEXISTENT", errors, $"Expected 'NONEXISTENT' in errors: {errors}");
+        Assert.Contains("unknown child", errors, $"Expected 'unknown child' in errors: {errors}");
     }
 }

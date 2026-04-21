@@ -351,8 +351,8 @@ sections:
         var result = Requirements.Load(filePath);
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("SYS-SEC-001")));
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Duplicate requirement ID")));
+        Assert.Contains(i => i.Description.Contains("SYS-SEC-001"), result.Issues);
+        Assert.Contains(i => i.Description.Contains("Duplicate requirement ID"), result.Issues);
     }
 
     /// <summary>
@@ -405,8 +405,8 @@ includes:
         var result = Requirements.Load(nonExistentPath);
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("File not found")));
-        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(nonExistentPath)));
+        Assert.Contains(i => i.Description.Contains("File not found"), result.Issues);
+        Assert.Contains(i => i.Location.Contains(nonExistentPath), result.Issues);
     }
 
     /// <summary>
@@ -428,9 +428,9 @@ sections:
         var result = Requirements.Load(filePath);
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Unknown field 'text' in requirement")));
-        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(filePath)));
-        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains($"{filePath}(")));
+        Assert.Contains(i => i.Description.Contains("Unknown field 'text' in requirement"), result.Issues);
+        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
+        Assert.Contains(i => i.Location.Contains($"{filePath}("), result.Issues);
     }
 
     /// <summary>
@@ -542,8 +542,8 @@ sections:
         var result = Requirements.Load(filePath);
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Requirement 'id' cannot be blank")));
-        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(filePath)));
+        Assert.Contains(i => i.Description.Contains("Requirement 'id' cannot be blank"), result.Issues);
+        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
     }
 
     /// <summary>
@@ -565,8 +565,8 @@ sections:
         var result = Requirements.Load(filePath);
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Requirement 'title' cannot be blank")));
-        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(filePath)));
+        Assert.Contains(i => i.Description.Contains("Requirement 'title' cannot be blank"), result.Issues);
+        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
     }
 
     /// <summary>
@@ -588,8 +588,8 @@ sections:
         var result = Requirements.Load(filePath);
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Section 'title' cannot be blank")));
-        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(filePath)));
+        Assert.Contains(i => i.Description.Contains("Section 'title' cannot be blank"), result.Issues);
+        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
     }
 
     /// <summary>
@@ -615,8 +615,8 @@ sections:
         var result = Requirements.Load(filePath);
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Test name cannot be blank")));
-        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(filePath)));
+        Assert.Contains(i => i.Description.Contains("Test name cannot be blank"), result.Issues);
+        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
     }
 
     /// <summary>
@@ -644,8 +644,8 @@ mappings:
         var result = Requirements.Load(filePath);
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Test name cannot be blank")));
-        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(filePath)));
+        Assert.Contains(i => i.Description.Contains("Test name cannot be blank"), result.Issues);
+        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
     }
 
     /// <summary>
@@ -672,8 +672,8 @@ mappings:
         var result = Requirements.Load(filePath);
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Mapping 'id' cannot be blank")));
-        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(filePath)));
+        Assert.Contains(i => i.Description.Contains("Mapping 'id' cannot be blank"), result.Issues);
+        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
     }
 
     /// <summary>
@@ -697,9 +697,9 @@ sections:
         var result = Requirements.Load(filePath);
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("SYS-SEC-001")));
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Duplicate requirement ID")));
-        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(filePath)));
+        Assert.Contains(i => i.Description.Contains("SYS-SEC-001"), result.Issues);
+        Assert.Contains(i => i.Description.Contains("Duplicate requirement ID"), result.Issues);
+        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
     }
 
     /// <summary>
@@ -862,9 +862,9 @@ sections:
         var result = Requirements.Load(file1Path, file2Path);
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("SYS-SEC-001")));
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Duplicate requirement ID")));
-        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(file2Path)));
+        Assert.Contains(i => i.Description.Contains("SYS-SEC-001"), result.Issues);
+        Assert.Contains(i => i.Description.Contains("Duplicate requirement ID"), result.Issues);
+        Assert.Contains(i => i.Location.Contains(file2Path), result.Issues);
     }
 
     /// <summary>
@@ -921,8 +921,8 @@ sections:
         var result = Requirements.Load(filePath);
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Tag name cannot be blank")));
-        Assert.IsTrue(result.Issues.Any(i => i.Location.Contains(filePath)));
+        Assert.Contains(i => i.Description.Contains("Tag name cannot be blank"), result.Issues);
+        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
     }
 
     /// <summary>
@@ -950,9 +950,9 @@ sections:
         var result = Requirements.Load(filePath);
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Circular requirement reference detected")));
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("REQ-A")));
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("REQ-B")));
+        Assert.Contains(i => i.Description.Contains("Circular requirement reference detected"), result.Issues);
+        Assert.Contains(i => i.Description.Contains("REQ-A"), result.Issues);
+        Assert.Contains(i => i.Description.Contains("REQ-B"), result.Issues);
     }
 
     /// <summary>
@@ -976,7 +976,7 @@ sections:
         var result = Requirements.Load(filePath);
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Circular requirement reference detected")));
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("REQ-A")));
+        Assert.Contains(i => i.Description.Contains("Circular requirement reference detected"), result.Issues);
+        Assert.Contains(i => i.Description.Contains("REQ-A"), result.Issues);
     }
 }

@@ -97,9 +97,9 @@ sections:
         var result = Requirements.Load(filePath);
 
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Count > 0);
-        Assert.IsTrue(result.Issues.Any(i => i.Severity == LintSeverity.Error));
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Unknown field 'unknown_field'")));
+        Assert.IsNotEmpty(result.Issues);
+        Assert.Contains(i => i.Severity == LintSeverity.Error, result.Issues);
+        Assert.Contains(i => i.Description.Contains("Unknown field 'unknown_field'"), result.Issues);
     }
 
     /// <summary>
@@ -111,9 +111,9 @@ sections:
         var result = Requirements.Load("/nonexistent/path/missing.yaml");
 
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Count > 0);
-        Assert.IsTrue(result.Issues.Any(i => i.Severity == LintSeverity.Error));
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("File not found")));
+        Assert.IsNotEmpty(result.Issues);
+        Assert.Contains(i => i.Severity == LintSeverity.Error, result.Issues);
+        Assert.Contains(i => i.Description.Contains("File not found"), result.Issues);
     }
 
     /// <summary>
@@ -133,9 +133,9 @@ sections:
         var result = Requirements.Load(filePath);
 
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Count > 0);
-        Assert.IsTrue(result.Issues.Any(i => i.Severity == LintSeverity.Error));
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Malformed YAML")));
+        Assert.IsNotEmpty(result.Issues);
+        Assert.Contains(i => i.Severity == LintSeverity.Error, result.Issues);
+        Assert.Contains(i => i.Description.Contains("Malformed YAML"), result.Issues);
     }
 
     /// <summary>
@@ -151,10 +151,10 @@ sections:
 
         var result = Requirements.Load(filePath);
 
-        Assert.IsTrue(result.Issues.Count > 0);
+        Assert.IsNotEmpty(result.Issues);
         var issue = result.Issues[0];
-        StringAssert.Contains(issue.Location, filePath);
-        StringAssert.Contains(issue.ToString(), "error:");
+        Assert.Contains(filePath, issue.Location);
+        Assert.Contains("error:", issue.ToString());
     }
 
     /// <summary>
@@ -193,11 +193,11 @@ unknown_root_field: bad
         var result = Requirements.Load(filePath);
 
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Count >= 4);
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Unknown field 'unknown_section_field'")));
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Requirement missing required field 'id'")));
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Duplicate requirement ID 'REQ-001'")));
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Unknown field 'unknown_root_field'")));
+        Assert.IsGreaterThanOrEqualTo(result.Issues.Count, 4);
+        Assert.Contains(i => i.Description.Contains("Unknown field 'unknown_section_field'"), result.Issues);
+        Assert.Contains(i => i.Description.Contains("Requirement missing required field 'id'"), result.Issues);
+        Assert.Contains(i => i.Description.Contains("Duplicate requirement ID 'REQ-001'"), result.Issues);
+        Assert.Contains(i => i.Description.Contains("Unknown field 'unknown_root_field'"), result.Issues);
     }
 
     /// <summary>
@@ -237,8 +237,8 @@ sections:
         var result = Requirements.Load(rootFile);
 
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Any(i => i.Severity == LintSeverity.Error));
-        Assert.IsTrue(result.Issues.Any(i => i.Description.Contains("Unknown field 'unknown_field'")));
+        Assert.Contains(i => i.Severity == LintSeverity.Error, result.Issues);
+        Assert.Contains(i => i.Description.Contains("Unknown field 'unknown_field'"), result.Issues);
     }
 
     /// <summary>
@@ -270,7 +270,7 @@ sections:
 
         Assert.AreEqual(1, exitCode);
         var log = File.ReadAllText(logFile);
-        Assert.IsTrue(log.Contains("unknown_field"));
+        Assert.Contains("unknown_field", log);
     }
 
     /// <summary>
@@ -293,7 +293,7 @@ sections:
 
         Assert.AreEqual(0, exitCode);
         var log = File.ReadAllText(logFile);
-        Assert.IsTrue(log.Contains("A warning"));
+        Assert.Contains("A warning", log);
     }
 
     /// <summary>
