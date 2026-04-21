@@ -1,5 +1,5 @@
 ---
-title: ReqStream Tool
+title: ReqStream Code Quality
 subtitle: Code Quality Report
 author: DEMA Consulting
 description: Code Quality Report for the ReqStream Tool for managing requirements in YAML format
