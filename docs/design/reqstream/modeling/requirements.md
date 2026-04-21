@@ -118,7 +118,7 @@ references. It is called once after all files are loaded.
 | Structure | Type | Purpose |
 | --------- | ---- | ------- |
 | `visiting` | `HashSet<string>` | IDs on the current DFS stack; a hit here indicates a cycle |
-| `path` | `List<string>` | Ordered IDs on the current stack; used to build the error message |
+| `currentPath` | `List<string>` | Ordered IDs on the current stack; used to build the error message |
 | `visited` | `HashSet<string>` | IDs whose entire sub-tree is confirmed cycle-free; skipped on future encounters |
 
 **Algorithm** (applied via `ValidateCyclesFrom` for each unvisited requirement):
