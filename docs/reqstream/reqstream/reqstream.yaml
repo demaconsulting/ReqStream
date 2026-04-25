@@ -12,16 +12,18 @@ sections:
               Providing version and help display at the system level ensures the CLI entry point
               is a first-class system behavior, distinct from the requirements processing pipeline.
             tests:
-              - Program_Run_WithVersionFlag_PrintsVersion
-              - Program_Run_WithHelpFlag_PrintsHelp
+              - ReqStream_System_CliInterface_VersionFlag_PrintsVersion
+              - ReqStream_System_CliInterface_HelpFlag_PrintsHelp
             children:
+              - ReqStream-Cli-Interface
+              - ReqStream-Cli-MissingArgumentValue
               - ReqStream-Program-Version
               - ReqStream-Program-Help
 
           - id: ReqStream-System-FullPipeline
             title: >-
-              The system shall process requirements files, load test results, generate reports, and
-              enforce coverage in a single invocation.
+              The system shall execute the full requirements-processing pipeline — loading,
+              reporting, tracing, and enforcement — in a single invocation.
             justification: |
               Combining requirements processing, test result loading, report generation, and
               enforcement in a single invocation is the primary CI/CD use case. This system-level
@@ -30,6 +32,7 @@ sections:
             tests:
               - ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces
             children:
+              - ReqStream-Program-Requirements
               - ReqStream-Modeling-YamlParsing
               - ReqStream-Tracing-TestResults
               - ReqStream-Modeling-Export
@@ -59,39 +62,42 @@ sections:
               This validates both the positive case (all requirements satisfied, exit code 0) and
               the negative case (unsatisfied requirement, non-zero exit code).
             tests:
-              - ReqStream_EnforcementMode
               - ReqStream_EnforcementMode_RequirementLacksTestEvidence_FailsWithNonZeroExitCode
             children:
+              - ReqStream-Program-Enforce
               - ReqStream-Tracing-Coverage
 
           - id: ReqStream-System-Lint
             title: >-
-              The system shall lint requirements files and report all structural issues in a single
-              invocation.
+              The system shall identify and report all structural issues in requirements files
+              during a single linting invocation.
             justification: |
               Linting enables CI/CD pipelines to catch malformed YAML, missing mandatory fields,
               unknown fields, duplicate IDs, and other structural problems early, before they cause
               silent failures in downstream processing.
             tests:
-              - Program_Run_WithLintFlag_RunsLinter
               - ReqStream_System_Lint_Flag_ReportsLintIssues
             children:
+              - ReqStream-Program-Lint
               - ReqStream-Modeling-Linting
               - ReqStream-Program-LintVerbosity
               - ReqStream-Program-LintNoFiles
 
           - id: ReqStream-System-Validate
             title: >-
-              The system shall run a built-in self-test suite when the validate flag is provided.
+              The system shall run a built-in self-test suite when the validate flag is provided,
+              and shall write test results to a file when the results flag is also provided.
             justification: |
               In regulated environments, tool qualification evidence is required to demonstrate that
               the tool functions correctly in its deployment environment. The self-test suite
-              exercises core behaviors and produces a pass/fail summary.
+              exercises core behaviors and produces a pass/fail summary. Writing results to a file
+              enables integration with CI/CD pipelines and requirements traceability tools.
             tests:
-              - Program_Run_WithValidateFlag_RunsValidation
               - ReqStream_System_Validate_Flag_RunsSelfValidation
             children:
+              - ReqStream-Program-Validate
               - ReqStream-SelfTest-Qualification
+              - ReqStream-SelfTest-ResultsOutput
 
           - id: ReqStream-System-RequirementsReport
             title: >-
@@ -115,7 +121,7 @@ sections:
             tests:
               - ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces
             children:
-              - ReqStream-Tracing-Coverage
+              - ReqStream-Tracing-Reporting
 
           - id: ReqStream-System-Justifications
             title: >-
@@ -136,8 +142,58 @@ sections:
               Tag-based filtering enables selective export of requirement subsets for focused
               reports, security audits, compliance documentation, and targeted reviews.
             tests:
-              - TraceMatrix_Export_WithFilterTags_ExportsOnlyMatchingRequirements
               - ReqStream_System_TagFilter_Flag_FiltersRequirements
             children:
               - ReqStream-Tracing-Coverage
+              - ReqStream-Tracing-Reporting
               - ReqStream-Modeling-Export
+
+          - id: ReqStream-System-OutputControl
+            title: >-
+              The system shall support configurable output routing, including log file output
+              and console output suppression, via command-line flags.
+            justification: |
+              Directing output to a log file and suppressing console output enables quiet operation
+              in automated CI/CD pipelines. Depth options allow control over Markdown heading
+              levels in exported reports. These behaviors are user-visible system features
+              requiring traceability through the Cli subsystem.
+            tests:
+              - ReqStream_System_OutputControl_LogFlag_WritesOutputToFile
+              - ReqStream_System_OutputControl_SilentFlag_SuppressesConsoleOutput
+            children:
+              - ReqStream-Cli-Output
+              - ReqStream-Cli-StderrRouting
+              - ReqStream-Cli-ExitCodeSignaling
+              - ReqStream-Cli-InvalidDepthValue
+              - ReqStream-Cli-LogFileOpenFailure
+              - ReqStream-Cli-DepthInheritance
+
+          - id: ReqStream-System-CrossPlatform
+            title: >-
+              The system shall run on supported operating systems and .NET runtime versions.
+            justification: |
+              Cross-platform support ensures the tool can be used in diverse development
+              environments including Windows, Linux, and macOS, and across the supported .NET
+              LTS and current releases. The CI matrix validates this on every build.
+            tests:
+              - ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces
+            children:
+              - ReqStream-Platform-Windows
+              - ReqStream-Platform-Linux
+              - ReqStream-Platform-MacOS
+              - ReqStream-Platform-Net8
+              - ReqStream-Platform-Net9
+              - ReqStream-Platform-Net10
+
+          - id: ReqStream-System-FileIncludes
+            title: >-
+              The system shall support loading requirements from multiple YAML files via file
+              includes, enabling modular requirements management.
+            justification: |
+              File includes allow requirements to be split across multiple YAML files organized
+              by component, team, or release, while still producing a single unified requirements
+              tree. This is essential for scalable requirements management in large repositories.
+            tests:
+              - ReqStream_System_FileIncludes_RequirementsWithIncludes_LoadsAllRequirements
+            children:
+              - ReqStream-Requirements-Includes

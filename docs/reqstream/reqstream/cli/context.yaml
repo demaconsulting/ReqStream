@@ -16,7 +16,7 @@ sections:
               - Context_Create_MultipleArguments_ParsesAllCorrectly
 
           - id: ReqStream-Command-Version
-            title: Context shall accept the `--version` flag and record it so that Program can display version information.
+            title: The tool shall accept a `--version` flag.
             justification: |
               Recording the version flag in Context allows Program to detect the request and print
               version information without requiring Context to have any knowledge of the version string.
@@ -26,7 +26,7 @@ sections:
               - Context_Create_VersionFlag_SetsVersionProperty
 
           - id: ReqStream-Command-Help
-            title: Context shall accept the `--help` flag and record it so that Program can display help information.
+            title: The tool shall accept a `--help` flag.
             justification: |
               Recording the help flag in Context allows Program to detect the request and print
               usage documentation without coupling help content to the argument-parsing layer.
@@ -111,7 +111,7 @@ sections:
               - Context_Create_EnforceFlag_SetsEnforceProperty
 
           - id: ReqStream-Command-ExitCode
-            title: Context shall expose an exit code property that Program uses to determine the process exit code.
+            title: The tool shall exit with a non-zero exit code when an error has been reported during execution.
             justification: |
               Exposing an exit code property allows Program to return the correct process exit code
               based on whether errors were reported during execution, enabling callers to detect

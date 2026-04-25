@@ -84,20 +84,9 @@ A call to `Requirements.Load(paths)` follows this sequence:
 
 ## Lint Check Categories
 
-`RequirementsLoader` checks the following categories of structural issues, all reported as
-Error-level:
-
-| Category | Checked Conditions |
-|---|---|
-| **File access** | Invalid path, file not found, I/O read failure |
-| **YAML syntax** | Malformed YAML (line and column reported) |
-| **Document structure** | Root is not a mapping; unknown document-level fields |
-| **Field types** | `sections`, `mappings`, or `includes` value is not a sequence; a `sections` or `requirements` entry is not a mapping node |
-| **Section rules** | Missing or blank `title`; unknown field in section |
-| **Requirement rules** | Missing or blank `id`; duplicate `id`; missing or blank `title`; unknown field in requirement |
-| **List entry rules** | Non-scalar entry in `tests`, `children`, `tags`, or `includes`; blank entry in `tests`, `children`, `tags`, or `includes` |
-| **Mapping rules** | Mapping entry is not a mapping node; missing or blank mapping `id`; unknown field in mapping |
-| **Graph rules** | Unknown child requirement reference; circular `children` reference (DFS cycle detection) |
+`RequirementsLoader` performs structural validation during loading. For the complete list of
+lint check categories and checked conditions, see the
+[RequirementsLoader Unit Design](./requirements-loader.md#lint-check-categories).
 
 No Warning-level issues are emitted by the current implementation; all detected conditions are
 Error-level and cause `LoadResult.Requirements` to be `null`.

@@ -46,6 +46,12 @@ non-validate, non-lint) invocation:
    `EnforceRequirementsCoverage` compares the satisfied-requirement count against the total count.
    Any unsatisfied requirement causes an error to be written to `context`, which results in a
    non-zero exit code.
+7. **Tag filtering** — if `--filter` is set, `Context.FilterTags` holds the list of tag strings.
+   This list is passed as the `filterTags` parameter to `Requirements.Export`,
+   `TraceMatrix.Export`, `TraceMatrix.CalculateSatisfiedRequirements`, and
+   `TraceMatrix.GetUnsatisfiedRequirements`. Tag filtering is therefore applied transparently
+   at each operation in steps 3, 5, and 6 rather than as a separate pipeline stage; only
+   requirements carrying at least one matching tag are included in reports and enforcement.
 
 ## Source-Specific Test Matching
 
@@ -69,8 +75,9 @@ correct platform.
 ## Lint Flow
 
 When `--lint` is specified, `Program.Run` loads the requirements files via
-`Requirements.Load(context.RequirementsFiles)` and reports any lint issues. The lint flow differs
-from normal processing in two important ways:
+`Requirements.Load(context.RequirementsFiles)`, calls `result.ReportIssues(context)` to route each
+lint issue through the `Context` output channel, and then exits. The lint flow differs from normal
+processing in two important ways:
 
 1. **No banner** — `PrintBanner` is suppressed so that only actionable issue lines appear in the
    output, making it straightforward to integrate `--lint` into editor tooling or CI scripts that
@@ -97,10 +104,10 @@ so that the evidence can be fed back into ReqStream's own requirements enforceme
 | `Program` | `TraceMatrix` | `ProcessRequirements` | Loads test results and maps them to requirements |
 | `Validation` | `Program` | test methods | Invokes `Program.Run` to exercise the full pipeline |
 
-## Component Interaction Diagram
+## Error and Output Data Flow
 
-The following table shows the data flow between units during a standard requirements processing
-invocation:
+The following table shows how errors and results flow between units during a standard requirements
+processing invocation, tracing them from origin to the process exit code:
 
 | Source | Data | Destination |
 | ------ | ---- | ----------- |
@@ -109,9 +116,9 @@ invocation:
 | Test result files | Test execution records | `TraceMatrix` |
 | `Context` | Expanded file lists and flags | `Requirements.Load` |
 | `Requirements.Load` | Parsed requirement tree | `TraceMatrix` |
-| `Requirements.Load` | Lint issues (warnings/errors) | Error output channel |
+| `Requirements.Load` + `result.ReportIssues` | Lint issues (warnings/errors) | `context.WriteError` → `Context._hasErrors` → `Context.ExitCode` |
 | `TraceMatrix` | Coverage analysis | Markdown reports |
-| `TraceMatrix` + lint issues | Error flags | Exit code (0 = pass, 1 = fail) |
+| `Program.EnforceRequirementsCoverage` (unsatisfied requirements) | Error messages via `context.WriteError` | `Context._hasErrors` → `Context.ExitCode` |
 
 ## Platform Support
 
@@ -143,7 +150,7 @@ by feature, component, or responsibility and still produce one coherent requirem
 ### Immutable Data Structures
 
 Properties prevent modification after construction; collections allow population during construction
-but not replacement. `TestMetrics` and `TestExecution` are immutable records. This removes an entire
+but not replacement. Internal value types within `TraceMatrix` are immutable records. This removes an entire
 class of concurrency and aliasing bugs and makes the data model easy to reason about.
 
 ### Error Context and Testability

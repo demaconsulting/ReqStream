@@ -342,4 +342,179 @@ public class IntegrationTests
             reportContent.Contains("Integration-System-TaggedBeta"),
             "Filtered report should not contain the beta-tagged requirement.");
     }
+
+    /// <summary>
+    /// Integration test verifying that the --version flag causes the tool to print version
+    /// information and exit with code 0, exercising the system-level CLI interface behavior.
+    /// </summary>
+    [TestMethod]
+    public void ReqStream_System_CliInterface_VersionFlag_PrintsVersion()
+    {
+        // Act: run with --version flag as an external process
+        var exitCode = Runner.Run(
+            out var output,
+            "dotnet",
+            _dllPath,
+            "--version");
+
+        // Assert: tool exits successfully
+        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
+
+        // Assert: output contains a version string (non-empty, no banner/help)
+        Assert.IsFalse(string.IsNullOrWhiteSpace(output), "Expected version output to be non-empty.");
+        Assert.IsFalse(output.Contains("Usage:"), "Version output should not contain usage help.");
+    }
+
+    /// <summary>
+    /// Integration test verifying that the --help flag causes the tool to print usage information
+    /// and exit with code 0, exercising the system-level CLI interface behavior.
+    /// </summary>
+    [TestMethod]
+    public void ReqStream_System_CliInterface_HelpFlag_PrintsHelp()
+    {
+        // Act: run with --help flag as an external process
+        var exitCode = Runner.Run(
+            out var output,
+            "dotnet",
+            _dllPath,
+            "--help");
+
+        // Assert: tool exits successfully
+        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
+
+        // Assert: output contains usage information
+        Assert.IsTrue(output.Contains("Usage:"), $"Expected help output to contain 'Usage:'. Output: {output}");
+        Assert.IsTrue(output.Contains("Options:"), $"Expected help output to contain 'Options:'. Output: {output}");
+    }
+
+    /// <summary>
+    /// Integration test verifying that the --log flag routes all output to the specified log file,
+    /// exercising the system-level output control behavior.
+    /// </summary>
+    [TestMethod]
+    public void ReqStream_System_OutputControl_LogFlag_WritesOutputToFile()
+    {
+        // Arrange: create a minimal requirements file
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: System Requirements
+                requirements:
+                  - id: Integration-System-LogTest
+                    title: The system shall do something.
+                    tests:
+                      - LogTest1
+            """);
+
+        var logFile = Path.Combine(_testDirectory, "output.log");
+
+        // Act: run with --log flag to route output to a file
+        var exitCode = Runner.RunInDirectory(
+            out _,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--requirements", "requirements.yaml",
+            "--silent",
+            "--log", logFile);
+
+        // Assert: tool exited successfully
+        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}.");
+
+        // Assert: log file was created with tool output
+        Assert.IsTrue(File.Exists(logFile), "Log file should have been created.");
+        var logContent = File.ReadAllText(logFile);
+        Assert.IsFalse(string.IsNullOrWhiteSpace(logContent), "Log file should contain output.");
+    }
+
+    /// <summary>
+    /// Integration test verifying that the --silent flag suppresses console output,
+    /// exercising the system-level output control behavior.
+    /// </summary>
+    [TestMethod]
+    public void ReqStream_System_OutputControl_SilentFlag_SuppressesConsoleOutput()
+    {
+        // Arrange: create a minimal requirements file
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: System Requirements
+                requirements:
+                  - id: Integration-System-SilentTest
+                    title: The system shall do something.
+                    tests:
+                      - SilentTest1
+            """);
+
+        // Act: run with --silent flag and capture output
+        var exitCode = Runner.RunInDirectory(
+            out var output,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--requirements", "requirements.yaml",
+            "--silent");
+
+        // Assert: tool exited successfully and produced no console output
+        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
+        Assert.IsTrue(string.IsNullOrWhiteSpace(output), $"Expected no console output with --silent. Got: {output}");
+    }
+
+    /// <summary>
+    /// Integration test verifying that requirements files using file includes correctly load
+    /// all requirements from included files, exercising the system-level file includes behavior.
+    /// </summary>
+    [TestMethod]
+    public void ReqStream_System_FileIncludes_RequirementsWithIncludes_LoadsAllRequirements()
+    {
+        // Arrange: create a child requirements file
+        var childFile = Path.Combine(_testDirectory, "child-requirements.yaml");
+        File.WriteAllText(childFile, """
+            sections:
+              - title: Child Requirements
+                requirements:
+                  - id: Integration-Child-Requirement
+                    title: The system shall have a child requirement.
+                    tests:
+                      - ChildTest1
+            """);
+
+        // Arrange: create a root requirements file that includes the child file
+        var rootFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(rootFile, """
+            includes:
+              - child-requirements.yaml
+            sections:
+              - title: Root Requirements
+                requirements:
+                  - id: Integration-Root-Requirement
+                    title: The system shall have a root requirement.
+                    tests:
+                      - RootTest1
+            """);
+
+        var reportFile = Path.Combine(_testDirectory, "report.md");
+
+        // Act: run with the root requirements file that uses includes
+        var exitCode = Runner.RunInDirectory(
+            out var output,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--requirements", "requirements.yaml",
+            "--report", reportFile);
+
+        // Assert: tool exited successfully
+        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
+
+        // Assert: report was generated containing requirements from both files
+        Assert.IsTrue(File.Exists(reportFile), "Report file should have been generated.");
+        var reportContent = File.ReadAllText(reportFile);
+        Assert.IsTrue(
+            reportContent.Contains("Integration-Root-Requirement"),
+            "Report should contain the root requirement.");
+        Assert.IsTrue(
+            reportContent.Contains("Integration-Child-Requirement"),
+            "Report should contain the included child requirement.");
+    }
 }

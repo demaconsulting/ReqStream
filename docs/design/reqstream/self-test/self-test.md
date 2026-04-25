@@ -33,11 +33,6 @@ The `SelfTest` subsystem exposes the following interface to the rest of the tool
 | `Context`  | Uses      | Output channel for header lines, test summaries, and errors. |
 | `Program`  | Uses      | `Program.Run` is called internally to exercise the tool.     |
 
-## References
-
-- [ReqStream System Design][arch]
-- [ReqStream Repository][repo]
-
 ## Error Handling
 
 The `SelfTest` subsystem handles the following error conditions:
@@ -48,5 +43,16 @@ The `SelfTest` subsystem handles the following error conditions:
 | Results file has an unsupported extension | `context.WriteError` is called with a descriptive message; no results file is written. |
 | Results file cannot be written (e.g., permission denied, path invalid) | `context.WriteError` is called with the exception message; the file is not written and execution continues normally. |
 
+> **Thread-safety constraint**: `Validation.Run` must not be called concurrently. Each test
+> method uses `DirectorySwitch` to mutate the process working directory, which is a process-wide
+> resource. See the [Validation unit design][validation] for details.
+
+## References
+
+- [ReqStream System Design][arch]
+- [Validation Unit Design][validation]
+- [ReqStream Repository][repo]
+
 [arch]: ../reqstream.md
+[validation]: validation.md
 [repo]: https://github.com/demaconsulting/ReqStream

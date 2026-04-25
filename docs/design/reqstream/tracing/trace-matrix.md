@@ -79,8 +79,9 @@ table for a quick reference of both formats.
 
 `GetAllTestResults` returns a read-only dictionary mapping each test name (referenced by any
 requirement in the tree) to its aggregated `TestMetrics`. Only tests that have been executed at
-least once (`Executed > 0`) are included in the result. This provides `Program` with a summary of
-all executed tests referenced in the requirements.
+least once (`Executed > 0`) are included in the result. This method is called internally by
+`Export` to populate the Testing section of the trace matrix report; it is not part of the
+public interface to `Program`.
 
 ### `GetUnsatisfiedRequirements(filterTags)`
 
@@ -138,6 +139,9 @@ while the Summary reflects full-subtree satisfaction.
 **Parameter behavior**:
 
 - `filePath`: required; an `ArgumentException` is thrown when `filePath` is null or empty.
+  On file-system write failure (for example, permission denied or an invalid path), the
+  underlying `IOException` or `UnauthorizedAccessException` is propagated to the caller without
+  wrapping.
 - `depth`: controls the starting Markdown heading level for the three top-level sections (Summary,
   Requirements, Testing). Section sub-headings are `depth + 1`; requirement sub-headings are
   `depth + 2`. Defaults to `1`.

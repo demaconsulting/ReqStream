@@ -16,7 +16,9 @@ sections:
         justification: |
           A structured issue type with a standardized string format allows callers to
           programmatically inspect lint issues and allows editors and CI tools to parse the
-          output and navigate directly to the reported issue.
+          output and navigate directly to the reported issue. The data model structure and
+          string format are a single inseparable concern: the format is the observable behavior
+          that the data model exists to support, so they are expressed together in one requirement.
         tags:
           - lint
         tests:

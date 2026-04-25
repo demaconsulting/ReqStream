@@ -223,4 +223,21 @@ public class CliTests
             Console.SetError(originalError);
         }
     }
+
+    /// <summary>
+    /// Test that --depth sets the default for all per-report depth options.
+    /// </summary>
+    [TestMethod]
+    public void Cli_Interface_DepthFlag_SetsDefaultForAllReportDepths()
+    {
+        // Arrange: nothing to arrange - the --depth flag alone is the input
+
+        // Act: create a context with only --depth 3 (no per-report overrides)
+        using var context = Context.Create(["--depth", "3"]);
+
+        // Assert: all per-report depth properties inherit the --depth value
+        Assert.AreEqual(3, context.ReportDepth);
+        Assert.AreEqual(3, context.MatrixDepth);
+        Assert.AreEqual(3, context.JustificationsDepth);
+    }
 }

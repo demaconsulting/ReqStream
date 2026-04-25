@@ -14,7 +14,7 @@ Requirements Management Tool
 ## Overview
 
 ReqStream is a .NET command-line tool for managing requirements written in YAML files. It provides functionality to
-create, validate, and manage requirement documents in a structured and maintainable way.
+validate and manage requirement documents in a structured and maintainable way.
 
 ## Features
 
@@ -23,14 +23,14 @@ create, validate, and manage requirement documents in a structured and maintaina
 - 🌐 **Multi-Platform** - Support for .NET 8, 9, and 10 across Windows, Linux, and macOS
 - 🔗 **Hierarchical Structure** - Organize requirements with sections and subsections
 - 🧪 **Test Mapping** - Link requirements to test cases for traceability
-- � **Source-Specific Test Matching** - Restrict coverage evidence to named result files using `filepart@testname` syntax
-- �📦 **File Includes** - Modularize requirements across multiple YAML files
+- 🎯 **Source-Specific Test Matching** - Restrict coverage evidence to named result files using `filepart@testname` syntax
+- 📦 **File Includes** - Modularize requirements across multiple YAML files
 - ✅ **Validation** - Run a built-in self-test suite to qualify the tool in its deployment environment
 - 🔍 **Linting** - Validate requirements YAML structure and references, reporting all issues in one pass
 - 🏷️ **Tag Filtering** - Categorize and filter requirements using tags
 - 📋 **Justifications** - Document the rationale behind each requirement
-- � **Export Capabilities** - Generate markdown reports for requirements, justifications, and test trace matrices
-- �🔒 **Continuous Compliance** - Compliance evidence generated automatically on every CI run, following
+- 📤 **Export Capabilities** - Generate markdown reports for requirements, justifications, and test trace matrices
+- 🔒 **Continuous Compliance** - Compliance evidence generated automatically on every CI run, following
   the [Continuous Compliance][link-continuous-compliance] methodology
 
 ## Installation

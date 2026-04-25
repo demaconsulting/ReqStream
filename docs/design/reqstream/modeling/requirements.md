@@ -33,6 +33,10 @@ Both methods walk the section tree recursively, emitting Markdown headings at th
 `depth` and a requirements table for each section. When `filterTags` is non-`null`, only
 requirements whose `Tags` list contains at least one matching tag are included in the output.
 
+**Error handling**: Both methods propagate any `IOException` or `UnauthorizedAccessException`
+thrown by the underlying file-write operations to the caller without wrapping. Callers are
+responsible for handling file-write failures; the methods do not catch or suppress I/O exceptions.
+
 **Export output format**:
 
 - Each `Section` produces a Markdown heading (`#` through `######` depending on `depth`) with

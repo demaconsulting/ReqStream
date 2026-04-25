@@ -6,6 +6,9 @@
 # - The Cli subsystem spans Context.cs (command-line argument parsing and I/O)
 # - Subsystem requirements describe the externally visible command-line interface behavior
 
+includes:
+  - context.yaml
+
 sections:
   - title: Cli Subsystem Requirements
     requirements:
@@ -50,16 +53,56 @@ sections:
           - ReqStream-Command-Silent
           - ReqStream-Logging-FileOutput
 
-      - id: ReqStream-Cli-ErrorReporting
-        title: The Cli subsystem shall provide an error reporting channel that routes errors to stderr and signals failure
-          via exit code.
+      - id: ReqStream-Cli-StderrRouting
+        title: The Cli subsystem shall route error messages to stderr.
         justification: |
-          A dedicated error reporting channel ensures error messages remain visible to the user
-          without polluting stdout, and that callers can detect failure conditions by inspecting
-          the process exit code.
+          Error messages must be written to stderr so they remain visible to the user
+          without polluting stdout, which consumers may pipe or redirect for data capture.
         tests:
           - Cli_Output_WriteError_WritesToErrorChannel
-          - Cli_Output_WriteError_SetsExitCodeToOne
         children:
           - ReqStream-Command-ErrorOutput
+
+      - id: ReqStream-Cli-ExitCodeSignaling
+        title: The Cli subsystem shall signal failure via a non-zero exit code when an error has been reported.
+        justification: |
+          A non-zero exit code allows callers to detect failure conditions by inspecting the
+          process exit code, enabling correct CI/CD pipeline behavior without parsing output.
+        tests:
+          - Cli_Output_WriteError_SetsExitCodeToOne
+        children:
           - ReqStream-Command-ExitCode
+
+      - id: ReqStream-Cli-MissingArgumentValue
+        title: The Cli subsystem shall reject a flag that requires a value when no value is provided.
+        justification: |
+          Providing clear feedback when a required argument value is omitted prevents silent
+          misconfiguration and helps users quickly identify and correct command-line errors.
+        tests:
+          - Cli_Interface_MissingArgumentValue_ThrowsArgumentException
+
+      - id: ReqStream-Cli-InvalidDepthValue
+        title: The Cli subsystem shall reject a non-integer depth value with a descriptive error.
+        justification: |
+          The depth argument must be a valid integer; rejecting non-integer values prevents
+          downstream formatting errors and gives users actionable feedback.
+        tests:
+          - Cli_Interface_InvalidDepthValue_ThrowsArgumentException
+
+      - id: ReqStream-Cli-LogFileOpenFailure
+        title: The Cli subsystem shall reject a log file path that cannot be opened for writing.
+        justification: |
+          Detecting an inaccessible log file path at startup prevents silent loss of log output
+          and gives users a clear error message before any processing begins.
+        tests:
+          - Cli_Interface_LogFileOpenFailure_ThrowsArgumentException
+
+      - id: ReqStream-Cli-DepthInheritance
+        title: The Cli subsystem shall apply the depth value as the default for per-report depth options not individually
+          specified.
+        justification: |
+          Providing a single --depth option that sets the default for all per-report depth
+          options reduces repetition in common invocations and simplifies pipeline configuration
+          while still allowing individual overrides.
+        tests:
+          - Cli_Interface_DepthFlag_SetsDefaultForAllReportDepths

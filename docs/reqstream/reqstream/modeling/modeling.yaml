@@ -32,6 +32,7 @@ sections:
           - ReqStream-Requirements-YamlProcessing
           - ReqStream-Requirements-Includes
           - ReqStream-Requirements-SectionMerging
+          - ReqStream-Requirements-Hierarchy
           - ReqStream-Section-Container
           - ReqStream-Section-Nesting
 
@@ -66,7 +67,6 @@ sections:
         children:
           - ReqStream-Requirements-Validation
           - ReqStream-Requirements-YamlErrorReporting
-          - ReqStream-Requirements-Hierarchy
           - ReqStream-Requirements-UniqueIds
           - ReqStream-Requirements-RequiredTitle
           - ReqStream-Requirements-UnifiedLoad

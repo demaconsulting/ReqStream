@@ -6,6 +6,9 @@
 # - The SelfTest subsystem spans Validation.cs (self-validation test execution)
 # - Subsystem requirements describe the self-validation mechanism for tool qualification
 
+includes:
+  - validation.yaml
+
 sections:
   - title: SelfTest Subsystem Requirements
     requirements:

@@ -51,7 +51,7 @@ sections:
               - TraceMatrix_Constructor_WithJUnitFile_ParsesCorrectly
               - TraceMatrix_Constructor_WithJUnitFailedTests_TracksFailures
 
-          - id: ReqStream-Test-GlobPatterns
+          - id: ReqStream-Test-MixedFormats
             title: The tool shall support processing mixed-format test result files.
             justification: |
               Mixed-format support allows requirements to be verified against test results produced

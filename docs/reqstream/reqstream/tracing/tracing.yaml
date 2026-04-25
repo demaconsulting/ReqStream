@@ -6,6 +6,9 @@
 # - The Tracing subsystem spans TraceMatrix.cs (test result loading and mapping)
 # - Subsystem requirements describe the traceability and coverage enforcement behavior
 
+includes:
+  - trace-matrix.yaml
+
 sections:
   - title: Tracing Subsystem Requirements
     requirements:
@@ -21,7 +24,7 @@ sections:
           - ReqStream-Test-TrxFormat
           - ReqStream-Test-JUnitFormat
           - ReqStream-Test-ResultFiles
-          - ReqStream-Test-GlobPatterns
+          - ReqStream-Test-MixedFormats
 
       - id: ReqStream-Tracing-Coverage
         title: The Tracing subsystem shall map test results to requirements and determine coverage.

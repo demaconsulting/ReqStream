@@ -119,6 +119,29 @@ Throughout this document:
   methods/algorithms, and interactions with other units.
 - Text tables are used in preference to diagrams, which may not render in all PDF viewers.
 
+## Companion Artifact Structure
+
+Each software item in the structure above has corresponding artifacts in parallel directory trees,
+enabling reviewers and auditors to navigate from any one artifact to all related files:
+
+```text
+Each software item has parallel artifacts organized as follows:
+- Requirements: docs/reqstream/reqstream/.../{item}.yaml  (kebab-case)
+- Design docs:  docs/design/reqstream/.../{item}.md        (kebab-case)
+- Source code:  src/DemaConsulting.ReqStream/.../{Item}.cs (PascalCase)
+- Tests:        test/DemaConsulting.ReqStream.Tests/.../{Item}Tests.cs (PascalCase)
+- Review-sets:  defined in .reviewmark.yaml
+```
+
+For example, the `Requirements` unit maps to:
+
+| Artifact | Path |
+| -------- | ---- |
+| Requirements | `docs/reqstream/reqstream/modeling/requirements.yaml` |
+| Design | `docs/design/reqstream/modeling/requirements.md` |
+| Source | `src/DemaConsulting.ReqStream/Modeling/Requirements.cs` |
+| Tests | `test/DemaConsulting.ReqStream.Tests/Modeling/ModelingTests.cs` |
+
 ## References
 
 - [ReqStream Repository][repo]

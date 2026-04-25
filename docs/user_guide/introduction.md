@@ -34,12 +34,15 @@ to be treated as code, stored in source control, and integrated into CI/CD pipel
 - **Multi-Platform** - Works on Windows, Linux, and macOS with .NET 8, 9, and 10
 - **Hierarchical Structure** - Organize requirements with sections and subsections for better organization
 - **Test Mapping** - Link requirements to test cases for traceability and verification
+- **Source-Specific Test Matching** - Restrict coverage evidence to named result files using `filepart@testname` syntax
 - **Justifications** - Document the rationale behind each requirement for better understanding
 - **File Includes** - Modularize requirements across multiple YAML files for better maintainability
 - **Linting** - Inspect requirements files for structural issues and reference errors, reporting all problems in one pass
 - **Validation** - Run a built-in self-test suite to qualify the tool in its deployment environment
 - **Tag Filtering** - Categorize and filter requirements using tags for focused reporting and enforcement
 - **Export Capabilities** - Generate markdown reports for requirements, justifications, and test trace matrices
+- **Continuous Compliance** - Automatically generate compliance evidence on every CI run, following the
+  [Continuous Compliance][continuous-compliance] methodology
 
 ## Use Cases
 
