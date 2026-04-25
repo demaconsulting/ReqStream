@@ -9,6 +9,27 @@ child references, applying test mappings, and exporting content to Markdown repo
 
 ## Data Model
 
+### `LintSeverity`
+
+`LintSeverity` is an enum that classifies the severity of a lint issue.
+
+| Member | Description |
+| ------ | ----------- |
+| `Warning` | A non-fatal issue; processing can continue. |
+| `Error` | A fatal issue that prevents successful requirements loading. |
+
+### `LintIssue`
+
+`LintIssue` represents a single issue found during requirements linting or loading.
+
+| Member | Type | Notes |
+| ------ | ---- | ----- |
+| `LintIssue(location, severity, description)` | Constructor | Initializes all three properties |
+| `Location` | `string` | The source location (e.g. `"file.yaml"` or `"file.yaml(3,5)"`) |
+| `Severity` | `LintSeverity` | The severity of the issue |
+| `Description` | `string` | A human-readable description of the issue |
+| `ToString()` | `string` | Returns the issue formatted as `"location: severity: description"` |
+
 ### `Requirement`
 
 `Requirement` represents a single requirement node.
@@ -92,21 +113,15 @@ design points govern its behavior:
   `RepresentationModel` DOM API. An empty or `null` root node is silently accepted.
 - **Validation and merging**: each section is validated (title must not be blank) and each
   requirement is validated (ID and title must not be blank; ID must not duplicate an entry already
-  seen). Validated sections are merged into the tree via `MergeSection`. Mapping entries append
-  additional test IDs to already-registered requirements.
+  seen). Validated sections are merged into the tree inline: if `parent.Sections` already contains
+  a section whose `Title` matches the incoming section title, the incoming requirements are appended
+  to that existing section and child sections are recursively merged; if no match is found, a new
+  `Section` is created and appended to `parent.Sections`. This same-title merge strategy is the key
+  design decision that enables modular requirements management: multiple YAML files can contribute
+  requirements to the same logical section without requiring a single monolithic file. Mapping
+  entries append additional test IDs to already-registered requirements.
 - **Recursive includes**: each path in the document's `includes` block is resolved relative to the
   current file's directory and passed to `LoadFile` recursively, enabling modular file organization.
-
-### `MergeSection(parent, sectionNode)`
-
-`MergeSection` integrates a newly parsed section into an existing section tree. If `parent.Sections`
-already contains a section whose `Title` matches the incoming section title, the incoming requirements are
-appended to that existing section and child sections are recursively merged. If no match is found, a
-new `Section` is created and appended to `parent.Sections`.
-
-This same-title merge strategy is the key design decision that enables modular requirements
-management: multiple YAML files can contribute requirements to the same logical section without
-requiring a single monolithic file.
 
 ### `ValidateCycles()`
 

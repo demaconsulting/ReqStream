@@ -24,8 +24,8 @@ create, validate, and manage requirement documents in a structured and maintaina
 - 🔗 **Hierarchical Structure** - Organize requirements with sections and subsections
 - 🧪 **Test Mapping** - Link requirements to test cases for traceability
 - 📦 **File Includes** - Modularize requirements across multiple YAML files
-- ✅ **Validation** - Built-in validation for requirement structure and references
-- 🔍 **Linting** - Validate requirements YAML structure and report all issues in one pass
+- ✅ **Validation** - Run a built-in self-test suite to qualify the tool in its deployment environment
+- 🔍 **Linting** - Validate requirements YAML structure and references, reporting all issues in one pass
 - 🏷️ **Tag Filtering** - Categorize and filter requirements using tags
 - 📋 **Justifications** - Document the rationale behind each requirement
 - 🔒 **Continuous Compliance** - Compliance evidence generated automatically on every CI run, following
@@ -567,7 +567,7 @@ For information about reporting security vulnerabilities, please see our [Securi
 [nuget-shield]: https://img.shields.io/nuget/v/DemaConsulting.ReqStream
 [nuget-url]: https://www.nuget.org/packages/DemaConsulting.ReqStream
 [license]: https://github.com/demaconsulting/ReqStream/blob/main/LICENSE
-[architecture]: https://github.com/demaconsulting/ReqStream/blob/main/ARCHITECTURE.md
+[architecture]: docs/design/introduction.md
 [contributing]: https://github.com/demaconsulting/ReqStream/blob/main/CONTRIBUTING.md
 [code-of-conduct]: https://github.com/demaconsulting/ReqStream/blob/main/CODE_OF_CONDUCT.md
 [security]: https://github.com/demaconsulting/ReqStream/blob/main/SECURITY.md

@@ -113,9 +113,38 @@ requirement must be traced to at least one passing test.
 
 ### `Export(filePath, depth, filterTags)`
 
-`Export` writes the trace matrix to a Markdown file at `filePath`. The output lists each
-requirement (respecting `filterTags`), its associated tests, and the pass/fail status of each
-test. The heading depth for requirement IDs is controlled by `depth`.
+`Export` writes the trace matrix to a Markdown file at `filePath`. The output has three sections,
+written in this order by three helper methods: `ExportSummary`, `ExportRequirements`, and
+`ExportTesting`.
+
+**Output structure**:
+
+| Section | Helper | Description |
+| ------- | ------ | ----------- |
+| Summary | `ExportSummary` | Single sentence: "N of M requirements are satisfied with tests." |
+| Requirements | `ExportRequirements` | One sub-section per requirements section; table with columns: ID, Tests Linked, Passed, Failed, Not Executed |
+| Testing | `ExportTesting` | Flat table of all executed tests linked to any requirement; columns: Test, Requirement, Passed, Failed |
+
+**Table format** (Requirements section): `| ID | Tests Linked | Passed | Failed | Not Executed |`
+
+**Table format** (Testing section): `| Test | Requirement | Passed | Failed |`
+
+The Requirements table rows show only the **direct** tests listed on each requirement (not child
+tests). The Summary satisfied-count is calculated by `CalculateSatisfiedRequirements`, which in
+turn calls `IsRequirementSatisfied`; that method uses `CollectAllTests` to recurse through the
+entire descendant subtree. This creates a deliberate asymmetry: the table shows direct-test counts
+while the Summary reflects full-subtree satisfaction.
+
+**Parameter behavior**:
+
+- `filePath`: required; an `ArgumentException` is thrown when `filePath` is null or empty.
+- `depth`: controls the starting Markdown heading level for the three top-level sections (Summary,
+  Requirements, Testing). Section sub-headings are `depth + 1`; requirement sub-headings are
+  `depth + 2`. Defaults to `1`.
+- `filterTags`: when non-`null`, only requirements whose `Tags` list contains at least one
+  matching tag are included in the Requirements table and counted in the Summary. The Testing
+  section is unaffected by tag filtering. Defaults to `null`.
+- `rootSection`: `_requirements` is used internally as the root to iterate the requirement tree.
 
 ## Test Name Format Summary
 
@@ -128,7 +157,7 @@ test. The heading depth for requirement IDs is controlled by `depth`.
 
 | Unit | Nature of interaction |
 | ---- | --------------------- |
-| `Program` | Constructs `TraceMatrix`; calls `CalculateSatisfiedRequirements` and `Export` |
+| `Program` | Constructs `TraceMatrix`; calls `CalculateSatisfiedRequirements`, `GetUnsatisfiedRequirements`, and `Export` |
 | `Requirements` | Provides the requirement tree; iterated during analysis |
 | `Validation` | Exercises `TraceMatrix` with fixture test-result files in validation tests |
 

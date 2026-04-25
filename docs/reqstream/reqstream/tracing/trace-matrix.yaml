@@ -12,9 +12,21 @@ sections:
             tags:
               - testing
             tests:
-              - TraceMatrix_WithNoFiles_CreatesEmptyMatrix
-              - TraceMatrix_MissingFile_ThrowsFileNotFoundException
-              - TraceMatrix_WithMultipleFiles_AggregatesResults
+              - TraceMatrix_Constructor_WithNoFiles_CreatesEmptyMatrix
+              - TraceMatrix_Constructor_MissingFile_ThrowsFileNotFoundException
+              - TraceMatrix_Constructor_WithMultipleFiles_AggregatesResults
+
+          - id: ReqStream-Test-ChildRequirements
+            title: >-
+              The tool shall consider child requirements when determining
+              requirement satisfaction.
+            justification: |
+              Child requirement satisfaction inheritance ensures that a parent
+              requirement is only satisfied when all tests across its entire
+              descendant subtree pass, providing accurate hierarchical coverage analysis.
+            tags:
+              - testing
+            tests:
               - TraceMatrix_Export_WithChildRequirements_ConsidersChildTests
 
           - id: ReqStream-Test-TrxFormat
@@ -25,8 +37,8 @@ sections:
             tags:
               - testing
             tests:
-              - TraceMatrix_WithTrxFile_ParsesCorrectly
-              - TraceMatrix_WithFailedTests_TracksFailures
+              - TraceMatrix_Constructor_WithTrxFile_ParsesCorrectly
+              - TraceMatrix_Constructor_WithFailedTests_TracksFailures
 
           - id: ReqStream-Test-JUnitFormat
             title: The tool shall support JUnit format test results.
@@ -36,18 +48,18 @@ sections:
             tags:
               - testing
             tests:
-              - TraceMatrix_WithJUnitFile_ParsesCorrectly
-              - TraceMatrix_WithJUnitFailedTests_TracksFailures
+              - TraceMatrix_Constructor_WithJUnitFile_ParsesCorrectly
+              - TraceMatrix_Constructor_WithJUnitFailedTests_TracksFailures
 
           - id: ReqStream-Test-GlobPatterns
-            title: The tool shall support glob patterns for test result files.
+            title: The tool shall support processing mixed-format test result files.
             justification: |
-              Glob patterns simplify specification of multiple test result files and enable flexible
-              file selection across different test runs and platforms.
+              Mixed-format support allows requirements to be verified against test results produced
+              by different frameworks (TRX and JUnit) in the same trace matrix run.
             tags:
               - testing
             tests:
-              - TraceMatrix_WithMixedFormats_ProcessesBoth
+              - TraceMatrix_Constructor_WithMixedFormats_ProcessesBoth
 
           - id: ReqStream-Test-SourceFiltering
             title: The tool shall support source-specific test matching using filepart@testname pattern.
@@ -57,9 +69,9 @@ sections:
             tags:
               - testing
             tests:
-              - TraceMatrix_WithSourceSpecificTests_MatchesCorrectly
-              - TraceMatrix_WithSourceSpecificTests_DoesNotMatchOtherSources
-              - TraceMatrix_WithMultipleSourceSpecifiers_MatchesAllRequirements
+              - TraceMatrix_GetTestResult_WithSourceSpecificTests_MatchesCorrectly
+              - TraceMatrix_GetTestResult_WithSourceSpecificTests_DoesNotMatchOtherSources
+              - TraceMatrix_GetTestResult_WithMultipleSourceSpecifiers_MatchesAllRequirements
 
           - id: ReqStream-Test-CaseInsensitive
             title: >-
@@ -71,7 +83,7 @@ sections:
             tags:
               - testing
             tests:
-              - TraceMatrix_WithSourceSpecificTests_IsCaseInsensitive
+              - TraceMatrix_GetTestResult_WithSourceSpecificTests_IsCaseInsensitive
 
           - id: ReqStream-Test-PartialFilenames
             title: The tool shall support partial filename matching for source-specific tests.
@@ -81,7 +93,7 @@ sections:
             tags:
               - testing
             tests:
-              - TraceMatrix_WithSourceSpecificTests_MatchesPartialFilename
+              - TraceMatrix_GetTestResult_WithSourceSpecificTests_MatchesPartialFilename
 
           - id: ReqStream-Test-PlainTestNames
             title: The tool shall support plain test names that aggregate from all sources.
@@ -91,7 +103,7 @@ sections:
             tags:
               - testing
             tests:
-              - TraceMatrix_WithPlainTestNames_MatchesAllSources
+              - TraceMatrix_GetTestResult_WithPlainTestNames_MatchesAllSources
 
           - id: ReqStream-Test-MixedTestNames
             title: >-
@@ -103,7 +115,7 @@ sections:
             tags:
               - testing
             tests:
-              - TraceMatrix_WithMixedTestNames_MatchesAppropriately
+              - TraceMatrix_GetTestResult_WithMixedTestNames_MatchesAppropriately
 
           - id: ReqStream-Test-MultipleRequirements
             title: >-
@@ -115,7 +127,7 @@ sections:
             tags:
               - testing
             tests:
-              - TraceMatrix_WithMixedFilterAndPlainReferences_MatchesBoth
+              - TraceMatrix_GetTestResult_WithMixedFilterAndPlainReferences_MatchesBoth
 
       - title: Reporting
         requirements:

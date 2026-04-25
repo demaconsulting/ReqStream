@@ -21,6 +21,7 @@ sections:
           - ReqStream-Test-TrxFormat
           - ReqStream-Test-JUnitFormat
           - ReqStream-Test-ResultFiles
+          - ReqStream-Test-GlobPatterns
 
       - id: ReqStream-Tracing-Coverage
         title: The Tracing subsystem shall map test results to requirements and determine coverage.
@@ -34,6 +35,9 @@ sections:
           - ReqStream-Test-SourceFiltering
           - ReqStream-Test-PlainTestNames
           - ReqStream-Test-MixedTestNames
+          - ReqStream-Test-CaseInsensitive
+          - ReqStream-Test-PartialFilenames
+          - ReqStream-Test-MultipleRequirements
           - ReqStream-Report-TraceMatrix
           - ReqStream-Report-TraceMatrixDepth
           - ReqStream-Report-TagFiltering

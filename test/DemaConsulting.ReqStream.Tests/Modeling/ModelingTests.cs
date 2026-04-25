@@ -205,4 +205,54 @@ public class ModelingTests
         Assert.Contains("Modeling-Test-Req2", content);
         Assert.Contains("This justification explains why the requirement is needed.", content);
     }
+
+    /// <summary>
+    /// Test that the Modeling subsystem detects an error when loading a malformed YAML file.
+    /// </summary>
+    [TestMethod]
+    public void Modeling_Linting_MalformedYaml_DetectsError()
+    {
+        // Arrange: create a requirements file containing malformed YAML
+        var reqFile = Path.Combine(_testDirectory, "malformed.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: Bad Requirements
+                requirements:
+                  - id: [unclosed bracket
+            """);
+
+        // Act: load the malformed requirements file through the Modeling subsystem entry point
+        var result = Requirements.Load(reqFile);
+
+        // Assert: an error-level lint issue is reported and requirements are null
+        Assert.IsTrue(result.HasErrors);
+        Assert.IsNull(result.Requirements);
+    }
+
+    /// <summary>
+    /// Test that the Modeling subsystem reports no issues when loading a valid requirements file.
+    /// </summary>
+    [TestMethod]
+    public void Modeling_Linting_ValidFile_ReturnsNoIssues()
+    {
+        // Arrange: create a structurally valid requirements YAML file
+        var reqFile = Path.Combine(_testDirectory, "valid.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: Valid Linting Requirements
+                requirements:
+                  - id: Modeling-Lint-Valid-Req1
+                    title: The system shall satisfy this requirement.
+                    justification: Justification for the requirement.
+                    tests:
+                      - Modeling_Linting_ValidFile_ReturnsNoIssues
+            """);
+
+        // Act: load the valid requirements file through the Modeling subsystem entry point
+        var result = Requirements.Load(reqFile);
+
+        // Assert: no lint issues are reported
+        Assert.IsFalse(result.HasErrors);
+        Assert.HasCount(0, result.Issues);
+    }
 }

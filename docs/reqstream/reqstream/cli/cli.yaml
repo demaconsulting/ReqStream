@@ -23,12 +23,18 @@ sections:
           - ReqStream-Command-Version
           - ReqStream-Command-Help
           - ReqStream-Command-InvalidArgs
+          - ReqStream-Command-Lint
           - ReqStream-Command-Validate
+          - ReqStream-Command-Results
           - ReqStream-Command-Enforce
           - ReqStream-Requirements-GlobPatterns
           - ReqStream-Requirements-TestGlobPatterns
+          - ReqStream-Command-Report
           - ReqStream-Command-ReportDepth
+          - ReqStream-Command-Matrix
           - ReqStream-Command-MatrixDepth
+          - ReqStream-Command-Justifications
+          - ReqStream-Command-JustificationsDepth
           - ReqStream-Command-Depth
           - ReqStream-Command-TagFilter
 
@@ -42,4 +48,5 @@ sections:
           - Cli_Output_LogFlag_WritesOutputToLogFile
         children:
           - ReqStream-Command-ErrorOutput
+          - ReqStream-Command-ExitCode
           - ReqStream-Logging-FileOutput

@@ -41,3 +41,42 @@ sections:
           - ReqStream-Report-Justifications
           - ReqStream-Report-JustificationsDepth
           - ReqStream-Report-TagFilterExport
+
+      - id: ReqStream-Modeling-Linting
+        title: >-
+          The Modeling subsystem shall validate requirements file structure and report all lint
+          issues discovered during loading.
+        justification: |
+          Structural validation during loading catches malformed YAML, missing mandatory fields,
+          unknown fields, duplicate IDs, and other problems early. Reporting all issues in a
+          single pass allows users to fix all problems at once rather than one at a time.
+        tests:
+          - Modeling_YamlParsing_DuplicateIds_DetectsLintError
+          - Modeling_Linting_MalformedYaml_DetectsError
+          - Modeling_Linting_ValidFile_ReturnsNoIssues
+        children:
+          - ReqStream-Requirements-Validation
+          - ReqStream-Requirements-YamlErrorReporting
+          - ReqStream-Requirements-Hierarchy
+          - ReqStream-Requirements-UniqueIds
+          - ReqStream-Requirements-RequiredTitle
+          - ReqStream-Requirements-UnifiedLoad
+          - ReqStream-Lint-MalformedYaml
+          - ReqStream-Lint-UnknownDocumentField
+          - ReqStream-Lint-UnknownSectionField
+          - ReqStream-Lint-MissingSectionTitle
+          - ReqStream-Lint-UnknownRequirementField
+          - ReqStream-Lint-MissingRequirementFields
+          - ReqStream-Lint-DuplicateIds
+          - ReqStream-Lint-MultipleIssues
+          - ReqStream-Lint-FollowsIncludes
+          - ReqStream-Lint-NoIssuesMessage
+          - ReqStream-Lint-ErrorFormat
+          - ReqStream-Lint-UnknownMappingField
+          - ReqStream-Lint-MissingMappingId
+          - ReqStream-Lint-BlankTestName
+          - ReqStream-Lint-BlankTagName
+          - ReqStream-Lint-IssueType
+          - ReqStream-Lint-NonScalarListEntries
+          - ReqStream-Lint-CircularReferences
+          - ReqStream-Lint-UnknownChildReference

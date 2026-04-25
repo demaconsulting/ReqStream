@@ -58,6 +58,7 @@ public class RequirementsLoadParsingTests
     [TestMethod]
     public void Requirements_Load_SimpleRequirement_ParsesCorrectly()
     {
+        // Arrange: create a YAML file with a single requirement
         var yamlContent = @"---
 sections:
   - title: ""System Security""
@@ -68,10 +69,12 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: requirement parsed correctly
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
         Assert.AreEqual("System Security", requirements.Sections[0].Title);
@@ -86,6 +89,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_RequirementWithTests_ParsesTestsCorrectly()
     {
+        // Arrange: create a YAML file with a requirement that has test references
         var yamlContent = @"---
 sections:
   - title: ""User Authentication""
@@ -100,10 +104,12 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: tests parsed correctly
         Assert.IsNotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
         Assert.AreEqual("AUTH-001", req.Id);
@@ -119,6 +125,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_RequirementWithChildren_ParsesChildrenCorrectly()
     {
+        // Arrange: create a YAML file with a requirement that has child references
         var yamlContent = @"---
 sections:
   - title: ""System Security""
@@ -136,10 +143,12 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: children parsed correctly
         Assert.IsNotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
         Assert.AreEqual("SYS-SEC-001", req.Id);
@@ -154,6 +163,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_RequirementWithJustification_ParsesJustificationCorrectly()
     {
+        // Arrange: create a YAML file with a requirement that has a justification
         var yamlContent = @"---
 sections:
   - title: System Security
@@ -167,10 +177,12 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: justification parsed correctly
         Assert.IsNotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
         Assert.AreEqual("SYS-SEC-001", req.Id);
@@ -186,6 +198,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_NestedSections_ParsesHierarchyCorrectly()
     {
+        // Arrange: create a YAML file with nested sections
         var yamlContent = @"---
 sections:
   - title: ""Data Management""
@@ -202,10 +215,12 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: nested section hierarchy parsed correctly
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
         Assert.AreEqual("Data Management", requirements.Sections[0].Title);
@@ -222,6 +237,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_TestMappings_AppliesMappingsCorrectly()
     {
+        // Arrange: create a YAML file with a mapping block that adds tests to an existing requirement
         var yamlContent = @"---
 sections:
   - title: ""System""
@@ -238,10 +254,12 @@ mappings:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: mappings applied correctly
         Assert.IsNotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
         Assert.AreEqual("DATA-001", req.Id);
@@ -256,6 +274,7 @@ mappings:
     [TestMethod]
     public void Requirements_Load_WithIncludes_MergesFilesCorrectly()
     {
+        // Arrange: create a main YAML file with an include directive pointing to an additional file
         var mainYaml = @"---
 sections:
   - title: ""System Security""
@@ -278,10 +297,12 @@ sections:
         File.WriteAllText(mainPath, mainYaml);
         File.WriteAllText(includedPath, includedYaml);
 
+        // Act: load the main requirements file
         var result = Requirements.Load(mainPath);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: requirements from both files merged into the tree
         Assert.IsNotNull(requirements);
         Assert.HasCount(2, requirements.Sections);
         Assert.AreEqual("System Security", requirements.Sections[0].Title);
@@ -296,6 +317,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_IdenticalSections_MergesCorrectly()
     {
+        // Arrange: create two YAML files with the same section title
         var mainYaml = @"---
 sections:
   - title: ""System Security""
@@ -318,10 +340,12 @@ sections:
         File.WriteAllText(mainPath, mainYaml);
         File.WriteAllText(includedPath, includedYaml);
 
+        // Act: load the main requirements file
         var result = Requirements.Load(mainPath);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: identical sections merged into one with both requirements
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
         Assert.AreEqual("System Security", requirements.Sections[0].Title);
@@ -336,6 +360,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_DuplicateRequirementId_ReportsError()
     {
+        // Arrange: create a YAML file with two requirements sharing the same ID
         var yamlContent = @"---
 sections:
   - title: ""System Security""
@@ -348,7 +373,10 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
+
+        // Assert: error reported for duplicate ID
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
         Assert.Contains(i => i.Description.Contains("SYS-SEC-001"), result.Issues);
@@ -361,6 +389,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop()
     {
+        // Arrange: create two YAML files that include each other
         var fileA = @"---
 sections:
   - title: ""File A""
@@ -386,7 +415,10 @@ includes:
         File.WriteAllText(pathA, fileA);
         File.WriteAllText(pathB, fileB);
 
+        // Act: load file A (which includes file B, which includes file A)
         var result = Requirements.Load(pathA);
+
+        // Assert: loading completes without infinite loop and both sections are present
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
@@ -400,9 +432,13 @@ includes:
     [TestMethod]
     public void Requirements_Load_FileNotFound_ReportsError()
     {
+        // Arrange: create a path to a file that does not exist
         var nonExistentPath = Path.Combine(_testDirectory, "nonexistent.yaml");
 
+        // Act: load the non-existent file
         var result = Requirements.Load(nonExistentPath);
+
+        // Assert: error reported with the missing file location
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
         Assert.Contains(i => i.Description.Contains("File not found"), result.Issues);
@@ -415,6 +451,7 @@ includes:
     [TestMethod]
     public void Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation()
     {
+        // Arrange: create a YAML file with an invalid property name
         var yamlContent = @"---
 sections:
   - title: ""System Security""
@@ -425,7 +462,10 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
+
+        // Assert: error reported with file location for the unknown field
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
         Assert.Contains(i => i.Description.Contains("Unknown field 'text' in requirement"), result.Issues);
@@ -439,15 +479,18 @@ sections:
     [TestMethod]
     public void Requirements_Load_EmptyFile_ReturnsEmptyRequirements()
     {
+        // Arrange: create an empty YAML file
         var yamlContent = @"---
 ";
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: empty requirements returned with no sections
         Assert.IsNotNull(requirements);
         Assert.IsEmpty(requirements.Sections);
         Assert.IsEmpty(requirements.Requirements);
@@ -459,6 +502,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_ComplexStructure_ParsesCorrectly()
     {
+        // Arrange: create a YAML file with a complex nested structure including children, tests, and mappings
         var yamlContent = @"---
 sections:
   - title: ""System Security""
@@ -493,10 +537,12 @@ mappings:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: complex structure parsed correctly
         Assert.IsNotNull(requirements);
         Assert.HasCount(2, requirements.Sections);
 
@@ -529,6 +575,7 @@ mappings:
     [TestMethod]
     public void Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation()
     {
+        // Arrange: create a YAML file with a blank requirement ID
         var yamlContent = @"---
 sections:
   - title: ""System Security""
@@ -539,7 +586,10 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
+
+        // Assert: error reported with file location for the blank ID
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
         Assert.Contains(i => i.Description.Contains("Requirement 'id' cannot be blank"), result.Issues);
@@ -552,6 +602,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation()
     {
+        // Arrange: create a YAML file with a blank requirement title
         var yamlContent = @"---
 sections:
   - title: ""System Security""
@@ -562,7 +613,10 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
+
+        // Assert: error reported with file location for the blank title
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
         Assert.Contains(i => i.Description.Contains("Requirement 'title' cannot be blank"), result.Issues);
@@ -575,6 +629,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_BlankSectionTitle_ReportsErrorWithFileLocation()
     {
+        // Arrange: create a YAML file with a blank section title
         var yamlContent = @"---
 sections:
   - title: """"
@@ -585,7 +640,10 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
+
+        // Assert: error reported with file location for the blank section title
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
         Assert.Contains(i => i.Description.Contains("Section 'title' cannot be blank"), result.Issues);
@@ -598,6 +656,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_BlankTestNameInRequirement_ReportsErrorWithFileLocation()
     {
+        // Arrange: create a YAML file with a blank test name entry in a requirement
         var yamlContent = @"---
 sections:
   - title: ""System Security""
@@ -612,7 +671,10 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
+
+        // Assert: error reported with file location for the blank test name
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
         Assert.Contains(i => i.Description.Contains("Test name cannot be blank"), result.Issues);
@@ -625,6 +687,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_BlankTestNameInMapping_ReportsErrorWithFileLocation()
     {
+        // Arrange: create a YAML file with a blank test name in a mapping
         var yamlContent = @"---
 sections:
   - title: ""System Security""
@@ -641,7 +704,10 @@ mappings:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
+
+        // Assert: error reported with file location for the blank mapping test name
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
         Assert.Contains(i => i.Description.Contains("Test name cannot be blank"), result.Issues);
@@ -654,6 +720,7 @@ mappings:
     [TestMethod]
     public void Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation()
     {
+        // Arrange: create a YAML file with a blank mapping ID
         var yamlContent = @"---
 sections:
   - title: ""System Security""
@@ -669,7 +736,10 @@ mappings:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
+
+        // Assert: error reported with file location for the blank mapping ID
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
         Assert.Contains(i => i.Description.Contains("Mapping 'id' cannot be blank"), result.Issues);
@@ -682,6 +752,7 @@ mappings:
     [TestMethod]
     public void Requirements_Load_DuplicateRequirementId_ErrorIncludesFileLocation()
     {
+        // Arrange: create a YAML file with two requirements sharing the same ID
         var yamlContent = @"---
 sections:
   - title: ""System Security""
@@ -694,7 +765,10 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
+
+        // Assert: error reported with file location for the duplicate ID
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
         Assert.Contains(i => i.Description.Contains("SYS-SEC-001"), result.Issues);
@@ -708,6 +782,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_MultipleFiles_MergesAllFiles()
     {
+        // Arrange: create three YAML files with different sections
         var file1Yaml = @"---
 sections:
   - title: ""System Security""
@@ -736,10 +811,12 @@ sections:
         File.WriteAllText(file2Path, file2Yaml);
         File.WriteAllText(file3Path, file3Yaml);
 
+        // Act: load all three files
         var result = Requirements.Load(file1Path, file2Path, file3Path);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: all three sections merged into the requirements tree
         Assert.IsNotNull(requirements);
         Assert.HasCount(3, requirements.Sections);
         Assert.AreEqual("System Security", requirements.Sections[0].Title);
@@ -756,6 +833,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_MultipleFilesWithSameSections_MergesSections()
     {
+        // Arrange: create two YAML files with the same section title
         var file1Yaml = @"---
 sections:
   - title: ""System Security""
@@ -775,10 +853,12 @@ sections:
         File.WriteAllText(file1Path, file1Yaml);
         File.WriteAllText(file2Path, file2Yaml);
 
+        // Act: load both files
         var result = Requirements.Load(file1Path, file2Path);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: sections with the same title merged into one section with both requirements
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
         Assert.AreEqual("System Security", requirements.Sections[0].Title);
@@ -793,6 +873,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_SingleFileWithParamsArray_WorksCorrectly()
     {
+        // Arrange: create a YAML file with one requirement
         var yamlContent = @"---
 sections:
   - title: ""System Security""
@@ -803,10 +884,12 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: requirement loaded correctly
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
         Assert.AreEqual("System Security", requirements.Sections[0].Title);
@@ -820,6 +903,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_NoArguments_ThrowsArgumentException()
     {
+        // Act + Assert: calling Load with no arguments throws ArgumentException
         var ex = Assert.ThrowsExactly<ArgumentException>(() => Requirements.Load());
         Assert.Contains("At least one file path must be provided", ex.Message);
     }
@@ -830,6 +914,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_NullArgument_ThrowsArgumentException()
     {
+        // Act + Assert: calling Load with null throws ArgumentException
         var ex = Assert.ThrowsExactly<ArgumentException>(() => Requirements.Load(null!));
         Assert.Contains("At least one file path must be provided", ex.Message);
     }
@@ -840,6 +925,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_MultipleFilesWithDuplicateIds_ReportsError()
     {
+        // Arrange: create two YAML files that share a requirement ID
         var file1Yaml = @"---
 sections:
   - title: ""System Security""
@@ -859,7 +945,10 @@ sections:
         File.WriteAllText(file1Path, file1Yaml);
         File.WriteAllText(file2Path, file2Yaml);
 
+        // Act: load both files
         var result = Requirements.Load(file1Path, file2Path);
+
+        // Assert: error reported for duplicate ID across files
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
         Assert.Contains(i => i.Description.Contains("SYS-SEC-001"), result.Issues);
@@ -873,6 +962,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_RequirementWithTags_ParsesTagsCorrectly()
     {
+        // Arrange: create a YAML file with a requirement that has tags
         var yamlContent = @"---
 sections:
   - title: ""System Security""
@@ -886,10 +976,12 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: tags parsed correctly
         Assert.IsNotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
         Assert.AreEqual("SYS-SEC-001", req.Id);
@@ -904,6 +996,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_BlankTagName_ReportsErrorWithFileLocation()
     {
+        // Arrange: create a YAML file with a blank tag name
         var yamlContent = @"---
 sections:
   - title: ""System Security""
@@ -918,7 +1011,10 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
+
+        // Assert: error reported with file location for the blank tag name
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
         Assert.Contains(i => i.Description.Contains("Tag name cannot be blank"), result.Issues);
@@ -931,6 +1027,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_CircularRequirements_ThrowsInvalidOperationException()
     {
+        // Arrange: create a YAML file with circular child references
         var yamlContent = @"---
 sections:
   - title: ""Cyclic Section""
@@ -947,7 +1044,10 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
+
+        // Assert: circular reference error reported
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
         Assert.Contains(i => i.Description.Contains("Circular requirement reference detected"), result.Issues);
@@ -961,6 +1061,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_SelfReferencingRequirement_ReportsCircularReferenceError()
     {
+        // Arrange: create a YAML file with a self-referencing child
         var yamlContent = @"---
 sections:
   - title: ""Cyclic Section""
@@ -973,7 +1074,10 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
+
+        // Assert: circular reference error reported
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
         Assert.Contains(i => i.Description.Contains("Circular requirement reference detected"), result.Issues);

@@ -38,10 +38,25 @@ The `Tracing` subsystem exposes the following interface to the rest of the tool:
 | `Requirements` | Uses      | Receives the requirement tree to map tests to requirements.            |
 | `Program`      | Used by   | Constructs `TraceMatrix` and calls enforcement/export methods.         |
 
+## Error Handling
+
+The `Tracing` subsystem raises the following exceptions at the subsystem boundary. Both
+exceptions are thrown by the `TraceMatrix` constructor and propagate to `Program` for
+display as fatal errors.
+
+| Exception | Trigger | Detail |
+|-----------|---------|--------|
+| `FileNotFoundException` | A path supplied in `testResultFiles` does not exist on disk. | The exception message includes the offending file path. |
+| `InvalidOperationException` | A test result file exists but cannot be parsed (malformed TRX or JUnit XML). | The exception message includes the offending file path; the original parse exception is available as the inner exception. |
+
+For the full error-handling design of `ProcessTestResultFile`, see [TraceMatrix Unit Design][tm].
+
 ## References
 
 - [ReqStream System Design][arch]
+- [TraceMatrix Unit Design][tm]
 - [ReqStream Repository][repo]
 
 [arch]: ../reqstream.md
+[tm]: trace-matrix.md
 [repo]: https://github.com/demaconsulting/ReqStream

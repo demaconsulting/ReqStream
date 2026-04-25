@@ -14,7 +14,7 @@ sections:
               requirement verifies that all subsystems — Modeling, Tracing, and Program —
               work correctly when integrated together.
             tests:
-              - ReqStream_FullPipeline_GeneratesAllReportsAndEnforces
+              - ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces
             children:
               - ReqStream-Modeling-YamlParsing
               - ReqStream-Tracing-Coverage
@@ -28,7 +28,7 @@ sections:
               separate test result files, source-specific matching ensures that platform-specific
               requirements are satisfied only by test evidence from the appropriate source files.
             tests:
-              - ReqStream_SourceFilter_MatchesTestsBySourceFile
+              - ReqStream_SourceFilter_NamedSourceInRequirement_MatchesTestsBySourceFile
             children:
               - ReqStream-Tracing-Coverage
 
@@ -43,6 +43,79 @@ sections:
               the negative case (unsatisfied requirement, non-zero exit code).
             tests:
               - ReqStream_EnforcementMode
-              - ReqStream_EnforcementMode_FailsWhenRequirementLacksTestEvidence
+              - ReqStream_EnforcementMode_RequirementLacksTestEvidence_FailsWithNonZeroExitCode
             children:
               - ReqStream-Tracing-Coverage
+
+          - id: ReqStream-System-Lint
+            title: >-
+              The system shall lint requirements files and report all structural issues in a single
+              invocation.
+            justification: |
+              Linting enables CI/CD pipelines to catch malformed YAML, missing mandatory fields,
+              unknown fields, duplicate IDs, and other structural problems early, before they cause
+              silent failures in downstream processing.
+            tests:
+              - Program_Run_WithLintFlag_RunsLinter
+            children:
+              - ReqStream-Modeling-Linting
+
+          - id: ReqStream-System-Validate
+            title: >-
+              The system shall run a built-in self-test suite when the validate flag is provided.
+            justification: |
+              In regulated environments, tool qualification evidence is required to demonstrate that
+              the tool functions correctly in its deployment environment. The self-test suite
+              exercises core behaviors and produces a pass/fail summary.
+            tests:
+              - Program_Run_WithValidateFlag_RunsValidation
+            children:
+              - ReqStream-SelfTest-Qualification
+
+          - id: ReqStream-System-RequirementsReport
+            title: >-
+              The system shall export requirements to a markdown report when the report flag is
+              provided.
+            justification: |
+              Markdown report generation from requirements data enables documentation to be produced
+              automatically from requirements files, reducing manual effort and ensuring consistency.
+            tests:
+              - ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces
+            children:
+              - ReqStream-Modeling-Export
+
+          - id: ReqStream-System-TraceMatrix
+            title: >-
+              The system shall export a trace matrix to a markdown report when the matrix flag is
+              provided.
+            justification: |
+              Trace matrix export provides visibility into test coverage and requirement
+              satisfaction, essential for quality assurance and compliance reporting.
+            tests:
+              - ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces
+            children:
+              - ReqStream-Tracing-Coverage
+
+          - id: ReqStream-System-Justifications
+            title: >-
+              The system shall export requirement justifications to a markdown report when the
+              justifications flag is provided.
+            justification: |
+              Justification export enables stakeholders to understand the rationale behind
+              requirements, supporting design reviews, audits, and compliance activities.
+            tests:
+              - ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces
+            children:
+              - ReqStream-Modeling-Export
+
+          - id: ReqStream-System-TagFilter
+            title: >-
+              The system shall filter requirements output by tags when the filter flag is provided.
+            justification: |
+              Tag-based filtering enables selective export of requirement subsets for focused
+              reports, security audits, compliance documentation, and targeted reviews.
+            tests:
+              - TraceMatrix_Export_WithFilterTags_ExportsOnlyMatchingRequirements
+            children:
+              - ReqStream-Tracing-Coverage
+              - ReqStream-Modeling-Export

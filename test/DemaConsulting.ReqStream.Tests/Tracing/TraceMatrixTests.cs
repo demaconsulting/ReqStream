@@ -60,7 +60,7 @@ public class TraceMatrixTests
     ///     Test source-specific test matching with filepart@testname pattern.
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_WithSourceSpecificTests_MatchesCorrectly()
+    public void TraceMatrix_GetTestResult_WithSourceSpecificTests_MatchesCorrectly()
     {
         // Create requirements with source-specific test names
         var reqYaml = @"---
@@ -132,7 +132,7 @@ sections:
     ///     Test that source-specific test names only match their specified source.
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_WithSourceSpecificTests_DoesNotMatchOtherSources()
+    public void TraceMatrix_GetTestResult_WithSourceSpecificTests_DoesNotMatchOtherSources()
     {
         // Create requirements with Windows-specific test name
         var reqYaml = @"---
@@ -175,7 +175,7 @@ sections:
     ///     Test that plain test names match all sources.
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_WithPlainTestNames_MatchesAllSources()
+    public void TraceMatrix_GetTestResult_WithPlainTestNames_MatchesAllSources()
     {
         // Create requirements with plain test name
         var reqYaml = @"---
@@ -233,7 +233,7 @@ sections:
     ///     Test mixed source-specific and plain test names in the same requirement.
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_WithMixedTestNames_MatchesAppropriately()
+    public void TraceMatrix_GetTestResult_WithMixedTestNames_MatchesAppropriately()
     {
         // Create requirements with both plain and source-specific test names
         var reqYaml = @"---
@@ -325,7 +325,7 @@ sections:
     ///     Test case-insensitive matching of file parts.
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_WithSourceSpecificTests_IsCaseInsensitive()
+    public void TraceMatrix_GetTestResult_WithSourceSpecificTests_IsCaseInsensitive()
     {
         // Create requirements with lowercase file part
         var reqYaml = @"---
@@ -370,7 +370,7 @@ sections:
     ///     Test partial file name matching (filepart can match anywhere in base name).
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_WithSourceSpecificTests_MatchesPartialFilename()
+    public void TraceMatrix_GetTestResult_WithSourceSpecificTests_MatchesPartialFilename()
     {
         // Create requirements with partial file name
         var reqYaml = @"---
@@ -416,7 +416,7 @@ sections:
     ///     This occurs when a filename contains multiple matching source specifiers.
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_WithMultipleSourceSpecifiers_MatchesAllRequirements()
+    public void TraceMatrix_GetTestResult_WithMultipleSourceSpecifiers_MatchesAllRequirements()
     {
         // Create requirements with multiple source-specific tests for the same test name
         var reqYaml = @"---
@@ -478,7 +478,7 @@ sections:
     ///     prevent matching the same test with plain format in the same file.
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_WithMixedFilterAndPlainReferences_MatchesBoth()
+    public void TraceMatrix_GetTestResult_WithMixedFilterAndPlainReferences_MatchesBoth()
     {
         // Create requirements where the same test is referenced with and without file filter
         var reqYaml = @"---
@@ -538,7 +538,7 @@ sections:
     ///     Test that non-executed tests are ignored and don't affect execution counts.
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_WithNotExecutedTests_IgnoresNonExecutedTests()
+    public void TraceMatrix_GetTestResult_WithNotExecutedTests_IgnoresNonExecutedTests()
     {
         // Create requirements with test references
         var reqYaml = @"---
@@ -601,7 +601,7 @@ sections:
     ///     Test that requirements with only non-executed tests are treated as having no test coverage.
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_WithOnlyNotExecutedTests_TreatsAsNoTests()
+    public void TraceMatrix_GetTestResult_WithOnlyNotExecutedTests_TreatsAsNoTests()
     {
         // Create requirements with test references
         var reqYaml = @"---
@@ -661,7 +661,7 @@ sections:
     ///     Test that non-executed tests are properly handled in mixed outcome scenarios.
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_WithMixedOutcomes_OnlyCountsExecutedTests()
+    public void TraceMatrix_GetTestResult_WithMixedOutcomes_OnlyCountsExecutedTests()
     {
         // Create requirements with test references
         var reqYaml = @"---

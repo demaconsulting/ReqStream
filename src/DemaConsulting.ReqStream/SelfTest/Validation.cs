@@ -598,6 +598,8 @@ public static class Validation
     /// <param name="testResults">The test results to write.</param>
     private static void WriteResultsFile(Context context, DemaConsulting.TestResults.TestResults testResults)
     {
+        // Defensive guard: the only call site already checks context.ResultsFile != null,
+        // but this guard protects against future callers that may not.
         if (context.ResultsFile == null)
         {
             return;

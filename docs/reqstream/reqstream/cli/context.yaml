@@ -35,6 +35,19 @@ sections:
             tests:
               - Context_Create_HelpFlags_SetsHelpProperty
 
+          - id: ReqStream-Command-Silent
+            title: The tool shall support suppressing console output.
+            justification: |
+              Suppressing console output enables quiet operation in automated pipelines where output
+              is captured to a log file or is otherwise unwanted, preventing the pipeline log from
+              being cluttered with tool output.
+            tags:
+              - cli
+            tests:
+              - Context_Create_SilentFlag_SetsSilentProperty
+              - Context_WriteLine_SilentMode_DoesNotWriteToConsole
+              - Context_WriteError_SilentMode_DoesNotWriteToConsole
+
           - id: ReqStream-Command-ErrorOutput
             title: The tool shall write error messages to stderr.
             justification: |
@@ -152,6 +165,74 @@ sections:
               - Context_Create_FilterArgumentWithSpaces_TrimsAndParsesTagsCorrectly
               - Context_Create_FilterSingleTag_ParsesCorrectly
               - Context_Create_MultipleFilterArguments_MergesIntoSingleSet
+
+          - id: ReqStream-Command-Lint
+            title: The tool shall accept a lint flag to activate requirements linting mode.
+            justification: |
+              Accepting a lint flag allows users to request structural validation of requirements
+              files from the command line, enabling lint checks to be integrated into CI/CD pipelines
+              and editor workflows.
+            tags:
+              - cli
+            tests:
+              - Context_Create_LintFlag_SetsLintProperty
+
+          - id: ReqStream-Command-Results
+            title: The tool shall accept a results file path for writing self-validation output.
+            justification: |
+              Writing self-validation results to a file enables CI/CD pipelines and traceability
+              tools to consume the output in standard TRX or JUnit XML formats.
+            tags:
+              - cli
+            tests:
+              - Context_Create_ResultsFlag_SetsResultsFileProperty
+              - Context_Create_ResultFlag_SetsResultsFileProperty
+              - Context_Create_MissingResultsFilename_ThrowsException
+
+          - id: ReqStream-Command-Report
+            title: The tool shall accept a report file path for writing the requirements report.
+            justification: |
+              Specifying the report output path from the command line enables flexible integration
+              into build pipelines where the output location is determined by the caller.
+            tags:
+              - cli
+            tests:
+              - Context_Create_ReportFile_SetsReportProperty
+              - Context_Create_MissingReportFilename_ThrowsException
+
+          - id: ReqStream-Command-Matrix
+            title: The tool shall accept a matrix file path for writing the trace matrix report.
+            justification: |
+              Specifying the trace matrix output path from the command line enables flexible
+              integration into build pipelines where the output location is determined by the caller.
+            tags:
+              - cli
+            tests:
+              - Context_Create_MatrixFile_SetsMatrixProperty
+              - Context_Create_MissingMatrixFilename_ThrowsException
+
+          - id: ReqStream-Command-Justifications
+            title: The tool shall accept a justifications file path for writing the justifications report.
+            justification: |
+              Specifying the justifications output path from the command line enables flexible
+              integration into build pipelines where the output location is determined by the caller.
+            tags:
+              - cli
+            tests:
+              - Context_Create_JustificationsFile_SetsJustificationsFileProperty
+              - Context_Create_MissingJustificationsFilename_ThrowsException
+
+          - id: ReqStream-Command-JustificationsDepth
+            title: The tool shall support configurable markdown header depth for justifications reports.
+            justification: |
+              Configurable header depth allows justifications reports to be embedded in larger
+              documents while maintaining proper document structure.
+            tags:
+              - cli
+            tests:
+              - Context_Create_JustificationsDepth_SetsJustificationsDepthProperty
+              - Context_Create_MissingJustificationsDepth_ThrowsException
+              - Context_Create_InvalidJustificationsDepth_ThrowsException
 
       - title: Logging
         requirements:

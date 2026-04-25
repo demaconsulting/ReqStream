@@ -27,6 +27,7 @@ namespace DemaConsulting.ReqStream.Tests.SelfTest;
 /// Unit tests for the Validation class.
 /// </summary>
 [TestClass]
+[DoNotParallelize]
 public class ValidationTests
 {
     private string _testDirectory = string.Empty;

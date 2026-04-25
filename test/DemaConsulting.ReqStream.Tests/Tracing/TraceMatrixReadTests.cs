@@ -60,7 +60,7 @@ public class TraceMatrixReadTests
     ///     Test TraceMatrix with a TRX test result file.
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_WithTrxFile_ParsesCorrectly()
+    public void TraceMatrix_Constructor_WithTrxFile_ParsesCorrectly()
     {
         // Create requirements
         var reqYaml = @"---
@@ -120,7 +120,7 @@ sections:
     ///     Test TraceMatrix with multiple test result files (matrix testing scenario).
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_WithMultipleFiles_AggregatesResults()
+    public void TraceMatrix_Constructor_WithMultipleFiles_AggregatesResults()
     {
         // Create requirements
         var reqYaml = @"---
@@ -192,7 +192,7 @@ sections:
     ///     Test that extra tests (beyond those in requirements) are ignored.
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_WithExtraTests_IgnoresUnreferencedTests()
+    public void TraceMatrix_Constructor_WithExtraTests_IgnoresUnreferencedTests()
     {
         // Create requirements with only one test
         var reqYaml = @"---
@@ -272,7 +272,7 @@ sections:
     ///     Test that null requirements throws ArgumentNullException.
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_NullRequirements_ThrowsArgumentNullException()
+    public void TraceMatrix_Constructor_NullRequirements_ThrowsArgumentNullException()
     {
         var ex = Assert.ThrowsExactly<ArgumentNullException>(() => _ = new TraceMatrix(null!, Array.Empty<string>()));
         Assert.Contains("requirements", ex.Message);
@@ -282,7 +282,7 @@ sections:
     ///     Test that missing test result file throws FileNotFoundException.
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_MissingFile_ThrowsFileNotFoundException()
+    public void TraceMatrix_Constructor_MissingFile_ThrowsFileNotFoundException()
     {
         // Create minimal requirements
         var reqYaml = @"---
@@ -310,7 +310,7 @@ sections:
     ///     Test TraceMatrix with failed tests.
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_WithFailedTests_TracksFailures()
+    public void TraceMatrix_Constructor_WithFailedTests_TracksFailures()
     {
         // Create requirements
         var reqYaml = @"---
@@ -372,7 +372,7 @@ sections:
     ///     Test TraceMatrix with no test result files.
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_WithNoFiles_CreatesEmptyMatrix()
+    public void TraceMatrix_Constructor_WithNoFiles_CreatesEmptyMatrix()
     {
         // Create requirements
         var reqYaml = @"---
@@ -405,7 +405,7 @@ sections:
     ///     Test TraceMatrix with a JUnit test result file.
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_WithJUnitFile_ParsesCorrectly()
+    public void TraceMatrix_Constructor_WithJUnitFile_ParsesCorrectly()
     {
         // Create requirements
         var reqYaml = @"---
@@ -465,7 +465,7 @@ sections:
     ///     Test TraceMatrix with mixed TRX and JUnit files.
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_WithMixedFormats_ProcessesBoth()
+    public void TraceMatrix_Constructor_WithMixedFormats_ProcessesBoth()
     {
         // Create requirements
         var reqYaml = @"---
@@ -530,7 +530,7 @@ sections:
     ///     Test TraceMatrix with JUnit file containing failed tests.
     /// </summary>
     [TestMethod]
-    public void TraceMatrix_WithJUnitFailedTests_TracksFailures()
+    public void TraceMatrix_Constructor_WithJUnitFailedTests_TracksFailures()
     {
         // Create requirements
         var reqYaml = @"---

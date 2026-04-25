@@ -37,6 +37,7 @@ The `Cli` subsystem exposes the following interface to the rest of the tool:
 | `Context.RequirementsFiles`   | Outbound  | Glob-expanded list of requirements file paths from `--requirements`. |
 | `Context.TestFiles`           | Outbound  | Glob-expanded list of test result file paths from `--tests`.         |
 | `Context.RequirementsReport`  | Outbound  | Path for requirements report output file (`--report`), or `null`.    |
+| `Context.Depth`               | Outbound  | Default markdown header depth for all reports (`--depth`; default 1).|
 | `Context.ReportDepth`         | Outbound  | Markdown header depth for the requirements report.                   |
 | `Context.Matrix`              | Outbound  | Path for trace matrix output file (`--matrix`), or `null`.           |
 | `Context.MatrixDepth`         | Outbound  | Markdown header depth for the trace matrix.                          |

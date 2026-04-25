@@ -36,8 +36,8 @@ to be treated as code, stored in source control, and integrated into CI/CD pipel
 - **Test Mapping** - Link requirements to test cases for traceability and verification
 - **Justifications** - Document the rationale behind each requirement for better understanding
 - **File Includes** - Modularize requirements across multiple YAML files for better maintainability
-- **Linting** - Inspect requirements files for structural issues before processing
-- **Validation** - Built-in validation ensures requirement structure and references are correct
+- **Linting** - Inspect requirements files for structural issues and reference errors, reporting all problems in one pass
+- **Validation** - Run a built-in self-test suite to qualify the tool in its deployment environment
 - **Tag Filtering** - Categorize and filter requirements using tags for focused reporting and enforcement
 - **Export Capabilities** - Generate markdown reports for requirements, justifications, and test trace matrices
 

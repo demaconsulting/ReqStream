@@ -12,10 +12,10 @@ when the enclosing `using` block in `Program.Main` exits.
 
 ## Private State
 
-| Field | Type | Purpose |
-| ----- | ---- | ------- |
-| `_logWriter` | `StreamWriter?` | Open writer for the optional log file; `null` when no log file was requested |
-| `_hasErrors` | `bool` | Accumulates error state; initially `false`; set to `true` by `WriteError` |
+| Field | Type | CLI flag | Purpose |
+| ----- | ---- | -------- | ------- |
+| `_logWriter` | `StreamWriter?` | `--log` | Open writer for the optional log file; `null` when no log file was requested |
+| `_hasErrors` | `bool` | — | Accumulates error state; initially `false`; set to `true` by `WriteError` |
 
 ## Properties
 
@@ -93,7 +93,7 @@ via an early return path.
 | ---- | --------------------- |
 | `Program` | Creates `Context` via `Create`; calls `WriteLine` and `WriteError`; reads `ExitCode` |
 | `Validation` | Calls `context.WriteLine`, `context.WriteError`, reads `ResultsFile`, `Silent` |
-| `Linter` | Calls `context.WriteError` to report linting issues |
+| `LoadResult` | Calls `context.WriteError` via `ReportIssues` to report linting issues |
 | `Requirements` | Receives `RequirementsFiles`; does not hold a reference to `Context` |
 | `TraceMatrix` | Receives `TestFiles`; does not hold a reference to `Context` |
 

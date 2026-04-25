@@ -61,7 +61,7 @@ public class IntegrationTests
     /// coverage — all subsystems working together correctly.
     /// </summary>
     [TestMethod]
-    public void ReqStream_FullPipeline_GeneratesAllReportsAndEnforces()
+    public void ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces()
     {
         // Arrange: create requirements file with one covered requirement
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
@@ -131,7 +131,7 @@ public class IntegrationTests
     /// requirement has no passing test evidence, confirming the CI/CD gate operates correctly.
     /// </summary>
     [TestMethod]
-    public void ReqStream_EnforcementMode_FailsWhenRequirementLacksTestEvidence()
+    public void ReqStream_EnforcementMode_RequirementLacksTestEvidence_FailsWithNonZeroExitCode()
     {
         // Arrange: create requirements file with one requirement that has no matching test
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
@@ -172,7 +172,7 @@ public class IntegrationTests
     /// provides the required passing test.
     /// </summary>
     [TestMethod]
-    public void ReqStream_SourceFilter_MatchesTestsBySourceFile()
+    public void ReqStream_SourceFilter_NamedSourceInRequirement_MatchesTestsBySourceFile()
     {
         // Arrange: create requirements file with source-specific test reference
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");

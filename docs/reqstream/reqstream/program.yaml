@@ -47,6 +47,7 @@ sections:
               - Program_Run_WithRequirementsFiles_ProcessesSuccessfully
               - Program_Run_WithRequirementsExport_GeneratesReport
               - Program_Run_WithTraceMatrixExport_GeneratesMatrix
+              - Program_Run_WithJustificationsExport_GeneratesJustificationsReport
 
           - id: ReqStream-Program-Enforce
             title: The tool shall enforce requirements coverage and fail when requirements are unsatisfied.
@@ -84,3 +85,16 @@ sections:
             tests:
               - Program_Run_WithLintFlag_SuppressesBanner
               - Program_Run_WithLintFlag_OnlyOutputsIssues
+
+          - id: ReqStream-Program-LintNoFiles
+            title: The tool shall report an informational message and exit when linting is requested without specifying any
+              requirements files.
+            justification: |
+              Reporting a clear message when the lint flag is used without any --requirements
+              arguments prevents silent no-op runs and provides actionable feedback to users
+              who may have forgotten to specify the requirements files to lint.
+            tags:
+              - cli
+              - requirements
+            tests:
+              - Program_Run_WithLintAndNoRequirements_PrintsError

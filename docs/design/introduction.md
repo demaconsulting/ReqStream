@@ -84,8 +84,10 @@ src/DemaConsulting.ReqStream/
 │   └── Context.cs              — command-line argument parser and I/O owner
 ├── Modeling/
 │   ├── LintIssue.cs            — lint issue severity and data model
+│   ├── LoadResult.cs           — combined result of loading requirements and associated lint issues
 │   ├── Requirement.cs          — single requirement with ID, title, and test links
 │   ├── Requirements.cs         — parsed requirements document with section tree
+│   ├── RequirementsLoader.cs   — YAML deserializer and lint validator for requirements files
 │   └── Section.cs              — named group of requirements within a document
 ├── Tracing/
 │   └── TraceMatrix.cs          — test result loader and requirement-coverage analyzer

@@ -96,27 +96,27 @@ internal static class Program
             return;
         }
 
-        // Print application banner (suppressed during lint for cleaner script integration)
+        // Priority 2: Print application banner (suppressed during lint for cleaner script integration)
         if (!context.Lint)
         {
             PrintBanner(context);
         }
 
-        // Priority 2: Help
+        // Priority 3: Help
         if (context.Help)
         {
             PrintHelp(context);
             return;
         }
 
-        // Priority 3: Self-Validation
+        // Priority 4: Self-Validation
         if (context.Validate)
         {
             Validation.Run(context);
             return;
         }
 
-        // Priority 4: Lint requirements files
+        // Priority 5: Lint requirements files
         if (context.Lint)
         {
             if (context.RequirementsFiles.Count == 0)
@@ -131,7 +131,7 @@ internal static class Program
             return;
         }
 
-        // Priority 5: Requirements processing
+        // Priority 6: Requirements processing
         ProcessRequirements(context);
     }
 

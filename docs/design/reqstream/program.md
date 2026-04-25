@@ -94,7 +94,9 @@ output.
 no `TraceMatrix` was built (i.e., no `--tests` argument was provided), it reports an error
 indicating that enforcement requires test results. Otherwise, it calls
 `traceMatrix.CalculateSatisfiedRequirements(context.FilterTags)` to obtain satisfied and total
-counts, and reports each unsatisfied requirement via `context.WriteError` if any are found.
+counts. If any requirements are unsatisfied, it calls
+`traceMatrix.GetUnsatisfiedRequirements(context.FilterTags)` to retrieve the list of unsatisfied
+requirement IDs and reports each one via `context.WriteError`.
 
 This method never throws; all failure signalling goes through `context.WriteError`, which sets the
 internal error flag and eventually produces a non-zero exit code.
