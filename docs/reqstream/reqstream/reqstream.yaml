@@ -85,18 +85,27 @@ sections:
 
           - id: ReqStream-System-Validate
             title: >-
-              The system shall run a built-in self-test suite when the validate flag is provided,
-              and shall write test results to a file when the results flag is also provided.
+              The system shall run a built-in self-test suite when the validate flag is provided.
             justification: |
               In regulated environments, tool qualification evidence is required to demonstrate that
               the tool functions correctly in its deployment environment. The self-test suite
-              exercises core behaviors and produces a pass/fail summary. Writing results to a file
-              enables integration with CI/CD pipelines and requirements traceability tools.
+              exercises core behaviors and produces a pass/fail summary.
             tests:
               - ReqStream_System_Validate_Flag_RunsSelfValidation
             children:
               - ReqStream-Program-Validate
               - ReqStream-SelfTest-Qualification
+
+          - id: ReqStream-System-ValidateResultsOutput
+            title: >-
+              The system shall write self-validation test results to a file when the results flag is
+              provided.
+            justification: |
+              Results file output enables CI/CD pipeline integration and requirements traceability
+              tool consumption.
+            tests:
+              - ReqStream_System_ValidateResultsOutput_ResultsFlag_WritesResultsFile
+            children:
               - ReqStream-SelfTest-ResultsOutput
 
           - id: ReqStream-System-RequirementsReport

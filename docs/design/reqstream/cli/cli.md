@@ -44,7 +44,7 @@ The `Cli` subsystem exposes the following interface to the rest of the tool:
 | `Context.JustificationsFile`  | Outbound  | Path for justifications output file (`--justifications`), or `null`. |
 | `Context.JustificationsDepth` | Outbound  | Markdown header depth for the justifications report.                 |
 | `Context.WriteLine`           | Outbound  | Writes a message to console and optional log file.                   |
-| `Context.WriteError`          | Outbound  | Writes an error to stderr and sets the error exit code.              |
+| `Context.WriteError`          | Outbound  | Writes an error to stderr, appends it to the log file if logging is enabled, and sets the error exit code. |
 | `Context.ExitCode`            | Outbound  | Returns 0 for success or 1 when errors have been reported.           |
 | `Context.Dispose`             | Outbound  | Closes the log file writer and releases resources.                   |
 

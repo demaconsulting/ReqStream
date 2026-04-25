@@ -70,7 +70,7 @@ sections:
               - Context_Create_MissingLogFilename_ThrowsException
               - Context_Create_MissingResultsFilename_ThrowsException
 
-          - id: ReqStream-Requirements-GlobPatterns
+          - id: ReqStream-Command-RequirementsGlobPatterns
             title: The tool shall support glob patterns for requirements files.
             justification: |
               Glob patterns enable flexible file selection and reduce the need for explicit file listing,
@@ -80,7 +80,7 @@ sections:
             tests:
               - Context_Create_WithRequirementsPattern_ExpandsGlobPattern
 
-          - id: ReqStream-Requirements-TestGlobPatterns
+          - id: ReqStream-Command-TestGlobPatterns
             title: The tool shall support glob patterns for test result files.
             justification: |
               Glob patterns for test result files simplify CI/CD configuration by enabling flexible
@@ -235,15 +235,13 @@ sections:
               - Context_Create_MissingJustificationsDepth_ThrowsException
               - Context_Create_InvalidJustificationsDepth_ThrowsException
 
-      - title: Logging
-        requirements:
-          - id: ReqStream-Logging-FileOutput
+          - id: ReqStream-Command-LogFileOutput
             title: The tool shall support writing output to a log file.
             justification: |
               Log file support enables capturing tool output for debugging, audit trails, and CI/CD
               integration where console output may be ephemeral.
             tags:
-              - logging
+              - cli
             tests:
               - Context_Create_WithLogFile_WritesToLogFile
               - Context_Create_WithLogFileAndSilent_WritesToLogOnly

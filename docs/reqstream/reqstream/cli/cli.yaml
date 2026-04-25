@@ -30,8 +30,8 @@ sections:
           - ReqStream-Command-Validate
           - ReqStream-Command-Results
           - ReqStream-Command-Enforce
-          - ReqStream-Requirements-GlobPatterns
-          - ReqStream-Requirements-TestGlobPatterns
+          - ReqStream-Command-RequirementsGlobPatterns
+          - ReqStream-Command-TestGlobPatterns
           - ReqStream-Command-Report
           - ReqStream-Command-ReportDepth
           - ReqStream-Command-Matrix
@@ -51,7 +51,7 @@ sections:
           - Cli_Output_LogFlag_WritesOutputToLogFile
         children:
           - ReqStream-Command-Silent
-          - ReqStream-Logging-FileOutput
+          - ReqStream-Command-LogFileOutput
 
       - id: ReqStream-Cli-StderrRouting
         title: The Cli subsystem shall route error messages to stderr.

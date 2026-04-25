@@ -5,14 +5,15 @@ for managing software requirements in YAML format.
 
 ## Purpose
 
-The purpose of this document is to describe the internal design of each software unit that comprises
-ReqStream. It captures data models, algorithms, key methods, and inter-unit interactions at a level
-of detail sufficient for formal code review, compliance verification, and future maintenance. The
-document does not restate requirements; it explains how they are realized.
+The purpose of this document is to describe the internal design of the ReqStream system, its
+subsystems, and each software unit. It captures data models, algorithms, key methods, and
+inter-unit interactions at a level of detail sufficient for formal code review, compliance
+verification, and future maintenance. The document does not restate requirements; it explains how
+they are realized.
 
 ## Scope
 
-This document covers the detailed design of the following software units:
+This document covers the detailed design of the following software items, spanning system, subsystem, and unit levels:
 
 - **Program** — entry point and execution orchestrator (`Program.cs`)
 - **Context** — command-line argument parser and I/O owner (`Cli/Context.cs`)

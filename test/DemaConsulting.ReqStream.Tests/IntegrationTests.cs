@@ -287,6 +287,34 @@ public class IntegrationTests
     }
 
     /// <summary>
+    /// Integration test verifying that the --validate --results flags write the self-test results
+    /// to the specified file, exercising the system-level validate results output behavior.
+    /// </summary>
+    [TestMethod]
+    public void ReqStream_System_ValidateResultsOutput_ResultsFlag_WritesResultsFile()
+    {
+        // Arrange: create a temporary file path for the results output
+        var resultsFile = Path.Combine(_testDirectory, "validation.trx");
+
+        // Act: run validate with results flag as an external process
+        var exitCode = Runner.Run(
+            out var output,
+            "dotnet",
+            _dllPath,
+            "--validate",
+            "--results", resultsFile);
+
+        // Assert: self-validation passes (exit code 0)
+        Assert.AreEqual(0, exitCode, $"Expected exit code 0 from --validate --results, but got {exitCode}. Output: {output}");
+
+        // Assert: results file was created
+        Assert.IsTrue(File.Exists(resultsFile), "Results file should be created by --results flag.");
+
+        // Assert: results file is non-empty
+        Assert.IsTrue(new FileInfo(resultsFile).Length > 0, "Results file should be non-empty.");
+    }
+
+    /// <summary>
     /// Integration test verifying that the --filter flag restricts requirements output to only
     /// those matching the specified tag, exercising the system-level tag-filter behavior.
     /// </summary>
