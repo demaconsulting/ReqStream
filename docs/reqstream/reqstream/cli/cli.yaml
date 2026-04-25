@@ -39,7 +39,7 @@ sections:
           - ReqStream-Command-TagFilter
 
       - id: ReqStream-Cli-Output
-        title: The Cli subsystem shall provide output and error reporting channels.
+        title: The Cli subsystem shall provide output channels to write messages to the console and optional log file.
         justification: |
           Centralized output routing ensures consistent formatting and allows output to be
           suppressed or redirected to a log file as needed.
@@ -47,7 +47,19 @@ sections:
           - Cli_Output_SilentFlag_SetsSilentProperty
           - Cli_Output_LogFlag_WritesOutputToLogFile
         children:
-          - ReqStream-Command-ErrorOutput
-          - ReqStream-Command-ExitCode
           - ReqStream-Command-Silent
           - ReqStream-Logging-FileOutput
+
+      - id: ReqStream-Cli-ErrorReporting
+        title: The Cli subsystem shall provide an error reporting channel that routes errors to stderr and signals failure
+          via exit code.
+        justification: |
+          A dedicated error reporting channel ensures error messages remain visible to the user
+          without polluting stdout, and that callers can detect failure conditions by inspecting
+          the process exit code.
+        tests:
+          - Cli_Output_WriteError_WritesToErrorChannel
+          - Cli_Output_WriteError_SetsExitCodeToOne
+        children:
+          - ReqStream-Command-ErrorOutput
+          - ReqStream-Command-ExitCode

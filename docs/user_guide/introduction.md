@@ -8,15 +8,15 @@ requirements in a structured, version-controllable manner.
 
 ## Scope
 
-This guide covers the following topics:
+This introduction covers the following topics:
 
-- Installing and updating ReqStream as a .NET tool
-- Understanding the YAML requirements file format and structure
-- Using the command-line interface to validate and process requirements
-- Mapping requirements to test cases for traceability
-- Exporting requirements reports, trace matrices, and justifications
-- Enforcing requirements coverage and test verification
-- Troubleshooting common issues and frequently asked questions
+- What ReqStream is and the problems it solves
+- Key features and capabilities
+- Primary use cases
+
+Detailed topics — including the YAML requirements file format, CLI usage reference, test
+mapping, report exports, enforcement, and troubleshooting — are covered in the additional
+sections of this guide.
 
 This guide does not cover the internal implementation of ReqStream or advanced customization beyond the documented
 command-line options and YAML format.

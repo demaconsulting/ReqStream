@@ -29,6 +29,7 @@ The following topics are out of scope:
 - External library internals (YamlDotNet, DemaConsulting.TestResults)
 - Build pipeline configuration
 - Deployment and packaging
+- Test projects, test classes, and test infrastructure
 
 ## Software Structure
 
@@ -71,7 +72,12 @@ docs/design/
     │   └── context.md                      — Context unit design
     ├── modeling/
     │   ├── modeling.md                     — Modeling subsystem design
-    │   └── requirements.md                 — Requirements, Section, and Requirement units design
+    │   ├── lint-issue.md                   — LintIssue unit design
+    │   ├── load-result.md                  — LoadResult unit design
+    │   ├── requirement.md                  — Requirement unit design
+    │   ├── requirements-loader.md          — RequirementsLoader unit design
+    │   ├── requirements.md                 — Requirements unit design
+    │   └── section.md                      — Section unit design
     ├── tracing/
     │   ├── tracing.md                      — Tracing subsystem design
     │   └── trace-matrix.md                 — TraceMatrix unit design
@@ -115,8 +121,6 @@ Throughout this document:
 
 ## References
 
-- [ReqStream System Design][arch]
 - [ReqStream Repository][repo]
 
-[arch]: reqstream/reqstream.md
 [repo]: https://github.com/demaconsulting/ReqStream

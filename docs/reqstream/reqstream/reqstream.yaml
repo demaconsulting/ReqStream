@@ -31,6 +31,9 @@ sections:
               - ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces
             children:
               - ReqStream-Modeling-YamlParsing
+              - ReqStream-Tracing-TestResults
+              - ReqStream-Modeling-Export
+              - ReqStream-Tracing-Reporting
               - ReqStream-Tracing-Coverage
 
           - id: ReqStream-System-SourceFilter

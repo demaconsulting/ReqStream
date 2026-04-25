@@ -131,6 +131,8 @@ Error-level:
 
 - [ReqStream System Design][arch]
 - [Modeling Subsystem Design][modeling]
+- [ReqStream Repository][repo]
 
 [arch]: ../reqstream.md
 [modeling]: modeling.md
+[repo]: https://github.com/demaconsulting/ReqStream

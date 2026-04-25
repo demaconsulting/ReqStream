@@ -23,7 +23,8 @@ create, validate, and manage requirement documents in a structured and maintaina
 - 🌐 **Multi-Platform** - Support for .NET 8, 9, and 10 across Windows, Linux, and macOS
 - 🔗 **Hierarchical Structure** - Organize requirements with sections and subsections
 - 🧪 **Test Mapping** - Link requirements to test cases for traceability
-- 📦 **File Includes** - Modularize requirements across multiple YAML files
+- � **Source-Specific Test Matching** - Restrict coverage evidence to named result files using `filepart@testname` syntax
+- �📦 **File Includes** - Modularize requirements across multiple YAML files
 - ✅ **Validation** - Run a built-in self-test suite to qualify the tool in its deployment environment
 - 🔍 **Linting** - Validate requirements YAML structure and references, reporting all issues in one pass
 - 🏷️ **Tag Filtering** - Categorize and filter requirements using tags

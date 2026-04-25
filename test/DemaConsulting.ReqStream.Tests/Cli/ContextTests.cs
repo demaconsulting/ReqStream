@@ -512,6 +512,34 @@ public class ContextTests
     }
 
     /// <summary>
+    /// Test that ExitCode returns 0 before any errors and 1 after WriteError.
+    /// </summary>
+    [TestMethod]
+    public void Context_ExitCode_AfterWriteError_ReturnsOne()
+    {
+        // Arrange: redirect stderr to suppress console noise during the test
+        var originalError = Console.Error;
+        Console.SetError(TextWriter.Null);
+
+        try
+        {
+            // Act: create context, check initial exit code, call WriteError, check again
+            using var context = Context.Create([]);
+            var initialExitCode = context.ExitCode;
+            context.WriteError("error");
+            var exitCodeAfterError = context.ExitCode;
+
+            // Assert: exit code starts at 0 and becomes 1 after WriteError
+            Assert.AreEqual(0, initialExitCode);
+            Assert.AreEqual(1, exitCodeAfterError);
+        }
+        finally
+        {
+            Console.SetError(originalError);
+        }
+    }
+
+    /// <summary>
     /// Test log file creation and writing.
     /// </summary>
     [TestMethod]

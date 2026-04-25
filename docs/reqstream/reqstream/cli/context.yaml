@@ -119,7 +119,7 @@ sections:
             tags:
               - cli
             tests:
-              - Context_WriteError_NormalMode_WritesToConsole
+              - Context_ExitCode_AfterWriteError_ReturnsOne
 
           - id: ReqStream-Command-ReportDepth
             title: The tool shall support configurable markdown header depth for requirements reports.

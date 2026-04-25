@@ -61,8 +61,8 @@ immediately; the banner step (row 2) prints the banner and then falls through to
 | 3 | `context.Help` is `true` | Call `PrintHelp`; return |
 | 4 | `context.Validate` is `true` | Call `Validation.Run(context)`; return |
 | 5 | `context.Lint` is `true` and `context.RequirementsFiles` is empty | Print informational message ("No requirements files specified"); return (exit code 0) |
-| 5 | `context.Lint` is `true` | Call `Requirements.Load(context.RequirementsFiles)`; report lint issues; return |
-| 6 | (default) | Call `ProcessRequirements(context)` |
+| 6 | `context.Lint` is `true` | Call `Requirements.Load(context.RequirementsFiles)`; report lint issues; return |
+| 7 | (default) | Call `ProcessRequirements(context)` |
 
 ### `PrintBanner`
 

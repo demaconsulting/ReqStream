@@ -3,8 +3,9 @@
 ## Overview
 
 This chapter describes how the ReqStream software units work together as an integrated system.
-Where the unit chapters (Program, Context, Validation, Requirements, TraceMatrix) each
-describe one component in isolation, this chapter focuses on the end-to-end data flow, the
+Where the unit and subsystem chapters (Program, Cli, Context, Modeling, LintIssue, LoadResult,
+Requirement, Requirements, RequirementsLoader, Section, Tracing, TraceMatrix, SelfTest, Validation)
+each describe one component in isolation, this chapter focuses on the end-to-end data flow, the
 coordination points between units, and the integrated scenarios that the units collectively
 enable.
 
@@ -98,31 +99,28 @@ so that the evidence can be fed back into ReqStream's own requirements enforceme
 
 ## Component Interaction Diagram
 
-The following diagram shows the data flow between units during a standard requirements processing
+The following table shows the data flow between units during a standard requirements processing
 invocation:
 
-```mermaid
-flowchart TD
-    yaml[YAML Files]
-    tests[Test Result Files]
-    args[CLI Arguments]
-    ctx[Context<br/>options & output]
-    req[Requirements.Load<br/>parsed tree + lint issues]
-    tm[TraceMatrix<br/>coverage analysis]
-    issues[Lint Issues<br/>warnings · errors]
-    reports[Markdown Reports<br/>requirements · justifications · trace matrix]
-    exit[Exit Code<br/>0 = pass · 1 = fail]
+| Source | Data | Destination |
+| ------ | ---- | ----------- |
+| CLI arguments | Parsed flags and file paths | `Context` |
+| YAML files | Requirements content | `Requirements.Load` |
+| Test result files | Test execution records | `TraceMatrix` |
+| `Context` | Expanded file lists and flags | `Requirements.Load` |
+| `Requirements.Load` | Parsed requirement tree | `TraceMatrix` |
+| `Requirements.Load` | Lint issues (warnings/errors) | Error output channel |
+| `TraceMatrix` | Coverage analysis | Markdown reports |
+| `TraceMatrix` + lint issues | Error flags | Exit code (0 = pass, 1 = fail) |
 
-    yaml --> req
-    tests --> tm
-    args --> ctx
-    ctx --> req
-    req --> tm
-    req --> issues
-    tm --> reports
-    tm --> exit
-    issues --> exit
-```
+## Platform Support
+
+ReqStream targets the `net8.0`, `net9.0`, and `net10.0` target framework monikers using .NET's
+multi-targeting build. Because all runtime dependencies (YamlDotNet, DemaConsulting.TestResults)
+ship as portable NuGet packages and no platform-specific APIs are used anywhere in the codebase,
+the resulting binaries run without modification on Windows, Linux, and macOS. The GitHub Actions
+CI matrix executes the full test suite on all three operating systems and all three .NET versions
+on every build, providing continuous evidence that the platform requirements are satisfied.
 
 ## Design Decisions
 
