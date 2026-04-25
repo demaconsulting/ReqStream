@@ -80,8 +80,8 @@ sections:
           - id: ReqStream-Command-Validate
             title: The tool shall accept a validate flag to trigger self-validation mode.
             justification: |
-              Parsing the validate flag enables the Context unit to signal to the Program unit
-              that self-validation mode should be activated, supporting tool qualification workflows.
+              Accepting a validate flag allows users to request self-validation mode from the command
+              line, supporting tool qualification workflows.
             tags:
               - cli
             tests:
@@ -90,9 +90,8 @@ sections:
           - id: ReqStream-Command-Enforce
             title: The tool shall accept an enforce flag to activate requirements enforcement mode.
             justification: |
-              Parsing the enforce flag enables the Context unit to signal to the Program unit that
-              enforcement mode should be activated, ensuring CI/CD pipelines can block releases
-              when requirements lack test coverage.
+              Accepting an enforce flag allows CI/CD pipelines to activate enforcement mode,
+              enabling builds to be blocked when requirements lack test coverage.
             tags:
               - cli
             tests:

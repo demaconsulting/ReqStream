@@ -123,13 +123,12 @@ sections:
 
           - id: ReqStream-Requirements-UnifiedLoad
             title: >-
-              The tool shall provide a unified load mechanism that simultaneously builds the requirements model and
-              reports lint issues from a single YAML DOM tree walk.
+              The tool shall load requirements and report all lint issues in a single operation,
+              returning both results together regardless of whether loading succeeds.
             justification: |
-              A single YAML DOM tree walk eliminates the drift that can occur between separate linting
-              and loading implementations. Load failures automatically produce detailed lint-issue output,
-              and the caller receives both the nullable requirements model and a complete list of issues
-              in one operation.
+              Combining requirement loading and lint reporting into a single operation ensures that
+              the two cannot produce inconsistent results. Even when loading fails, the operation
+              produces complete lint-issue output, allowing users to diagnose all problems in one pass.
             tags:
               - requirements
             tests:
