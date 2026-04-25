@@ -18,7 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.ReqStream.Cli;
 using DemaConsulting.ReqStream.Modeling;
 
 namespace DemaConsulting.ReqStream.Tests.Modeling;
@@ -172,21 +171,6 @@ sections:
     }
 
     /// <summary>
-    /// Test that LintIssue.ToString() formats as "location: severity: description".
-    /// </summary>
-    [TestMethod]
-    public void LintIssue_ToString_FormatsCorrectly()
-    {
-        // Arrange: create LintIssue instances with error and warning severity
-        var errorIssue = new LintIssue("file.yaml(3,5)", LintSeverity.Error, "Some error");
-        var warningIssue = new LintIssue("file.yaml", LintSeverity.Warning, "Some warning");
-
-        // Act / Assert: verify ToString formats as "location: severity: description"
-        Assert.AreEqual("file.yaml(3,5): error: Some error", errorIssue.ToString());
-        Assert.AreEqual("file.yaml: warning: Some warning", warningIssue.ToString());
-    }
-
-    /// <summary>
     /// Test that loading a file with multiple lint errors reports all of them.
     /// </summary>
     [TestMethod]
@@ -264,129 +248,4 @@ sections:
         Assert.Contains(i => i.Description.Contains("Unknown field 'unknown_field'"), result.Issues);
     }
 
-    /// <summary>
-    /// Test that ReportIssues routes error-level issues to the context error output.
-    /// </summary>
-    [TestMethod]
-    public void LoadResult_ReportIssues_ErrorIssue_SetsContextError()
-    {
-        // Arrange: load a file with a lint error
-        var yamlContent = @"---
-sections:
-  - title: ""Test Section""
-    requirements:
-      - id: ""REQ-001""
-        title: ""A requirement.""
-        unknown_field: bad
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-
-        // Act: report the issues via context
-        var logFile = Path.Combine(_testDirectory, "report-issues-error.log");
-        int exitCode;
-        using (var context = Context.Create(["--silent", "--log", logFile]))
-        {
-            result.ReportIssues(context);
-            exitCode = context.ExitCode;
-        }
-
-        // Assert: error context exit code set and log contains issue
-        Assert.AreEqual(1, exitCode);
-        var log = File.ReadAllText(logFile);
-        Assert.Contains("unknown_field", log);
-    }
-
-    /// <summary>
-    /// Test that ReportIssues routes warning-level issues to context normal output.
-    /// </summary>
-    [TestMethod]
-    public void LoadResult_ReportIssues_WarningIssue_DoesNotSetContextError()
-    {
-        // Arrange: create a load result with a single warning issue
-        var warningResult = new LoadResult(
-            new Requirements(),
-            [new LintIssue("file.yaml", LintSeverity.Warning, "A warning")]);
-
-        // Act: report issues via context
-        var logFile = Path.Combine(_testDirectory, "report-issues-warning.log");
-        int exitCode;
-        using (var context = Context.Create(["--silent", "--log", logFile]))
-        {
-            warningResult.ReportIssues(context);
-            exitCode = context.ExitCode;
-        }
-
-        // Assert: no error exit code and warning written to log
-        Assert.AreEqual(0, exitCode);
-        var log = File.ReadAllText(logFile);
-        Assert.Contains("A warning", log);
-    }
-
-    /// <summary>
-    /// Test that ReportIssues produces no output when there are no issues.
-    /// </summary>
-    [TestMethod]
-    public void LoadResult_ReportIssues_NoIssues_ProducesNoOutput()
-    {
-        // Arrange: load a valid file with no issues
-        var yamlContent = @"---
-sections:
-  - title: ""Test Section""
-    requirements:
-      - id: ""REQ-001""
-        title: ""A valid requirement.""
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-
-        // Act: report issues via context
-        var logFile = Path.Combine(_testDirectory, "report-issues-none.log");
-        int exitCode;
-        using (var context = Context.Create(["--silent", "--log", logFile]))
-        {
-            result.ReportIssues(context);
-            exitCode = context.ExitCode;
-        }
-
-        // Assert: no output produced and exit code zero
-        Assert.AreEqual(0, exitCode);
-        Assert.AreEqual(string.Empty, File.ReadAllText(logFile));
-    }
-
-    /// <summary>
-    /// Test that HasErrors is false when there are only warnings.
-    /// </summary>
-    [TestMethod]
-    public void LoadResult_HasErrors_WithOnlyWarnings_ReturnsFalse()
-    {
-        // Arrange: create a load result with a single warning issue
-        var result = new LoadResult(
-            new Requirements(),
-            [new LintIssue("file.yaml", LintSeverity.Warning, "A warning")]);
-
-        // Assert: HasErrors is false and Requirements is not null for warnings-only results
-        Assert.IsFalse(result.HasErrors);
-        Assert.IsNotNull(result.Requirements);
-    }
-
-    /// <summary>
-    /// Test that HasErrors is true when there are error-level issues.
-    /// </summary>
-    [TestMethod]
-    public void LoadResult_HasErrors_WithErrorIssue_ReturnsTrue()
-    {
-        // Arrange: create a load result with an error issue and null requirements
-        var result = new LoadResult(
-            null,
-            [new LintIssue("file.yaml", LintSeverity.Error, "An error")]);
-
-        // Assert: HasErrors is true and Requirements is null for error results
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-    }
 }

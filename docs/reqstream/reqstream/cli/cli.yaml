@@ -49,4 +49,5 @@ sections:
         children:
           - ReqStream-Command-ErrorOutput
           - ReqStream-Command-ExitCode
+          - ReqStream-Command-Silent
           - ReqStream-Logging-FileOutput

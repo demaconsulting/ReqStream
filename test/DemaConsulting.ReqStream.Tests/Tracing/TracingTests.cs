@@ -219,4 +219,62 @@ public class TracingTests
         Assert.HasCount(1, unsatisfied);
         Assert.Contains("Tracing-Enforce-Unsatisfied", unsatisfied);
     }
+
+    /// <summary>
+    /// Test that constructing a TraceMatrix with a non-existent file path throws FileNotFoundException.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_Constructor_NonExistentFile_ThrowsFileNotFoundException()
+    {
+        // Arrange: create a requirements object and a path to a file that does not exist
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: Error Test Requirements
+                requirements:
+                  - id: Tracing-Error-Req1
+                    title: The system shall handle missing result files.
+                    justification: Error handling test justification.
+                    tests:
+                      - ErrorTest1
+            """);
+        var loadResult = Requirements.Load(reqFile);
+        Assert.IsNotNull(loadResult.Requirements);
+        var missingFile = Path.Combine(_testDirectory, "does-not-exist.trx");
+
+        // Act and Assert: constructing a TraceMatrix with a missing file throws FileNotFoundException
+        Assert.ThrowsExactly<FileNotFoundException>(() =>
+            _ = new TraceMatrix(loadResult.Requirements, missingFile));
+    }
+
+    /// <summary>
+    /// Test that constructing a TraceMatrix with a malformed result file throws InvalidOperationException
+    /// containing the offending file path in the message.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_Constructor_MalformedFile_ThrowsInvalidOperationException()
+    {
+        // Arrange: create a requirements object and a file with invalid (non-XML) content
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: Error Test Requirements
+                requirements:
+                  - id: Tracing-Error-Req2
+                    title: The system shall handle malformed result files.
+                    justification: Error handling test justification.
+                    tests:
+                      - ErrorTest2
+            """);
+        var loadResult = Requirements.Load(reqFile);
+        Assert.IsNotNull(loadResult.Requirements);
+        var malformedFile = Path.Combine(_testDirectory, "malformed.trx");
+        File.WriteAllText(malformedFile, "this is not valid xml or json content @@##!!");
+
+        // Act and Assert: constructing a TraceMatrix with a malformed file throws InvalidOperationException
+        // with the offending path in the message
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() =>
+            _ = new TraceMatrix(loadResult.Requirements, malformedFile));
+        Assert.IsTrue(ex.Message.Contains(malformedFile), "Exception message should contain the file path.");
+    }
 }

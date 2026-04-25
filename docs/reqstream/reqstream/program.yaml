@@ -97,4 +97,4 @@ sections:
               - cli
               - requirements
             tests:
-              - Program_Run_WithLintAndNoRequirements_PrintsError
+              - Program_Run_WithLintAndNoRequirements_PrintsInformationalMessage

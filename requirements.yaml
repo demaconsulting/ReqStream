@@ -9,7 +9,6 @@ includes:
   - docs/reqstream/reqstream/cli/context.yaml
   # Modeling subsystem
   - docs/reqstream/reqstream/modeling/modeling.yaml
-  - docs/reqstream/reqstream/modeling/requirements.yaml
   # Tracing subsystem
   - docs/reqstream/reqstream/tracing/tracing.yaml
   - docs/reqstream/reqstream/tracing/trace-matrix.yaml

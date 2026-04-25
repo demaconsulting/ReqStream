@@ -54,7 +54,10 @@ rather than an unhandled exception.
 `--filter` values are split on `','` and accumulated into `FilterTags`; multiple `--filter`
 arguments merge into the same set. `--requirements` and `--tests` values are passed to
 `ExpandGlobPattern` and appended to the respective file lists. If `--log` is specified, the named
-file is opened for writing and assigned to `_logWriter` before the method returns.
+file is opened for writing and assigned to `_logWriter` before the method returns. If the log file
+cannot be opened (for example, due to an invalid path or insufficient permissions), `Create` catches
+the underlying I/O exception, wraps it in an `ArgumentException`, and rethrows it so the caller
+receives a user-actionable error message rather than an unhandled exception.
 
 `--depth` sets the default heading depth (`Depth`). The per-report depth arguments
 (`--report-depth`, `--matrix-depth`, `--justifications-depth`) override this default if

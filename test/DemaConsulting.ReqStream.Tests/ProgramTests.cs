@@ -785,7 +785,7 @@ sections:
     /// Test Run with lint flag and no requirements files prints an informational message.
     /// </summary>
     [TestMethod]
-    public void Program_Run_WithLintAndNoRequirements_PrintsError()
+    public void Program_Run_WithLintAndNoRequirements_PrintsInformationalMessage()
     {
         // Act: run with lint flag but no requirements files
         using var context = Context.Create(["--lint"]);

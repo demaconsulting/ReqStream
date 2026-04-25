@@ -23,8 +23,8 @@ to persist the results.
 > **Thread-safety constraint**: `Run` must not be called concurrently. Each validation test uses
 > `DirectorySwitch`, which mutates the process-wide current working directory
 > (`Directory.SetCurrentDirectory`). Concurrent calls would race on this shared state, causing
-> tests to resolve relative paths against the wrong directory. The `[DoNotParallelize]` attribute
-> on `ValidationTests` enforces this constraint in the test suite.
+> tests to resolve relative paths against the wrong directory. The validation subsystem therefore
+> accesses global process state and is not thread-safe.
 The six validation tests exist to provide structured, machine-readable evidence that ReqStream
 correctly processes its own input formats. This evidence can be fed back into ReqStream to verify
 the tool's own requirements coverage, enabling a self-hosting compliance workflow.

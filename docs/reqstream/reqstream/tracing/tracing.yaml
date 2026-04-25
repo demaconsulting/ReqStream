@@ -10,7 +10,7 @@ sections:
   - title: Tracing Subsystem Requirements
     requirements:
       - id: ReqStream-Tracing-TestResults
-        title: The Tracing subsystem shall load test results from TRX and JUnit XML files.
+        title: The Tracing subsystem shall load test results from supported file formats.
         justification: |
           Supporting both TRX and JUnit XML formats ensures the tool works with the major
           test frameworks used in .NET development, maximizing interoperability.
@@ -38,6 +38,17 @@ sections:
           - ReqStream-Test-CaseInsensitive
           - ReqStream-Test-PartialFilenames
           - ReqStream-Test-MultipleRequirements
+          - ReqStream-Test-ChildRequirements
+
+      - id: ReqStream-Tracing-Reporting
+        title: The Tracing subsystem shall export a trace matrix report to a Markdown file.
+        justification: |
+          Exporting a trace matrix as a Markdown file provides human-readable coverage evidence
+          that can be embedded in documentation, reviewed in pull requests, and consumed by
+          reporting pipelines.
+        tests:
+          - TraceMatrix_Export_SimpleTraceMatrix_CreatesMarkdownFile
+        children:
           - ReqStream-Report-TraceMatrix
           - ReqStream-Report-TraceMatrixDepth
           - ReqStream-Report-TagFiltering

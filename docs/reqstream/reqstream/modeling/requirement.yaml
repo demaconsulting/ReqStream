@@ -1,0 +1,56 @@
+---
+# Requirement Unit Requirements
+#
+# PURPOSE:
+# - Define requirements for the Requirement unit (Requirement.cs)
+# - Requirement is the domain model for a single requirement entry
+# - Unit requirements describe the data that each requirement must hold
+
+sections:
+  - title: Requirement Unit Requirements
+    requirements:
+      - id: ReqStream-Requirements-UniqueIds
+        title: Each requirement shall have a unique identifier.
+        justification: |
+          Unique identifiers enable unambiguous referencing of requirements in documentation, test
+          mappings, and traceability reports.
+        tags:
+          - requirements
+        tests:
+          - Requirements_Load_DuplicateRequirementId_ReportsError
+          - Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation
+          - Requirements_Load_MultipleFilesWithDuplicateIds_ReportsError
+
+      - id: ReqStream-Requirements-RequiredTitle
+        title: Each requirement shall have a title.
+        justification: |
+          Titles provide human-readable descriptions of requirements, making them understandable to
+          stakeholders without needing to reference external documentation.
+        tags:
+          - requirements
+        tests:
+          - Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation
+
+      - id: ReqStream-Requirements-ParentChild
+        title: Requirement shall support parent-child relationships to other requirements.
+        justification: |
+          Parent-child relationships enable hierarchical requirement decomposition, allowing high-level
+          requirements to be satisfied through lower-level requirements.
+        tags:
+          - requirements
+        tests:
+          - Requirements_Load_RequirementWithChildren_ParsesChildrenCorrectly
+
+      - id: ReqStream-Requirements-TestMappings
+        title: Requirement shall store linked test identifiers.
+        justification: |
+          Test mappings establish traceability between requirements and tests, enabling verification
+          that requirements are adequately tested and satisfied.
+        tags:
+          - requirements
+        tests:
+          - Requirements_Load_RequirementWithTests_ParsesTestsCorrectly
+          - Requirements_Load_BlankTestNameInRequirement_ReportsErrorWithFileLocation
+          - Requirements_Load_TestMappings_AppliesMappingsCorrectly
+          - Requirements_Load_BlankTestNameInMapping_ReportsErrorWithFileLocation
+          - Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation

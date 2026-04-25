@@ -228,4 +228,118 @@ public class IntegrationTests
         // Assert: enforcement passed because platform-a.trx satisfies the source-filtered requirement
         Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
     }
+
+    /// <summary>
+    /// Integration test verifying that the --lint flag lints requirements files and reports
+    /// structural issues in a single invocation, exercising the system-level lint behavior.
+    /// </summary>
+    [TestMethod]
+    public void ReqStream_System_Lint_Flag_ReportsLintIssues()
+    {
+        // Arrange: create a requirements file with a structural issue (missing title)
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: System Requirements
+                requirements:
+                  - id: Integration-System-MissingTitle
+            """);
+
+        // Act: run lint as an external process
+        var exitCode = Runner.RunInDirectory(
+            out var output,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--lint",
+            "--requirements", "requirements.yaml");
+
+        // Assert: lint exits with a non-zero code because an issue was found
+        Assert.AreNotEqual(0, exitCode, $"Expected non-zero exit code from lint, but got {exitCode}. Output: {output}");
+
+        // Assert: lint reported an issue about the missing title
+        Assert.IsTrue(
+            output.Contains("Integration-System-MissingTitle") || output.Contains("title"),
+            $"Expected lint output to reference the missing-title issue. Output: {output}");
+    }
+
+    /// <summary>
+    /// Integration test verifying that the --validate flag runs the built-in self-test suite
+    /// and exits successfully, exercising the system-level validate behavior.
+    /// </summary>
+    [TestMethod]
+    public void ReqStream_System_Validate_Flag_RunsSelfValidation()
+    {
+        // Act: run validate as an external process
+        var exitCode = Runner.Run(
+            out var output,
+            "dotnet",
+            _dllPath,
+            "--validate");
+
+        // Assert: self-validation passes (exit code 0)
+        Assert.AreEqual(0, exitCode, $"Expected exit code 0 from --validate, but got {exitCode}. Output: {output}");
+
+        // Assert: output contains the validation summary header
+        Assert.IsTrue(
+            output.Contains("Passed") || output.Contains("Total Tests"),
+            $"Expected validation output to contain test summary. Output: {output}");
+    }
+
+    /// <summary>
+    /// Integration test verifying that the --filter flag restricts requirements output to only
+    /// those matching the specified tag, exercising the system-level tag-filter behavior.
+    /// </summary>
+    [TestMethod]
+    public void ReqStream_System_TagFilter_Flag_FiltersRequirements()
+    {
+        // Arrange: create requirements file with two requirements, each with a different tag
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: System Requirements
+                requirements:
+                  - id: Integration-System-TaggedAlpha
+                    title: The system shall satisfy alpha requirements.
+                    justification: Alpha requirement for tag filtering test.
+                    tags:
+                      - alpha
+                    tests:
+                      - FilterTest_Alpha
+                  - id: Integration-System-TaggedBeta
+                    title: The system shall satisfy beta requirements.
+                    justification: Beta requirement for tag filtering test.
+                    tags:
+                      - beta
+                    tests:
+                      - FilterTest_Beta
+            """);
+
+        var reportFile = Path.Combine(_testDirectory, "filtered-report.md");
+
+        // Act: run with --filter alpha to export only alpha-tagged requirements
+        var exitCode = Runner.RunInDirectory(
+            out var output,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--requirements", "requirements.yaml",
+            "--report", reportFile,
+            "--filter", "alpha");
+
+        // Assert: tool exited successfully
+        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
+
+        // Assert: report was generated
+        Assert.IsTrue(File.Exists(reportFile), "Filtered requirements report should be generated.");
+
+        // Assert: report contains the alpha requirement but not the beta requirement
+        var reportContent = File.ReadAllText(reportFile);
+        Assert.IsTrue(
+            reportContent.Contains("Integration-System-TaggedAlpha"),
+            "Filtered report should contain the alpha-tagged requirement.");
+        Assert.IsFalse(
+            reportContent.Contains("Integration-System-TaggedBeta"),
+            "Filtered report should not contain the beta-tagged requirement.");
+    }
 }

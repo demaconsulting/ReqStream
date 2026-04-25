@@ -22,6 +22,7 @@ sections:
           - SelfTest_Qualification_Run_PassesAllTests
         children:
           - ReqStream-Validation-SelfValidation
+          - ReqStream-Validation-NullContext
 
       - id: ReqStream-SelfTest-ResultsOutput
         title: The tool shall write self-validation results to a standard test result file when --results is provided.
@@ -34,3 +35,5 @@ sections:
         tests:
           - SelfTest_ResultsOutput_TrxResultsPath_WritesTrxFile
           - SelfTest_ResultsOutput_XmlResultsPath_WritesJUnitFile
+        children:
+          - ReqStream-Validation-UnsupportedResultsFormat

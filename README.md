@@ -28,7 +28,8 @@ create, validate, and manage requirement documents in a structured and maintaina
 - 🔍 **Linting** - Validate requirements YAML structure and references, reporting all issues in one pass
 - 🏷️ **Tag Filtering** - Categorize and filter requirements using tags
 - 📋 **Justifications** - Document the rationale behind each requirement
-- 🔒 **Continuous Compliance** - Compliance evidence generated automatically on every CI run, following
+- � **Export Capabilities** - Generate markdown reports for requirements, justifications, and test trace matrices
+- �🔒 **Continuous Compliance** - Compliance evidence generated automatically on every CI run, following
   the [Continuous Compliance][link-continuous-compliance] methodology
 
 ## Installation
@@ -96,7 +97,7 @@ Options:
   -?, -h, --help                   Display this help message
   --silent                         Suppress console output
   --validate                       Run self-validation
-  --results <file>                 Write validation results to file (TRX or JUnit format)
+  --results <file>                 Write validation results to file (TRX or JUnit format; use .trx or .xml extension)
   --log <file>                     Write output to log file
   --lint                           Lint requirements files for structural issues
   --depth <depth>                  Default markdown header depth for all reports (default: 1)
@@ -146,7 +147,7 @@ Each test in the report proves:
 - **`ReqStream_ReportExport`** - requirements report is correctly exported to a markdown file.
 - **`ReqStream_TagsFiltering`** - requirements are correctly filtered by tags.
 - **`ReqStream_EnforcementMode`** - enforcement mode correctly validates requirement test coverage.
-- **`ReqStream_Lint`** - linter correctly validates requirements YAML file structure and reports all issues.
+- **`ReqStream_Lint`** - lint mode correctly identifies and reports issues in requirements files.
 
 See the [User Guide][link-guide] for more details on the self-validation tests.
 

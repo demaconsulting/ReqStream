@@ -21,7 +21,8 @@ processing invocation:
 | `Context.TestFiles` | Glob-expanded file paths | `TraceMatrix` constructor |
 | Requirement tree | Requirements | `TraceMatrix` constructor |
 | `TraceMatrix` | Coverage data | `Program.EnforceRequirementsCoverage` |
-| `TraceMatrix` / requirement tree | Export input | Report files |
+| Requirement tree | Export input | Requirements and justifications report files (`--report`, `--justifications`) |
+| `TraceMatrix` + requirement tree | Export input | Trace matrix report file (`--matrix`) |
 
 ## Integrated Processing Pipeline
 

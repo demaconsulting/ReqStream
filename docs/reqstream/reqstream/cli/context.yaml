@@ -16,20 +16,20 @@ sections:
               - Context_Create_MultipleArguments_ParsesAllCorrectly
 
           - id: ReqStream-Command-Version
-            title: The tool shall display version information when requested.
+            title: Context shall accept the `--version` flag and record it so that Program can display version information.
             justification: |
-              Version information is critical for debugging, support, and ensuring compatibility with
-              documentation and scripts.
+              Recording the version flag in Context allows Program to detect the request and print
+              version information without requiring Context to have any knowledge of the version string.
             tags:
               - cli
             tests:
               - Context_Create_VersionFlag_SetsVersionProperty
 
           - id: ReqStream-Command-Help
-            title: The tool shall display help information when requested.
+            title: Context shall accept the `--help` flag and record it so that Program can display help information.
             justification: |
-              Help information improves user experience and reduces the learning curve for new users by
-              providing quick access to command-line options.
+              Recording the help flag in Context allows Program to detect the request and print
+              usage documentation without coupling help content to the argument-parsing layer.
             tags:
               - cli
             tests:
@@ -111,10 +111,11 @@ sections:
               - Context_Create_EnforceFlag_SetsEnforceProperty
 
           - id: ReqStream-Command-ExitCode
-            title: The tool shall return a non-zero exit code on failure.
+            title: Context shall expose an exit code property that Program uses to determine the process exit code.
             justification: |
-              Callers (scripts, CI/CD pipelines) must be able to detect failure conditions
-              programmatically via the process exit code.
+              Exposing an exit code property allows Program to return the correct process exit code
+              based on whether errors were reported during execution, enabling callers to detect
+              failure conditions programmatically.
             tags:
               - cli
             tests:
@@ -247,3 +248,4 @@ sections:
               - Context_Create_WithLogFile_WritesToLogFile
               - Context_Create_WithLogFileAndSilent_WritesToLogOnly
               - Context_Dispose_WithLogFile_ClosesLogFile
+              - Context_Create_InvalidLogPath_ThrowsException

@@ -17,8 +17,11 @@ This document covers the detailed design of the following software units:
 - **Program** — entry point and execution orchestrator (`Program.cs`)
 - **Context** — command-line argument parser and I/O owner (`Cli/Context.cs`)
 - **Validation** — self-validation test runner (`SelfTest/Validation.cs`)
-- **Requirements, Section, and Requirement** — YAML parsing, section merging, validation, and export
-  (`Modeling/Requirements.cs`, `Modeling/Section.cs`, `Modeling/Requirement.cs`)
+- **LintIssue and LoadResult** — lint severity classification, issue data model, and load-result
+  encapsulation (`Modeling/LintIssue.cs`, `Modeling/LoadResult.cs`)
+- **Requirement, Requirements, RequirementsLoader, and Section** — YAML parsing, section merging,
+  validation, lint reporting, and export (`Modeling/Requirement.cs`, `Modeling/Requirements.cs`,
+  `Modeling/RequirementsLoader.cs`, `Modeling/Section.cs`)
 - **TraceMatrix** — test result loader and requirement-coverage analyzer (`Tracing/TraceMatrix.cs`)
 
 The following topics are out of scope:
@@ -38,9 +41,12 @@ ReqStream (System)
 ├── Cli (Subsystem)
 │   └── Context (Unit)
 ├── Modeling (Subsystem)
+│   ├── LintIssue (Unit)
+│   ├── LoadResult (Unit)
+│   ├── Requirement (Unit)
 │   ├── Requirements (Unit)
-│   ├── Section (Unit)
-│   └── Requirement (Unit)
+│   ├── RequirementsLoader (Unit)
+│   └── Section (Unit)
 ├── Tracing (Subsystem)
 │   └── TraceMatrix (Unit)
 └── SelfTest (Subsystem)

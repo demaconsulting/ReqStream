@@ -109,21 +109,57 @@ reviews:
       - "src/**/Cli/Context.cs"                             # implementation
       - "test/**/Cli/ContextTests.cs"                       # unit tests
 
+  - id: ReqStream-Modeling-LintIssue
+    title: Review that ReqStream Modeling LintIssue Implementation is Correct
+    paths:
+      - "docs/reqstream/reqstream/modeling/lint-issue.yaml"     # unit requirements
+      - "docs/design/reqstream/modeling/lint-issue.md"          # unit design
+      - "src/**/Modeling/LintIssue.cs"                          # implementation
+      - "test/**/Modeling/LintIssueTests.cs"                    # unit tests
+
+  - id: ReqStream-Modeling-LoadResult
+    title: Review that ReqStream Modeling LoadResult Implementation is Correct
+    paths:
+      - "docs/reqstream/reqstream/modeling/load-result.yaml"    # unit requirements
+      - "docs/design/reqstream/modeling/load-result.md"         # unit design
+      - "src/**/Modeling/LoadResult.cs"                         # implementation
+      - "test/**/Modeling/LoadResultTests.cs"                   # unit tests
+      - "test/**/Modeling/RequirementsLoadTests.cs"             # load result integration tests
+
+  - id: ReqStream-Modeling-Requirement
+    title: Review that ReqStream Modeling Requirement Implementation is Correct
+    paths:
+      - "docs/reqstream/reqstream/modeling/requirement.yaml"    # unit requirements
+      - "docs/design/reqstream/modeling/requirement.md"         # unit design
+      - "src/**/Modeling/Requirement.cs"                        # implementation
+      - "test/**/Modeling/RequirementTests.cs"                  # unit tests
+
   - id: ReqStream-Modeling-Requirements
     title: Review that ReqStream Modeling Requirements Implementation is Correct
     paths:
-      - "docs/reqstream/reqstream/modeling/requirements.yaml"  # unit requirements
-      - "docs/design/reqstream/modeling/requirements.md"    # unit design
-      - "src/**/Modeling/LintIssue.cs"                      # implementation
-      - "src/**/Modeling/LoadResult.cs"                     # implementation
-      - "src/**/Modeling/Requirement.cs"                    # implementation
-      - "src/**/Modeling/Requirements.cs"                   # implementation
-      - "src/**/Modeling/RequirementsLoader.cs"             # implementation
-      - "src/**/Modeling/Section.cs"                        # implementation
-      - "test/**/Modeling/RequirementsExportTests.cs"       # unit tests
-      - "test/**/Modeling/RequirementsLoadParsingTests.cs"  # unit tests
-      - "test/**/Modeling/RequirementsLoadTests.cs"         # unit tests
-      - "test/**/Modeling/RequirementsLoaderTests.cs"       # unit tests
+      - "docs/reqstream/reqstream/modeling/requirements.yaml"   # unit requirements
+      - "docs/design/reqstream/modeling/requirements.md"        # unit design
+      - "src/**/Modeling/Requirements.cs"                       # implementation
+      - "test/**/Modeling/RequirementsLoadTests.cs"             # unit tests
+      - "test/**/Modeling/RequirementsLoadParsingTests.cs"      # unit tests
+      - "test/**/Modeling/RequirementsExportTests.cs"           # unit tests
+
+  - id: ReqStream-Modeling-RequirementsLoader
+    title: Review that ReqStream Modeling RequirementsLoader Implementation is Correct
+    paths:
+      - "docs/reqstream/reqstream/modeling/requirements-loader.yaml"  # unit requirements
+      - "docs/design/reqstream/modeling/requirements-loader.md"       # unit design
+      - "src/**/Modeling/RequirementsLoader.cs"                       # implementation
+      - "test/**/Modeling/RequirementsLoaderTests.cs"                 # unit tests
+
+  - id: ReqStream-Modeling-Section
+    title: Review that ReqStream Modeling Section Implementation is Correct
+    paths:
+      - "docs/reqstream/reqstream/modeling/section.yaml"        # unit requirements
+      - "docs/design/reqstream/modeling/section.md"             # unit design
+      - "src/**/Modeling/Section.cs"                            # implementation
+      - "test/**/Modeling/SectionTests.cs"                      # unit tests
+      - "test/**/Modeling/RequirementsExportTests.cs"           # section hierarchy export tests
 
   - id: ReqStream-Tracing-TraceMatrix
     title: Review that ReqStream Tracing TraceMatrix Implementation is Correct

@@ -1,0 +1,23 @@
+---
+# LintIssue Unit Requirements
+#
+# PURPOSE:
+# - Define requirements for the LintIssue unit (LintIssue.cs)
+# - LintIssue represents a single issue discovered during requirements linting
+# - Unit requirements describe the issue representation and string formatting behavior
+
+sections:
+  - title: LintIssue Unit Requirements
+    requirements:
+      - id: ReqStream-Lint-IssueType
+        title: >-
+          LintIssue shall represent a lint issue with a location, severity, and description,
+          formatted as "location: severity: description".
+        justification: |
+          A structured issue type with a standardized string format allows callers to
+          programmatically inspect lint issues and allows editors and CI tools to parse the
+          output and navigate directly to the reported issue.
+        tags:
+          - lint
+        tests:
+          - LintIssue_ToString_FormatsCorrectly

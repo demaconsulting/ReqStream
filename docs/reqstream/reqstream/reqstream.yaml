@@ -4,6 +4,20 @@ sections:
     sections:
       - title: System Integration
         requirements:
+          - id: ReqStream-System-CliInterface
+            title: >-
+              The system shall display version or help information and exit when the
+              corresponding flag is provided.
+            justification: |
+              Providing version and help display at the system level ensures the CLI entry point
+              is a first-class system behavior, distinct from the requirements processing pipeline.
+            tests:
+              - Program_Run_WithVersionFlag_PrintsVersion
+              - Program_Run_WithHelpFlag_PrintsHelp
+            children:
+              - ReqStream-Program-Version
+              - ReqStream-Program-Help
+
           - id: ReqStream-System-FullPipeline
             title: >-
               The system shall process requirements files, load test results, generate reports, and
@@ -57,8 +71,11 @@ sections:
               silent failures in downstream processing.
             tests:
               - Program_Run_WithLintFlag_RunsLinter
+              - ReqStream_System_Lint_Flag_ReportsLintIssues
             children:
               - ReqStream-Modeling-Linting
+              - ReqStream-Program-LintVerbosity
+              - ReqStream-Program-LintNoFiles
 
           - id: ReqStream-System-Validate
             title: >-
@@ -69,6 +86,7 @@ sections:
               exercises core behaviors and produces a pass/fail summary.
             tests:
               - Program_Run_WithValidateFlag_RunsValidation
+              - ReqStream_System_Validate_Flag_RunsSelfValidation
             children:
               - ReqStream-SelfTest-Qualification
 
@@ -116,6 +134,7 @@ sections:
               reports, security audits, compliance documentation, and targeted reviews.
             tests:
               - TraceMatrix_Export_WithFilterTags_ExportsOnlyMatchingRequirements
+              - ReqStream_System_TagFilter_Flag_FiltersRequirements
             children:
               - ReqStream-Tracing-Coverage
               - ReqStream-Modeling-Export

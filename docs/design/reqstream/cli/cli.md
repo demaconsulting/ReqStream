@@ -46,12 +46,31 @@ The `Cli` subsystem exposes the following interface to the rest of the tool:
 | `Context.WriteLine`           | Outbound  | Writes a message to console and optional log file.                   |
 | `Context.WriteError`          | Outbound  | Writes an error to stderr and sets the error exit code.              |
 | `Context.ExitCode`            | Outbound  | Returns 0 for success or 1 when errors have been reported.           |
+| `Context.Dispose`             | Outbound  | Closes the log file writer and releases resources.                   |
 
 ## Interactions
 
 The `Cli` subsystem has no dependencies on other tool subsystems. It uses only .NET base
 class library types. The `Program` unit at system level creates the `Context` and passes it
 to all subsystems that need to produce output.
+
+## Error Handling
+
+`Context.Create` throws `ArgumentException` under the following conditions:
+
+| Condition | Description |
+|-----------|-------------|
+| Unknown argument | An unrecognized flag is present in `args`. |
+| Missing argument value | A flag that requires a value is the last argument (no value follows). |
+| Invalid depth value | A `--depth`, `--report-depth`, `--matrix-depth`, or `--justifications-depth` value is not a positive integer. |
+| Log file open failure | The file path provided to `--log` cannot be opened for writing. |
+
+## Depth Inheritance
+
+`Context.ReportDepth`, `Context.MatrixDepth`, and `Context.JustificationsDepth` all default
+to `Context.Depth` when not individually overridden by `--report-depth`, `--matrix-depth`, or
+`--justifications-depth` respectively. This means that `--depth 2` applies to all three reports
+unless a report-specific depth flag is also present.
 
 ## References
 
