@@ -32,7 +32,7 @@ validate and manage requirement documents in a structured and maintainable way.
 - 📤 **Export Capabilities** - Generate markdown reports for requirements, justifications, and test trace matrices
 - 📐 **Configurable Report Depth** - Control Markdown heading levels in exported reports via
   `--depth`, `--report-depth`, `--matrix-depth`, and `--justifications-depth` flags
-- �🔒 **Continuous Compliance** - Compliance evidence generated automatically on every CI run, following
+- 🔒 **Continuous Compliance** - Compliance evidence generated automatically on every CI run, following
   the [Continuous Compliance][link-continuous-compliance] methodology
 
 ## Installation
