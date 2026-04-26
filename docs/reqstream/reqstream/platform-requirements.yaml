@@ -2,7 +2,7 @@
 sections:
   - title: ReqStream Requirements
     sections:
-      - title: Platform Support
+      - title: System Integration
         requirements:
           - id: ReqStream-Platform-Windows
             title: The tool shall run on Windows operating systems.

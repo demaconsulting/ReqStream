@@ -22,9 +22,9 @@ The `SelfTest` subsystem contains the following software unit:
 
 The `SelfTest` subsystem exposes the following interface to the rest of the tool:
 
-| Interface        | Direction | Description                                                           |
-|------------------|-----------|-----------------------------------------------------------------------|
-| `Validation.Run` | Outbound  | Runs all self-validation tests, prints a summary, and writes results. |
+| Interface        | Description                                                           |
+|------------------|-----------------------------------------------------------------------|
+| `Validation.Run` | Runs all self-validation tests, prints a summary, and writes results. |
 
 ## Interactions
 
@@ -33,10 +33,17 @@ The `SelfTest` subsystem exposes the following interface to the rest of the tool
 | `Context`  | Uses      | Output channel for header lines, test summaries, and errors. |
 | `Program`  | Uses      | `Program.Run` is called internally to exercise the tool.     |
 
-## References
+## Error Handling
 
-- [ReqStream System Design][arch]
-- [ReqStream Repository][repo]
+The `SelfTest` subsystem handles the following error conditions:
 
-[arch]: ../reqstream.md
-[repo]: https://github.com/demaconsulting/ReqStream
+- **One or more self-validation tests fail** — `context.WriteError` is called for each failing test;
+  the method returns without setting a success state, so `context.ExitCode` is `1`.
+- **Results file has an unsupported extension** — `context.WriteError` is called with a descriptive
+  message; no results file is written.
+- **Results file cannot be written** (e.g., permission denied, path invalid) — `context.WriteError`
+  is called with the exception message; the file is not written and execution continues normally.
+
+> **Thread-safety constraint**: `Validation.Run` must not be called concurrently. Each test
+> method uses `DirectorySwitch` to mutate the process working directory, which is a process-wide
+> resource. See the Validation unit design documentation for details.

@@ -72,15 +72,18 @@ test from plain-name lookups in other requirements.
 
 When no `'@'` separator is present, all executions for the test name are summed across all result
 files. If the test name is not found in `_testExecutions`, the method returns `TestMetrics(0, 0)`,
-ensuring callers always receive a valid object. See the [Test Name Format Summary](#test-name-format-summary)
-table for a quick reference of both formats.
+ensuring callers always receive a valid object. See the Test Name Format Summary table below
+for a quick reference of both formats.
 
 ### `GetAllTestResults()`
 
 `GetAllTestResults` returns a read-only dictionary mapping each test name (referenced by any
 requirement in the tree) to its aggregated `TestMetrics`. Only tests that have been executed at
-least once (`Executed > 0`) are included in the result. This provides `Program` with a summary of
-all executed tests referenced in the requirements.
+least once (`Executed > 0`) are included; unexecuted tests are omitted. This method is not
+called by `Export` or `ExportTesting`: the Testing section is built by calling
+`BuildTestToRequirementsMap` and `GetTestResult` directly, so the Testing table includes
+unexecuted tests showing `0 / 0` counts. `GetAllTestResults` is available for callers that
+want an executed-only summary without generating a full report.
 
 ### `GetUnsatisfiedRequirements(filterTags)`
 
@@ -96,12 +99,12 @@ filtering) and returns a `(satisfied, total)` tuple. It calls `IsRequirementSati
 requirement to determine whether all associated tests have passed. This provides `Program` with the
 counts needed to report coverage status and determine whether `--enforce` should fail.
 
-### `CollectAllTests(requirement)`
+### `CollectAllTests(requirement, rootSection, allTests)`
 
 `CollectAllTests` returns the union of all test names associated with a requirement and its
 entire descendant subtree. Child requirements inherit their parent's coverage obligations, so a
 requirement is only considered covered when all tests across its whole subtree pass. Because
-`Requirements.ValidateCycles()` has already confirmed the child graph is acyclic, this method
+`RequirementsLoader.ValidateCycles()` has already confirmed the child graph is acyclic, this method
 recurses without a cycle guard.
 
 ### `IsRequirementSatisfied(requirement)`
@@ -113,9 +116,43 @@ requirement must be traced to at least one passing test.
 
 ### `Export(filePath, depth, filterTags)`
 
-`Export` writes the trace matrix to a Markdown file at `filePath`. The output lists each
-requirement (respecting `filterTags`), its associated tests, and the pass/fail status of each
-test. The heading depth for requirement IDs is controlled by `depth`.
+`Export` writes the trace matrix to a Markdown file at `filePath`. The output has three sections,
+written in this order by three helper methods: `ExportSummary`, `ExportRequirements`, and
+`ExportTesting`.
+
+**Output structure**:
+
+- **Summary** (`ExportSummary`) — Single sentence: "N of M requirements are satisfied with tests."
+- **Requirements** (`ExportRequirements`) — One sub-section per requirements section;
+  table with columns: ID, Tests Linked, Passed, Failed, Not Executed.
+- **Testing** (`ExportTesting`) — Flat table of all requirement-referenced tests (including
+  unexecuted ones showing 0/0);
+  columns: Test, Requirement, Passed, Failed.
+
+**Table format** (Requirements section): `| ID | Tests Linked | Passed | Failed | Not Executed |`
+
+**Table format** (Testing section): `| Test | Requirement | Passed | Failed |`
+
+The Requirements table rows show only the **direct** tests listed on each requirement (not child
+tests). The Summary satisfied-count is calculated by `CalculateSatisfiedRequirements`, which in
+turn calls `IsRequirementSatisfied`; that method uses `CollectAllTests` to recurse through the
+entire descendant subtree. This creates a deliberate asymmetry: the table shows direct-test counts
+while the Summary reflects full-subtree satisfaction.
+
+**Parameter behavior**:
+
+- `filePath`: required; an `ArgumentException` is thrown when `filePath` is null or empty.
+  On file-system write failure (for example, permission denied or an invalid path), the
+  underlying `IOException` or `UnauthorizedAccessException` is propagated to the caller without
+  wrapping.
+- `depth`: controls the starting Markdown heading level for the three top-level sections (Summary,
+  Requirements, Testing). Each requirements sub-section heading uses `depth + 1`; individual
+  requirements are rows in a table, not sub-headings. Defaults to `1`.
+- `filterTags`: when non-`null`, only requirements whose `Tags` list contains at least one
+  matching tag are included in the Requirements table and counted in the Summary. The Testing
+  section is filtered by the same criteria: tests linked only from filtered-out requirements do
+  not appear in the Testing table. Defaults to `null`.
+- `rootSection`: `_requirements` is used internally as the root to iterate the requirement tree.
 
 ## Test Name Format Summary
 
@@ -126,16 +163,6 @@ test. The heading depth for requirement IDs is controlled by `depth`.
 
 ## Interactions with Other Units
 
-| Unit | Nature of interaction |
-| ---- | --------------------- |
-| `Program` | Constructs `TraceMatrix`; calls `CalculateSatisfiedRequirements` and `Export` |
-| `Requirements` | Provides the requirement tree; iterated during analysis |
-| `Validation` | Exercises `TraceMatrix` with fixture test-result files in validation tests |
-
-## References
-
-- [ReqStream System Design][arch]
-- [ReqStream Repository][repo]
-
-[arch]: ../reqstream.md
-[repo]: https://github.com/demaconsulting/ReqStream
+- **`Program`** — Constructs `TraceMatrix`; calls `CalculateSatisfiedRequirements`, `GetUnsatisfiedRequirements`, and `Export`.
+- **`Requirements`** — Provides the requirement tree; iterated during analysis.
+- **`Validation`** — Exercises `TraceMatrix` with fixture test-result files in validation tests.

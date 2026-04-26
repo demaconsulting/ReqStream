@@ -11,7 +11,8 @@ error-handling boundary for the entire process. All meaningful work is delegated
 
 ### `Version`
 
-`Version` is a static read-only string property that resolves the tool's version at runtime.
+`Version` is a static read-only property backed by the private `_version` field, which is
+initialized once at class startup to avoid repeated reflection on every access.
 
 Resolution order:
 
@@ -60,8 +61,12 @@ immediately; the banner step (row 2) prints the banner and then falls through to
 | 2 | `context.Lint` is `false` | Call `PrintBanner` (no return; falls through to next step) |
 | 3 | `context.Help` is `true` | Call `PrintHelp`; return |
 | 4 | `context.Validate` is `true` | Call `Validation.Run(context)`; return |
-| 5 | `context.Lint` is `true` | Call `Requirements.Load(context.RequirementsFiles)`; report lint issues; return |
-| 6 | (default) | Call `ProcessRequirements(context)` |
+| 5 | `context.Lint` is `true`, no RequirementsFiles | Print "No requirements files specified"; return |
+| 6 | `context.Lint` is `true` | Call `Requirements.Load(context.RequirementsFiles)`; report lint issues; return |
+| 7 | (default) | Call `ProcessRequirements(context)` |
+
+With priorities 5 and 6 the `Run` method enters the `if (context.Lint)` block. Priority 5 guards
+the early-exit path for the no-files case; priority 6 is the normal lint path that follows.
 
 ### `PrintBanner`
 
@@ -79,11 +84,13 @@ argument, grouped logically. It is only called when `--help` is present.
 ### `ProcessRequirements`
 
 `ProcessRequirements` orchestrates the normal (non-version, non-help, non-validate, non-lint) run.
-It begins by calling `Requirements.Load(context.RequirementsFiles)` to build the parsed requirement
-tree. It then conditionally generates the requirements report (if `--report` is set) and the
-justifications report (if `--justifications` is set). If `--tests` files are provided, a
+If `context.RequirementsFiles` is empty, it writes "No requirements files specified." and returns
+immediately. Otherwise it calls `Requirements.Load(context.RequirementsFiles)` to build the parsed
+requirement tree. It then conditionally generates the requirements report (if `--report` is set)
+and the justifications report (if `--justifications` is set). If `--tests` files are provided, a
 `TraceMatrix` is constructed from the requirement tree and the test result files to enable coverage
-analysis. If `--matrix` is set and a `TraceMatrix` was built, the trace matrix report is exported.
+analysis. If `--matrix` is set and a `TraceMatrix` was built, the trace matrix report is exported;
+if `--matrix` is set but no test files were provided, the matrix export is silently skipped.
 If `--enforce` is active, `EnforceRequirementsCoverage` is called last so that all reports are
 generated even when coverage fails. All export methods respect `context.FilterTags` for tag-filtered
 output.
@@ -94,7 +101,9 @@ output.
 no `TraceMatrix` was built (i.e., no `--tests` argument was provided), it reports an error
 indicating that enforcement requires test results. Otherwise, it calls
 `traceMatrix.CalculateSatisfiedRequirements(context.FilterTags)` to obtain satisfied and total
-counts, and reports each unsatisfied requirement via `context.WriteError` if any are found.
+counts. If any requirements are unsatisfied, it calls
+`traceMatrix.GetUnsatisfiedRequirements(context.FilterTags)` to retrieve the list of unsatisfied
+requirement IDs and reports each one via `context.WriteError`.
 
 This method never throws; all failure signalling goes through `context.WriteError`, which sets the
 internal error flag and eventually produces a non-zero exit code.
@@ -107,11 +116,3 @@ internal error flag and eventually produces a non-zero exit code.
 | `Validation` | Called by `Run` when `--validate` is present |
 | `Requirements` | Constructed in `ProcessRequirements`; provides the requirement tree; also used for linting |
 | `TraceMatrix` | Constructed in `ProcessRequirements` when test files are present |
-
-## References
-
-- [ReqStream System Design][arch]
-- [ReqStream Repository][repo]
-
-[arch]: reqstream.md
-[repo]: https://github.com/demaconsulting/ReqStream

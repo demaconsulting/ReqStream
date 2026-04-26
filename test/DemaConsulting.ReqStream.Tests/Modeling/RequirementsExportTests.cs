@@ -58,6 +58,7 @@ public class RequirementsExportTests
     [TestMethod]
     public void Requirements_Export_SimpleRequirements_CreatesMarkdownFile()
     {
+        // Arrange: create a requirements YAML file with two security requirements
         var yamlContent = @"---
 sections:
   - title: System Security
@@ -73,6 +74,7 @@ sections:
         Assert.IsNotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act: export requirements to a Markdown file
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         requirements.Export(mdPath);
 
@@ -90,6 +92,7 @@ sections:
     [TestMethod]
     public void Requirements_Export_WithCustomDepth_UsesCorrectHeaderLevel()
     {
+        // Arrange: create a requirements YAML file with one requirement
         var yamlContent = @"---
 sections:
   - title: System Security
@@ -103,6 +106,7 @@ sections:
         Assert.IsNotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act: export with depth 3
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         requirements.Export(mdPath, depth: 3);
 
@@ -116,6 +120,7 @@ sections:
     [TestMethod]
     public void Requirements_Export_NestedSections_CreatesHierarchy()
     {
+        // Arrange: create a requirements YAML file with nested sections
         var yamlContent = @"---
 sections:
   - title: Data Management
@@ -135,6 +140,7 @@ sections:
         Assert.IsNotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act: export requirements to Markdown
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         requirements.Export(mdPath);
 
@@ -152,6 +158,7 @@ sections:
     [TestMethod]
     public void Requirements_Export_SectionWithNoRequirements_CreatesHeaderOnly()
     {
+        // Arrange: create a requirements YAML file with a parent section that has no direct requirements
         var yamlContent = @"---
 sections:
   - title: Parent Section
@@ -167,6 +174,7 @@ sections:
         Assert.IsNotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act: export requirements to Markdown
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         requirements.Export(mdPath);
 
@@ -182,6 +190,7 @@ sections:
     [TestMethod]
     public void Requirements_Export_NullFilePath_ThrowsArgumentException()
     {
+        // Arrange: load a valid requirements file
         var yamlContent = @"---
 sections:
   - title: System Security
@@ -195,6 +204,7 @@ sections:
         Assert.IsNotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act + Assert: calling Export with null path throws ArgumentException
         var ex = Assert.ThrowsExactly<ArgumentException>(() => requirements.Export(null!));
         Assert.Contains("File path cannot be null or empty", ex.Message);
     }
@@ -205,6 +215,7 @@ sections:
     [TestMethod]
     public void Requirements_Export_EmptyFilePath_ThrowsArgumentException()
     {
+        // Arrange: load a valid requirements file
         var yamlContent = @"---
 sections:
   - title: System Security
@@ -218,6 +229,7 @@ sections:
         Assert.IsNotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act + Assert: calling Export with empty path throws ArgumentException
         var ex = Assert.ThrowsExactly<ArgumentException>(() => requirements.Export(string.Empty));
         Assert.Contains("File path cannot be null or empty", ex.Message);
     }
@@ -228,6 +240,7 @@ sections:
     [TestMethod]
     public void Requirements_Export_MultipleSections_ExportsAll()
     {
+        // Arrange: create a requirements YAML file with two top-level sections
         var yamlContent = @"---
 sections:
   - title: System Security
@@ -245,6 +258,7 @@ sections:
         Assert.IsNotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act: export requirements to Markdown
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         requirements.Export(mdPath);
 
@@ -261,6 +275,7 @@ sections:
     [TestMethod]
     public void Requirements_Export_EmptyRequirements_CreatesEmptyFile()
     {
+        // Arrange: create an empty requirements YAML file
         var yamlContent = @"---
 ";
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
@@ -269,6 +284,7 @@ sections:
         Assert.IsNotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act: export requirements to Markdown
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         requirements.Export(mdPath);
 
@@ -283,6 +299,7 @@ sections:
     [TestMethod]
     public void Requirements_ExportJustifications_WithJustifications_CreatesMarkdownFile()
     {
+        // Arrange: create a requirements YAML file with two requirements with justifications
         var yamlContent = @"---
 sections:
   - title: System Security
@@ -304,6 +321,7 @@ sections:
         Assert.IsNotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act: export justifications to Markdown
         var mdPath = Path.Combine(_testDirectory, "justifications.md");
         requirements.ExportJustifications(mdPath);
 
@@ -324,6 +342,7 @@ sections:
     [TestMethod]
     public void Requirements_ExportJustifications_WithCustomDepth_UsesCorrectHeaderLevel()
     {
+        // Arrange: create a requirements YAML file with one requirement with justification
         var yamlContent = @"---
 sections:
   - title: System Security
@@ -338,6 +357,7 @@ sections:
         Assert.IsNotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act: export justifications with depth 2
         var mdPath = Path.Combine(_testDirectory, "justifications.md");
         requirements.ExportJustifications(mdPath, depth: 2);
 
@@ -353,6 +373,7 @@ sections:
     [TestMethod]
     public void Requirements_ExportJustifications_WithoutJustifications_CreatesHeadersOnly()
     {
+        // Arrange: create a requirements YAML file with a requirement that has no justification
         var yamlContent = @"---
 sections:
   - title: System Security
@@ -366,6 +387,7 @@ sections:
         Assert.IsNotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act: export justifications to Markdown
         var mdPath = Path.Combine(_testDirectory, "justifications.md");
         requirements.ExportJustifications(mdPath);
 
@@ -403,6 +425,7 @@ sections:
     [TestMethod]
     public void Requirements_ExportJustifications_NestedSections_CreatesHierarchy()
     {
+        // Arrange: create a requirements YAML file with nested sections and justifications
         var yamlContent = @"---
 sections:
   - title: Data Management
@@ -419,6 +442,7 @@ sections:
         Assert.IsNotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act: export justifications to Markdown
         var mdPath = Path.Combine(_testDirectory, "justifications.md");
         requirements.ExportJustifications(mdPath);
 
@@ -436,6 +460,7 @@ sections:
     [TestMethod]
     public void Requirements_Export_WithFilterTags_ExportsOnlyMatchingRequirements()
     {
+        // Arrange: create a requirements YAML file with requirements tagged security and performance
         var yamlContent = @"---
 sections:
   - title: System Security
@@ -460,6 +485,7 @@ sections:
         Assert.IsNotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act: export with security filter
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         var filterTags = new HashSet<string> { "security" };
         requirements.Export(mdPath, filterTags: filterTags);
@@ -479,6 +505,7 @@ sections:
     [TestMethod]
     public void Requirements_Export_WithMultipleFilterTags_ExportsRequirementsMatchingAnyTag()
     {
+        // Arrange: create a requirements YAML file with security, performance, and data-integrity requirements
         var yamlContent = @"---
 sections:
   - title: System Security
@@ -502,6 +529,7 @@ sections:
         Assert.IsNotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act: export with security and data-integrity filter
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         var filterTags = new HashSet<string> { "security", "data-integrity" };
         requirements.Export(mdPath, filterTags: filterTags);
@@ -519,6 +547,7 @@ sections:
     [TestMethod]
     public void Requirements_Export_WithFilterMatchingNoRequirements_ExportsEmptyFile()
     {
+        // Arrange: create a requirements YAML file with only security-tagged requirements
         var yamlContent = @"---
 sections:
   - title: System Security
@@ -534,6 +563,7 @@ sections:
         Assert.IsNotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act: export with a performance filter that matches nothing
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         var filterTags = new HashSet<string> { "performance" };
         requirements.Export(mdPath, filterTags: filterTags);
@@ -550,6 +580,7 @@ sections:
     [TestMethod]
     public void Requirements_Export_WithoutFilter_ExportsAllRequirements()
     {
+        // Arrange: create a requirements YAML file with security and performance requirements
         var yamlContent = @"---
 sections:
   - title: System Security
@@ -569,6 +600,7 @@ sections:
         Assert.IsNotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act: export with no filter
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         requirements.Export(mdPath);
 
@@ -584,6 +616,7 @@ sections:
     [TestMethod]
     public void Requirements_ExportJustifications_WithFilterTags_ExportsOnlyMatchingRequirements()
     {
+        // Arrange: create a requirements YAML file with security and performance requirements with justifications
         var yamlContent = @"---
 sections:
   - title: System Security
@@ -606,6 +639,7 @@ sections:
         Assert.IsNotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act: export justifications with security filter
         var mdPath = Path.Combine(_testDirectory, "justifications.md");
         var filterTags = new HashSet<string> { "security" };
         requirements.ExportJustifications(mdPath, filterTags: filterTags);
@@ -624,6 +658,7 @@ sections:
     [TestMethod]
     public void Requirements_Export_WithFilterExcludesEmptySections_OnlyShowsSectionsWithMatchingRequirements()
     {
+        // Arrange: create a requirements YAML file with two top-level sections, each with differently tagged requirements
         var yamlContent = @"---
 sections:
   - title: System Security
@@ -645,6 +680,7 @@ sections:
         Assert.IsNotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act: export with security filter
         var mdPath = Path.Combine(_testDirectory, "requirements.md");
         var filterTags = new HashSet<string> { "security" };
         requirements.Export(mdPath, filterTags: filterTags);

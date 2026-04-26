@@ -1,0 +1,82 @@
+---
+# Requirement Unit Requirements
+#
+# PURPOSE:
+# - Define requirements for the Requirement unit (Requirement.cs)
+# - Requirement is the domain model for a single requirement entry
+# - Unit requirements describe the data that each requirement must hold
+
+sections:
+  - title: Requirement Unit Requirements
+    requirements:
+      - id: ReqStream-Requirements-UniqueIds
+        title: Each requirement shall have a unique identifier.
+        justification: |
+          Unique identifiers enable unambiguous referencing of requirements in documentation, test
+          mappings, and traceability reports.
+        tags:
+          - requirements
+        tests:
+          - Requirements_Load_DuplicateRequirementId_ReportsError
+          - Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation
+          - Requirements_Load_MultipleFilesWithDuplicateIds_ReportsError
+
+      - id: ReqStream-Requirements-RequiredTitle
+        title: Each requirement shall have a title.
+        justification: |
+          Titles provide human-readable descriptions of requirements, making them understandable to
+          stakeholders without needing to reference external documentation.
+        tags:
+          - requirements
+        tests:
+          - Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation
+
+      - id: ReqStream-Requirements-ParentChild
+        title: >-
+          Requirement shall support parent-child relationships to other requirements,
+          and blank child IDs shall be rejected.
+        justification: |
+          Parent-child relationships enable hierarchical requirement decomposition, allowing high-level
+          requirements to be satisfied through lower-level requirements. Rejecting blank child IDs
+          prevents silent failures in cycle detection and trace matrix generation.
+        tags:
+          - requirements
+        tests:
+          - Requirements_Load_RequirementWithChildren_ParsesChildrenCorrectly
+          - Requirements_Load_BlankChildIdInRequirement_ReportsErrorWithFileLocation
+
+      - id: ReqStream-Requirements-Tags
+        title: >-
+          Requirement shall support optional tags, and blank tag names shall be rejected.
+        justification: |
+          Tags allow requirements to be categorized and filtered for targeted exports. Rejecting blank
+          tag names prevents silent failures in tag-based filtering and export operations.
+        tags:
+          - requirements
+        tests:
+          - Requirements_Load_RequirementWithTags_ParsesTagsCorrectly
+          - Requirements_Load_BlankTagName_ReportsErrorWithFileLocation
+
+      - id: ReqStream-Requirements-Justification
+        title: Requirement shall support an optional justification field.
+        justification: |
+          Justification text allows stakeholders to understand why a requirement exists without
+          needing to consult external documentation, improving auditability and traceability.
+        tags:
+          - requirements
+        tests:
+          - Requirements_Load_RequirementWithJustification_ParsesJustificationCorrectly
+
+      - id: ReqStream-Requirements-TestMappings
+        title: Requirement shall store linked test identifiers.
+        justification: |
+          Test mappings establish traceability between requirements and tests, enabling verification
+          that requirements are adequately tested and satisfied.
+        tags:
+          - requirements
+        tests:
+          - Requirements_Load_RequirementWithTests_ParsesTestsCorrectly
+          - Requirements_Load_BlankTestNameInRequirement_ReportsErrorWithFileLocation
+          - Requirements_Load_TestMappings_AppliesMappingsCorrectly
+          - Requirements_Load_BlankTestNameInMapping_ReportsErrorWithFileLocation
+          - Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation

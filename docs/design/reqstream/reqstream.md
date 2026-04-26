@@ -3,8 +3,9 @@
 ## Overview
 
 This chapter describes how the ReqStream software units work together as an integrated system.
-Where the unit chapters (Program, Context, Validation, Requirements, TraceMatrix) each
-describe one component in isolation, this chapter focuses on the end-to-end data flow, the
+Where the unit and subsystem chapters (Program, Cli, Context, Modeling, LintIssue, LoadResult,
+Requirement, Requirements, RequirementsLoader, Section, Tracing, TraceMatrix, SelfTest, Validation)
+each describe one component in isolation, this chapter focuses on the end-to-end data flow, the
 coordination points between units, and the integrated scenarios that the units collectively
 enable.
 
@@ -21,7 +22,9 @@ processing invocation:
 | `Context.TestFiles` | Glob-expanded file paths | `TraceMatrix` constructor |
 | Requirement tree | Requirements | `TraceMatrix` constructor |
 | `TraceMatrix` | Coverage data | `Program.EnforceRequirementsCoverage` |
-| `TraceMatrix` / requirement tree | Export input | Report files |
+| Requirement tree | Export input | Requirements and justifications report files (`--report`, `--justifications`) |
+| `TraceMatrix` + requirement tree | Export input | Trace matrix report file (`--matrix`) |
+| `Context.ResultsFile` | Output file path | `Validation.Run` |
 
 ## Integrated Processing Pipeline
 
@@ -44,6 +47,12 @@ non-validate, non-lint) invocation:
    `EnforceRequirementsCoverage` compares the satisfied-requirement count against the total count.
    Any unsatisfied requirement causes an error to be written to `context`, which results in a
    non-zero exit code.
+7. **Tag filtering** — if `--filter` is set, `Context.FilterTags` holds the list of tag strings.
+   This list is passed as the `filterTags` parameter to `Requirements.Export`,
+   `TraceMatrix.Export`, `TraceMatrix.CalculateSatisfiedRequirements`, and
+   `TraceMatrix.GetUnsatisfiedRequirements`. Tag filtering is therefore applied transparently
+   at each operation in steps 3, 5, and 6 rather than as a separate pipeline stage; only
+   requirements carrying at least one matching tag are included in reports and enforcement.
 
 ## Source-Specific Test Matching
 
@@ -67,8 +76,9 @@ correct platform.
 ## Lint Flow
 
 When `--lint` is specified, `Program.Run` loads the requirements files via
-`Requirements.Load(context.RequirementsFiles)` and reports any lint issues. The lint flow differs
-from normal processing in two important ways:
+`Requirements.Load(context.RequirementsFiles)`, calls `result.ReportIssues(context)` to route each
+lint issue through the `Context` output channel, and then exits. The lint flow differs from normal
+processing in two important ways:
 
 1. **No banner** — `PrintBanner` is suppressed so that only actionable issue lines appear in the
    output, making it straightforward to integrate `--lint` into editor tooling or CI scripts that
@@ -82,7 +92,10 @@ When `--validate` is specified, `Program.Run` delegates entirely to `Validation.
 `Validation` is self-contained: it creates temporary directories, writes fixture files, and invokes
 the same `Program` methods used in normal processing. The self-validation path exercises the
 integrated pipeline internally and produces structured test-result output in TRX or JUnit format
-so that the evidence can be fed back into ReqStream's own requirements enforcement.
+so that the evidence can be fed back into ReqStream's own requirements enforcement. When
+`Context.ResultsFile` is non-`null` (set by the `--results` flag), `Validation.Run` writes the
+test-result output to that file path; otherwise the results are written only to the console
+output channel.
 
 ## Interactions Between Units
 
@@ -95,33 +108,31 @@ so that the evidence can be fed back into ReqStream's own requirements enforceme
 | `Program` | `TraceMatrix` | `ProcessRequirements` | Loads test results and maps them to requirements |
 | `Validation` | `Program` | test methods | Invokes `Program.Run` to exercise the full pipeline |
 
-## Component Interaction Diagram
+## Error and Output Data Flow
 
-The following diagram shows the data flow between units during a standard requirements processing
-invocation:
+The following table shows how errors and results flow between units during a standard requirements
+processing invocation, tracing them from origin to the process exit code:
 
-```mermaid
-flowchart TD
-    yaml[YAML Files]
-    tests[Test Result Files]
-    args[CLI Arguments]
-    ctx[Context<br/>options & output]
-    req[Requirements.Load<br/>parsed tree + lint issues]
-    tm[TraceMatrix<br/>coverage analysis]
-    issues[Lint Issues<br/>warnings · errors]
-    reports[Markdown Reports<br/>requirements · justifications · trace matrix]
-    exit[Exit Code<br/>0 = pass · 1 = fail]
+| Source | Data | Destination |
+| ------ | ---- | ----------- |
+| CLI arguments | Parsed flags and file paths | `Context` |
+| YAML files | Requirements content | `Requirements.Load` |
+| Test result files | Test execution records | `TraceMatrix` |
+| `Context` | Expanded file lists and flags | `Requirements.Load` |
+| `Requirements.Load` | Parsed requirement tree | `Program` |
+| `Program` | Parsed requirement tree | `TraceMatrix` |
+| `Requirements.Load` + `result.ReportIssues` | Lint warnings/errors | `context.WriteError` → `Context.ExitCode` |
+| `TraceMatrix` | Coverage analysis | Markdown reports |
+| `Program.EnforceRequirementsCoverage` | Unsatisfied requirements | `context.WriteError` → `Context.ExitCode` |
 
-    yaml --> req
-    tests --> tm
-    args --> ctx
-    ctx --> req
-    req --> tm
-    req --> issues
-    tm --> reports
-    tm --> exit
-    issues --> exit
-```
+## Platform Support
+
+ReqStream targets the `net8.0`, `net9.0`, and `net10.0` target framework monikers using .NET's
+multi-targeting build. Because all runtime dependencies (YamlDotNet, DemaConsulting.TestResults)
+ship as portable NuGet packages and no platform-specific APIs are used anywhere in the codebase,
+the resulting binaries run without modification on Windows, Linux, and macOS. The GitHub Actions
+CI matrix executes the full test suite on all three operating systems and all three .NET versions
+on every build, providing continuous evidence that the platform requirements are satisfied.
 
 ## Design Decisions
 
@@ -144,7 +155,7 @@ by feature, component, or responsibility and still produce one coherent requirem
 ### Immutable Data Structures
 
 Properties prevent modification after construction; collections allow population during construction
-but not replacement. `TestMetrics` and `TestExecution` are immutable records. This removes an entire
+but not replacement. Internal value types within `TraceMatrix` are immutable records. This removes an entire
 class of concurrency and aliasing bugs and makes the data model easy to reason about.
 
 ### Error Context and Testability
@@ -162,9 +173,3 @@ without mocking or fixtures.
 | Composite | `Section` trees enable recursive traversal for export and satisfaction calculation |
 | Strategy | Test result parsing tries TRX first, then JUnit; name matching tries source-specific first, then plain |
 | Disposable | `Context` implements `IDisposable` for deterministic log file cleanup |
-
-## References
-
-- [ReqStream Repository][repo]
-
-[repo]: https://github.com/demaconsulting/ReqStream

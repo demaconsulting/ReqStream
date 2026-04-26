@@ -37,3 +37,29 @@ sections:
               - validation
             tests:
               - Validation_Run_WithInvalidResultsExtension_ReportsError
+
+          - id: ReqStream-Validation-WriteFailure-ReportsError
+            title: >-
+              The tool shall report an error when the self-validation results file cannot be
+              written.
+            justification: |
+              Reporting a write error ensures that the exit code reflects the failure and
+              guides users to diagnose file system conditions that prevent the results file
+              from being created.
+            tags:
+              - validation
+            tests:
+              - Validation_Run_WithUnwritableResultsFile_ReportsError
+
+          - id: ReqStream-Validation-WriteFailure-Continues
+            title: >-
+              The tool shall continue processing and produce the self-validation summary when
+              the results file cannot be written.
+            justification: |
+              Continuing execution after a write failure ensures that the self-validation
+              summary is still produced, even when file system conditions prevent the results
+              file from being created.
+            tags:
+              - validation
+            tests:
+              - Validation_Run_WithUnwritableResultsFile_Continues

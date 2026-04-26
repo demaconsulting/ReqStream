@@ -27,6 +27,7 @@ namespace DemaConsulting.ReqStream.Tests.SelfTest;
 /// Unit tests for the Validation class.
 /// </summary>
 [TestClass]
+[DoNotParallelize]
 public class ValidationTests
 {
     private string _testDirectory = string.Empty;
@@ -145,6 +146,49 @@ public class ValidationTests
         var xmlContent = File.ReadAllText(resultsFile);
         Assert.StartsWith("<?xml", xmlContent);
         Assert.Contains("testsuite", xmlContent);
+    }
+
+    /// <summary>
+    /// Test that Run reports an error and continues when the results file cannot be written.
+    /// </summary>
+    [TestMethod]
+    public void Validation_Run_WithUnwritableResultsFile_ReportsError()
+    {
+        // Arrange: create a directory at the results file path to force a write failure
+        var resultsFile = Path.Combine(_testDirectory, "unwritable-results.trx");
+        Directory.CreateDirectory(resultsFile);
+        using var context = Context.Create(["--silent", "--results", resultsFile]);
+
+        // Act: run validation
+        Validation.Run(context);
+
+        // Assert: exit code must be 1 indicating the write failure was reported
+        Assert.AreEqual(1, context.ExitCode);
+    }
+
+    /// <summary>
+    /// Test that Run continues and produces a summary when the results file cannot be written.
+    /// </summary>
+    [TestMethod]
+    public void Validation_Run_WithUnwritableResultsFile_Continues()
+    {
+        // Arrange: create a log file to capture output, and a directory at the results path to force a write failure
+        var logFile = Path.Combine(_testDirectory, "validation-continues.log");
+        var resultsFile = Path.Combine(_testDirectory, "unwritable-results2.trx");
+        Directory.CreateDirectory(resultsFile);
+
+        // Act: run validation with the unwritable results file, capturing output to the log
+        using (var context = Context.Create(["--silent", "--log", logFile, "--results", resultsFile]))
+        {
+            Validation.Run(context);
+        }
+
+        // Assert: the summary block is still present in the log despite the write failure
+        Assert.IsTrue(File.Exists(logFile), "Log file should exist");
+        var logContent = File.ReadAllText(logFile);
+        Assert.Contains("Total Tests:", logContent);
+        Assert.Contains("Passed:", logContent);
+        Assert.Contains("Failed:", logContent);
     }
 
     /// <summary>

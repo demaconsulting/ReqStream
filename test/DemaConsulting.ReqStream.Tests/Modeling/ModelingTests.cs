@@ -138,6 +138,8 @@ public class ModelingTests
 
         // Assert: an error-level lint issue was detected
         Assert.IsTrue(result.HasErrors);
+        Assert.IsTrue(result.Issues.Count > 0, "Expected at least one lint issue to be reported.");
+        Assert.IsTrue(result.Issues.Any(i => i.Severity == LintSeverity.Error), "Expected at least one Error-severity lint issue.");
     }
 
     /// <summary>
@@ -204,5 +206,88 @@ public class ModelingTests
         var content = File.ReadAllText(justificationsFile);
         Assert.Contains("Modeling-Test-Req2", content);
         Assert.Contains("This justification explains why the requirement is needed.", content);
+    }
+
+    /// <summary>
+    /// Test that the Modeling subsystem detects an error when loading a malformed YAML file.
+    /// </summary>
+    [TestMethod]
+    public void Modeling_Linting_MalformedYaml_DetectsError()
+    {
+        // Arrange: create a requirements file containing malformed YAML
+        var reqFile = Path.Combine(_testDirectory, "malformed.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: Bad Requirements
+                requirements:
+                  - id: [unclosed bracket
+            """);
+
+        // Act: load the malformed requirements file through the Modeling subsystem entry point
+        var result = Requirements.Load(reqFile);
+
+        // Assert: an error-level lint issue is reported and requirements are null
+        Assert.IsTrue(result.HasErrors);
+        Assert.IsNull(result.Requirements);
+        Assert.IsTrue(result.Issues.Count > 0, "Expected at least one lint issue to be reported.");
+        Assert.IsTrue(result.Issues.Any(i => i.Severity == LintSeverity.Error), "Expected at least one Error-severity lint issue.");
+    }
+
+    /// <summary>
+    /// Test that the Modeling subsystem reports no issues when loading a valid requirements file.
+    /// </summary>
+    [TestMethod]
+    public void Modeling_Linting_ValidFile_ReturnsNoIssues()
+    {
+        // Arrange: create a structurally valid requirements YAML file
+        var reqFile = Path.Combine(_testDirectory, "valid.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: Valid Linting Requirements
+                requirements:
+                  - id: Modeling-Lint-Valid-Req1
+                    title: The system shall satisfy this requirement.
+                    justification: Justification for the requirement.
+                    tests:
+                      - Modeling_Linting_ValidFile_ReturnsNoIssues
+            """);
+
+        // Act: load the valid requirements file through the Modeling subsystem entry point
+        var result = Requirements.Load(reqFile);
+
+        // Assert: no lint issues are reported
+        Assert.IsFalse(result.HasErrors);
+        Assert.HasCount(0, result.Issues);
+    }
+
+    /// <summary>
+    /// Test that the Modeling subsystem reports ALL lint issues when multiple independent
+    /// lint conditions are present in one load, not just the first one encountered.
+    /// </summary>
+    [TestMethod]
+    public void Modeling_LintingReporting_MultipleConditions_ReportsAllIssues()
+    {
+        // Arrange: create a requirements file with two independent lint errors:
+        //   (1) a section missing its title field
+        //   (2) a requirement missing its title field
+        var reqFile = Path.Combine(_testDirectory, "multi_lint.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - requirements:
+                  - id: Modeling-MultiLint-Req1
+              - title: Second Section
+                requirements:
+                  - id: Modeling-MultiLint-Req2
+            """);
+
+        // Act: load through the Modeling subsystem entry point
+        var result = Requirements.Load(reqFile);
+
+        // Assert: both lint issues are reported (not just HasErrors == true)
+        Assert.IsTrue(result.HasErrors);
+        Assert.IsTrue(result.Issues.Count >= 2,
+            $"Expected at least 2 lint issues but got {result.Issues.Count}.");
+        Assert.IsTrue(result.Issues.All(i => i.Severity == LintSeverity.Error),
+            "All reported issues should be Error severity.");
     }
 }

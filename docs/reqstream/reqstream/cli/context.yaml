@@ -16,24 +16,37 @@ sections:
               - Context_Create_MultipleArguments_ParsesAllCorrectly
 
           - id: ReqStream-Command-Version
-            title: The tool shall display version information when requested.
+            title: The tool shall accept a `--version` flag.
             justification: |
-              Version information is critical for debugging, support, and ensuring compatibility with
-              documentation and scripts.
+              Recording the version flag in Context allows Program to detect the request and print
+              version information without requiring Context to have any knowledge of the version string.
             tags:
               - cli
             tests:
               - Context_Create_VersionFlag_SetsVersionProperty
 
           - id: ReqStream-Command-Help
-            title: The tool shall display help information when requested.
+            title: The tool shall accept a `--help` flag.
             justification: |
-              Help information improves user experience and reduces the learning curve for new users by
-              providing quick access to command-line options.
+              Recording the help flag in Context allows Program to detect the request and print
+              usage documentation without coupling help content to the argument-parsing layer.
             tags:
               - cli
             tests:
               - Context_Create_HelpFlags_SetsHelpProperty
+
+          - id: ReqStream-Command-Silent
+            title: The tool shall support suppressing console output.
+            justification: |
+              Suppressing console output enables quiet operation in automated pipelines where output
+              is captured to a log file or is otherwise unwanted, preventing the pipeline log from
+              being cluttered with tool output.
+            tags:
+              - cli
+            tests:
+              - Context_Create_SilentFlag_SetsSilentProperty
+              - Context_WriteLine_SilentMode_DoesNotWriteToConsole
+              - Context_WriteError_SilentMode_DoesNotWriteToConsole
 
           - id: ReqStream-Command-ErrorOutput
             title: The tool shall write error messages to stderr.
@@ -45,19 +58,29 @@ sections:
             tests:
               - Context_WriteError_NormalMode_WritesToConsole
 
-          - id: ReqStream-Command-InvalidArgs
-            title: The tool shall reject unknown or malformed command-line arguments with a descriptive error.
+          - id: ReqStream-Command-UnknownArgs
+            title: The tool shall reject unknown command-line arguments with a descriptive error.
             justification: |
-              Providing clear feedback for invalid arguments helps users quickly correct
-              mistakes and prevents silent misconfiguration.
+              Providing clear feedback for unrecognized arguments helps users quickly identify
+              typos and prevents silent misconfiguration caused by arguments being silently ignored.
             tags:
               - cli
             tests:
               - Context_Create_UnsupportedArgument_ThrowsException
+
+          - id: ReqStream-Command-MalformedArgs
+            title: The tool shall reject malformed command-line arguments with a descriptive error.
+            justification: |
+              Providing clear feedback when a flag that requires a value is missing its value
+              helps users quickly correct mistakes and prevents silent misconfiguration.
+            tags:
+              - cli
+            tests:
               - Context_Create_MissingLogFilename_ThrowsException
               - Context_Create_MissingResultsFilename_ThrowsException
+              - Context_Create_FilterArgumentMissingValue_ThrowsException
 
-          - id: ReqStream-Requirements-GlobPatterns
+          - id: ReqStream-Command-RequirementsGlobPatterns
             title: The tool shall support glob patterns for requirements files.
             justification: |
               Glob patterns enable flexible file selection and reduce the need for explicit file listing,
@@ -67,7 +90,7 @@ sections:
             tests:
               - Context_Create_WithRequirementsPattern_ExpandsGlobPattern
 
-          - id: ReqStream-Requirements-TestGlobPatterns
+          - id: ReqStream-Command-TestGlobPatterns
             title: The tool shall support glob patterns for test result files.
             justification: |
               Glob patterns for test result files simplify CI/CD configuration by enabling flexible
@@ -80,8 +103,8 @@ sections:
           - id: ReqStream-Command-Validate
             title: The tool shall accept a validate flag to trigger self-validation mode.
             justification: |
-              Parsing the validate flag enables the Context unit to signal to the Program unit
-              that self-validation mode should be activated, supporting tool qualification workflows.
+              Accepting a validate flag allows users to request self-validation mode from the command
+              line, supporting tool qualification workflows.
             tags:
               - cli
             tests:
@@ -90,23 +113,23 @@ sections:
           - id: ReqStream-Command-Enforce
             title: The tool shall accept an enforce flag to activate requirements enforcement mode.
             justification: |
-              Parsing the enforce flag enables the Context unit to signal to the Program unit that
-              enforcement mode should be activated, ensuring CI/CD pipelines can block releases
-              when requirements lack test coverage.
+              Accepting an enforce flag allows CI/CD pipelines to activate enforcement mode,
+              enabling builds to be blocked when requirements lack test coverage.
             tags:
               - cli
             tests:
               - Context_Create_EnforceFlag_SetsEnforceProperty
 
           - id: ReqStream-Command-ExitCode
-            title: The tool shall return a non-zero exit code on failure.
+            title: The tool shall exit with a non-zero exit code when an error has been reported during execution.
             justification: |
-              Callers (scripts, CI/CD pipelines) must be able to detect failure conditions
-              programmatically via the process exit code.
+              Exposing an exit code property allows Program to return the correct process exit code
+              based on whether errors were reported during execution, enabling callers to detect
+              failure conditions programmatically.
             tags:
               - cli
             tests:
-              - Context_WriteError_NormalMode_WritesToConsole
+              - Context_ExitCode_AfterWriteError_ReturnsOne
 
           - id: ReqStream-Command-ReportDepth
             title: The tool shall support configurable markdown header depth for requirements reports.
@@ -154,16 +177,83 @@ sections:
               - Context_Create_FilterSingleTag_ParsesCorrectly
               - Context_Create_MultipleFilterArguments_MergesIntoSingleSet
 
-      - title: Logging
-        requirements:
-          - id: ReqStream-Logging-FileOutput
+          - id: ReqStream-Command-Lint
+            title: The tool shall accept a lint flag to activate requirements linting mode.
+            justification: |
+              Accepting a lint flag allows users to request structural validation of requirements
+              files from the command line, enabling lint checks to be integrated into CI/CD pipelines
+              and editor workflows.
+            tags:
+              - cli
+            tests:
+              - Context_Create_LintFlag_SetsLintProperty
+
+          - id: ReqStream-Command-Results
+            title: The tool shall accept a results file path for writing self-validation output.
+            justification: |
+              Writing self-validation results to a file enables CI/CD pipelines and traceability
+              tools to consume the output in standard TRX or JUnit XML formats.
+            tags:
+              - cli
+            tests:
+              - Context_Create_ResultsFlag_SetsResultsFileProperty
+              - Context_Create_ResultFlag_SetsResultsFileProperty
+              - Context_Create_MissingResultsFilename_ThrowsException
+
+          - id: ReqStream-Command-Report
+            title: The tool shall accept a report file path for writing the requirements report.
+            justification: |
+              Specifying the report output path from the command line enables flexible integration
+              into build pipelines where the output location is determined by the caller.
+            tags:
+              - cli
+            tests:
+              - Context_Create_ReportFile_SetsReportProperty
+              - Context_Create_MissingReportFilename_ThrowsException
+
+          - id: ReqStream-Command-Matrix
+            title: The tool shall accept a matrix file path for writing the trace matrix report.
+            justification: |
+              Specifying the trace matrix output path from the command line enables flexible
+              integration into build pipelines where the output location is determined by the caller.
+            tags:
+              - cli
+            tests:
+              - Context_Create_MatrixFile_SetsMatrixProperty
+              - Context_Create_MissingMatrixFilename_ThrowsException
+
+          - id: ReqStream-Command-Justifications
+            title: The tool shall accept a justifications file path for writing the justifications report.
+            justification: |
+              Specifying the justifications output path from the command line enables flexible
+              integration into build pipelines where the output location is determined by the caller.
+            tags:
+              - cli
+            tests:
+              - Context_Create_JustificationsFile_SetsJustificationsFileProperty
+              - Context_Create_MissingJustificationsFilename_ThrowsException
+
+          - id: ReqStream-Command-JustificationsDepth
+            title: The tool shall support configurable markdown header depth for justifications reports.
+            justification: |
+              Configurable header depth allows justifications reports to be embedded in larger
+              documents while maintaining proper document structure.
+            tags:
+              - cli
+            tests:
+              - Context_Create_JustificationsDepth_SetsJustificationsDepthProperty
+              - Context_Create_MissingJustificationsDepth_ThrowsException
+              - Context_Create_InvalidJustificationsDepth_ThrowsException
+
+          - id: ReqStream-Command-LogFileOutput
             title: The tool shall support writing output to a log file.
             justification: |
               Log file support enables capturing tool output for debugging, audit trails, and CI/CD
               integration where console output may be ephemeral.
             tags:
-              - logging
+              - cli
             tests:
               - Context_Create_WithLogFile_WritesToLogFile
               - Context_Create_WithLogFileAndSilent_WritesToLogOnly
               - Context_Dispose_WithLogFile_ClosesLogFile
+              - Context_Create_InvalidLogPath_ThrowsException

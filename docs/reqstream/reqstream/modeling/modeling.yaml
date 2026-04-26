@@ -3,8 +3,17 @@
 #
 # PURPOSE:
 # - Define requirements for the ReqStream Modeling subsystem
-# - The Modeling subsystem spans Requirements.cs, Section.cs, and Requirement.cs
+# - The Modeling subsystem spans Requirements.cs, Section.cs, Requirement.cs,
+#   RequirementsLoader.cs, LoadResult.cs, and LintIssue.cs
 # - Subsystem requirements describe the YAML parsing and data model behavior
+
+includes:
+  - lint-issue.yaml
+  - load-result.yaml
+  - requirement.yaml
+  - requirements.yaml
+  - requirements-loader.yaml
+  - section.yaml
 
 sections:
   - title: Modeling Subsystem Requirements
@@ -23,9 +32,12 @@ sections:
           - ReqStream-Requirements-YamlProcessing
           - ReqStream-Requirements-Includes
           - ReqStream-Requirements-SectionMerging
+          - ReqStream-Requirements-Hierarchy
+          - ReqStream-Section-Container
+          - ReqStream-Section-Nesting
 
       - id: ReqStream-Modeling-Export
-        title: The Modeling subsystem shall export requirements and justifications to Markdown reports.
+        title: The Modeling subsystem shall generate Markdown reports from requirements data.
         justification: |
           Generating Markdown reports from requirements data enables documentation to be
           produced automatically from the requirements files, reducing manual effort and
@@ -41,3 +53,75 @@ sections:
           - ReqStream-Report-Justifications
           - ReqStream-Report-JustificationsDepth
           - ReqStream-Report-TagFilterExport
+
+      - id: ReqStream-Modeling-MultiFileLoading
+        title: >-
+          The Modeling subsystem shall load requirements from multiple YAML files,
+          following `includes` directives transitively.
+        justification: |
+          Modular requirements management requires the subsystem to resolve `includes` references
+          recursively, merging all referenced files into a single requirements tree. This enables
+          teams to split requirements across files and directories without losing traceability.
+        tests:
+          - Modeling_YamlParsing_ValidFile_LoadsRequirements
+        children:
+          - ReqStream-Requirements-Includes
+          - ReqStream-Requirements-SectionMerging
+
+      - id: ReqStream-Modeling-Linting
+        title: The Modeling subsystem shall perform requirements file linting.
+        justification: |
+          Structural validation during loading catches malformed YAML, missing mandatory fields,
+          unknown fields, duplicate IDs, and other problems early. Reporting all issues in a
+          single pass allows users to fix all problems at once rather than one at a time.
+        tests:
+          - Modeling_YamlParsing_DuplicateIds_DetectsLintError
+          - Modeling_Linting_MalformedYaml_DetectsError
+          - Modeling_Linting_ValidFile_ReturnsNoIssues
+        children:
+          - ReqStream-Requirements-Validation
+          - ReqStream-Requirements-YamlErrorReporting
+          - ReqStream-Requirements-UniqueIds
+          - ReqStream-Requirements-RequiredTitle
+          - ReqStream-Requirements-UnifiedLoad
+          - ReqStream-Lint-MalformedYaml
+          - ReqStream-Lint-UnknownDocumentField
+          - ReqStream-Lint-UnknownSectionField
+          - ReqStream-Lint-MissingSectionTitle
+          - ReqStream-Lint-UnknownRequirementField
+          - ReqStream-Lint-MissingRequirementId
+          - ReqStream-Lint-MissingRequirementTitle
+          - ReqStream-Lint-DuplicateIds
+          - ReqStream-Lint-MultipleIssues
+          - ReqStream-Lint-FollowsIncludes
+          - ReqStream-Lint-NoIssuesMessage
+          - ReqStream-Lint-ErrorFormat
+          - ReqStream-Lint-UnknownMappingField
+          - ReqStream-Lint-MissingMappingId
+          - ReqStream-Lint-BlankTestName
+          - ReqStream-Lint-BlankTagName
+          - ReqStream-Lint-IssueType
+          - ReqStream-Lint-NonScalarListEntries
+          - ReqStream-Lint-CircularReferences
+          - ReqStream-Lint-UnknownChildReference
+          - ReqStream-Modeling-LintingValidation
+          - ReqStream-Modeling-LintingReporting
+          - ReqStream-LoadResult-ReportIssues
+
+      - id: ReqStream-Modeling-LintingValidation
+        title: The Modeling subsystem shall validate requirements file structure.
+        justification: |
+          Structural validation during loading catches malformed YAML, missing mandatory fields,
+          unknown fields, duplicate IDs, and other problems early, allowing users to fix all
+          problems before running reports or tracing.
+        tests:
+          - Modeling_Linting_MalformedYaml_DetectsError
+          - Modeling_Linting_ValidFile_ReturnsNoIssues
+
+      - id: ReqStream-Modeling-LintingReporting
+        title: The Modeling subsystem shall report all lint issues discovered during loading.
+        justification: |
+          Reporting all issues in a single pass allows users to fix all problems at once
+          rather than one at a time, improving developer productivity and CI turnaround.
+        tests:
+          - Modeling_YamlParsing_DuplicateIds_DetectsLintError

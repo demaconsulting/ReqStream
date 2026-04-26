@@ -130,4 +130,116 @@ public class CliTests
         var content = File.ReadAllText(logFile);
         Assert.Contains("test output message", content);
     }
+
+    /// <summary>
+    /// Test that --log without a filename throws an ArgumentException.
+    /// </summary>
+    [TestMethod]
+    public void Cli_Interface_MissingArgumentValue_ThrowsArgumentException()
+    {
+        // Arrange: nothing to arrange - the missing value is the input
+
+        // Act + Assert: creating a context with --log but no filename throws ArgumentException
+        Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--log"]));
+    }
+
+    /// <summary>
+    /// Test that an invalid depth value throws an ArgumentException.
+    /// </summary>
+    [TestMethod]
+    public void Cli_Interface_InvalidDepthValue_ThrowsArgumentException()
+    {
+        // Arrange: nothing to arrange - the invalid depth is the input
+
+        // Act + Assert: creating a context with a non-integer depth throws ArgumentException
+        Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--depth", "not-a-number"]));
+    }
+
+    /// <summary>
+    /// Test that a log file path that cannot be opened throws an ArgumentException.
+    /// </summary>
+    [TestMethod]
+    public void Cli_Interface_LogFileOpenFailure_ThrowsArgumentException()
+    {
+        // Arrange: use a path inside a directory that does not exist
+        var invalidLogPath = Path.Combine(_testDirectory, "nonexistent-subdir", "output.log");
+
+        // Act + Assert: creating a context with an inaccessible log file throws ArgumentException
+        Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--log", invalidLogPath]));
+    }
+
+    /// <summary>
+    /// Test that WriteError writes to the error channel, not standard output.
+    /// </summary>
+    [TestMethod]
+    [DoNotParallelize]
+    public void Cli_Output_WriteError_WritesToErrorChannel()
+    {
+        // Arrange: redirect both stdout and stderr to capture writes separately
+        var originalOut = Console.Out;
+        var originalError = Console.Error;
+        using var stdoutCapture = new StringWriter();
+        using var stderrCapture = new StringWriter();
+        Console.SetOut(stdoutCapture);
+        Console.SetError(stderrCapture);
+
+        try
+        {
+            // Act: create a context and write an error message
+            using var context = Context.Create([]);
+            context.WriteError("error message");
+
+            // Assert: the error went to stderr, not stdout
+            Assert.AreEqual(string.Empty, stdoutCapture.ToString(), "Error must not appear on stdout");
+            Assert.Contains("error message", stderrCapture.ToString());
+        }
+        finally
+        {
+            Console.SetOut(originalOut);
+            Console.SetError(originalError);
+        }
+    }
+
+    /// <summary>
+    /// Test that ExitCode returns 1 after WriteError is called.
+    /// </summary>
+    [TestMethod]
+    [DoNotParallelize]
+    public void Cli_Output_WriteError_SetsExitCodeToOne()
+    {
+        // Arrange: redirect stderr to suppress console noise during the test
+        var originalError = Console.Error;
+        Console.SetError(TextWriter.Null);
+
+        try
+        {
+            // Act: create a context and write an error
+            using var context = Context.Create([]);
+            context.WriteError("error message");
+
+            // Assert: exit code is 1 after an error is reported
+            Assert.AreEqual(1, context.ExitCode);
+        }
+        finally
+        {
+            Console.SetError(originalError);
+        }
+    }
+
+    /// <summary>
+    /// Test that --depth sets the default for all per-report depth options.
+    /// </summary>
+    [TestMethod]
+    public void Cli_Interface_DepthFlag_SetsDefaultForAllReportDepths()
+    {
+        // Arrange: nothing to arrange - the --depth flag alone is the input
+
+        // Act: create a context with only --depth 3 (no per-report overrides)
+        using var context = Context.Create(["--depth", "3"]);
+
+        // Assert: all per-report depth properties inherit the --depth value
+        Assert.AreEqual(3, context.ReportDepth);
+        Assert.AreEqual(3, context.MatrixDepth);
+        Assert.AreEqual(3, context.JustificationsDepth);
+    }
 }

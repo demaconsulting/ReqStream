@@ -19,6 +19,13 @@ executes the six validation tests in order and prints a multi-line summary block
 number of tests, how many passed, and how many failed (using `WriteError` for the failed count when
 any tests have failed). If `context.ResultsFile` is set, it calls `WriteResultsFile(context, testResults)`
 to persist the results.
+
+> **Thread-safety constraint**: `Run` must not be called concurrently. Each validation test uses
+> `DirectorySwitch`, which mutates the process-wide current working directory
+> (`Directory.SetCurrentDirectory`). Concurrent calls would race on this shared state, causing
+> tests to resolve relative paths against the wrong directory. The validation subsystem therefore
+> accesses global process state and is not thread-safe.
+
 The six validation tests exist to provide structured, machine-readable evidence that ReqStream
 correctly processes its own input formats. This evidence can be fed back into ReqStream to verify
 the tool's own requirements coverage, enabling a self-hosting compliance workflow.
@@ -50,7 +57,8 @@ outcome `Passed` or `Failed`.
 | `.xml` | JUnit serializer (`DemaConsulting.TestResults.IO`) |
 | Any other | Reports error via `context.WriteError` and returns |
 
-The serializer is invoked with the assembled `TestResults` object and the resolved output path.
+The serializer is called with the assembled `TestResults` object, returning a serialized string.
+The string is then written to the resolved output path via `File.WriteAllText`.
 
 ## Supporting Types
 
@@ -84,15 +92,7 @@ after the test completes, regardless of whether the test passes or fails.
 
 | Unit | Nature of interaction |
 | ---- | --------------------- |
-| `Context` | Reads `ResultsFile`, `Version`, `Silent`; calls `WriteLine` for headers and summary |
-| `Program` | `Run` internally exercises `Program.Run` or individual workflow methods |
+| `Context` | Reads `ResultsFile`, `Silent`; calls `WriteLine` for headers and summary |
+| `Program` | Reads `Program.Version`; `Run` exercises `Program.Run` or individual workflow methods |
 | `Requirements` | Tests exercise `Requirements.Load` with fixture YAML files |
 | `TraceMatrix` | Tests exercise `TraceMatrix` construction with fixture test-result files |
-
-## References
-
-- [ReqStream System Design][arch]
-- [ReqStream Repository][repo]
-
-[arch]: ../reqstream.md
-[repo]: https://github.com/demaconsulting/ReqStream

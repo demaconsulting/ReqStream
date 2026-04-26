@@ -14,7 +14,7 @@ Requirements Management Tool
 ## Overview
 
 ReqStream is a .NET command-line tool for managing requirements written in YAML files. It provides functionality to
-create, validate, and manage requirement documents in a structured and maintainable way.
+validate and manage requirement documents in a structured and maintainable way.
 
 ## Features
 
@@ -23,11 +23,15 @@ create, validate, and manage requirement documents in a structured and maintaina
 - 🌐 **Multi-Platform** - Support for .NET 8, 9, and 10 across Windows, Linux, and macOS
 - 🔗 **Hierarchical Structure** - Organize requirements with sections and subsections
 - 🧪 **Test Mapping** - Link requirements to test cases for traceability
+- 🎯 **Source-Specific Test Matching** - Restrict coverage evidence to named result files using `filepart@testname` syntax
 - 📦 **File Includes** - Modularize requirements across multiple YAML files
-- ✅ **Validation** - Built-in validation for requirement structure and references
-- 🔍 **Linting** - Validate requirements YAML structure and report all issues in one pass
+- ✅ **Validation** - Run a built-in self-test suite to qualify the tool in its deployment environment
+- 🔍 **Linting** - Validate requirements YAML structure and references, reporting all issues in one pass
 - 🏷️ **Tag Filtering** - Categorize and filter requirements using tags
 - 📋 **Justifications** - Document the rationale behind each requirement
+- 📤 **Export Capabilities** - Generate markdown reports for requirements, justifications, and test trace matrices
+- 📐 **Configurable Report Depth** - Control Markdown heading levels in exported reports via
+  `--depth`, `--report-depth`, `--matrix-depth`, and `--justifications-depth` flags
 - 🔒 **Continuous Compliance** - Compliance evidence generated automatically on every CI run, following
   the [Continuous Compliance][link-continuous-compliance] methodology
 
@@ -96,7 +100,7 @@ Options:
   -?, -h, --help                   Display this help message
   --silent                         Suppress console output
   --validate                       Run self-validation
-  --results <file>                 Write validation results to file (TRX or JUnit format)
+  --results <file>                 Write validation results to file (TRX or JUnit format; use .trx or .xml extension)
   --log <file>                     Write output to log file
   --lint                           Lint requirements files for structural issues
   --depth <depth>                  Default markdown header depth for all reports (default: 1)
@@ -146,7 +150,7 @@ Each test in the report proves:
 - **`ReqStream_ReportExport`** - requirements report is correctly exported to a markdown file.
 - **`ReqStream_TagsFiltering`** - requirements are correctly filtered by tags.
 - **`ReqStream_EnforcementMode`** - enforcement mode correctly validates requirement test coverage.
-- **`ReqStream_Lint`** - linter correctly validates requirements YAML file structure and reports all issues.
+- **`ReqStream_Lint`** - lint mode correctly identifies and reports issues in requirements files.
 
 See the [User Guide][link-guide] for more details on the self-validation tests.
 
@@ -567,7 +571,7 @@ For information about reporting security vulnerabilities, please see our [Securi
 [nuget-shield]: https://img.shields.io/nuget/v/DemaConsulting.ReqStream
 [nuget-url]: https://www.nuget.org/packages/DemaConsulting.ReqStream
 [license]: https://github.com/demaconsulting/ReqStream/blob/main/LICENSE
-[architecture]: https://github.com/demaconsulting/ReqStream/blob/main/ARCHITECTURE.md
+[architecture]: docs/design/introduction.md
 [contributing]: https://github.com/demaconsulting/ReqStream/blob/main/CONTRIBUTING.md
 [code-of-conduct]: https://github.com/demaconsulting/ReqStream/blob/main/CODE_OF_CONDUCT.md
 [security]: https://github.com/demaconsulting/ReqStream/blob/main/SECURITY.md

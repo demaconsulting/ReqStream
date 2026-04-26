@@ -366,9 +366,10 @@ public static class Validation
                 }
 
                 // Check if execution succeeded and filtered report was created
-                if (exitCode == 0 && File.Exists("filtered.md"))
+                var filteredReportPath = Path.Combine(tempDir.DirectoryPath, "filtered.md");
+                if (exitCode == 0 && File.Exists(filteredReportPath))
                 {
-                    var reportContent = File.ReadAllText("filtered.md");
+                    var reportContent = File.ReadAllText(filteredReportPath);
 
                     // Verify filtered report contains only tagged requirement
                     if (reportContent.Contains("REQ-001") && !reportContent.Contains("REQ-002"))
@@ -598,6 +599,8 @@ public static class Validation
     /// <param name="testResults">The test results to write.</param>
     private static void WriteResultsFile(Context context, DemaConsulting.TestResults.TestResults testResults)
     {
+        // Defensive guard: the only call site already checks context.ResultsFile != null,
+        // but this guard protects against future callers that may not.
         if (context.ResultsFile == null)
         {
             return;

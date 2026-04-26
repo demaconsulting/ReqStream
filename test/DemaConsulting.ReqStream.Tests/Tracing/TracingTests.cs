@@ -219,4 +219,110 @@ public class TracingTests
         Assert.HasCount(1, unsatisfied);
         Assert.Contains("Tracing-Enforce-Unsatisfied", unsatisfied);
     }
+
+    /// <summary>
+    /// Test that constructing a TraceMatrix with a non-existent file path throws FileNotFoundException.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_Constructor_NonExistentFile_ThrowsFileNotFoundException()
+    {
+        // Arrange: create a requirements object and a path to a file that does not exist
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: Error Test Requirements
+                requirements:
+                  - id: Tracing-Error-Req1
+                    title: The system shall handle missing result files.
+                    justification: Error handling test justification.
+                    tests:
+                      - ErrorTest1
+            """);
+        var loadResult = Requirements.Load(reqFile);
+        Assert.IsNotNull(loadResult.Requirements);
+        var missingFile = Path.Combine(_testDirectory, "does-not-exist.trx");
+
+        // Act and Assert: constructing a TraceMatrix with a missing file throws FileNotFoundException
+        Assert.ThrowsExactly<FileNotFoundException>(() =>
+            _ = new TraceMatrix(loadResult.Requirements, missingFile));
+    }
+
+    /// <summary>
+    /// Test that constructing a TraceMatrix with a malformed result file throws InvalidOperationException
+    /// containing the offending file path in the message.
+    /// </summary>
+    [TestMethod]
+    public void TraceMatrix_Constructor_MalformedFile_ThrowsInvalidOperationException()
+    {
+        // Arrange: create a requirements object and a file with invalid (non-XML) content
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: Error Test Requirements
+                requirements:
+                  - id: Tracing-Error-Req2
+                    title: The system shall handle malformed result files.
+                    justification: Error handling test justification.
+                    tests:
+                      - ErrorTest2
+            """);
+        var loadResult = Requirements.Load(reqFile);
+        Assert.IsNotNull(loadResult.Requirements);
+        var malformedFile = Path.Combine(_testDirectory, "malformed.trx");
+        File.WriteAllText(malformedFile, "this is not valid xml or json content @@##!!");
+
+        // Act and Assert: constructing a TraceMatrix with a malformed file throws InvalidOperationException
+        // with the offending path in the message
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() =>
+            _ = new TraceMatrix(loadResult.Requirements, malformedFile));
+        Assert.IsTrue(ex.Message.Contains(malformedFile), "Exception message should contain the file path.");
+    }
+
+    /// <summary>
+    /// Test that the Tracing subsystem exports a trace matrix report to a Markdown file.
+    /// </summary>
+    [TestMethod]
+    public void Tracing_Reporting_SimpleMatrix_CreatesMarkdownFile()
+    {
+        // Arrange: create a requirements file with one traceable requirement
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: Reporting Test Requirements
+                requirements:
+                  - id: Tracing-Report-Req1
+                    title: The system shall be verified by a passing test.
+                    justification: Reporting test justification.
+                    tests:
+                      - Tracing_Reporting_Test1
+            """);
+        var loadResult = Requirements.Load(reqFile);
+        Assert.IsNotNull(loadResult.Requirements);
+
+        // Arrange: create a TRX file with a passing test result
+        var testResults = new TestResults.TestResults { Name = "ReportingRun" };
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Tracing_Reporting_Test1",
+            ClassName = "TracingTests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+        var trxFile = Path.Combine(_testDirectory, "results.trx");
+        File.WriteAllText(trxFile, TrxSerializer.Serialize(testResults));
+
+        // Act: build the trace matrix and export the report
+        var matrix = new TraceMatrix(loadResult.Requirements, trxFile);
+        var mdFile = Path.Combine(_testDirectory, "trace-matrix.md");
+        matrix.Export(mdFile);
+
+        // Assert: the Markdown report file exists and contains required sections
+        Assert.IsTrue(File.Exists(mdFile));
+        var content = File.ReadAllText(mdFile);
+        Assert.Contains("# Summary", content);
+        Assert.Contains("1 of 1 requirements are satisfied with tests.", content);
+        Assert.Contains("# Requirements", content);
+        Assert.Contains("# Testing", content);
+    }
 }

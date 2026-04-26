@@ -109,4 +109,28 @@ public class SelfTestTests
         var content = File.ReadAllText(resultsFile);
         Assert.Contains("testsuite", content);
     }
+
+    /// <summary>
+    /// Test that self-validation sets exit code 1 and reports errors when failures are encountered.
+    /// </summary>
+    [TestMethod]
+    public void SelfTest_FailureReporting_WithErrors_SetsExitCode1()
+    {
+        // Arrange: create a results file path with an unsupported extension to trigger an error
+        var resultsFile = Path.Combine(_testDirectory, "validation-results.invalid");
+        var logFile = Path.Combine(_testDirectory, "failure-test.log");
+
+        int exitCode;
+        using (var context = Context.Create(["--silent", "--log", logFile, "--results", resultsFile]))
+        {
+            // Act: run self-validation
+            Validation.Run(context);
+            exitCode = context.ExitCode;
+        }
+
+        // Assert: exit code is 1 and error output was written to the log (read after context disposed to flush log)
+        Assert.AreEqual(1, exitCode);
+        var logContent = File.ReadAllText(logFile);
+        Assert.Contains("Error:", logContent);
+    }
 }

@@ -12,10 +12,8 @@ when the enclosing `using` block in `Program.Main` exits.
 
 ## Private State
 
-| Field | Type | Purpose |
-| ----- | ---- | ------- |
-| `_logWriter` | `StreamWriter?` | Open writer for the optional log file; `null` when no log file was requested |
-| `_hasErrors` | `bool` | Accumulates error state; initially `false`; set to `true` by `WriteError` |
+- **`_logWriter`** (`StreamWriter?`, `--log`) — Open writer for the optional log file; `null` when no log file was requested.
+- **`_hasErrors`** (`bool`) — Accumulates error state; initially `false`; set to `true` by `WriteError`.
 
 ## Properties
 
@@ -33,11 +31,11 @@ when the enclosing `using` block in `Program.Main` exits.
 | `TestFiles` | `List<string>` | `--tests` | Expanded list of test-result file paths |
 | `RequirementsReport` | `string?` | `--report` | Destination path for requirements report |
 | `Depth` | `int` | `--depth` | Default heading depth for all reports (default: 1) |
-| `ReportDepth` | `int` | `--report-depth` | Heading depth for requirements report (overrides `Depth`) |
+| `ReportDepth` | `int` | `--report-depth` | Heading depth for requirements report; defaults to `Depth` |
 | `Matrix` | `string?` | `--matrix` | Destination path for trace matrix report |
-| `MatrixDepth` | `int` | `--matrix-depth` | Heading depth for trace matrix report (overrides `Depth`) |
+| `MatrixDepth` | `int` | `--matrix-depth` | Heading depth for trace matrix report; defaults to `Depth` |
 | `JustificationsFile` | `string?` | `--justifications` | Destination path for justifications report |
-| `JustificationsDepth` | `int` | `--justifications-depth` | Heading depth for justifications (overrides `Depth`) |
+| `JustificationsDepth` | `int` | `--justifications-depth` | Justifications report heading depth; defaults to `Depth` |
 | `ExitCode` | `int` | — | Computed: `_hasErrors ? 1 : 0` |
 
 ## Methods
@@ -54,7 +52,10 @@ rather than an unhandled exception.
 `--filter` values are split on `','` and accumulated into `FilterTags`; multiple `--filter`
 arguments merge into the same set. `--requirements` and `--tests` values are passed to
 `ExpandGlobPattern` and appended to the respective file lists. If `--log` is specified, the named
-file is opened for writing and assigned to `_logWriter` before the method returns.
+file is opened for writing and assigned to `_logWriter` before the method returns. If the log file
+cannot be opened (for example, due to an invalid path or insufficient permissions), `Create` catches
+the underlying I/O exception, wraps it in an `ArgumentException`, and rethrows it so the caller
+receives a user-actionable error message rather than an unhandled exception.
 
 `--depth` sets the default heading depth (`Depth`). The per-report depth arguments
 (`--report-depth`, `--matrix-depth`, `--justifications-depth`) override this default if
@@ -93,14 +94,6 @@ via an early return path.
 | ---- | --------------------- |
 | `Program` | Creates `Context` via `Create`; calls `WriteLine` and `WriteError`; reads `ExitCode` |
 | `Validation` | Calls `context.WriteLine`, `context.WriteError`, reads `ResultsFile`, `Silent` |
-| `Linter` | Calls `context.WriteError` to report linting issues |
+| `LoadResult` | Calls `context.WriteError` via `ReportIssues` to report linting issues |
 | `Requirements` | Receives `RequirementsFiles`; does not hold a reference to `Context` |
 | `TraceMatrix` | Receives `TestFiles`; does not hold a reference to `Context` |
-
-## References
-
-- [ReqStream System Design][arch]
-- [ReqStream Repository][repo]
-
-[arch]: ../reqstream.md
-[repo]: https://github.com/demaconsulting/ReqStream

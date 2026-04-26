@@ -18,7 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.ReqStream.Cli;
 using DemaConsulting.ReqStream.Modeling;
 
 namespace DemaConsulting.ReqStream.Tests.Modeling;
@@ -79,35 +78,12 @@ public class RequirementsLoaderTests
     }
 
     /// <summary>
-    /// Test that loading with no files produces no issues (empty list).
-    /// </summary>
-    [TestMethod]
-    public void RequirementsLoader_Load_WithNoFiles_PrintsMessage()
-    {
-        var originalOut = Console.Out;
-        using var output = new StringWriter();
-        Console.SetOut(output);
-
-        try
-        {
-            using var context = Context.Create([]);
-            Program.Run(context);
-
-            Assert.AreEqual(0, context.ExitCode);
-            Assert.Contains("No requirements files specified", output.ToString());
-        }
-        finally
-        {
-            Console.SetOut(originalOut);
-        }
-    }
-
-    /// <summary>
     /// Test that a valid requirements file produces no issues.
     /// </summary>
     [TestMethod]
     public void RequirementsLoader_Load_WithValidFile_ReportsNoIssues()
     {
+        // Arrange: create a valid requirements YAML file
         var reqFile = Path.Combine(_testDirectory, "valid.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -120,11 +96,69 @@ public class RequirementsLoaderTests
           - tag1
 ");
 
+        // Act: load the requirements file
         var (exitCode, output, errors) = RunLintWithOutput(reqFile);
 
+        // Assert: exit code is 0 and no issues are reported
         Assert.AreEqual(0, exitCode);
         Assert.Contains("No issues found", output);
         Assert.AreEqual(string.Empty, errors);
+    }
+
+    /// <summary>
+    /// Test that an invalid file path (containing null characters) reports an error.
+    /// </summary>
+    [TestMethod]
+    public void RequirementsLoader_Load_WithInvalidFilePath_ReportsError()
+    {
+        // Act: attempt to load a file with a null character in the path (invalid on all platforms)
+        var (exitCode, errors) = RunLint("path\0with_null.yaml");
+
+        // Assert: exit code is 1 and error mentions invalid file path
+        Assert.AreEqual(1, exitCode);
+        Assert.Contains("error", errors);
+        Assert.Contains("Invalid file path", errors);
+    }
+
+    /// <summary>
+    /// Test that a file that cannot be read due to an I/O failure reports an error.
+    /// </summary>
+    [TestMethod]
+    public void RequirementsLoader_Load_WithIoReadFailure_ReportsError()
+    {
+        // Skip this test on non-Unix platforms (file permission removal requires Unix)
+        if (!OperatingSystem.IsLinux() && !OperatingSystem.IsMacOS())
+        {
+            Assert.Inconclusive("This test requires Unix file permissions.");
+            return;
+        }
+
+        // Skip if running as root (root can read any file regardless of permissions)
+        if (Environment.IsPrivilegedProcess)
+        {
+            Assert.Inconclusive("This test cannot run as root.");
+            return;
+        }
+
+        // Arrange: create a YAML file and remove all permissions so it cannot be read
+        var reqFile = Path.Combine(_testDirectory, "unreadable.yaml");
+        File.WriteAllText(reqFile, "sections: []");
+        File.SetUnixFileMode(reqFile, UnixFileMode.None);
+        try
+        {
+            // Act: load the file that exists but cannot be read
+            var (exitCode, errors) = RunLint(reqFile);
+
+            // Assert: exit code is 1 and error reports the read failure
+            Assert.AreEqual(1, exitCode);
+            Assert.Contains("error", errors);
+            Assert.Contains("Failed to read file", errors);
+        }
+        finally
+        {
+            // Restore permissions so TestCleanup can delete the file
+            File.SetUnixFileMode(reqFile, UnixFileMode.UserRead | UnixFileMode.UserWrite);
+        }
     }
 
     /// <summary>
@@ -133,8 +167,10 @@ public class RequirementsLoaderTests
     [TestMethod]
     public void RequirementsLoader_Load_WithMissingFile_ReportsError()
     {
+        // Act: attempt to load a file that does not exist
         var (exitCode, errors) = RunLint("/nonexistent/path/missing.yaml");
 
+        // Assert: exit code is 1 and error mentions the file not found
         Assert.AreEqual(1, exitCode);
         Assert.Contains("error", errors);
         Assert.Contains("File not found", errors);
@@ -146,6 +182,7 @@ public class RequirementsLoaderTests
     [TestMethod]
     public void RequirementsLoader_Load_WithMalformedYaml_ReportsError()
     {
+        // Arrange: create a YAML file with invalid syntax
         var reqFile = Path.Combine(_testDirectory, "malformed.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Bad
@@ -153,8 +190,10 @@ public class RequirementsLoaderTests
   invalid yaml here
 ");
 
+        // Act: load the malformed requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error reports malformed YAML
         Assert.AreEqual(1, exitCode);
         Assert.Contains("error", errors);
         Assert.Contains("Malformed YAML", errors);
@@ -166,11 +205,14 @@ public class RequirementsLoaderTests
     [TestMethod]
     public void RequirementsLoader_Load_WithEmptyFile_ReportsNoIssues()
     {
+        // Arrange: create an empty YAML file
         var reqFile = Path.Combine(_testDirectory, "empty.yaml");
         File.WriteAllText(reqFile, string.Empty);
 
+        // Act: load the empty requirements file
         var (exitCode, output, errors) = RunLintWithOutput(reqFile);
 
+        // Assert: exit code is 0 and no issues are reported
         Assert.AreEqual(0, exitCode);
         Assert.Contains("No issues found", output);
         Assert.AreEqual(string.Empty, errors);
@@ -182,14 +224,17 @@ public class RequirementsLoaderTests
     [TestMethod]
     public void RequirementsLoader_Load_WithUnknownDocumentField_ReportsError()
     {
+        // Arrange: create a YAML file with an unknown field at document root
         var reqFile = Path.Combine(_testDirectory, "unknown-field.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test
 unknown_field: value
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error names the unknown field
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Unknown field 'unknown_field'", errors);
     }
@@ -200,6 +245,7 @@ unknown_field: value
     [TestMethod]
     public void RequirementsLoader_Load_WithSectionMissingTitle_ReportsError()
     {
+        // Arrange: create a YAML file with a section that has no title
         var reqFile = Path.Combine(_testDirectory, "missing-title.yaml");
         File.WriteAllText(reqFile, @"sections:
   - requirements:
@@ -207,8 +253,10 @@ unknown_field: value
         title: A requirement
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error reports the missing title field
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Section missing required field 'title'", errors);
     }
@@ -219,6 +267,7 @@ unknown_field: value
     [TestMethod]
     public void RequirementsLoader_Load_WithBlankSectionTitle_ReportsError()
     {
+        // Arrange: create a YAML file with a section whose title is blank
         var reqFile = Path.Combine(_testDirectory, "blank-title.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: ''
@@ -227,8 +276,10 @@ unknown_field: value
         title: A requirement
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error reports the blank title
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Section 'title' cannot be blank", errors);
     }
@@ -239,14 +290,17 @@ unknown_field: value
     [TestMethod]
     public void RequirementsLoader_Load_WithUnknownSectionField_ReportsError()
     {
+        // Arrange: create a YAML file with an unknown field inside a section
         var reqFile = Path.Combine(_testDirectory, "unknown-section-field.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test
     unknown_field: value
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error names the unknown section field
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Unknown field 'unknown_field' in section", errors);
     }
@@ -257,6 +311,7 @@ unknown_field: value
     [TestMethod]
     public void RequirementsLoader_Load_WithRequirementMissingId_ReportsError()
     {
+        // Arrange: create a YAML file with a requirement that has no id field
         var reqFile = Path.Combine(_testDirectory, "missing-id.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -264,8 +319,10 @@ unknown_field: value
       - title: Requirement without ID
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error reports the missing id field
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Requirement missing required field 'id'", errors);
     }
@@ -276,6 +333,7 @@ unknown_field: value
     [TestMethod]
     public void RequirementsLoader_Load_WithRequirementMissingTitle_ReportsError()
     {
+        // Arrange: create a YAML file with a requirement that has no title field
         var reqFile = Path.Combine(_testDirectory, "missing-req-title.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -283,8 +341,10 @@ unknown_field: value
       - id: REQ-001
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error reports the missing title field
         Assert.AreEqual(1, exitCode);
         Assert.Contains("missing required field 'title'", errors);
     }
@@ -295,6 +355,7 @@ unknown_field: value
     [TestMethod]
     public void RequirementsLoader_Load_WithUnknownRequirementField_ReportsError()
     {
+        // Arrange: create a YAML file with a requirement that has an unknown field
         var reqFile = Path.Combine(_testDirectory, "unknown-req-field.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -304,8 +365,10 @@ unknown_field: value
         unknown_field: value
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error names the unknown requirement field
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Unknown field 'unknown_field' in requirement", errors);
     }
@@ -316,6 +379,7 @@ unknown_field: value
     [TestMethod]
     public void RequirementsLoader_Load_WithDuplicateIds_ReportsError()
     {
+        // Arrange: create a YAML file with two requirements sharing the same ID
         var reqFile = Path.Combine(_testDirectory, "duplicates.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -326,8 +390,10 @@ unknown_field: value
         title: Duplicate requirement
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error reports the duplicate ID
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Duplicate requirement ID 'REQ-001'", errors);
     }
@@ -338,6 +404,7 @@ unknown_field: value
     [TestMethod]
     public void RequirementsLoader_Load_WithDuplicateIdsAcrossFiles_ReportsError()
     {
+        // Arrange: create two YAML files that each define the same requirement ID
         var reqFile1 = Path.Combine(_testDirectory, "file1.yaml");
         File.WriteAllText(reqFile1, @"sections:
   - title: Section 1
@@ -354,8 +421,10 @@ unknown_field: value
         title: Duplicate across files
 ");
 
+        // Act: load both requirements files together
         var (exitCode, errors) = RunLint(reqFile1, reqFile2);
 
+        // Assert: exit code is 1 and error reports the cross-file duplicate ID
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Duplicate requirement ID 'REQ-001'", errors);
     }
@@ -366,6 +435,7 @@ unknown_field: value
     [TestMethod]
     public void RequirementsLoader_Load_WithMultipleIssues_ReportsAllIssues()
     {
+        // Arrange: create a YAML file with multiple structural errors
         var reqFile = Path.Combine(_testDirectory, "multiple-issues.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -379,8 +449,10 @@ unknown_field: value
 unknown_root_field: bad
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and all four errors are reported
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Unknown field 'unknown_section_field' in section", errors);
         Assert.Contains("Requirement missing required field 'id'", errors);
@@ -394,6 +466,7 @@ unknown_root_field: bad
     [TestMethod]
     public void RequirementsLoader_Load_WithIncludes_LintsIncludedFiles()
     {
+        // Arrange: create an included YAML file with an unknown field and a root file that includes it
         var includedFile = Path.Combine(_testDirectory, "included.yaml");
         File.WriteAllText(includedFile, @"sections:
   - title: Included Section
@@ -413,8 +486,10 @@ sections:
         title: Root requirement
 ");
 
+        // Act: load the root requirements file (which includes the other)
         var (exitCode, errors) = RunLint(rootFile);
 
+        // Assert: exit code is 1 and error from the included file is reported
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Unknown field 'unknown_field' in requirement", errors);
     }
@@ -425,6 +500,7 @@ sections:
     [TestMethod]
     public void RequirementsLoader_Load_WithUnknownMappingField_ReportsError()
     {
+        // Arrange: create a YAML file with an unknown field inside a mapping block
         var reqFile = Path.Combine(_testDirectory, "unknown-mapping-field.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -438,8 +514,10 @@ mappings:
     unknown_field: bad
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error names the unknown mapping field
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Unknown field 'unknown_field' in mapping", errors);
     }
@@ -450,6 +528,7 @@ mappings:
     [TestMethod]
     public void RequirementsLoader_Load_WithMappingMissingId_ReportsError()
     {
+        // Arrange: create a YAML file with a mapping block that has no id field
         var reqFile = Path.Combine(_testDirectory, "mapping-missing-id.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -461,8 +540,10 @@ mappings:
       - SomeTest
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error reports the missing mapping id field
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Mapping missing required field 'id'", errors);
     }
@@ -473,6 +554,7 @@ mappings:
     [TestMethod]
     public void RequirementsLoader_Load_WithNestedSectionIssues_ReportsError()
     {
+        // Arrange: create a YAML file with an issue inside a nested child section
         var reqFile = Path.Combine(_testDirectory, "nested.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Parent Section
@@ -486,8 +568,10 @@ mappings:
             title: Bad requirement
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error names the unknown nested requirement field
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Unknown field 'unknown_req_field' in requirement", errors);
     }
@@ -498,17 +582,17 @@ mappings:
     [TestMethod]
     public void RequirementsLoader_Load_ErrorFormat_IncludesFileAndLocation()
     {
+        // Arrange: create a YAML file with a single unknown root field
         var reqFile = Path.Combine(_testDirectory, "format-test.yaml");
         File.WriteAllText(reqFile, @"unknown_field: value
 ");
 
+        // Act: load the requirements file
         var (_, errors) = RunLint(reqFile);
 
-        // Error should include the file path
+        // Assert: error message includes file path, line/column, and severity
         Assert.Contains(reqFile, errors);
-        // Error should include line and column in (line,col) format
         Assert.Contains("(1,", errors);
-        // Error should include 'error:' severity
         Assert.Contains("error:", errors);
     }
 
@@ -518,6 +602,7 @@ mappings:
     [TestMethod]
     public void RequirementsLoader_Load_WithBlankRequirementId_ReportsError()
     {
+        // Arrange: create a YAML file with a requirement whose id is blank
         var reqFile = Path.Combine(_testDirectory, "blank-req-id.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -526,8 +611,10 @@ mappings:
         title: Test requirement
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error reports the blank id
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Requirement 'id' cannot be blank", errors);
     }
@@ -538,6 +625,7 @@ mappings:
     [TestMethod]
     public void RequirementsLoader_Load_WithBlankRequirementTitle_ReportsError()
     {
+        // Arrange: create a YAML file with a requirement whose title is blank
         var reqFile = Path.Combine(_testDirectory, "blank-req-title.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -546,8 +634,10 @@ mappings:
         title: ''
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error reports the blank title
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Requirement 'title' cannot be blank", errors);
     }
@@ -558,6 +648,7 @@ mappings:
     [TestMethod]
     public void RequirementsLoader_Load_WithBlankMappingId_ReportsError()
     {
+        // Arrange: create a YAML file with a mapping block whose id is blank
         var reqFile = Path.Combine(_testDirectory, "blank-mapping-id.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -570,8 +661,10 @@ mappings:
       - SomeTest
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error reports the blank mapping id
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Mapping 'id' cannot be blank", errors);
     }
@@ -582,6 +675,7 @@ mappings:
     [TestMethod]
     public void RequirementsLoader_Load_WithBlankTestName_ReportsError()
     {
+        // Arrange: create a YAML file with a requirement that has a blank test name
         var reqFile = Path.Combine(_testDirectory, "blank-test-name.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -592,8 +686,10 @@ mappings:
           - ''
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error reports the blank test name
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Test name cannot be blank", errors);
     }
@@ -604,6 +700,7 @@ mappings:
     [TestMethod]
     public void RequirementsLoader_Load_WithBlankTagName_ReportsError()
     {
+        // Arrange: create a YAML file with a requirement that has a blank tag name
         var reqFile = Path.Combine(_testDirectory, "blank-tag-name.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -614,8 +711,10 @@ mappings:
           - ''
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error reports the blank tag name
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Tag name cannot be blank", errors);
     }
@@ -626,6 +725,7 @@ mappings:
     [TestMethod]
     public void RequirementsLoader_Load_WithBlankMappingTestName_ReportsError()
     {
+        // Arrange: create a YAML file with a mapping block that has a blank test name
         var reqFile = Path.Combine(_testDirectory, "blank-mapping-test-name.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -638,8 +738,10 @@ mappings:
       - ''
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error reports the blank mapping test name
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Test name cannot be blank in mapping", errors);
     }
@@ -650,13 +752,16 @@ mappings:
     [TestMethod]
     public void RequirementsLoader_Load_WithNonMappingRoot_ReportsError()
     {
+        // Arrange: create a YAML file whose root is a sequence rather than a mapping
         var reqFile = Path.Combine(_testDirectory, "non-mapping-root.yaml");
         File.WriteAllText(reqFile, @"- item1
 - item2
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error reports the non-mapping root
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Document root must be a mapping", errors);
     }
@@ -667,6 +772,7 @@ mappings:
     [TestMethod]
     public void RequirementsLoader_Load_WithNonScalarTestEntry_ReportsError()
     {
+        // Arrange: create a YAML file with a mapping node instead of a scalar in the tests list
         var reqFile = Path.Combine(_testDirectory, "non-scalar-test.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -677,8 +783,10 @@ mappings:
           - key: value
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error reports the non-scalar test entry
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Test entry must be a scalar value", errors);
     }
@@ -689,6 +797,7 @@ mappings:
     [TestMethod]
     public void RequirementsLoader_Load_WithNonScalarChildEntry_ReportsError()
     {
+        // Arrange: create a YAML file with a mapping node instead of a scalar in the children list
         var reqFile = Path.Combine(_testDirectory, "non-scalar-child.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -699,8 +808,10 @@ mappings:
           - key: value
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error reports the non-scalar child entry
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Child requirement reference must be a scalar string", errors);
     }
@@ -711,6 +822,7 @@ mappings:
     [TestMethod]
     public void RequirementsLoader_Load_WithNonScalarTagEntry_ReportsError()
     {
+        // Arrange: create a YAML file with a mapping node instead of a scalar in the tags list
         var reqFile = Path.Combine(_testDirectory, "non-scalar-tag.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -721,8 +833,10 @@ mappings:
           - key: value
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error reports the non-scalar tag entry
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Tag entry must be a scalar value", errors);
     }
@@ -733,6 +847,7 @@ mappings:
     [TestMethod]
     public void RequirementsLoader_Load_WithNonScalarMappingTestEntry_ReportsError()
     {
+        // Arrange: create a YAML file with a mapping node instead of a scalar in a mapping tests list
         var reqFile = Path.Combine(_testDirectory, "non-scalar-mapping-test.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -745,8 +860,10 @@ mappings:
       - key: value
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error reports the non-scalar mapping test entry
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Test entry must be a scalar value in mapping", errors);
     }
@@ -757,13 +874,16 @@ mappings:
     [TestMethod]
     public void RequirementsLoader_Load_WithNonScalarIncludeEntry_ReportsError()
     {
+        // Arrange: create a YAML file with a mapping node instead of a scalar in the includes list
         var reqFile = Path.Combine(_testDirectory, "non-scalar-include.yaml");
         File.WriteAllText(reqFile, @"includes:
   - key: value
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error reports the non-scalar include entry
         Assert.AreEqual(1, exitCode);
         Assert.Contains("Each 'includes' entry must be a scalar string", errors);
     }
@@ -774,6 +894,7 @@ mappings:
     [TestMethod]
     public void RequirementsLoader_Load_WithMultipleCycles_ReportsAllCycles()
     {
+        // Arrange: create a YAML file with two separate back-edges creating two cycles
         var reqFile = Path.Combine(_testDirectory, "multiple-cycles.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -793,8 +914,10 @@ mappings:
           - REQ-A
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and both cycles are individually reported
         Assert.AreEqual(1, exitCode);
 
         // Both back-edges (REQ-B->REQ-A and REQ-C->REQ-A) should each be reported exactly once
@@ -809,6 +932,7 @@ mappings:
     [TestMethod]
     public void RequirementsLoader_Load_WithUnknownChildReference_ReportsError()
     {
+        // Arrange: create a YAML file with a requirement that references a non-existent child
         var reqFile = Path.Combine(_testDirectory, "unknown-child.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
@@ -819,8 +943,10 @@ mappings:
           - NONEXISTENT
 ");
 
+        // Act: load the requirements file
         var (exitCode, errors) = RunLint(reqFile);
 
+        // Assert: exit code is 1 and error mentions both the parent and the missing child ID
         Assert.AreEqual(1, exitCode);
         Assert.Contains("PARENT", errors, $"Expected 'PARENT' in errors: {errors}");
         Assert.Contains("NONEXISTENT", errors, $"Expected 'NONEXISTENT' in errors: {errors}");

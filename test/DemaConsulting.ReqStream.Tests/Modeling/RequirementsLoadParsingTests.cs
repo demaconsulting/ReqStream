@@ -53,209 +53,12 @@ public class RequirementsLoadParsingTests
     }
 
     /// <summary>
-    /// Test reading a simple YAML file with a single requirement.
-    /// </summary>
-    [TestMethod]
-    public void Requirements_Load_SimpleRequirement_ParsesCorrectly()
-    {
-        var yamlContent = @"---
-sections:
-  - title: ""System Security""
-    requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-        Assert.IsFalse(result.HasErrors);
-        var requirements = result.Requirements;
-
-        Assert.IsNotNull(requirements);
-        Assert.HasCount(1, requirements.Sections);
-        Assert.AreEqual("System Security", requirements.Sections[0].Title);
-        Assert.HasCount(1, requirements.Sections[0].Requirements);
-        Assert.AreEqual("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
-        Assert.AreEqual("The system shall support credentials authentication.", requirements.Sections[0].Requirements[0].Title);
-    }
-
-    /// <summary>
-    /// Test reading a requirement with tests.
-    /// </summary>
-    [TestMethod]
-    public void Requirements_Load_RequirementWithTests_ParsesTestsCorrectly()
-    {
-        var yamlContent = @"---
-sections:
-  - title: ""User Authentication""
-    requirements:
-      - id: ""AUTH-001""
-        title: ""All requests shall have their credentials authenticated.""
-        tests:
-          - ""Credentials_Valid_Allowed""
-          - ""Credentials_Invalid_Refused""
-          - ""Credentials_Missing_Refused""
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-        Assert.IsFalse(result.HasErrors);
-        var requirements = result.Requirements;
-
-        Assert.IsNotNull(requirements);
-        var req = requirements.Sections[0].Requirements[0];
-        Assert.AreEqual("AUTH-001", req.Id);
-        Assert.HasCount(3, req.Tests);
-        Assert.AreEqual("Credentials_Valid_Allowed", req.Tests[0]);
-        Assert.AreEqual("Credentials_Invalid_Refused", req.Tests[1]);
-        Assert.AreEqual("Credentials_Missing_Refused", req.Tests[2]);
-    }
-
-    /// <summary>
-    /// Test reading a requirement with child requirements.
-    /// </summary>
-    [TestMethod]
-    public void Requirements_Load_RequirementWithChildren_ParsesChildrenCorrectly()
-    {
-        var yamlContent = @"---
-sections:
-  - title: ""System Security""
-    requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
-        children:
-          - ""AUTH-001""
-          - ""AUTH-002""
-      - id: ""AUTH-001""
-        title: ""The system shall validate user credentials.""
-      - id: ""AUTH-002""
-        title: ""The system shall reject invalid credentials.""
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-        Assert.IsFalse(result.HasErrors);
-        var requirements = result.Requirements;
-
-        Assert.IsNotNull(requirements);
-        var req = requirements.Sections[0].Requirements[0];
-        Assert.AreEqual("SYS-SEC-001", req.Id);
-        Assert.HasCount(2, req.Children);
-        Assert.AreEqual("AUTH-001", req.Children[0]);
-        Assert.AreEqual("AUTH-002", req.Children[1]);
-    }
-
-    /// <summary>
-    /// Test reading a requirement with justification.
-    /// </summary>
-    [TestMethod]
-    public void Requirements_Load_RequirementWithJustification_ParsesJustificationCorrectly()
-    {
-        var yamlContent = @"---
-sections:
-  - title: System Security
-    requirements:
-      - id: SYS-SEC-001
-        title: The system shall support credentials authentication.
-        justification: |
-          This requirement is necessary to ensure that only authorized users
-          can access the system and to maintain data security and integrity.
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-        Assert.IsFalse(result.HasErrors);
-        var requirements = result.Requirements;
-
-        Assert.IsNotNull(requirements);
-        var req = requirements.Sections[0].Requirements[0];
-        Assert.AreEqual("SYS-SEC-001", req.Id);
-        Assert.AreEqual("The system shall support credentials authentication.", req.Title);
-        Assert.IsNotNull(req.Justification);
-        Assert.Contains("authorized users", req.Justification);
-        Assert.Contains("data security", req.Justification);
-    }
-
-    /// <summary>
-    /// Test reading nested sections.
-    /// </summary>
-    [TestMethod]
-    public void Requirements_Load_NestedSections_ParsesHierarchyCorrectly()
-    {
-        var yamlContent = @"---
-sections:
-  - title: ""Data Management""
-    sections:
-      - title: ""User Authentication""
-        requirements:
-          - id: ""AUTH-001""
-            title: ""All requests shall be authenticated.""
-      - title: ""Logging""
-        requirements:
-          - id: ""LOG-001""
-            title: ""All requests shall be logged.""
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-        Assert.IsFalse(result.HasErrors);
-        var requirements = result.Requirements;
-
-        Assert.IsNotNull(requirements);
-        Assert.HasCount(1, requirements.Sections);
-        Assert.AreEqual("Data Management", requirements.Sections[0].Title);
-        Assert.HasCount(2, requirements.Sections[0].Sections);
-        Assert.AreEqual("User Authentication", requirements.Sections[0].Sections[0].Title);
-        Assert.AreEqual("Logging", requirements.Sections[0].Sections[1].Title);
-        Assert.AreEqual("AUTH-001", requirements.Sections[0].Sections[0].Requirements[0].Id);
-        Assert.AreEqual("LOG-001", requirements.Sections[0].Sections[1].Requirements[0].Id);
-    }
-
-    /// <summary>
-    /// Test reading test mappings that are separate from requirements.
-    /// </summary>
-    [TestMethod]
-    public void Requirements_Load_TestMappings_AppliesMappingsCorrectly()
-    {
-        var yamlContent = @"---
-sections:
-  - title: ""System""
-    requirements:
-      - id: ""DATA-001""
-        title: ""All requests shall be logged.""
-
-mappings:
-  - id: ""DATA-001""
-    tests:
-      - ""Logging_ValidRequest_Logged""
-      - ""Logging_InvalidRequest_Logged""
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-        Assert.IsFalse(result.HasErrors);
-        var requirements = result.Requirements;
-
-        Assert.IsNotNull(requirements);
-        var req = requirements.Sections[0].Requirements[0];
-        Assert.AreEqual("DATA-001", req.Id);
-        Assert.HasCount(2, req.Tests);
-        Assert.AreEqual("Logging_ValidRequest_Logged", req.Tests[0]);
-        Assert.AreEqual("Logging_InvalidRequest_Logged", req.Tests[1]);
-    }
-
-    /// <summary>
     /// Test reading a file with includes.
     /// </summary>
     [TestMethod]
     public void Requirements_Load_WithIncludes_MergesFilesCorrectly()
     {
+        // Arrange: create a main YAML file with an include directive pointing to an additional file
         var mainYaml = @"---
 sections:
   - title: ""System Security""
@@ -278,10 +81,12 @@ sections:
         File.WriteAllText(mainPath, mainYaml);
         File.WriteAllText(includedPath, includedYaml);
 
+        // Act: load the main requirements file
         var result = Requirements.Load(mainPath);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: requirements from both files merged into the tree
         Assert.IsNotNull(requirements);
         Assert.HasCount(2, requirements.Sections);
         Assert.AreEqual("System Security", requirements.Sections[0].Title);
@@ -296,6 +101,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_IdenticalSections_MergesCorrectly()
     {
+        // Arrange: create two YAML files with the same section title
         var mainYaml = @"---
 sections:
   - title: ""System Security""
@@ -318,10 +124,12 @@ sections:
         File.WriteAllText(mainPath, mainYaml);
         File.WriteAllText(includedPath, includedYaml);
 
+        // Act: load the main requirements file
         var result = Requirements.Load(mainPath);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: identical sections merged into one with both requirements
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
         Assert.AreEqual("System Security", requirements.Sections[0].Title);
@@ -331,36 +139,12 @@ sections:
     }
 
     /// <summary>
-    /// Test that duplicate requirement IDs report an error issue.
-    /// </summary>
-    [TestMethod]
-    public void Requirements_Load_DuplicateRequirementId_ReportsError()
-    {
-        var yamlContent = @"---
-sections:
-  - title: ""System Security""
-    requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
-      - id: ""SYS-SEC-001""
-        title: ""Duplicate ID requirement.""
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("SYS-SEC-001"), result.Issues);
-        Assert.Contains(i => i.Description.Contains("Duplicate requirement ID"), result.Issues);
-    }
-
-    /// <summary>
     /// Test that include loops are prevented.
     /// </summary>
     [TestMethod]
     public void Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop()
     {
+        // Arrange: create two YAML files that include each other
         var fileA = @"---
 sections:
   - title: ""File A""
@@ -386,7 +170,10 @@ includes:
         File.WriteAllText(pathA, fileA);
         File.WriteAllText(pathB, fileB);
 
+        // Act: load file A (which includes file B, which includes file A)
         var result = Requirements.Load(pathA);
+
+        // Assert: loading completes without infinite loop and both sections are present
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
@@ -400,9 +187,13 @@ includes:
     [TestMethod]
     public void Requirements_Load_FileNotFound_ReportsError()
     {
+        // Arrange: create a path to a file that does not exist
         var nonExistentPath = Path.Combine(_testDirectory, "nonexistent.yaml");
 
+        // Act: load the non-existent file
         var result = Requirements.Load(nonExistentPath);
+
+        // Assert: error reported with the missing file location
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
         Assert.Contains(i => i.Description.Contains("File not found"), result.Issues);
@@ -415,6 +206,7 @@ includes:
     [TestMethod]
     public void Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation()
     {
+        // Arrange: create a YAML file with an invalid property name
         var yamlContent = @"---
 sections:
   - title: ""System Security""
@@ -425,7 +217,10 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
+
+        // Assert: error reported with file location for the unknown field
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
         Assert.Contains(i => i.Description.Contains("Unknown field 'text' in requirement"), result.Issues);
@@ -439,15 +234,18 @@ sections:
     [TestMethod]
     public void Requirements_Load_EmptyFile_ReturnsEmptyRequirements()
     {
+        // Arrange: create an empty YAML file
         var yamlContent = @"---
 ";
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: empty requirements returned with no sections
         Assert.IsNotNull(requirements);
         Assert.IsEmpty(requirements.Sections);
         Assert.IsEmpty(requirements.Requirements);
@@ -459,6 +257,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_ComplexStructure_ParsesCorrectly()
     {
+        // Arrange: create a YAML file with a complex nested structure including children, tests, and mappings
         var yamlContent = @"---
 sections:
   - title: ""System Security""
@@ -493,10 +292,12 @@ mappings:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: complex structure parsed correctly
         Assert.IsNotNull(requirements);
         Assert.HasCount(2, requirements.Sections);
 
@@ -524,190 +325,12 @@ mappings:
     }
 
     /// <summary>
-    ///     Test that a blank requirement ID reports an error issue with file location.
-    /// </summary>
-    [TestMethod]
-    public void Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation()
-    {
-        var yamlContent = @"---
-sections:
-  - title: ""System Security""
-    requirements:
-      - id: """"
-        title: ""The system shall support credentials authentication.""
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Requirement 'id' cannot be blank"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
-    }
-
-    /// <summary>
-    ///     Test that a blank requirement title reports an error issue with file location.
-    /// </summary>
-    [TestMethod]
-    public void Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation()
-    {
-        var yamlContent = @"---
-sections:
-  - title: ""System Security""
-    requirements:
-      - id: ""SYS-SEC-001""
-        title: """"
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Requirement 'title' cannot be blank"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
-    }
-
-    /// <summary>
-    ///     Test that a blank section title reports an error issue with file location.
-    /// </summary>
-    [TestMethod]
-    public void Requirements_Load_BlankSectionTitle_ReportsErrorWithFileLocation()
-    {
-        var yamlContent = @"---
-sections:
-  - title: """"
-    requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Section 'title' cannot be blank"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
-    }
-
-    /// <summary>
-    ///     Test that a blank test name in a requirement reports an error issue with file location.
-    /// </summary>
-    [TestMethod]
-    public void Requirements_Load_BlankTestNameInRequirement_ReportsErrorWithFileLocation()
-    {
-        var yamlContent = @"---
-sections:
-  - title: ""System Security""
-    requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
-        tests:
-          - ""ValidTest""
-          - """"
-          - ""AnotherTest""
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Test name cannot be blank"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
-    }
-
-    /// <summary>
-    ///     Test that a blank test name in a mapping reports an error issue with file location.
-    /// </summary>
-    [TestMethod]
-    public void Requirements_Load_BlankTestNameInMapping_ReportsErrorWithFileLocation()
-    {
-        var yamlContent = @"---
-sections:
-  - title: ""System Security""
-    requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
-
-mappings:
-  - id: ""SYS-SEC-001""
-    tests:
-      - ""ValidTest""
-      - """"
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Test name cannot be blank"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
-    }
-
-    /// <summary>
-    ///     Test that a blank mapping ID reports an error issue with file location.
-    /// </summary>
-    [TestMethod]
-    public void Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation()
-    {
-        var yamlContent = @"---
-sections:
-  - title: ""System Security""
-    requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
-
-mappings:
-  - id: """"
-    tests:
-      - ""ValidTest""
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Mapping 'id' cannot be blank"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
-    }
-
-    /// <summary>
-    ///     Test that duplicate requirement ID message includes file location.
-    /// </summary>
-    [TestMethod]
-    public void Requirements_Load_DuplicateRequirementId_ErrorIncludesFileLocation()
-    {
-        var yamlContent = @"---
-sections:
-  - title: ""System Security""
-    requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
-      - id: ""SYS-SEC-001""
-        title: ""Duplicate ID requirement.""
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("SYS-SEC-001"), result.Issues);
-        Assert.Contains(i => i.Description.Contains("Duplicate requirement ID"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
-    }
-
-    /// <summary>
     ///     Test reading multiple files with params array.
     /// </summary>
     [TestMethod]
     public void Requirements_Load_MultipleFiles_MergesAllFiles()
     {
+        // Arrange: create three YAML files with different sections
         var file1Yaml = @"---
 sections:
   - title: ""System Security""
@@ -736,10 +359,12 @@ sections:
         File.WriteAllText(file2Path, file2Yaml);
         File.WriteAllText(file3Path, file3Yaml);
 
+        // Act: load all three files
         var result = Requirements.Load(file1Path, file2Path, file3Path);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: all three sections merged into the requirements tree
         Assert.IsNotNull(requirements);
         Assert.HasCount(3, requirements.Sections);
         Assert.AreEqual("System Security", requirements.Sections[0].Title);
@@ -756,6 +381,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_MultipleFilesWithSameSections_MergesSections()
     {
+        // Arrange: create two YAML files with the same section title
         var file1Yaml = @"---
 sections:
   - title: ""System Security""
@@ -775,10 +401,12 @@ sections:
         File.WriteAllText(file1Path, file1Yaml);
         File.WriteAllText(file2Path, file2Yaml);
 
+        // Act: load both files
         var result = Requirements.Load(file1Path, file2Path);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: sections with the same title merged into one section with both requirements
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
         Assert.AreEqual("System Security", requirements.Sections[0].Title);
@@ -793,6 +421,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_SingleFileWithParamsArray_WorksCorrectly()
     {
+        // Arrange: create a YAML file with one requirement
         var yamlContent = @"---
 sections:
   - title: ""System Security""
@@ -803,10 +432,12 @@ sections:
         var filePath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
+        // Act: load the requirements file
         var result = Requirements.Load(filePath);
         Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
+        // Assert: requirement loaded correctly
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
         Assert.AreEqual("System Security", requirements.Sections[0].Title);
@@ -820,6 +451,7 @@ sections:
     [TestMethod]
     public void Requirements_Load_NoArguments_ThrowsArgumentException()
     {
+        // Act + Assert: calling Load with no arguments throws ArgumentException
         var ex = Assert.ThrowsExactly<ArgumentException>(() => Requirements.Load());
         Assert.Contains("At least one file path must be provided", ex.Message);
     }
@@ -830,153 +462,8 @@ sections:
     [TestMethod]
     public void Requirements_Load_NullArgument_ThrowsArgumentException()
     {
+        // Act + Assert: calling Load with null throws ArgumentException
         var ex = Assert.ThrowsExactly<ArgumentException>(() => Requirements.Load(null!));
         Assert.Contains("At least one file path must be provided", ex.Message);
-    }
-
-    /// <summary>
-    ///     Test that duplicate IDs across multiple files are detected.
-    /// </summary>
-    [TestMethod]
-    public void Requirements_Load_MultipleFilesWithDuplicateIds_ReportsError()
-    {
-        var file1Yaml = @"---
-sections:
-  - title: ""System Security""
-    requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
-";
-        var file2Yaml = @"---
-sections:
-  - title: ""Data Management""
-    requirements:
-      - id: ""SYS-SEC-001""
-        title: ""Duplicate requirement with same ID.""
-";
-        var file1Path = Path.Combine(_testDirectory, "file1.yaml");
-        var file2Path = Path.Combine(_testDirectory, "file2.yaml");
-        File.WriteAllText(file1Path, file1Yaml);
-        File.WriteAllText(file2Path, file2Yaml);
-
-        var result = Requirements.Load(file1Path, file2Path);
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("SYS-SEC-001"), result.Issues);
-        Assert.Contains(i => i.Description.Contains("Duplicate requirement ID"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(file2Path), result.Issues);
-    }
-
-    /// <summary>
-    ///     Test reading a requirement with tags.
-    /// </summary>
-    [TestMethod]
-    public void Requirements_Load_RequirementWithTags_ParsesTagsCorrectly()
-    {
-        var yamlContent = @"---
-sections:
-  - title: ""System Security""
-    requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
-        tags:
-          - ""security""
-          - ""critical""
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-        Assert.IsFalse(result.HasErrors);
-        var requirements = result.Requirements;
-
-        Assert.IsNotNull(requirements);
-        var req = requirements.Sections[0].Requirements[0];
-        Assert.AreEqual("SYS-SEC-001", req.Id);
-        Assert.HasCount(2, req.Tags);
-        Assert.AreEqual("security", req.Tags[0]);
-        Assert.AreEqual("critical", req.Tags[1]);
-    }
-
-    /// <summary>
-    ///     Test that a blank tag name reports an error issue with file location.
-    /// </summary>
-    [TestMethod]
-    public void Requirements_Load_BlankTagName_ReportsErrorWithFileLocation()
-    {
-        var yamlContent = @"---
-sections:
-  - title: ""System Security""
-    requirements:
-      - id: ""SYS-SEC-001""
-        title: ""The system shall support credentials authentication.""
-        tags:
-          - ""security""
-          - """"
-          - ""critical""
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Tag name cannot be blank"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
-    }
-
-    /// <summary>
-    ///     Test that circular requirements (A -> B -> A) throw an exception at read time.
-    /// </summary>
-    [TestMethod]
-    public void Requirements_Load_CircularRequirements_ThrowsInvalidOperationException()
-    {
-        var yamlContent = @"---
-sections:
-  - title: ""Cyclic Section""
-    requirements:
-      - id: ""REQ-A""
-        title: ""Requirement A""
-        children:
-          - ""REQ-B""
-      - id: ""REQ-B""
-        title: ""Requirement B""
-        children:
-          - ""REQ-A""
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Circular requirement reference detected"), result.Issues);
-        Assert.Contains(i => i.Description.Contains("REQ-A"), result.Issues);
-        Assert.Contains(i => i.Description.Contains("REQ-B"), result.Issues);
-    }
-
-    /// <summary>
-    ///     Test that a self-referencing requirement (A -> A) reports an error issue at load time.
-    /// </summary>
-    [TestMethod]
-    public void Requirements_Load_SelfReferencingRequirement_ReportsCircularReferenceError()
-    {
-        var yamlContent = @"---
-sections:
-  - title: ""Cyclic Section""
-    requirements:
-      - id: ""REQ-A""
-        title: ""Requirement A""
-        children:
-          - ""REQ-A""
-";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
-        File.WriteAllText(filePath, yamlContent);
-
-        var result = Requirements.Load(filePath);
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Circular requirement reference detected"), result.Issues);
-        Assert.Contains(i => i.Description.Contains("REQ-A"), result.Issues);
     }
 }

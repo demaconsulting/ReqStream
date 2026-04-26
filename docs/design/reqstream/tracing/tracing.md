@@ -22,13 +22,14 @@ The `Tracing` subsystem contains the following software unit:
 
 The `Tracing` subsystem exposes the following interface to the rest of the tool:
 
-| Interface                                    | Direction | Description                                               |
-|----------------------------------------------|-----------|-----------------------------------------------------------|
-| `TraceMatrix` constructor                    | Outbound  | Loads test results and maps them to requirements.         |
-| `TraceMatrix.Export`                         | Outbound  | Exports the trace matrix to a Markdown report.            |
-| `TraceMatrix.CalculateSatisfiedRequirements` | Outbound  | Returns satisfied and total requirement counts.           |
-| `TraceMatrix.GetUnsatisfiedRequirements`     | Outbound  | Returns IDs of requirements not covered by passing tests. |
-| `TraceMatrix.GetTestResult`                  | Outbound  | Returns pass/fail counts for a named test across results. |
+| Interface | Description |
+| --- | --- |
+| `TraceMatrix` constructor | Loads test results and maps them to requirements. |
+| `TraceMatrix.Export` | Exports the trace matrix to a Markdown report. |
+| `TraceMatrix.CalculateSatisfiedRequirements` | Returns satisfied and total requirement counts. |
+| `TraceMatrix.GetUnsatisfiedRequirements` | Returns IDs of requirements not covered by passing tests. |
+| `TraceMatrix.GetTestResult` | Returns pass/fail counts for a named test across results. |
+| `TraceMatrix.GetAllTestResults` | Returns pass/fail `TestMetrics` for all tests referenced in requirements. |
 
 ## Interactions
 
@@ -38,10 +39,16 @@ The `Tracing` subsystem exposes the following interface to the rest of the tool:
 | `Requirements` | Uses      | Receives the requirement tree to map tests to requirements.            |
 | `Program`      | Used by   | Constructs `TraceMatrix` and calls enforcement/export methods.         |
 
-## References
+## Error Handling
 
-- [ReqStream System Design][arch]
-- [ReqStream Repository][repo]
+The `Tracing` subsystem raises the following exceptions at the subsystem boundary. Both
+exceptions are thrown by the `TraceMatrix` constructor and propagate to `Program` for
+display as fatal errors.
 
-[arch]: ../reqstream.md
-[repo]: https://github.com/demaconsulting/ReqStream
+- **`FileNotFoundException`** — A path supplied in `testResultFiles` does not exist on disk.
+  The exception message includes the offending file path.
+- **`InvalidOperationException`** — A test result file exists but cannot be parsed
+  (malformed TRX or JUnit XML). The exception message includes the offending file path;
+  the original parse exception is available as the inner exception.
+
+For the full error-handling design of `ProcessTestResultFile`, see the TraceMatrix unit design documentation.

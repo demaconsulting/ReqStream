@@ -21,5 +21,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 // Configure test parallelization for the test assembly.
-// Tests are configured to run sequentially to avoid conflicts with console output capturing.
+// Tests are configured to run sequentially to avoid resource contention on shared process state
+// (file handles, process limits, and current working directory mutations in self-test validation).
 [assembly: DoNotParallelize]

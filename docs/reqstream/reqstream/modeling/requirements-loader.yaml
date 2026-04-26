@@ -1,0 +1,266 @@
+---
+# RequirementsLoader Unit Requirements
+#
+# PURPOSE:
+# - Define requirements for the RequirementsLoader unit (RequirementsLoader.cs)
+# - RequirementsLoader is the YAML deserializer and lint validator for requirements files
+# - Unit requirements describe the structural validation checks performed during loading
+
+sections:
+  - title: Requirements Loading
+    requirements:
+      - id: ReqStream-Lint-InvalidFilePath
+        title: The requirements loader shall report an error when a requirements file path is invalid.
+        justification: |
+          Invalid file paths (e.g. null, empty, or paths containing illegal characters) cannot be
+          opened for reading. Reporting the error with the offending path helps users identify
+          configuration problems before attempting to load requirements.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithInvalidFilePath_ReportsError
+
+      - id: ReqStream-Lint-FileNotFound
+        title: The requirements loader shall report an error when a requirements file is not found.
+        justification: |
+          A missing file path indicates a misconfiguration or stale reference. Reporting the error
+          with the file path allows users to quickly locate and correct the missing file reference.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithMissingFile_ReportsError
+
+      - id: ReqStream-Lint-IoReadFailure
+        title: >-
+          The requirements loader shall report an error when a requirements file
+          cannot be read due to an I/O failure.
+        justification: |
+          I/O failures (e.g. permission denied, disk error) prevent the file from being read.
+          Reporting the error with the file path and failure reason allows users to diagnose
+          access permission or storage problems.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithIoReadFailure_ReportsError
+
+      - id: ReqStream-Lint-NonMappingRoot
+        title: The requirements loader shall report an error when the requirements document root is not a mapping node.
+        justification: |
+          The YAML document root must be a mapping node to be a valid requirements file. A non-mapping
+          root (e.g. a sequence or scalar at the top level) cannot contain sections, requirements, or
+          includes, and would otherwise be silently ignored.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithNonMappingRoot_ReportsError
+
+      - id: ReqStream-Lint-MalformedYaml
+        title: The requirements loader shall report an error when a requirements file contains malformed YAML.
+        justification: |
+          Malformed YAML files cannot be parsed and prevent requirements from being loaded.
+          Reporting the error with a file location helps users identify and fix the syntax problem.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithMalformedYaml_ReportsError
+
+      - id: ReqStream-Lint-UnknownDocumentField
+        title: >-
+          The requirements loader shall report an error when the requirements document contains an unknown
+          field.
+        justification: |
+          Unknown fields may indicate typos or outdated configuration that would otherwise be silently
+          ignored, leading to unexpected behavior.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithUnknownDocumentField_ReportsError
+
+      - id: ReqStream-Lint-UnknownSectionField
+        title: The requirements loader shall report an error when a section contains an unknown field.
+        justification: |
+          Unknown fields in sections may indicate typos or unsupported configuration that would otherwise
+          be silently ignored.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithUnknownSectionField_ReportsError
+
+      - id: ReqStream-Lint-MissingSectionTitle
+        title: The requirements loader shall report an error when a section is missing the required title field.
+        justification: |
+          The title field is mandatory for all sections. Missing it prevents the section from being
+          correctly identified in reports and trace matrices.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithSectionMissingTitle_ReportsError
+          - RequirementsLoader_Load_WithBlankSectionTitle_ReportsError
+
+      - id: ReqStream-Lint-UnknownRequirementField
+        title: The requirements loader shall report an error when a requirement contains an unknown field.
+        justification: |
+          Unknown fields in requirements may indicate typos or unsupported attributes that would otherwise
+          be silently ignored.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithUnknownRequirementField_ReportsError
+          - RequirementsLoader_Load_WithNestedSectionIssues_ReportsError
+
+      - id: ReqStream-Lint-MissingRequirementId
+        title: The requirements loader shall report an error when a requirement is missing or has a blank id field.
+        justification: |
+          The id field is mandatory for all requirements. Missing or blank values cause downstream
+          processing failures, duplicate-ID detection gaps, and produce incomplete reports.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithRequirementMissingId_ReportsError
+          - RequirementsLoader_Load_WithBlankRequirementId_ReportsError
+
+      - id: ReqStream-Lint-MissingRequirementTitle
+        title: The requirements loader shall report an error when a requirement is missing or has a blank title field.
+        justification: |
+          The title field is mandatory for all requirements. Missing or blank values produce incomplete
+          reports and prevent the requirement from being correctly identified in trace matrices.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithRequirementMissingTitle_ReportsError
+          - RequirementsLoader_Load_WithBlankRequirementTitle_ReportsError
+
+      - id: ReqStream-Lint-DuplicateIds
+        title: The requirements loader shall report an error when duplicate requirement IDs are found.
+        justification: |
+          Duplicate requirement IDs cause ambiguity in trace matrices and reports, and can lead to
+          incorrect coverage calculations.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithDuplicateIds_ReportsError
+          - RequirementsLoader_Load_WithDuplicateIdsAcrossFiles_ReportsError
+
+      - id: ReqStream-Lint-MultipleIssues
+        title: The requirements loader shall report all issues found rather than stopping at the first issue.
+        justification: |
+          Reporting all issues at once allows users to fix all problems in a single pass, which is more
+          efficient than fixing one issue at a time and re-running.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithMultipleIssues_ReportsAllIssues
+
+      - id: ReqStream-Lint-FollowsIncludes
+        title: The requirements loader shall follow include directives and load all included files.
+        justification: |
+          Requirements files can include other files. Loading must follow these includes to ensure all
+          referenced files are also checked for issues.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithIncludes_LintsIncludedFiles
+
+      - id: ReqStream-Lint-NoIssuesMessage
+        title: The requirements loader shall report a no-issues result when no problems are found.
+        justification: |
+          Reporting success when no issues are found provides positive confirmation to the user
+          that the requirements files passed all checks.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithValidFile_ReportsNoIssues
+          - RequirementsLoader_Load_WithEmptyFile_ReportsNoIssues
+
+      - id: ReqStream-Lint-ErrorFormat
+        title: "The requirements loader shall format errors as \"[location]: [severity]: [description]\"."
+        justification: |
+          Standard output format with file path and location information allows editors and CI tools
+          to parse the output and navigate directly to the reported issue.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_ErrorFormat_IncludesFileAndLocation
+
+      - id: ReqStream-Lint-UnknownMappingField
+        title: The requirements loader shall report an error when a test mapping contains an unknown field.
+        justification: |
+          Unknown fields in test mappings may indicate typos or unsupported configuration that would
+          otherwise be silently ignored.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithUnknownMappingField_ReportsError
+
+      - id: ReqStream-Lint-MissingMappingId
+        title: The requirements loader shall report an error when a test mapping is missing or has a blank id field.
+        justification: |
+          The id field is mandatory for all test mappings. Missing or blank values prevent the mapping
+          from being associated with a requirement and cause downstream processing failures.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithMappingMissingId_ReportsError
+          - RequirementsLoader_Load_WithBlankMappingId_ReportsError
+
+      - id: ReqStream-Lint-BlankTestName
+        title: The requirements loader shall report an error when a test name in a requirement or mapping is blank.
+        justification: |
+          Blank test names cannot be matched against test result files and would silently break
+          coverage calculations.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithBlankTestName_ReportsError
+          - RequirementsLoader_Load_WithBlankMappingTestName_ReportsError
+
+      - id: ReqStream-Lint-BlankTagName
+        title: The requirements loader shall report an error when a tag name in a requirement is blank.
+        justification: |
+          Blank tag names cannot be used for filtering and would silently produce incorrect filtered
+          exports.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithBlankTagName_ReportsError
+
+      - id: ReqStream-Lint-NonScalarListEntries
+        title: >-
+          The requirements loader shall report an error when a list field contains a non-scalar entry.
+        justification: |
+          List fields such as tests, children, tags, and includes must contain scalar string values.
+          Non-scalar entries (e.g. nested mappings) would be silently ignored without this check,
+          leading to missing coverage or include entries.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithNonScalarTestEntry_ReportsError
+          - RequirementsLoader_Load_WithNonScalarChildEntry_ReportsError
+          - RequirementsLoader_Load_WithNonScalarTagEntry_ReportsError
+          - RequirementsLoader_Load_WithNonScalarMappingTestEntry_ReportsError
+          - RequirementsLoader_Load_WithNonScalarIncludeEntry_ReportsError
+
+      - id: ReqStream-Lint-CircularReferences
+        title: >-
+          The requirements loader shall report an error when circular references are detected in the
+          requirement children graph.
+        justification: |
+          Circular requirement references would cause infinite loops during trace matrix generation.
+          All back-edges in the children graph must be reported, not just the first one found.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithMultipleCycles_ReportsAllCycles
+
+      - id: ReqStream-Lint-UnknownChildReference
+        title: >-
+          The requirements loader shall report an error when a requirement references a child
+          requirement ID that does not exist.
+        justification: |
+          References to non-existent child requirement IDs indicate typos or stale references.
+          Reporting these as errors ensures that requirement hierarchies remain consistent and
+          prevents silent failures in trace matrix generation.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithUnknownChildReference_ReportsError
