@@ -275,7 +275,7 @@ public class TracingTests
         // with the offending path in the message
         var ex = Assert.ThrowsExactly<InvalidOperationException>(() =>
             _ = new TraceMatrix(loadResult.Requirements, malformedFile));
-        Assert.IsTrue(ex.Message.Contains(malformedFile), "Exception message should contain the file path.");
+        Assert.Contains(malformedFile, ex.Message, "Exception message should contain the file path.");
     }
 
     /// <summary>

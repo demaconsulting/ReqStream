@@ -346,7 +346,7 @@ public class IntegrationTests
         Assert.IsTrue(File.Exists(resultsFile), "Results file should be created by --results flag.");
 
         // Assert: results file is non-empty
-        Assert.IsTrue(new FileInfo(resultsFile).Length > 0, "Results file should be non-empty.");
+        Assert.IsGreaterThan(0, new FileInfo(resultsFile).Length, "Results file should be non-empty.");
     }
 
     /// <summary>
@@ -398,11 +398,13 @@ public class IntegrationTests
 
         // Assert: report contains the alpha requirement but not the beta requirement
         var reportContent = File.ReadAllText(reportFile);
-        Assert.IsTrue(
-            reportContent.Contains("Integration-System-TaggedAlpha"),
+        Assert.Contains(
+            "Integration-System-TaggedAlpha",
+            reportContent,
             "Filtered report should contain the alpha-tagged requirement.");
-        Assert.IsFalse(
-            reportContent.Contains("Integration-System-TaggedBeta"),
+        Assert.DoesNotContain(
+            "Integration-System-TaggedBeta",
+            reportContent,
             "Filtered report should not contain the beta-tagged requirement.");
     }
 
@@ -425,7 +427,7 @@ public class IntegrationTests
 
         // Assert: output contains a version string (non-empty, no banner/help)
         Assert.IsFalse(string.IsNullOrWhiteSpace(output), "Expected version output to be non-empty.");
-        Assert.IsFalse(output.Contains("Usage:"), "Version output should not contain usage help.");
+        Assert.DoesNotContain("Usage:", output, "Version output should not contain usage help.");
     }
 
     /// <summary>
@@ -446,8 +448,8 @@ public class IntegrationTests
         Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
 
         // Assert: output contains usage information
-        Assert.IsTrue(output.Contains("Usage:"), $"Expected help output to contain 'Usage:'. Output: {output}");
-        Assert.IsTrue(output.Contains("Options:"), $"Expected help output to contain 'Options:'. Output: {output}");
+        Assert.Contains("Usage:", output, $"Expected help output to contain 'Usage:'. Output: {output}");
+        Assert.Contains("Options:", output, $"Expected help output to contain 'Options:'. Output: {output}");
     }
 
     /// <summary>
@@ -573,11 +575,13 @@ public class IntegrationTests
         // Assert: report was generated containing requirements from both files
         Assert.IsTrue(File.Exists(reportFile), "Report file should have been generated.");
         var reportContent = File.ReadAllText(reportFile);
-        Assert.IsTrue(
-            reportContent.Contains("Integration-Root-Requirement"),
+        Assert.Contains(
+            "Integration-Root-Requirement",
+            reportContent,
             "Report should contain the root requirement.");
-        Assert.IsTrue(
-            reportContent.Contains("Integration-Child-Requirement"),
+        Assert.Contains(
+            "Integration-Child-Requirement",
+            reportContent,
             "Report should contain the included child requirement.");
     }
 
