@@ -79,9 +79,11 @@ for a quick reference of both formats.
 
 `GetAllTestResults` returns a read-only dictionary mapping each test name (referenced by any
 requirement in the tree) to its aggregated `TestMetrics`. Only tests that have been executed at
-least once (`Executed > 0`) are included in the result. This method is not part of the public
-interface to `Program`; the Testing section of the trace matrix report is built directly by
-`ExportTesting` via `BuildTestToRequirementsMap`.
+least once (`Executed > 0`) are included; unexecuted tests are omitted. This method is not
+called by `Export` or `ExportTesting`: the Testing section is built by calling
+`BuildTestToRequirementsMap` and `GetTestResult` directly, so the Testing table includes
+unexecuted tests showing `0 / 0` counts. `GetAllTestResults` is available for callers that
+want an executed-only summary without generating a full report.
 
 ### `GetUnsatisfiedRequirements(filterTags)`
 
@@ -144,11 +146,12 @@ while the Summary reflects full-subtree satisfaction.
   underlying `IOException` or `UnauthorizedAccessException` is propagated to the caller without
   wrapping.
 - `depth`: controls the starting Markdown heading level for the three top-level sections (Summary,
-  Requirements, Testing). Section sub-headings are `depth + 1`; requirement sub-headings are
-  `depth + 2`. Defaults to `1`.
+  Requirements, Testing). Each requirements sub-section heading uses `depth + 1`; individual
+  requirements are rows in a table, not sub-headings. Defaults to `1`.
 - `filterTags`: when non-`null`, only requirements whose `Tags` list contains at least one
-  matching tag are included in the Requirements table, counted in the Summary, and referenced
-  in the Testing section. Defaults to `null`.
+  matching tag are included in the Requirements table and counted in the Summary. The Testing
+  section is filtered by the same criteria: tests linked only from filtered-out requirements do
+  not appear in the Testing table. Defaults to `null`.
 - `rootSection`: `_requirements` is used internally as the root to iterate the requirement tree.
 
 ## Test Name Format Summary
