@@ -18,7 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.ReqStream.Cli;
 using DemaConsulting.ReqStream.Modeling;
 
 namespace DemaConsulting.ReqStream.Tests.Modeling;
@@ -76,33 +75,6 @@ public class RequirementsLoaderTests
         var exitCode = result.HasErrors ? 1 : 0;
         var output = exitCode == 0 && files.Length > 0 ? $"{files[0]}: No issues found" : string.Empty;
         return (exitCode, output, errors);
-    }
-
-    /// <summary>
-    /// Test that loading with no files produces no issues (empty list).
-    /// </summary>
-    [TestMethod]
-    public void RequirementsLoader_Load_WithNoFiles_PrintsMessage()
-    {
-        // Arrange: redirect stdout to capture output
-        var originalOut = Console.Out;
-        using var output = new StringWriter();
-        Console.SetOut(output);
-
-        try
-        {
-            // Act: run program with no arguments
-            using var context = Context.Create([]);
-            Program.Run(context);
-
-            // Assert: exit code is 0 and message includes "No requirements files specified"
-            Assert.AreEqual(0, context.ExitCode);
-            Assert.Contains("No requirements files specified", output.ToString());
-        }
-        finally
-        {
-            Console.SetOut(originalOut);
-        }
     }
 
     /// <summary>

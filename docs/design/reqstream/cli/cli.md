@@ -69,11 +69,3 @@ to all subsystems that need to produce output.
 to `Context.Depth` when not individually overridden by `--report-depth`, `--matrix-depth`, or
 `--justifications-depth` respectively. This means that `--depth 2` applies to all three reports
 unless a report-specific depth flag is also present.
-
-## References
-
-- [ReqStream System Design][arch]
-- [ReqStream Repository][repo]
-
-[arch]: ../reqstream.md
-[repo]: https://github.com/demaconsulting/ReqStream

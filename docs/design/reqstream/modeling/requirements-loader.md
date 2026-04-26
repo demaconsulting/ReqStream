@@ -46,6 +46,10 @@ one call:
 `ValidateCycles` and assembles the `LoadResult`. If any error-level issue was collected,
 `LoadResult.Requirements` is `null`; otherwise it contains the populated tree.
 
+`ValidateCycles` is only invoked when `allRequirements.Count > 0`; when no requirements were
+loaded (e.g. all files were empty or contained only `---`), cycle detection is skipped entirely
+because there are no nodes to traverse.
+
 ### `LoadFile(path)`
 
 `LoadFile` loads a single YAML file and merges its content into the shared `Requirements` tree.
@@ -55,7 +59,10 @@ Four design points govern its behavior:
   before any work is done. If already present, the method returns immediately. This prevents
   infinite loops when files include each other directly or transitively.
 - **YAML parsing**: the file text is parsed into a `YamlStream` using `YamlDotNet`'s
-  `RepresentationModel` DOM API. An empty or `null` root node is silently accepted.
+  `RepresentationModel` DOM API. A `YamlScalarNode` at the document root whose `Value` is
+  `null` or empty (produced by a `---`-only YAML file or a blank document) is silently accepted
+  and treated as an empty file with no sections. Any other non-mapping root node is reported as
+  an error.
 - **Validation and merging**: each section is validated (title must not be blank) and each
   requirement is validated (ID and title must not be blank; ID must not duplicate an entry already
   seen). Validated sections are merged into the tree inline using the same-title merge strategy
@@ -126,13 +133,3 @@ Error-level:
 | `Requirement` | Creates `Requirement` objects and populates their fields |
 | `LintIssue` | Creates `LintIssue` objects for every structural problem found |
 | `LoadResult` | Assembled by `Load` from the requirements tree and collected issues |
-
-## References
-
-- [ReqStream System Design][arch]
-- [Modeling Subsystem Design][modeling]
-- [ReqStream Repository][repo]
-
-[arch]: ../reqstream.md
-[modeling]: modeling.md
-[repo]: https://github.com/demaconsulting/ReqStream

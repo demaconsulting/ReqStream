@@ -29,17 +29,54 @@ namespace DemaConsulting.ReqStream.Tests.Modeling;
 public class LintIssueTests
 {
     /// <summary>
-    /// Test that LintIssue.ToString() formats as "location: severity: description".
+    /// Test that LintIssue.ToString() formats error severity as "error".
     /// </summary>
     [TestMethod]
-    public void LintIssue_ToString_FormatsCorrectly()
+    public void LintIssue_ToString_ErrorSeverity_FormatsAsError()
     {
-        // Arrange: create LintIssue instances with error and warning severity
-        var errorIssue = new LintIssue("file.yaml(3,5)", LintSeverity.Error, "Some error");
-        var warningIssue = new LintIssue("file.yaml", LintSeverity.Warning, "Some warning");
+        // Arrange: create a LintIssue with error severity
+        var issue = new LintIssue("file.yaml(3,5)", LintSeverity.Error, "Some error");
 
-        // Act / Assert: verify ToString formats as "location: severity: description"
-        Assert.AreEqual("file.yaml(3,5): error: Some error", errorIssue.ToString());
-        Assert.AreEqual("file.yaml: warning: Some warning", warningIssue.ToString());
+        // Act / Assert: verify ToString uses "error" for LintSeverity.Error
+        Assert.AreEqual("file.yaml(3,5): error: Some error", issue.ToString());
+    }
+
+    /// <summary>
+    /// Test that LintIssue.ToString() formats warning severity as "warning".
+    /// </summary>
+    [TestMethod]
+    public void LintIssue_ToString_WarningSeverity_FormatsAsWarning()
+    {
+        // Arrange: create a LintIssue with warning severity
+        var issue = new LintIssue("file.yaml", LintSeverity.Warning, "Some warning");
+
+        // Act / Assert: verify ToString uses "warning" for LintSeverity.Warning
+        Assert.AreEqual("file.yaml: warning: Some warning", issue.ToString());
+    }
+
+    /// <summary>
+    /// Test that LintIssue.ToString() handles an empty location correctly.
+    /// </summary>
+    [TestMethod]
+    public void LintIssue_ToString_EmptyLocation_FormatsCorrectly()
+    {
+        // Arrange: create a LintIssue with an empty location string
+        var issue = new LintIssue(string.Empty, LintSeverity.Error, "Some error");
+
+        // Act / Assert: verify ToString still formats as "location: severity: description"
+        Assert.AreEqual(": error: Some error", issue.ToString());
+    }
+
+    /// <summary>
+    /// Test that LintIssue.ToString() handles an empty description correctly.
+    /// </summary>
+    [TestMethod]
+    public void LintIssue_ToString_EmptyDescription_FormatsCorrectly()
+    {
+        // Arrange: create a LintIssue with an empty description string
+        var issue = new LintIssue("file.yaml", LintSeverity.Warning, string.Empty);
+
+        // Act / Assert: verify ToString still formats as "location: severity: description"
+        Assert.AreEqual("file.yaml: warning: ", issue.ToString());
     }
 }

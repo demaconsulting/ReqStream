@@ -216,6 +216,33 @@ public class ProgramTests
     }
 
     /// <summary>
+    /// Test Run with no requirements files prints an informational message.
+    /// </summary>
+    [TestMethod]
+    public void Program_Run_WithNoFiles_PrintsMessage()
+    {
+        // Arrange: redirect stdout to capture output
+        var originalOut = Console.Out;
+        using var output = new StringWriter();
+        Console.SetOut(output);
+
+        try
+        {
+            // Act: run program with no arguments
+            using var context = Context.Create([]);
+            Program.Run(context);
+
+            // Assert: exit code is 0 and message includes "No requirements files specified"
+            Assert.AreEqual(0, context.ExitCode);
+            Assert.Contains("No requirements files specified", output.ToString());
+        }
+        finally
+        {
+            Console.SetOut(originalOut);
+        }
+    }
+
+    /// <summary>
     /// Test Run with no requirements files shows message.
     /// </summary>
     [TestMethod]

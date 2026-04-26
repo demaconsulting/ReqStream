@@ -38,6 +38,13 @@ where the issue occurred, how severe it is, and what the problem is.
 file.yaml(3,5): error: Unknown field 'unknown_field'
 ```
 
+The `LintSeverity` enum values map to the following lowercase strings in `ToString()` output:
+
+| `LintSeverity` value | String in output |
+| -------------------- | ---------------- |
+| `Error`              | `"error"`        |
+| `Warning`            | `"warning"`      |
+
 This format is recognized by editors and CI tools that can parse file locations and navigate to
 the line containing the issue.
 
@@ -47,13 +54,3 @@ the line containing the issue.
 | ---- | --------------------- |
 | `LoadResult` | Holds a list of `LintIssue` objects; routes them to context output |
 | `RequirementsLoader` | Creates `LintIssue` objects during YAML validation |
-
-## References
-
-- [ReqStream System Design][arch]
-- [Modeling Subsystem Design][modeling]
-- [ReqStream Repository][repo]
-
-[arch]: ../reqstream.md
-[modeling]: modeling.md
-[repo]: https://github.com/demaconsulting/ReqStream

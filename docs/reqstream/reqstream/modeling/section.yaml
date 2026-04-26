@@ -19,8 +19,8 @@ sections:
         tags:
           - requirements
         tests:
-          - Requirements_Load_SimpleRequirement_ParsesCorrectly
-          - Requirements_Load_NestedSections_ParsesHierarchyCorrectly
+          - Section_Load_SimpleRequirement_ParsesCorrectly
+          - Section_Load_NestedSections_ParsesHierarchyCorrectly
 
       - id: ReqStream-Section-Nesting
         title: Section shall support nested child sections for hierarchical organization.
@@ -30,5 +30,19 @@ sections:
         tags:
           - requirements
         tests:
-          - Requirements_Load_NestedSections_ParsesHierarchyCorrectly
+          - Section_Load_NestedSections_ParsesHierarchyCorrectly
           - Requirements_Export_NestedSections_CreatesHierarchy
+
+      - id: ReqStream-Section-TitleMerging
+        title: >-
+          Section shall be identified by its title for merging when multiple files contribute
+          to the same hierarchical path.
+        justification: |
+          Title-based identity is the observable invariant that enables modular requirements
+          management: RequirementsLoader uses the title to decide whether to reuse an existing
+          Section or create a new one. Section is responsible for exposing its Title as a
+          stable identity key.
+        tags:
+          - requirements
+        tests:
+          - Requirements_Load_IdenticalSections_MergesCorrectly

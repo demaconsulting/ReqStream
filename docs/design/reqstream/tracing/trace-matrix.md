@@ -72,8 +72,8 @@ test from plain-name lookups in other requirements.
 
 When no `'@'` separator is present, all executions for the test name are summed across all result
 files. If the test name is not found in `_testExecutions`, the method returns `TestMetrics(0, 0)`,
-ensuring callers always receive a valid object. See the [Test Name Format Summary](#test-name-format-summary)
-table for a quick reference of both formats.
+ensuring callers always receive a valid object. See the Test Name Format Summary table below
+for a quick reference of both formats.
 
 ### `GetAllTestResults()`
 
@@ -97,7 +97,7 @@ filtering) and returns a `(satisfied, total)` tuple. It calls `IsRequirementSati
 requirement to determine whether all associated tests have passed. This provides `Program` with the
 counts needed to report coverage status and determine whether `--enforce` should fail.
 
-### `CollectAllTests(requirement)`
+### `CollectAllTests(requirement, rootSection, allTests)`
 
 `CollectAllTests` returns the union of all test names associated with a requirement and its
 entire descendant subtree. Child requirements inherit their parent's coverage obligations, so a
@@ -123,7 +123,8 @@ written in this order by three helper methods: `ExportSummary`, `ExportRequireme
 - **Summary** (`ExportSummary`) — Single sentence: "N of M requirements are satisfied with tests."
 - **Requirements** (`ExportRequirements`) — One sub-section per requirements section;
   table with columns: ID, Tests Linked, Passed, Failed, Not Executed.
-- **Testing** (`ExportTesting`) — Flat table of all executed tests linked to any requirement;
+- **Testing** (`ExportTesting`) — Flat table of all requirement-referenced tests (including
+  unexecuted ones showing 0/0);
   columns: Test, Requirement, Passed, Failed.
 
 **Table format** (Requirements section): `| ID | Tests Linked | Passed | Failed | Not Executed |`
@@ -162,11 +163,3 @@ while the Summary reflects full-subtree satisfaction.
 - **`Program`** — Constructs `TraceMatrix`; calls `CalculateSatisfiedRequirements`, `GetUnsatisfiedRequirements`, and `Export`.
 - **`Requirements`** — Provides the requirement tree; iterated during analysis.
 - **`Validation`** — Exercises `TraceMatrix` with fixture test-result files in validation tests.
-
-## References
-
-- [ReqStream System Design][arch]
-- [ReqStream Repository][repo]
-
-[arch]: ../reqstream.md
-[repo]: https://github.com/demaconsulting/ReqStream

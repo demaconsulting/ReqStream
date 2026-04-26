@@ -97,11 +97,3 @@ via an early return path.
 | `LoadResult` | Calls `context.WriteError` via `ReportIssues` to report linting issues |
 | `Requirements` | Receives `RequirementsFiles`; does not hold a reference to `Context` |
 | `TraceMatrix` | Receives `TestFiles`; does not hold a reference to `Context` |
-
-## References
-
-- [ReqStream System Design][arch]
-- [ReqStream Repository][repo]
-
-[arch]: ../reqstream.md
-[repo]: https://github.com/demaconsulting/ReqStream

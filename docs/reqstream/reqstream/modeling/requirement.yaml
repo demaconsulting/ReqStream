@@ -32,14 +32,40 @@ sections:
           - Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation
 
       - id: ReqStream-Requirements-ParentChild
-        title: Requirement shall support parent-child relationships to other requirements.
+        title: >-
+          Requirement shall support parent-child relationships to other requirements,
+          and blank child IDs shall be rejected.
         justification: |
           Parent-child relationships enable hierarchical requirement decomposition, allowing high-level
-          requirements to be satisfied through lower-level requirements.
+          requirements to be satisfied through lower-level requirements. Rejecting blank child IDs
+          prevents silent failures in cycle detection and trace matrix generation.
         tags:
           - requirements
         tests:
           - Requirements_Load_RequirementWithChildren_ParsesChildrenCorrectly
+          - Requirements_Load_BlankChildIdInRequirement_ReportsErrorWithFileLocation
+
+      - id: ReqStream-Requirements-Tags
+        title: >-
+          Requirement shall support optional tags, and blank tag names shall be rejected.
+        justification: |
+          Tags allow requirements to be categorized and filtered for targeted exports. Rejecting blank
+          tag names prevents silent failures in tag-based filtering and export operations.
+        tags:
+          - requirements
+        tests:
+          - Requirements_Load_RequirementWithTags_ParsesTagsCorrectly
+          - Requirements_Load_BlankTagName_ReportsErrorWithFileLocation
+
+      - id: ReqStream-Requirements-Justification
+        title: Requirement shall support an optional justification field.
+        justification: |
+          Justification text allows stakeholders to understand why a requirement exists without
+          needing to consult external documentation, improving auditability and traceability.
+        tags:
+          - requirements
+        tests:
+          - Requirements_Load_RequirementWithJustification_ParsesJustificationCorrectly
 
       - id: ReqStream-Requirements-TestMappings
         title: Requirement shall store linked test identifiers.

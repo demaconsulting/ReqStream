@@ -26,6 +26,10 @@ during YAML DOM traversal and consumed by `Requirements`, `TraceMatrix`, and the
 - Entries in `Tests`, `Children`, and `Tags` must be non-blank scalar strings.
   Non-scalar or blank entries are reported as errors by `RequirementsLoader`.
 
+**Default property values**: All list properties (`Tests`, `Children`, `Tags`) are initialized
+to empty `List<string>` instances. `Justification` defaults to `null`. `Location` defaults to
+`null`. No property is left uninitialized; callers can safely iterate lists without null checks.
+
 ## Interactions with Other Units
 
 | Unit | Nature of interaction |
@@ -34,13 +38,3 @@ during YAML DOM traversal and consumed by `Requirements`, `TraceMatrix`, and the
 | `Section` | Holds `Requirement` objects in its `Requirements` list |
 | `TraceMatrix` | Reads `Tests` and `Children` to compute coverage |
 | `Requirements` | Exports `Requirement` fields to Markdown via `Export` and `ExportJustifications` |
-
-## References
-
-- [ReqStream System Design][arch]
-- [Modeling Subsystem Design][modeling]
-- [ReqStream Repository][repo]
-
-[arch]: ../reqstream.md
-[modeling]: modeling.md
-[repo]: https://github.com/demaconsulting/ReqStream

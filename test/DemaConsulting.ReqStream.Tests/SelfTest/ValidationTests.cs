@@ -167,6 +167,31 @@ public class ValidationTests
     }
 
     /// <summary>
+    /// Test that Run continues and produces a summary when the results file cannot be written.
+    /// </summary>
+    [TestMethod]
+    public void Validation_Run_WithUnwritableResultsFile_Continues()
+    {
+        // Arrange: create a log file to capture output, and a directory at the results path to force a write failure
+        var logFile = Path.Combine(_testDirectory, "validation-continues.log");
+        var resultsFile = Path.Combine(_testDirectory, "unwritable-results2.trx");
+        Directory.CreateDirectory(resultsFile);
+
+        // Act: run validation with the unwritable results file, capturing output to the log
+        using (var context = Context.Create(["--silent", "--log", logFile, "--results", resultsFile]))
+        {
+            Validation.Run(context);
+        }
+
+        // Assert: the summary block is still present in the log despite the write failure
+        Assert.IsTrue(File.Exists(logFile), "Log file should exist");
+        var logContent = File.ReadAllText(logFile);
+        Assert.Contains("Total Tests:", logContent);
+        Assert.Contains("Passed:", logContent);
+        Assert.Contains("Failed:", logContent);
+    }
+
+    /// <summary>
     /// Test that Run reports an error when the results file has an unsupported extension.
     /// </summary>
     [TestMethod]

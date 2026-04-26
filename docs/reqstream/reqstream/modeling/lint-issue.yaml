@@ -22,4 +22,21 @@ sections:
         tags:
           - lint
         tests:
-          - LintIssue_ToString_FormatsCorrectly
+          - LintIssue_ToString_ErrorSeverity_FormatsAsError
+          - LintIssue_ToString_WarningSeverity_FormatsAsWarning
+
+      - id: ReqStream-Lint-SeverityString
+        title: >-
+          LintSeverity.Error shall produce "error" and LintSeverity.Warning shall produce
+          "warning" in the LintIssue.ToString() output.
+        justification: |
+          Using the lowercase strings "error" and "warning" matches the conventional diagnostic
+          output format expected by editors and CI tools that parse severity from tool output.
+          Specifying the exact strings as requirements ensures that any future change to the enum
+          or its string rendering is caught by regression tests rather than discovered in
+          production CI pipelines.
+        tags:
+          - lint
+        tests:
+          - LintIssue_ToString_ErrorSeverity_FormatsAsError
+          - LintIssue_ToString_WarningSeverity_FormatsAsWarning

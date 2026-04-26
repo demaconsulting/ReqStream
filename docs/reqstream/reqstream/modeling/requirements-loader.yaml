@@ -9,6 +9,45 @@
 sections:
   - title: Requirements Loading
     requirements:
+      - id: ReqStream-Lint-InvalidFilePath
+        title: The requirements loader shall report an error when a requirements file path is invalid.
+        justification: |
+          Invalid file paths (e.g. null, empty, or paths containing illegal characters) cannot be
+          opened for reading. Reporting the error with the offending path helps users identify
+          configuration problems before attempting to load requirements.
+        tags:
+          - lint
+
+      - id: ReqStream-Lint-FileNotFound
+        title: The requirements loader shall report an error when a requirements file is not found.
+        justification: |
+          A missing file path indicates a misconfiguration or stale reference. Reporting the error
+          with the file path allows users to quickly locate and correct the missing file reference.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithMissingFile_ReportsError
+
+      - id: ReqStream-Lint-IoReadFailure
+        title: The requirements loader shall report an error when a requirements file cannot be read due to an I/O failure.
+        justification: |
+          I/O failures (e.g. permission denied, disk error) prevent the file from being read.
+          Reporting the error with the file path and failure reason allows users to diagnose
+          access permission or storage problems.
+        tags:
+          - lint
+
+      - id: ReqStream-Lint-NonMappingRoot
+        title: The requirements loader shall report an error when the requirements document root is not a mapping node.
+        justification: |
+          The YAML document root must be a mapping node to be a valid requirements file. A non-mapping
+          root (e.g. a sequence or scalar at the top level) cannot contain sections, requirements, or
+          includes, and would otherwise be silently ignored.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithNonMappingRoot_ReportsError
+
       - id: ReqStream-Lint-MalformedYaml
         title: The requirements loader shall report an error when a requirements file contains malformed YAML.
         justification: |

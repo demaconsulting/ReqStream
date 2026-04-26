@@ -142,9 +142,3 @@ For example, the `Requirements` unit maps to:
 | Design | `docs/design/reqstream/modeling/requirements.md` |
 | Source | `src/DemaConsulting.ReqStream/Modeling/Requirements.cs` |
 | Tests | `test/DemaConsulting.ReqStream.Tests/Modeling/ModelingTests.cs` |
-
-## References
-
-- [ReqStream Repository][repo]
-
-[repo]: https://github.com/demaconsulting/ReqStream

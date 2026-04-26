@@ -572,4 +572,36 @@ sections:
         Assert.Contains(i => i.Description.Contains("Tag name cannot be blank"), result.Issues);
         Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
     }
+
+    /// <summary>
+    ///     Test that a blank child ID in a requirement reports an error issue with file location.
+    /// </summary>
+    [TestMethod]
+    public void Requirements_Load_BlankChildIdInRequirement_ReportsErrorWithFileLocation()
+    {
+        // Arrange: create a YAML file with a blank entry in a requirement's children list
+        var yamlContent = @"---
+sections:
+  - title: ""System Security""
+    requirements:
+      - id: ""SYS-SEC-001""
+        title: ""The system shall support credentials authentication.""
+        children:
+          - ""AUTH-001""
+          - """"
+      - id: ""AUTH-001""
+        title: ""The system shall validate user credentials.""
+";
+        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        // Act: load the requirements file
+        var result = Requirements.Load(filePath);
+
+        // Assert: error reported with file location for the blank child ID
+        Assert.IsTrue(result.HasErrors);
+        Assert.IsNull(result.Requirements);
+        Assert.Contains(i => i.Description.Contains("Child requirement reference cannot be blank"), result.Issues);
+        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
+    }
 }

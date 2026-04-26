@@ -33,9 +33,11 @@ Both methods walk the section tree recursively, emitting Markdown headings at th
 `depth` and a requirements table for each section. When `filterTags` is non-`null`, only
 requirements whose `Tags` list contains at least one matching tag are included in the output.
 
-**Error handling**: Both methods propagate any `IOException` or `UnauthorizedAccessException`
-thrown by the underlying file-write operations to the caller without wrapping. Callers are
-responsible for handling file-write failures; the methods do not catch or suppress I/O exceptions.
+**Error handling**: Both `Export` and `ExportJustifications` throw `ArgumentException` when
+`filePath` is `null` or empty. Both methods propagate any `IOException` or
+`UnauthorizedAccessException` thrown by the underlying file-write operations to the caller
+without wrapping. Callers are responsible for handling file-write failures; the methods do not
+catch or suppress I/O exceptions.
 
 **Export output format**:
 
@@ -58,13 +60,3 @@ responsible for handling file-write failures; the methods do not catch or suppre
 | `Section` | `Requirements` extends `Section` and inherits its container properties |
 | `Program` | Calls `Requirements.Load` to load requirements and calls `Export` / `ExportJustifications` |
 | `TraceMatrix` | Receives the populated `Requirements` root and iterates the section tree |
-
-## References
-
-- [ReqStream System Design][arch]
-- [Modeling Subsystem Design][modeling]
-- [ReqStream Repository][repo]
-
-[arch]: ../reqstream.md
-[modeling]: modeling.md
-[repo]: https://github.com/demaconsulting/ReqStream

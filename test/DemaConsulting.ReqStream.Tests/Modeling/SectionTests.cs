@@ -57,7 +57,7 @@ public class SectionTests
     /// Test reading a simple YAML file with a single requirement.
     /// </summary>
     [TestMethod]
-    public void Requirements_Load_SimpleRequirement_ParsesCorrectly()
+    public void Section_Load_SimpleRequirement_ParsesCorrectly()
     {
         // Arrange: create a YAML file with a single requirement
         var yamlContent = @"---
@@ -72,10 +72,10 @@ sections:
 
         // Act: load the requirements file
         var result = Requirements.Load(filePath);
-        Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
         // Assert: requirement parsed correctly
+        Assert.IsFalse(result.HasErrors);
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
         Assert.AreEqual("System Security", requirements.Sections[0].Title);
@@ -88,7 +88,7 @@ sections:
     /// Test reading nested sections.
     /// </summary>
     [TestMethod]
-    public void Requirements_Load_NestedSections_ParsesHierarchyCorrectly()
+    public void Section_Load_NestedSections_ParsesHierarchyCorrectly()
     {
         // Arrange: create a YAML file with nested sections
         var yamlContent = @"---
@@ -109,10 +109,10 @@ sections:
 
         // Act: load the requirements file
         var result = Requirements.Load(filePath);
-        Assert.IsFalse(result.HasErrors);
         var requirements = result.Requirements;
 
         // Assert: nested section hierarchy parsed correctly
+        Assert.IsFalse(result.HasErrors);
         Assert.IsNotNull(requirements);
         Assert.HasCount(1, requirements.Sections);
         Assert.AreEqual("Data Management", requirements.Sections[0].Title);
@@ -127,7 +127,7 @@ sections:
     ///     Test that a blank section title reports an error issue with file location.
     /// </summary>
     [TestMethod]
-    public void Requirements_Load_BlankSectionTitle_ReportsErrorWithFileLocation()
+    public void Section_Load_BlankSectionTitle_ReportsErrorWithFileLocation()
     {
         // Arrange: create a YAML file with a blank section title
         var yamlContent = @"---

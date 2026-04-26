@@ -116,11 +116,3 @@ internal error flag and eventually produces a non-zero exit code.
 | `Validation` | Called by `Run` when `--validate` is present |
 | `Requirements` | Constructed in `ProcessRequirements`; provides the requirement tree; also used for linting |
 | `TraceMatrix` | Constructed in `ProcessRequirements` when test files are present |
-
-## References
-
-- [ReqStream System Design][arch]
-- [ReqStream Repository][repo]
-
-[arch]: reqstream.md
-[repo]: https://github.com/demaconsulting/ReqStream

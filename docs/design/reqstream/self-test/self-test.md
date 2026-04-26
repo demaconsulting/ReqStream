@@ -46,14 +46,4 @@ The `SelfTest` subsystem handles the following error conditions:
 
 > **Thread-safety constraint**: `Validation.Run` must not be called concurrently. Each test
 > method uses `DirectorySwitch` to mutate the process working directory, which is a process-wide
-> resource. See the [Validation unit design][validation] for details.
-
-## References
-
-- [ReqStream System Design][arch]
-- [Validation Unit Design][validation]
-- [ReqStream Repository][repo]
-
-[arch]: ../reqstream.md
-[validation]: validation.md
-[repo]: https://github.com/demaconsulting/ReqStream
+> resource. See the Validation unit design documentation for details.

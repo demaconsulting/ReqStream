@@ -33,8 +33,8 @@ delegates all formatting and routing decisions to the `Context` unit.
 
 `LoadResult` has an `internal` constructor called only by `RequirementsLoader.Load`. The
 constructor accepts the `Requirements?` tree and the collected `IReadOnlyList<LintIssue>`.
-`HasErrors` is computed lazily on first access by scanning `Issues` for any entry whose
-`Severity` is `LintSeverity.Error`.
+`HasErrors` is a computed property that evaluates `Issues.Any(i => i.Severity == LintSeverity.Error)`
+on each access.
 
 ## Interactions with Other Units
 
@@ -44,13 +44,3 @@ constructor accepts the `Requirements?` tree and the collected `IReadOnlyList<Li
 | `Requirements` | Returns a `LoadResult` from its `Load` factory method |
 | `Context` | Receives routed issues via `ReportIssues(context)` |
 | `Program` | Calls `result.ReportIssues(context)` and checks `result.HasErrors` |
-
-## References
-
-- [ReqStream System Design][arch]
-- [Modeling Subsystem Design][modeling]
-- [ReqStream Repository][repo]
-
-[arch]: ../reqstream.md
-[modeling]: modeling.md
-[repo]: https://github.com/demaconsulting/ReqStream

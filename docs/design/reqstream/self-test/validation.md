@@ -57,7 +57,7 @@ outcome `Passed` or `Failed`.
 | `.xml` | JUnit serializer (`DemaConsulting.TestResults.IO`) |
 | Any other | Reports error via `context.WriteError` and returns |
 
-The serializer is invoked with the assembled `TestResults` object and the resolved output path.
+The serializer is called with the assembled `TestResults` object, returning a serialized string. The string is then written to the resolved output path via `File.WriteAllText`.
 
 ## Supporting Types
 
@@ -96,11 +96,3 @@ after the test completes, regardless of whether the test passes or fails.
 | `Program` | `Run` internally exercises `Program.Run` or individual workflow methods |
 | `Requirements` | Tests exercise `Requirements.Load` with fixture YAML files |
 | `TraceMatrix` | Tests exercise `TraceMatrix` construction with fixture test-result files |
-
-## References
-
-- [ReqStream System Design][arch]
-- [ReqStream Repository][repo]
-
-[arch]: ../reqstream.md
-[repo]: https://github.com/demaconsulting/ReqStream

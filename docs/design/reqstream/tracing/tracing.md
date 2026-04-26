@@ -51,14 +51,4 @@ display as fatal errors.
   (malformed TRX or JUnit XML). The exception message includes the offending file path;
   the original parse exception is available as the inner exception.
 
-For the full error-handling design of `ProcessTestResultFile`, see [TraceMatrix Unit Design][tm].
-
-## References
-
-- [ReqStream System Design][arch]
-- [TraceMatrix Unit Design][tm]
-- [ReqStream Repository][repo]
-
-[arch]: ../reqstream.md
-[tm]: trace-matrix.md
-[repo]: https://github.com/demaconsulting/ReqStream
+For the full error-handling design of `ProcessTestResultFile`, see the TraceMatrix unit design documentation.

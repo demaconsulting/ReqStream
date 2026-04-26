@@ -12,11 +12,11 @@ properties without adding additional state.
 
 ## Properties
 
-| Property | Type | YAML key | Notes |
-| -------- | ---- | -------- | ----- |
-| `Title` | `string` | `title` | Used to identify and merge sections across files |
-| `Requirements` | `List<Requirement>` | `requirements` | Requirements directly in this section |
-| `Sections` | `List<Section>` | `sections` | Child sections |
+| Property | Type | YAML key | Default | Notes |
+| -------- | ---- | -------- | ------- | ----- |
+| `Title` | `string` | `title` | `""` | Used to identify and merge sections across files |
+| `Requirements` | `List<Requirement>` | `requirements` | `[]` | Requirements directly in this section |
+| `Sections` | `List<Section>` | `sections` | `[]` | Child sections |
 
 ## Section Merging
 
@@ -25,6 +25,10 @@ the same parent, it reuses the existing `Section` object rather than creating a 
 same-title merge strategy is the design decision that enables modular requirements management:
 multiple YAML files can contribute requirements to the same logical section without requiring a
 single monolithic file.
+
+## Error Handling
+
+Section contains no executable logic; all validation errors are produced by `RequirementsLoader`.
 
 ## Interactions with Other Units
 
@@ -35,13 +39,3 @@ single monolithic file.
 | `Requirements` | Extends `Section`; acts as the tree root |
 | `TraceMatrix` | Recursively visits sections to collect requirements |
 | `Requirements.Export` | Recursively visits sections to generate Markdown headings and tables |
-
-## References
-
-- [ReqStream System Design][arch]
-- [Modeling Subsystem Design][modeling]
-- [ReqStream Repository][repo]
-
-[arch]: ../reqstream.md
-[modeling]: modeling.md
-[repo]: https://github.com/demaconsulting/ReqStream

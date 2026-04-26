@@ -19,7 +19,7 @@ sections:
             tags:
               - requirements
             tests:
-              - Requirements_Load_SimpleRequirement_ParsesCorrectly
+              - Section_Load_SimpleRequirement_ParsesCorrectly
               - Requirements_Load_ComplexStructure_ParsesCorrectly
 
           - id: ReqStream-Requirements-Validation
@@ -30,7 +30,7 @@ sections:
             tags:
               - requirements
             tests:
-              - Requirements_Load_BlankSectionTitle_ReportsErrorWithFileLocation
+              - Section_Load_BlankSectionTitle_ReportsErrorWithFileLocation
               - Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation
               - Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation
               - Requirements_Load_DuplicateRequirementId_ReportsError
@@ -54,7 +54,7 @@ sections:
             tags:
               - requirements
             tests:
-              - Requirements_Load_NestedSections_ParsesHierarchyCorrectly
+              - Section_Load_NestedSections_ParsesHierarchyCorrectly
               - Requirements_Export_NestedSections_CreatesHierarchy
 
           - id: ReqStream-Requirements-Includes

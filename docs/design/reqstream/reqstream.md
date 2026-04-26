@@ -173,9 +173,3 @@ without mocking or fixtures.
 | Composite | `Section` trees enable recursive traversal for export and satisfaction calculation |
 | Strategy | Test result parsing tries TRX first, then JUnit; name matching tries source-specific first, then plain |
 | Disposable | `Context` implements `IDisposable` for deterministic log file cleanup |
-
-## References
-
-- [ReqStream Repository][repo]
-
-[repo]: https://github.com/demaconsulting/ReqStream

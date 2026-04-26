@@ -41,3 +41,18 @@ sections:
         tests:
           - LoadResult_ReportIssues_ErrorIssue_SetsContextError
           - LoadResult_ReportIssues_WarningIssue_DoesNotSetContextError
+
+      - id: ReqStream-LoadResult-HasErrors
+        title: >-
+          LoadResult.HasErrors shall return true if and only if Issues contains at least one
+          LintIssue with LintSeverity.Error.
+        justification: |
+          Providing an explicit HasErrors property allows callers to check for error-level issues
+          without manually filtering the Issues list. Tying the property precisely to error-severity
+          issues prevents warnings from being misclassified as fatal, ensuring that callers only abort
+          processing when a genuine error has been reported.
+        tags:
+          - requirements
+        tests:
+          - LoadResult_HasErrors_WithErrorIssue_ReturnsTrue
+          - LoadResult_HasErrors_WithOnlyWarnings_ReturnsFalse
