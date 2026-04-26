@@ -106,6 +106,62 @@ public class RequirementsLoaderTests
     }
 
     /// <summary>
+    /// Test that an invalid file path (containing null characters) reports an error.
+    /// </summary>
+    [TestMethod]
+    public void RequirementsLoader_Load_WithInvalidFilePath_ReportsError()
+    {
+        // Act: attempt to load a file with a null character in the path (invalid on all platforms)
+        var (exitCode, errors) = RunLint("path\0with_null.yaml");
+
+        // Assert: exit code is 1 and error mentions invalid file path
+        Assert.AreEqual(1, exitCode);
+        Assert.Contains("error", errors);
+        Assert.Contains("Invalid file path", errors);
+    }
+
+    /// <summary>
+    /// Test that a file that cannot be read due to an I/O failure reports an error.
+    /// </summary>
+    [TestMethod]
+    public void RequirementsLoader_Load_WithIoReadFailure_ReportsError()
+    {
+        // Skip this test on non-Unix platforms (file permission removal requires Unix)
+        if (!OperatingSystem.IsLinux() && !OperatingSystem.IsMacOS())
+        {
+            Assert.Inconclusive("This test requires Unix file permissions.");
+            return;
+        }
+
+        // Skip if running as root (root can read any file regardless of permissions)
+        if (Environment.IsPrivilegedProcess)
+        {
+            Assert.Inconclusive("This test cannot run as root.");
+            return;
+        }
+
+        // Arrange: create a YAML file and remove all permissions so it cannot be read
+        var reqFile = Path.Combine(_testDirectory, "unreadable.yaml");
+        File.WriteAllText(reqFile, "sections: []");
+        File.SetUnixFileMode(reqFile, UnixFileMode.None);
+        try
+        {
+            // Act: load the file that exists but cannot be read
+            var (exitCode, errors) = RunLint(reqFile);
+
+            // Assert: exit code is 1 and error reports the read failure
+            Assert.AreEqual(1, exitCode);
+            Assert.Contains("error", errors);
+            Assert.Contains("Failed to read file", errors);
+        }
+        finally
+        {
+            // Restore permissions so TestCleanup can delete the file
+            File.SetUnixFileMode(reqFile, UnixFileMode.UserRead | UnixFileMode.UserWrite);
+        }
+    }
+
+    /// <summary>
     /// Test that a file that doesn't exist reports an error.
     /// </summary>
     [TestMethod]

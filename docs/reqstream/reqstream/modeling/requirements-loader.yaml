@@ -17,6 +17,8 @@ sections:
           configuration problems before attempting to load requirements.
         tags:
           - lint
+        tests:
+          - RequirementsLoader_Load_WithInvalidFilePath_ReportsError
 
       - id: ReqStream-Lint-FileNotFound
         title: The requirements loader shall report an error when a requirements file is not found.
@@ -38,6 +40,8 @@ sections:
           access permission or storage problems.
         tags:
           - lint
+        tests:
+          - RequirementsLoader_Load_WithIoReadFailure_ReportsError
 
       - id: ReqStream-Lint-NonMappingRoot
         title: The requirements loader shall report an error when the requirements document root is not a mapping node.
