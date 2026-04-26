@@ -22,14 +22,14 @@ The `Tracing` subsystem contains the following software unit:
 
 The `Tracing` subsystem exposes the following interface to the rest of the tool:
 
-| Interface                                    | Description                                                                                                       |
-|----------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| `TraceMatrix` constructor                    | Loads test results and maps them to requirements.                                                                 |
-| `TraceMatrix.Export`                         | Exports the trace matrix to a Markdown report.                                                                    |
-| `TraceMatrix.CalculateSatisfiedRequirements` | Returns satisfied and total requirement counts.                                                                   |
-| `TraceMatrix.GetUnsatisfiedRequirements`     | Returns IDs of requirements not covered by passing tests.                                                         |
-| `TraceMatrix.GetTestResult`                  | Returns pass/fail counts for a named test across results.                                                         |
-| `TraceMatrix.GetAllTestResults`              | Returns `IReadOnlyDictionary<string, TestMetrics>` of pass/fail counts for all tests referenced in requirements.  |
+| Interface | Description |
+| --- | --- |
+| `TraceMatrix` constructor | Loads test results and maps them to requirements. |
+| `TraceMatrix.Export` | Exports the trace matrix to a Markdown report. |
+| `TraceMatrix.CalculateSatisfiedRequirements` | Returns satisfied and total requirement counts. |
+| `TraceMatrix.GetUnsatisfiedRequirements` | Returns IDs of requirements not covered by passing tests. |
+| `TraceMatrix.GetTestResult` | Returns pass/fail counts for a named test across results. |
+| `TraceMatrix.GetAllTestResults` | Returns pass/fail `TestMetrics` for all tests referenced in requirements. |
 
 ## Interactions
 

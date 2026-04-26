@@ -25,7 +25,7 @@ sections:
           - ReqStream-Command-Cli
           - ReqStream-Command-Version
           - ReqStream-Command-Help
-          - ReqStream-Command-InvalidArgs
+          - ReqStream-Command-UnknownArgs
           - ReqStream-Command-Lint
           - ReqStream-Command-Validate
           - ReqStream-Command-Results

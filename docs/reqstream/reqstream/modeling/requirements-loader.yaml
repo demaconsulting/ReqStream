@@ -29,7 +29,9 @@ sections:
           - RequirementsLoader_Load_WithMissingFile_ReportsError
 
       - id: ReqStream-Lint-IoReadFailure
-        title: The requirements loader shall report an error when a requirements file cannot be read due to an I/O failure.
+        title: >-
+          The requirements loader shall report an error when a requirements file
+          cannot be read due to an I/O failure.
         justification: |
           I/O failures (e.g. permission denied, disk error) prevent the file from being read.
           Reporting the error with the file path and failure reason allows users to diagnose

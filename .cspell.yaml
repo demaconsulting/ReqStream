@@ -30,6 +30,7 @@ words:
   - sonarmark
   - testname
   - tracematrix
+  - Unwritable
   - venv
   - versionmark
   - Weasy

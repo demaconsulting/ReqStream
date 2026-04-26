@@ -57,7 +57,8 @@ outcome `Passed` or `Failed`.
 | `.xml` | JUnit serializer (`DemaConsulting.TestResults.IO`) |
 | Any other | Reports error via `context.WriteError` and returns |
 
-The serializer is called with the assembled `TestResults` object, returning a serialized string. The string is then written to the resolved output path via `File.WriteAllText`.
+The serializer is called with the assembled `TestResults` object, returning a serialized string.
+The string is then written to the resolved output path via `File.WriteAllText`.
 
 ## Supporting Types
 

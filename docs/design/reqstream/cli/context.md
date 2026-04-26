@@ -31,11 +31,11 @@ when the enclosing `using` block in `Program.Main` exits.
 | `TestFiles` | `List<string>` | `--tests` | Expanded list of test-result file paths |
 | `RequirementsReport` | `string?` | `--report` | Destination path for requirements report |
 | `Depth` | `int` | `--depth` | Default heading depth for all reports (default: 1) |
-| `ReportDepth` | `int` | `--report-depth` | Heading depth for requirements report; defaults to `Depth` when not explicitly specified |
+| `ReportDepth` | `int` | `--report-depth` | Heading depth for requirements report; defaults to `Depth` |
 | `Matrix` | `string?` | `--matrix` | Destination path for trace matrix report |
-| `MatrixDepth` | `int` | `--matrix-depth` | Heading depth for trace matrix report; defaults to `Depth` when not explicitly specified |
+| `MatrixDepth` | `int` | `--matrix-depth` | Heading depth for trace matrix report; defaults to `Depth` |
 | `JustificationsFile` | `string?` | `--justifications` | Destination path for justifications report |
-| `JustificationsDepth` | `int` | `--justifications-depth` | Heading depth for justifications report; defaults to `Depth` when not explicitly specified |
+| `JustificationsDepth` | `int` | `--justifications-depth` | Justifications report heading depth; defaults to `Depth` |
 | `ExitCode` | `int` | — | Computed: `_hasErrors ? 1 : 0` |
 
 ## Methods
