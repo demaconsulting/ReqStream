@@ -40,3 +40,4 @@ sections:
           - requirements
         tests:
           - LoadResult_ReportIssues_ErrorIssue_SetsContextError
+          - LoadResult_ReportIssues_WarningIssue_DoesNotSetContextError

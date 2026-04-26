@@ -22,9 +22,9 @@ The `SelfTest` subsystem contains the following software unit:
 
 The `SelfTest` subsystem exposes the following interface to the rest of the tool:
 
-| Interface        | Direction | Description                                                           |
-|------------------|-----------|-----------------------------------------------------------------------|
-| `Validation.Run` | Outbound  | Runs all self-validation tests, prints a summary, and writes results. |
+| Interface        | Description                                                           |
+|------------------|-----------------------------------------------------------------------|
+| `Validation.Run` | Runs all self-validation tests, prints a summary, and writes results. |
 
 ## Interactions
 

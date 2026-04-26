@@ -191,7 +191,7 @@ public class CliTests
 
             // Assert: the error went to stderr, not stdout
             Assert.AreEqual(string.Empty, stdoutCapture.ToString(), "Error must not appear on stdout");
-            StringAssert.Contains(stderrCapture.ToString(), "error message");
+            Assert.Contains("error message", stderrCapture.ToString());
         }
         finally
         {

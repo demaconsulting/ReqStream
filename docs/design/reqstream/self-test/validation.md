@@ -25,6 +25,7 @@ to persist the results.
 > (`Directory.SetCurrentDirectory`). Concurrent calls would race on this shared state, causing
 > tests to resolve relative paths against the wrong directory. The validation subsystem therefore
 > accesses global process state and is not thread-safe.
+
 The six validation tests exist to provide structured, machine-readable evidence that ReqStream
 correctly processes its own input formats. This evidence can be fed back into ReqStream to verify
 the tool's own requirements coverage, enabling a self-hosting compliance workflow.

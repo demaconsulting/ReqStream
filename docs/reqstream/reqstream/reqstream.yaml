@@ -4,20 +4,30 @@ sections:
     sections:
       - title: System Integration
         requirements:
-          - id: ReqStream-System-CliInterface
+          - id: ReqStream-System-VersionDisplay
             title: >-
-              The system shall display version or help information and exit when the
-              corresponding flag is provided.
+              The system shall display version information and exit when the version flag is
+              provided.
             justification: |
-              Providing version and help display at the system level ensures the CLI entry point
-              is a first-class system behavior, distinct from the requirements processing pipeline.
+              Providing the version at the system entry point ensures users and tooling can
+              confirm which release is deployed without running the full pipeline.
             tests:
               - ReqStream_System_CliInterface_VersionFlag_PrintsVersion
+            children:
+              - ReqStream-Cli-Interface
+              - ReqStream-Program-Version
+
+          - id: ReqStream-System-HelpDisplay
+            title: >-
+              The system shall display help information and exit when the help flag is provided.
+            justification: |
+              Providing built-in help at the system entry point enables users to discover
+              available flags and options without consulting external documentation.
+            tests:
               - ReqStream_System_CliInterface_HelpFlag_PrintsHelp
             children:
               - ReqStream-Cli-Interface
               - ReqStream-Cli-MissingArgumentValue
-              - ReqStream-Program-Version
               - ReqStream-Program-Help
 
           - id: ReqStream-System-FullPipeline
@@ -158,14 +168,13 @@ sections:
               - ReqStream-Tracing-Reporting
               - ReqStream-Modeling-Export
 
-          - id: ReqStream-System-OutputControl
+          - id: ReqStream-System-OutputRouting
             title: >-
               The system shall support configurable output routing, including log file output
               and console output suppression, via command-line flags.
             justification: |
               Directing output to a log file and suppressing console output enables quiet operation
-              in automated CI/CD pipelines. Depth options allow control over Markdown heading
-              levels in exported reports. These behaviors are user-visible system features
+              in automated CI/CD pipelines. These behaviors are user-visible system features
               requiring traceability through the Cli subsystem.
             tests:
               - ReqStream_System_OutputControl_LogFlag_WritesOutputToFile
@@ -174,8 +183,20 @@ sections:
               - ReqStream-Cli-Output
               - ReqStream-Cli-StderrRouting
               - ReqStream-Cli-ExitCodeSignaling
-              - ReqStream-Cli-InvalidDepthValue
               - ReqStream-Cli-LogFileOpenFailure
+
+          - id: ReqStream-System-ReportDepth
+            title: >-
+              The system shall support configurable report heading depth via command-line flags.
+            justification: |
+              Depth options allow control over Markdown heading levels in exported reports,
+              enabling integration with external document workflows that require specific
+              heading hierarchies. A single --depth flag sets the default for all report types,
+              with per-report overrides available for fine-grained control.
+            tests:
+              - ReqStream_System_ReportDepth_DepthFlag_GeneratesReportWithCorrectHeadingLevel
+            children:
+              - ReqStream-Cli-InvalidDepthValue
               - ReqStream-Cli-DepthInheritance
 
           - id: ReqStream-System-CrossPlatform
@@ -185,9 +206,14 @@ sections:
               Cross-platform support ensures the tool can be used in diverse development
               environments including Windows, Linux, and macOS, and across the supported .NET
               LTS and current releases. The CI matrix validates this on every build.
-              Test evidence is provided by the platform child requirements, each carrying
-              platform-filtered test references from the CI integration-tests matrix job.
+              This requirement is satisfied by its children: each child carries source-filtered
+              test references from the CI matrix job, scoped to the specific platform or runtime
+              it represents. Satisfaction of all children constitutes complete evidence for this
+              system-level requirement.
             children:
+              # Each child carries source-filtered test references from the CI matrix job,
+              # providing platform- and runtime-specific evidence. Satisfaction of all
+              # children is sufficient to prove this system-level requirement.
               - ReqStream-Platform-Windows
               - ReqStream-Platform-Linux
               - ReqStream-Platform-MacOS

@@ -277,4 +277,52 @@ public class TracingTests
             _ = new TraceMatrix(loadResult.Requirements, malformedFile));
         Assert.IsTrue(ex.Message.Contains(malformedFile), "Exception message should contain the file path.");
     }
+
+    /// <summary>
+    /// Test that the Tracing subsystem exports a trace matrix report to a Markdown file.
+    /// </summary>
+    [TestMethod]
+    public void Tracing_Reporting_SimpleMatrix_CreatesMarkdownFile()
+    {
+        // Arrange: create a requirements file with one traceable requirement
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: Reporting Test Requirements
+                requirements:
+                  - id: Tracing-Report-Req1
+                    title: The system shall be verified by a passing test.
+                    justification: Reporting test justification.
+                    tests:
+                      - Tracing_Reporting_Test1
+            """);
+        var loadResult = Requirements.Load(reqFile);
+        Assert.IsNotNull(loadResult.Requirements);
+
+        // Arrange: create a TRX file with a passing test result
+        var testResults = new TestResults.TestResults { Name = "ReportingRun" };
+        testResults.Results.Add(new TestResult
+        {
+            Name = "Tracing_Reporting_Test1",
+            ClassName = "TracingTests",
+            CodeBase = "Tests.dll",
+            Outcome = TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+        var trxFile = Path.Combine(_testDirectory, "results.trx");
+        File.WriteAllText(trxFile, TrxSerializer.Serialize(testResults));
+
+        // Act: build the trace matrix and export the report
+        var matrix = new TraceMatrix(loadResult.Requirements, trxFile);
+        var mdFile = Path.Combine(_testDirectory, "trace-matrix.md");
+        matrix.Export(mdFile);
+
+        // Assert: the Markdown report file exists and contains required sections
+        Assert.IsTrue(File.Exists(mdFile));
+        var content = File.ReadAllText(mdFile);
+        Assert.Contains("# Summary", content);
+        Assert.Contains("1 of 1 requirements are satisfied with tests.", content);
+        Assert.Contains("# Requirements", content);
+        Assert.Contains("# Testing", content);
+    }
 }

@@ -149,6 +149,24 @@ public class ValidationTests
     }
 
     /// <summary>
+    /// Test that Run reports an error and continues when the results file cannot be written.
+    /// </summary>
+    [TestMethod]
+    public void Validation_Run_WithUnwritableResultsFile_ReportsError()
+    {
+        // Arrange: create a directory at the results file path to force a write failure
+        var resultsFile = Path.Combine(_testDirectory, "unwritable-results.trx");
+        Directory.CreateDirectory(resultsFile);
+        using var context = Context.Create(["--silent", "--results", resultsFile]);
+
+        // Act: run validation
+        Validation.Run(context);
+
+        // Assert: exit code must be 1 indicating the write failure was reported
+        Assert.AreEqual(1, context.ExitCode);
+    }
+
+    /// <summary>
     /// Test that Run reports an error when the results file has an unsupported extension.
     /// </summary>
     [TestMethod]

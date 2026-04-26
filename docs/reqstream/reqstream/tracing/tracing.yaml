@@ -26,14 +26,13 @@ sections:
           - ReqStream-Test-ResultFiles
           - ReqStream-Test-MixedFormats
 
-      - id: ReqStream-Tracing-Coverage
-        title: The Tracing subsystem shall map test results to requirements and determine coverage.
+      - id: ReqStream-Tracing-Mapping
+        title: The Tracing subsystem shall map test results to requirements.
         justification: |
-          Requirement traceability requires mapping each test execution to the requirements
-          it satisfies. This enables enforcement of full test coverage as a quality gate.
+          Mapping each test execution to the requirements it references enables traceability
+          evidence that links implementation testing to specific software requirements.
         tests:
           - Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied
-          - Tracing_Coverage_WithMissingTests_RequirementIsUnsatisfied
         children:
           - ReqStream-Test-SourceFiltering
           - ReqStream-Test-PlainTestNames
@@ -41,7 +40,33 @@ sections:
           - ReqStream-Test-CaseInsensitive
           - ReqStream-Test-PartialFilenames
           - ReqStream-Test-MultipleRequirements
+
+      - id: ReqStream-Tracing-Coverage
+        title: The Tracing subsystem shall determine whether each requirement is covered by passing tests.
+        justification: |
+          Determining requirement coverage from mapped test results enables enforcement of full
+          test coverage as a quality gate.
+        tests:
+          - Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied
+          - Tracing_Coverage_WithMissingTests_RequirementIsUnsatisfied
+        children:
           - ReqStream-Test-ChildRequirements
+
+      - id: ReqStream-Tracing-MissingFile
+        title: The Tracing subsystem shall raise FileNotFoundException when a test result file path does not exist.
+        justification: |
+          Raising a FileNotFoundException with the offending path allows callers to report a clear
+          fatal error, preventing silent data loss from ignored missing files.
+        tests:
+          - TraceMatrix_Constructor_NonExistentFile_ThrowsFileNotFoundException
+
+      - id: ReqStream-Tracing-MalformedFile
+        title: The Tracing subsystem shall raise InvalidOperationException when a test result file cannot be parsed.
+        justification: |
+          Raising an InvalidOperationException with the offending path and the original parse
+          exception as the inner exception allows callers to provide actionable diagnostic output.
+        tests:
+          - TraceMatrix_Constructor_MalformedFile_ThrowsInvalidOperationException
 
       - id: ReqStream-Tracing-Reporting
         title: The Tracing subsystem shall export a trace matrix report to a Markdown file.
@@ -50,7 +75,7 @@ sections:
           that can be embedded in documentation, reviewed in pull requests, and consumed by
           reporting pipelines.
         tests:
-          - TraceMatrix_Export_SimpleTraceMatrix_CreatesMarkdownFile
+          - Tracing_Reporting_SimpleMatrix_CreatesMarkdownFile
         children:
           - ReqStream-Report-TraceMatrix
           - ReqStream-Report-TraceMatrixDepth

@@ -30,7 +30,9 @@ validate and manage requirement documents in a structured and maintainable way.
 - 🏷️ **Tag Filtering** - Categorize and filter requirements using tags
 - 📋 **Justifications** - Document the rationale behind each requirement
 - 📤 **Export Capabilities** - Generate markdown reports for requirements, justifications, and test trace matrices
-- 🔒 **Continuous Compliance** - Compliance evidence generated automatically on every CI run, following
+- 📐 **Configurable Report Depth** - Control Markdown heading levels in exported reports via
+  `--depth`, `--report-depth`, `--matrix-depth`, and `--justifications-depth` flags
+- �🔒 **Continuous Compliance** - Compliance evidence generated automatically on every CI run, following
   the [Continuous Compliance][link-continuous-compliance] methodology
 
 ## Installation

@@ -86,6 +86,18 @@ sections:
               - Program_Run_WithLintFlag_SuppressesBanner
               - Program_Run_WithLintFlag_OnlyOutputsIssues
 
+          - id: ReqStream-Program-LintFailure
+            title: The tool shall exit with a non-zero exit code when linting detects any issues.
+            justification: |
+              Exiting with a non-zero exit code when lint finds issues allows build pipelines
+              and scripts to detect and report requirements quality problems, preventing
+              malformed requirements from silently entering the codebase.
+            tags:
+              - cli
+              - requirements
+            tests:
+              - Program_Run_WithLintFlag_OnlyOutputsIssues
+
           - id: ReqStream-Program-LintNoFiles
             title: >-
               The tool shall report an informational message and exit when linting is

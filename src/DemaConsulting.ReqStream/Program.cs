@@ -27,26 +27,35 @@ using DemaConsulting.ReqStream.Tracing;
 namespace DemaConsulting.ReqStream;
 
 /// <summary>
-/// Main program entry point for the ReqStream tool.
+///     Entry point and top-level dispatch controller for the ReqStream tool.
+///     Separated into <see cref="Run"/> so that tests can construct a <see cref="Cli.Context"/>
+///     and invoke the program logic directly without spawning a new process.
 /// </summary>
 internal static class Program
 {
     /// <summary>
-    ///     Gets the application version string.
+    ///     Cached application version, resolved once at class initialization to avoid
+    ///     repeated reflection on every <see cref="Version"/> access.
     /// </summary>
-    public static string Version
-    {
-        get
-        {
-            var assembly = typeof(Program).Assembly;
-            return assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
-                   ?? assembly.GetName().Version?.ToString()
-                   ?? "Unknown";
-        }
-    }
+    private static readonly string _version =
+        typeof(Program).Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+            ?.InformationalVersion
+        ?? typeof(Program).Assembly.GetName().Version?.ToString()
+        ?? "Unknown";
 
     /// <summary>
-    ///     Main entry point for the application.
+    ///     Gets the application version string. Backed by the <see cref="_version"/> field to
+    ///     avoid repeated reflection calls. Prefers the informational version (which carries
+    ///     pre-release labels and build metadata) over the numeric assembly version, and falls
+    ///     back to <c>"Unknown"</c> so the property never returns <c>null</c>.
+    /// </summary>
+    public static string Version => _version;
+
+    /// <summary>
+    ///     Process entry point. Responsible solely for creating the <see cref="Cli.Context"/>,
+    ///     delegating all program logic to <see cref="Run"/>, and mapping exceptions to exit
+    ///     codes so that callers receive a well-defined exit code regardless of failure mode.
     /// </summary>
     /// <param name="args">Command line arguments.</param>
     /// <returns>Exit code.</returns>
@@ -84,7 +93,9 @@ internal static class Program
     }
 
     /// <summary>
-    ///     Runs the program logic based on the provided context.
+    ///     Implements the priority-ordered dispatch for all program modes. Separated from
+    ///     <see cref="Main"/> so that tests can supply a pre-constructed <see cref="Cli.Context"/>
+    ///     and exercise the full dispatch path without spawning a child process.
     /// </summary>
     /// <param name="context">The context containing command line arguments and program state.</param>
     public static void Run(Context context)
@@ -116,27 +127,30 @@ internal static class Program
             return;
         }
 
-        // Priority 5: Lint requirements files
-        if (context.Lint)
+        // Priority 5: Lint requirements files - early exit when no files specified
+        if (context.Lint && context.RequirementsFiles.Count == 0)
         {
-            if (context.RequirementsFiles.Count == 0)
-            {
-                context.WriteLine("No requirements files specified.");
-                return;
-            }
-
-            var result = Requirements.Load(context.RequirementsFiles.ToArray());
-            result.ReportIssues(context);
-
+            context.WriteLine("No requirements files specified.");
             return;
         }
 
-        // Priority 6: Requirements processing
+        // Priority 6: Lint requirements files - load and report issues
+        if (context.Lint)
+        {
+            var result = Requirements.Load(context.RequirementsFiles.ToArray());
+            result.ReportIssues(context);
+            return;
+        }
+
+        // Priority 7: Requirements processing
         ProcessRequirements(context);
     }
 
     /// <summary>
-    ///     Prints the application banner.
+    ///     Writes the tool identity banner to support compliance audits: every non-trivial
+    ///     invocation records which version was used, satisfying traceability requirements.
+    ///     The banner is suppressed during lint runs so that only actionable issue lines appear
+    ///     in lint output.
     /// </summary>
     /// <param name="context">The context for output.</param>
     private static void PrintBanner(Context context)
@@ -147,7 +161,9 @@ internal static class Program
     }
 
     /// <summary>
-    ///     Prints usage information.
+    ///     Writes the full option listing so users can discover all supported flags without
+    ///     consulting external documentation. Invoked only at dispatch priority 3,
+    ///     when <c>--help</c> is present.
     /// </summary>
     /// <param name="context">The context for output.</param>
     private static void PrintHelp(Context context)
@@ -177,7 +193,11 @@ internal static class Program
     }
 
     /// <summary>
-    ///     Processes requirements files and generates reports as requested.
+    ///     Orchestrates the normal (non-version, non-help, non-validate, non-lint) run, acting
+    ///     as the requirements-processing stage of the dispatch chain. Delegates all domain work
+    ///     to <see cref="Modeling.Requirements"/>, <see cref="Tracing.TraceMatrix"/>, and
+    ///     <see cref="EnforceRequirementsCoverage"/> so that <c>Program</c> itself contains no
+    ///     domain logic.
     /// </summary>
     /// <param name="context">The context containing command line arguments and program state.</param>
     private static void ProcessRequirements(Context context)
@@ -247,7 +267,10 @@ internal static class Program
     }
 
     /// <summary>
-    ///     Enforces that all requirements are satisfied with passing tests.
+    ///     Enforces the compliance contract that every requirement must be backed by at least one
+    ///     passing test. Separated from <see cref="ProcessRequirements"/> to keep enforcement
+    ///     logic isolated and to allow all reports to be generated before a coverage failure
+    ///     is signalled.
     /// </summary>
     /// <param name="context">The context for output.</param>
     /// <param name="traceMatrix">The trace matrix containing test results, or null if no tests were provided.</param>

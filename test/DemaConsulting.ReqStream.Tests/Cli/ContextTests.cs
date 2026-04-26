@@ -403,6 +403,12 @@ public class ContextTests
 
         // Assert: exception message indicates a positive integer is required
         Assert.Contains("--matrix-depth requires a positive integer", ex2.Message);
+
+        // Act: create context with negative matrix-depth (combined with assertion)
+        var ex3 = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--matrix-depth", "-1"]));
+
+        // Assert: exception message indicates a positive integer is required
+        Assert.Contains("--matrix-depth requires a positive integer", ex3.Message);
     }
 
     /// <summary>
@@ -783,7 +789,7 @@ public class ContextTests
     /// Test creating a context with filter argument missing value.
     /// </summary>
     [TestMethod]
-    public void Context_Create_FilterArgumentMissingValue_ThrowsArgumentException()
+    public void Context_Create_FilterArgumentMissingValue_ThrowsException()
     {
         // Act: create context with --filter and no following value (combined with assertion)
         var ex = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--filter"]));
@@ -910,6 +916,12 @@ public class ContextTests
 
         // Assert: exception message indicates a positive integer is required
         Assert.Contains("--justifications-depth requires a positive integer", ex2.Message);
+
+        // Act: create context with negative justifications-depth (combined with assertion)
+        var ex3 = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--justifications-depth", "-1"]));
+
+        // Assert: exception message indicates a positive integer is required
+        Assert.Contains("--justifications-depth requires a positive integer", ex3.Message);
     }
 
     /// <summary>
@@ -976,5 +988,11 @@ public class ContextTests
 
         // Assert: exception message indicates a positive integer is required
         Assert.Contains("--depth requires a positive integer", ex2.Message);
+
+        // Act: create context with negative depth (combined with assertion)
+        var ex3 = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--depth", "-1"]));
+
+        // Assert: exception message indicates a positive integer is required
+        Assert.Contains("--depth requires a positive integer", ex3.Message);
     }
 }

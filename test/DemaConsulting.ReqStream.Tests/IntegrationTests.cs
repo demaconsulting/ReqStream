@@ -120,10 +120,10 @@ public class IntegrationTests
         Assert.Contains("Integration-System-DoSomethingUseful", reportContent);
         Assert.Contains("The system shall do something useful.", reportContent);
 
-        // Assert: trace matrix contains the satisfied requirement
+        // Assert: trace matrix contains the satisfied requirement and its covering test
         var matrixContent = File.ReadAllText(matrixFile);
         Assert.Contains("Integration-System-DoSomethingUseful", matrixContent);
-        Assert.Contains("satisfied with tests", matrixContent);
+        Assert.Contains("IntegrationTest1", matrixContent);
     }
 
     /// <summary>
@@ -579,5 +579,87 @@ public class IntegrationTests
         Assert.IsTrue(
             reportContent.Contains("Integration-Child-Requirement"),
             "Report should contain the included child requirement.");
+    }
+
+    /// <summary>
+    /// Integration test verifying that the --log flag routes output to a file without
+    /// requiring --silent, confirming independent operation of the log flag.
+    /// </summary>
+    [TestMethod]
+    public void ReqStream_System_OutputControl_LogFlag_WithoutSilent_WritesOutputToFileAndConsole()
+    {
+        // Arrange: create a minimal requirements file
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: System Requirements
+                requirements:
+                  - id: Integration-System-LogWithoutSilent
+                    title: The system shall do something.
+                    tests:
+                      - LogWithoutSilentTest1
+            """);
+
+        var logFile = Path.Combine(_testDirectory, "output.log");
+
+        // Act: run with --log flag but without --silent
+        var exitCode = Runner.RunInDirectory(
+            out var output,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--requirements", "requirements.yaml",
+            "--log", logFile);
+
+        // Assert: tool exited successfully
+        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}.");
+
+        // Assert: log file was created with tool output
+        Assert.IsTrue(File.Exists(logFile), "Log file should have been created.");
+        var logContent = File.ReadAllText(logFile);
+        Assert.IsFalse(string.IsNullOrWhiteSpace(logContent), "Log file should contain output.");
+
+        // Assert: console output was also produced (--silent was not specified)
+        Assert.IsFalse(string.IsNullOrWhiteSpace(output), "Console output should not be suppressed without --silent.");
+    }
+
+    /// <summary>
+    /// Integration test verifying that the --depth flag controls the Markdown heading level
+    /// in the generated requirements report, exercising the system-level report depth behavior.
+    /// </summary>
+    [TestMethod]
+    public void ReqStream_System_ReportDepth_DepthFlag_GeneratesReportWithCorrectHeadingLevel()
+    {
+        // Arrange: create a minimal requirements file
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: Depth Test Section
+                requirements:
+                  - id: Integration-System-DepthTest
+                    title: The system shall do something.
+                    tests:
+                      - DepthTest1
+            """);
+
+        var reportFile = Path.Combine(_testDirectory, "report.md");
+
+        // Act: run with --depth 3 to use heading level 3 (###)
+        var exitCode = Runner.RunInDirectory(
+            out var output,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--requirements", "requirements.yaml",
+            "--report", reportFile,
+            "--depth", "3");
+
+        // Assert: tool exited successfully
+        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
+
+        // Assert: report was generated with heading level 3
+        Assert.IsTrue(File.Exists(reportFile), "Report file should have been generated.");
+        var reportContent = File.ReadAllText(reportFile);
+        Assert.Contains("### Depth Test Section", reportContent);
     }
 }

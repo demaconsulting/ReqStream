@@ -23,29 +23,29 @@ The `Cli` subsystem contains the following software unit:
 
 The `Cli` subsystem exposes the following interface to the rest of the tool:
 
-- **`Context.Create`** (Outbound) — Factory method constructing a `Context` from `string[] args`.
-- **`Context.Version`** (Outbound) — `true` when `--version` was specified.
-- **`Context.Help`** (Outbound) — `true` when `--help` was specified.
-- **`Context.Silent`** (Outbound) — `true` when `--silent` was specified.
-- **`Context.Validate`** (Outbound) — `true` when `--validate` was specified.
-- **`Context.Lint`** (Outbound) — `true` when `--lint` was specified.
-- **`Context.Enforce`** (Outbound) — `true` when `--enforce` was specified.
-- **`Context.ResultsFile`** (Outbound) — Path for validation results output file (`--results`), or `null`.
-- **`Context.FilterTags`** (Outbound) — Set of filter tags from `--filter`, or `null` when not specified.
-- **`Context.RequirementsFiles`** (Outbound) — Glob-expanded list of requirements file paths from `--requirements`.
-- **`Context.TestFiles`** (Outbound) — Glob-expanded list of test result file paths from `--tests`.
-- **`Context.RequirementsReport`** (Outbound) — Path for requirements report output file (`--report`), or `null`.
-- **`Context.Depth`** (Outbound) — Default markdown header depth for all reports (`--depth`; default 1).
-- **`Context.ReportDepth`** (Outbound) — Markdown header depth for the requirements report.
-- **`Context.Matrix`** (Outbound) — Path for trace matrix output file (`--matrix`), or `null`.
-- **`Context.MatrixDepth`** (Outbound) — Markdown header depth for the trace matrix.
-- **`Context.JustificationsFile`** (Outbound) — Path for justifications output file (`--justifications`), or `null`.
-- **`Context.JustificationsDepth`** (Outbound) — Markdown header depth for the justifications report.
-- **`Context.WriteLine`** (Outbound) — Writes a message to console and optional log file.
-- **`Context.WriteError`** (Outbound) — Writes an error to stderr (suppressed when `--silent` is active),
+- **`Context.Create`** — Factory method constructing a `Context` from `string[] args`.
+- **`Context.Version`** — `true` when `--version` was specified.
+- **`Context.Help`** — `true` when `--help` was specified.
+- **`Context.Silent`** — `true` when `--silent` was specified.
+- **`Context.Validate`** — `true` when `--validate` was specified.
+- **`Context.Lint`** — `true` when `--lint` was specified.
+- **`Context.Enforce`** — `true` when `--enforce` was specified.
+- **`Context.ResultsFile`** — Path for validation results output file (`--results`), or `null`.
+- **`Context.FilterTags`** — Set of filter tags from `--filter`, or `null` when not specified.
+- **`Context.RequirementsFiles`** — Glob-expanded list of requirements file paths from `--requirements`.
+- **`Context.TestFiles`** — Glob-expanded list of test result file paths from `--tests`.
+- **`Context.RequirementsReport`** — Path for requirements report output file (`--report`), or `null`.
+- **`Context.Depth`** — Default markdown header depth for all reports (`--depth`; default 1).
+- **`Context.ReportDepth`** — Markdown header depth for the requirements report.
+- **`Context.Matrix`** — Path for trace matrix output file (`--matrix`), or `null`.
+- **`Context.MatrixDepth`** — Markdown header depth for the trace matrix.
+- **`Context.JustificationsFile`** — Path for justifications output file (`--justifications`), or `null`.
+- **`Context.JustificationsDepth`** — Markdown header depth for the justifications report.
+- **`Context.WriteLine`** — Writes a message to console and optional log file.
+- **`Context.WriteError`** — Writes an error to stderr (suppressed when `--silent` is active),
   appends it to the log file if logging is enabled, and sets the error exit code.
-- **`Context.ExitCode`** (Outbound) — Returns 0 for success or 1 when errors have been reported.
-- **`Context.Dispose`** (Outbound) — Closes the log file writer and releases resources.
+- **`Context.ExitCode`** — Returns 0 for success or 1 when errors have been reported.
+- **`Context.Dispose`** — Closes the log file writer and releases resources.
 
 ## Interactions
 

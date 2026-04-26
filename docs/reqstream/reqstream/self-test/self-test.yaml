@@ -25,7 +25,6 @@ sections:
           - SelfTest_Qualification_Run_PassesAllTests
         children:
           - ReqStream-Validation-SelfValidation
-          - ReqStream-Validation-NullContext
 
       - id: ReqStream-SelfTest-ResultsOutput
         title: The tool shall write self-validation results to a standard test result file when --results is provided.
@@ -40,3 +39,13 @@ sections:
           - SelfTest_ResultsOutput_XmlResultsPath_WritesJUnitFile
         children:
           - ReqStream-Validation-UnsupportedResultsFormat
+          - ReqStream-Validation-WriteFailure
+
+      - id: ReqStream-SelfTest-FailureReporting
+        title: The tool shall report an error and set exit code 1 when self-validation encounters failures.
+        justification: |
+          Automated test pipelines and CI/CD systems rely on non-zero exit codes to detect
+          tool failures. Reporting each error via WriteError and exiting with code 1 ensures
+          that failures are surfaced to the pipeline and not silently ignored.
+        tests:
+          - SelfTest_FailureReporting_WithErrors_SetsExitCode1

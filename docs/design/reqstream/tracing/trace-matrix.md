@@ -102,7 +102,7 @@ counts needed to report coverage status and determine whether `--enforce` should
 `CollectAllTests` returns the union of all test names associated with a requirement and its
 entire descendant subtree. Child requirements inherit their parent's coverage obligations, so a
 requirement is only considered covered when all tests across its whole subtree pass. Because
-Because `RequirementsLoader.ValidateCycles()` has already confirmed the child graph is acyclic, this method
+`RequirementsLoader.ValidateCycles()` has already confirmed the child graph is acyclic, this method
 recurses without a cycle guard.
 
 ### `IsRequirementSatisfied(requirement)`

@@ -54,6 +54,18 @@ sections:
           - ReqStream-Report-JustificationsDepth
           - ReqStream-Report-TagFilterExport
 
+      - id: ReqStream-Modeling-MultiFileLoading
+        title: The Modeling subsystem shall load requirements from multiple YAML files, following `includes` directives transitively.
+        justification: |
+          Modular requirements management requires the subsystem to resolve `includes` references
+          recursively, merging all referenced files into a single requirements tree. This enables
+          teams to split requirements across files and directories without losing traceability.
+        tests:
+          - Modeling_YamlParsing_ValidFile_LoadsRequirements
+        children:
+          - ReqStream-Requirements-Includes
+          - ReqStream-Requirements-SectionMerging
+
       - id: ReqStream-Modeling-Linting
         title: The Modeling subsystem shall perform requirements file linting.
         justification: |

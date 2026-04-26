@@ -58,17 +58,27 @@ sections:
             tests:
               - Context_WriteError_NormalMode_WritesToConsole
 
-          - id: ReqStream-Command-InvalidArgs
-            title: The tool shall reject unknown or malformed command-line arguments with a descriptive error.
+          - id: ReqStream-Command-UnknownArgs
+            title: The tool shall reject unknown command-line arguments with a descriptive error.
             justification: |
-              Providing clear feedback for invalid arguments helps users quickly correct
-              mistakes and prevents silent misconfiguration.
+              Providing clear feedback for unrecognized arguments helps users quickly identify
+              typos and prevents silent misconfiguration caused by arguments being silently ignored.
             tags:
               - cli
             tests:
               - Context_Create_UnsupportedArgument_ThrowsException
+
+          - id: ReqStream-Command-MalformedArgs
+            title: The tool shall reject malformed command-line arguments with a descriptive error.
+            justification: |
+              Providing clear feedback when a flag that requires a value is missing its value
+              helps users quickly correct mistakes and prevents silent misconfiguration.
+            tags:
+              - cli
+            tests:
               - Context_Create_MissingLogFilename_ThrowsException
               - Context_Create_MissingResultsFilename_ThrowsException
+              - Context_Create_FilterArgumentMissingValue_ThrowsException
 
           - id: ReqStream-Command-RequirementsGlobPatterns
             title: The tool shall support glob patterns for requirements files.

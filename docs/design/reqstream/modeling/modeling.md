@@ -26,13 +26,13 @@ The `Modeling` subsystem contains the following software units:
 
 The `Modeling` subsystem exposes the following interface to the rest of the tool:
 
-| Interface                          | Direction | Description                                                         |
-|------------------------------------|-----------|---------------------------------------------------------------------|
-| `Requirements.Load`                | Outbound  | Reads and merges YAML requirement files into a requirement tree.    |
-| `Requirements.Export`              | Outbound  | Exports requirements to a Markdown report.                          |
-| `Requirements.ExportJustifications`| Outbound  | Exports requirement justifications to a Markdown report.            |
-| `LoadResult.ReportIssues`          | Outbound  | Reports lint issues discovered during loading via the context.      |
-| `RequirementsLoader.Load`          | Outbound  | Deserializes a single requirements file and collects lint issues.   |
+| Interface                           | Description                                                                                                                                                                                                          |
+|-------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Requirements.Load`                 | Reads and merges YAML requirement files into a requirement tree.                                                                                                                                                     |
+| `Requirements.Export`               | Exports requirements to a Markdown report. Optional `depth` (default 1) sets the starting Markdown header level. Optional `filterTags` restricts output to requirements carrying at least one matching tag.          |
+| `Requirements.ExportJustifications` | Exports requirement justifications to a Markdown report. Optional `depth` (default 1) sets the starting Markdown header level. Optional `filterTags` restricts output to requirements carrying at least one matching tag. |
+| `LoadResult.ReportIssues`           | Reports lint issues discovered during loading via the context.                                                                                                                                                       |
+| `RequirementsLoader.Load`           | Deserializes a single requirements file and collects lint issues.                                                                                                                                                    |
 
 ## Interactions
 

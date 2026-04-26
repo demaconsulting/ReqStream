@@ -119,7 +119,8 @@ processing invocation, tracing them from origin to the process exit code:
 | YAML files | Requirements content | `Requirements.Load` |
 | Test result files | Test execution records | `TraceMatrix` |
 | `Context` | Expanded file lists and flags | `Requirements.Load` |
-| `Requirements.Load` | Parsed requirement tree | `TraceMatrix` |
+| `Requirements.Load` | Parsed requirement tree | `Program` |
+| `Program` | Parsed requirement tree | `TraceMatrix` |
 | `Requirements.Load` + `result.ReportIssues` | Lint warnings/errors | `context.WriteError` → `Context.ExitCode` |
 | `TraceMatrix` | Coverage analysis | Markdown reports |
 | `Program.EnforceRequirementsCoverage` | Unsatisfied requirements | `context.WriteError` → `Context.ExitCode` |
