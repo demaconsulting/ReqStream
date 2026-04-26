@@ -79,9 +79,9 @@ for a quick reference of both formats.
 
 `GetAllTestResults` returns a read-only dictionary mapping each test name (referenced by any
 requirement in the tree) to its aggregated `TestMetrics`. Only tests that have been executed at
-least once (`Executed > 0`) are included in the result. This method is called internally by
-`Export` to populate the Testing section of the trace matrix report; it is not part of the
-public interface to `Program`.
+least once (`Executed > 0`) are included in the result. This method is not part of the public
+interface to `Program`; the Testing section of the trace matrix report is built directly by
+`ExportTesting` via `BuildTestToRequirementsMap`.
 
 ### `GetUnsatisfiedRequirements(filterTags)`
 
@@ -147,8 +147,8 @@ while the Summary reflects full-subtree satisfaction.
   Requirements, Testing). Section sub-headings are `depth + 1`; requirement sub-headings are
   `depth + 2`. Defaults to `1`.
 - `filterTags`: when non-`null`, only requirements whose `Tags` list contains at least one
-  matching tag are included in the Requirements table and counted in the Summary. The Testing
-  section is unaffected by tag filtering. Defaults to `null`.
+  matching tag are included in the Requirements table, counted in the Summary, and referenced
+  in the Testing section. Defaults to `null`.
 - `rootSection`: `_requirements` is used internally as the root to iterate the requirement tree.
 
 ## Test Name Format Summary
