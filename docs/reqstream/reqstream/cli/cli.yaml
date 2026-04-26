@@ -98,8 +98,9 @@ sections:
           - Cli_Interface_LogFileOpenFailure_ThrowsArgumentException
 
       - id: ReqStream-Cli-DepthInheritance
-        title: The Cli subsystem shall apply the depth value as the default for per-report depth options not individually
-          specified.
+        title: >-
+          The Cli subsystem shall apply the depth value as the default for per-report
+          depth options not individually specified.
         justification: |
           Providing a single --depth option that sets the default for all per-report depth
           options reduces repetition in common invocations and simplifies pipeline configuration

@@ -14,10 +14,6 @@ This introduction covers the following topics:
 - Key features and capabilities
 - Primary use cases
 
-Detailed topics — including the YAML requirements file format, CLI usage reference, test
-mapping, report exports, enforcement, and troubleshooting — are covered in the additional
-sections of this guide.
-
 This guide does not cover the internal implementation of ReqStream or advanced customization beyond the documented
 command-line options and YAML format.
 

@@ -12,10 +12,8 @@ when the enclosing `using` block in `Program.Main` exits.
 
 ## Private State
 
-| Field | Type | CLI flag | Purpose |
-| ----- | ---- | -------- | ------- |
-| `_logWriter` | `StreamWriter?` | `--log` | Open writer for the optional log file; `null` when no log file was requested |
-| `_hasErrors` | `bool` | — | Accumulates error state; initially `false`; set to `true` by `WriteError` |
+- **`_logWriter`** (`StreamWriter?`, `--log`) — Open writer for the optional log file; `null` when no log file was requested.
+- **`_hasErrors`** (`bool`) — Accumulates error state; initially `false`; set to `true` by `WriteError`.
 
 ## Properties
 

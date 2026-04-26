@@ -38,7 +38,7 @@ public class LoadResultTests
     [TestInitialize]
     public void TestInitialize()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_loadresult_test_{Guid.NewGuid()}");
+        _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_load_result_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
     }
 

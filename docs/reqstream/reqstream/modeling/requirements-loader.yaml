@@ -63,19 +63,26 @@ sections:
           - RequirementsLoader_Load_WithUnknownRequirementField_ReportsError
           - RequirementsLoader_Load_WithNestedSectionIssues_ReportsError
 
-      - id: ReqStream-Lint-MissingRequirementFields
-        title: >-
-          The requirements loader shall report an error when a requirement is missing or has a blank id or
-          title field.
+      - id: ReqStream-Lint-MissingRequirementId
+        title: The requirements loader shall report an error when a requirement is missing or has a blank id field.
         justification: |
-          The id and title fields are mandatory for all requirements. Missing or blank values cause downstream
-          processing failures and produce incomplete reports.
+          The id field is mandatory for all requirements. Missing or blank values cause downstream
+          processing failures, duplicate-ID detection gaps, and produce incomplete reports.
         tags:
           - lint
         tests:
           - RequirementsLoader_Load_WithRequirementMissingId_ReportsError
-          - RequirementsLoader_Load_WithRequirementMissingTitle_ReportsError
           - RequirementsLoader_Load_WithBlankRequirementId_ReportsError
+
+      - id: ReqStream-Lint-MissingRequirementTitle
+        title: The requirements loader shall report an error when a requirement is missing or has a blank title field.
+        justification: |
+          The title field is mandatory for all requirements. Missing or blank values produce incomplete
+          reports and prevent the requirement from being correctly identified in trace matrices.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithRequirementMissingTitle_ReportsError
           - RequirementsLoader_Load_WithBlankRequirementTitle_ReportsError
 
       - id: ReqStream-Lint-DuplicateIds

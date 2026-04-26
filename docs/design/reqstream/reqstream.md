@@ -24,6 +24,7 @@ processing invocation:
 | `TraceMatrix` | Coverage data | `Program.EnforceRequirementsCoverage` |
 | Requirement tree | Export input | Requirements and justifications report files (`--report`, `--justifications`) |
 | `TraceMatrix` + requirement tree | Export input | Trace matrix report file (`--matrix`) |
+| `Context.ResultsFile` | Output file path | `Validation.Run` |
 
 ## Integrated Processing Pipeline
 
@@ -91,7 +92,10 @@ When `--validate` is specified, `Program.Run` delegates entirely to `Validation.
 `Validation` is self-contained: it creates temporary directories, writes fixture files, and invokes
 the same `Program` methods used in normal processing. The self-validation path exercises the
 integrated pipeline internally and produces structured test-result output in TRX or JUnit format
-so that the evidence can be fed back into ReqStream's own requirements enforcement.
+so that the evidence can be fed back into ReqStream's own requirements enforcement. When
+`Context.ResultsFile` is non-`null` (set by the `--results` flag), `Validation.Run` writes the
+test-result output to that file path; otherwise the results are written only to the console
+output channel.
 
 ## Interactions Between Units
 
@@ -116,9 +120,9 @@ processing invocation, tracing them from origin to the process exit code:
 | Test result files | Test execution records | `TraceMatrix` |
 | `Context` | Expanded file lists and flags | `Requirements.Load` |
 | `Requirements.Load` | Parsed requirement tree | `TraceMatrix` |
-| `Requirements.Load` + `result.ReportIssues` | Lint issues (warnings/errors) | `context.WriteError` → `Context._hasErrors` → `Context.ExitCode` |
+| `Requirements.Load` + `result.ReportIssues` | Lint warnings/errors | `context.WriteError` → `Context.ExitCode` |
 | `TraceMatrix` | Coverage analysis | Markdown reports |
-| `Program.EnforceRequirementsCoverage` (unsatisfied requirements) | Error messages via `context.WriteError` | `Context._hasErrors` → `Context.ExitCode` |
+| `Program.EnforceRequirementsCoverage` | Unsatisfied requirements | `context.WriteError` → `Context.ExitCode` |
 
 ## Platform Support
 

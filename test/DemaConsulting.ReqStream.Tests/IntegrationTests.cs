@@ -230,6 +230,41 @@ public class IntegrationTests
     }
 
     /// <summary>
+    /// Integration test verifying that the --lint flag exits silently with code 0 when a valid
+    /// requirements file is provided, confirming the no-output-on-success design.
+    /// </summary>
+    [TestMethod]
+    public void ReqStream_System_Lint_ValidRequirementsFile_ExitsSilentlyWithZero()
+    {
+        // Arrange: create a structurally valid requirements file
+        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: System Requirements
+                requirements:
+                  - id: Integration-System-ValidLintRequirement
+                    title: The system shall perform a lint-clean operation.
+                    tests:
+                      - LintTest1
+            """);
+
+        // Act: run lint as an external process
+        var exitCode = Runner.RunInDirectory(
+            out var output,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--lint",
+            "--requirements", "requirements.yaml");
+
+        // Assert: lint exits with code 0 because no issues were found
+        Assert.AreEqual(0, exitCode, $"Expected exit code 0 from lint on valid file, but got {exitCode}. Output: {output}");
+
+        // Assert: no output was produced (silent on success)
+        Assert.AreEqual(string.Empty, output.Trim(), $"Expected no output from lint on valid file, but got: {output}");
+    }
+
+    /// <summary>
     /// Integration test verifying that the --lint flag lints requirements files and reports
     /// structural issues in a single invocation, exercising the system-level lint behavior.
     /// </summary>

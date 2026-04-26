@@ -77,6 +77,7 @@ sections:
               silent failures in downstream processing.
             tests:
               - ReqStream_System_Lint_Flag_ReportsLintIssues
+              - ReqStream_System_Lint_ValidRequirementsFile_ExitsSilentlyWithZero
             children:
               - ReqStream-Program-Lint
               - ReqStream-Modeling-Linting
@@ -184,8 +185,8 @@ sections:
               Cross-platform support ensures the tool can be used in diverse development
               environments including Windows, Linux, and macOS, and across the supported .NET
               LTS and current releases. The CI matrix validates this on every build.
-            tests:
-              - ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces
+              Test evidence is provided by the platform child requirements, each carrying
+              platform-filtered test references from the CI integration-tests matrix job.
             children:
               - ReqStream-Platform-Windows
               - ReqStream-Platform-Linux

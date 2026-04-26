@@ -37,11 +37,12 @@ The `SelfTest` subsystem exposes the following interface to the rest of the tool
 
 The `SelfTest` subsystem handles the following error conditions:
 
-| Condition | Handling |
-|-----------|----------|
-| One or more self-validation tests fail | `context.WriteError` is called for each failing test; the method returns without setting a success state, so `context.ExitCode` is `1`. |
-| Results file has an unsupported extension | `context.WriteError` is called with a descriptive message; no results file is written. |
-| Results file cannot be written (e.g., permission denied, path invalid) | `context.WriteError` is called with the exception message; the file is not written and execution continues normally. |
+- **One or more self-validation tests fail** — `context.WriteError` is called for each failing test;
+  the method returns without setting a success state, so `context.ExitCode` is `1`.
+- **Results file has an unsupported extension** — `context.WriteError` is called with a descriptive
+  message; no results file is written.
+- **Results file cannot be written** (e.g., permission denied, path invalid) — `context.WriteError`
+  is called with the exception message; the file is not written and execution continues normally.
 
 > **Thread-safety constraint**: `Validation.Run` must not be called concurrently. Each test
 > method uses `DirectorySwitch` to mutate the process working directory, which is a process-wide

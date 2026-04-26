@@ -75,7 +75,8 @@ sections:
           - ReqStream-Lint-UnknownSectionField
           - ReqStream-Lint-MissingSectionTitle
           - ReqStream-Lint-UnknownRequirementField
-          - ReqStream-Lint-MissingRequirementFields
+          - ReqStream-Lint-MissingRequirementId
+          - ReqStream-Lint-MissingRequirementTitle
           - ReqStream-Lint-DuplicateIds
           - ReqStream-Lint-MultipleIssues
           - ReqStream-Lint-FollowsIncludes

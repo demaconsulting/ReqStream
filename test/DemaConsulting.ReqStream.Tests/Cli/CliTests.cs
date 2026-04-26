@@ -152,7 +152,7 @@ public class CliTests
         // Arrange: nothing to arrange - the invalid depth is the input
 
         // Act + Assert: creating a context with a non-integer depth throws ArgumentException
-        Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--depth", "notanumber"]));
+        Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--depth", "not-a-number"]));
     }
 
     /// <summary>
@@ -172,6 +172,7 @@ public class CliTests
     /// Test that WriteError writes to the error channel, not standard output.
     /// </summary>
     [TestMethod]
+    [DoNotParallelize]
     public void Cli_Output_WriteError_WritesToErrorChannel()
     {
         // Arrange: redirect both stdout and stderr to capture writes separately
@@ -203,6 +204,7 @@ public class CliTests
     /// Test that ExitCode returns 1 after WriteError is called.
     /// </summary>
     [TestMethod]
+    [DoNotParallelize]
     public void Cli_Output_WriteError_SetsExitCodeToOne()
     {
         // Arrange: redirect stderr to suppress console noise during the test

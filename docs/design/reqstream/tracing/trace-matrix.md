@@ -102,7 +102,7 @@ counts needed to report coverage status and determine whether `--enforce` should
 `CollectAllTests` returns the union of all test names associated with a requirement and its
 entire descendant subtree. Child requirements inherit their parent's coverage obligations, so a
 requirement is only considered covered when all tests across its whole subtree pass. Because
-`Requirements.ValidateCycles()` has already confirmed the child graph is acyclic, this method
+Because `RequirementsLoader.ValidateCycles()` has already confirmed the child graph is acyclic, this method
 recurses without a cycle guard.
 
 ### `IsRequirementSatisfied(requirement)`
@@ -120,11 +120,11 @@ written in this order by three helper methods: `ExportSummary`, `ExportRequireme
 
 **Output structure**:
 
-| Section | Helper | Description |
-| ------- | ------ | ----------- |
-| Summary | `ExportSummary` | Single sentence: "N of M requirements are satisfied with tests." |
-| Requirements | `ExportRequirements` | One sub-section per requirements section; table with columns: ID, Tests Linked, Passed, Failed, Not Executed |
-| Testing | `ExportTesting` | Flat table of all executed tests linked to any requirement; columns: Test, Requirement, Passed, Failed |
+- **Summary** (`ExportSummary`) — Single sentence: "N of M requirements are satisfied with tests."
+- **Requirements** (`ExportRequirements`) — One sub-section per requirements section;
+  table with columns: ID, Tests Linked, Passed, Failed, Not Executed.
+- **Testing** (`ExportTesting`) — Flat table of all executed tests linked to any requirement;
+  columns: Test, Requirement, Passed, Failed.
 
 **Table format** (Requirements section): `| ID | Tests Linked | Passed | Failed | Not Executed |`
 
@@ -159,11 +159,9 @@ while the Summary reflects full-subtree satisfaction.
 
 ## Interactions with Other Units
 
-| Unit | Nature of interaction |
-| ---- | --------------------- |
-| `Program` | Constructs `TraceMatrix`; calls `CalculateSatisfiedRequirements`, `GetUnsatisfiedRequirements`, and `Export` |
-| `Requirements` | Provides the requirement tree; iterated during analysis |
-| `Validation` | Exercises `TraceMatrix` with fixture test-result files in validation tests |
+- **`Program`** — Constructs `TraceMatrix`; calls `CalculateSatisfiedRequirements`, `GetUnsatisfiedRequirements`, and `Export`.
+- **`Requirements`** — Provides the requirement tree; iterated during analysis.
+- **`Validation`** — Exercises `TraceMatrix` with fixture test-result files in validation tests.
 
 ## References
 

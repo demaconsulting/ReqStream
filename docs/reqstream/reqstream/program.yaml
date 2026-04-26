@@ -87,8 +87,9 @@ sections:
               - Program_Run_WithLintFlag_OnlyOutputsIssues
 
           - id: ReqStream-Program-LintNoFiles
-            title: The tool shall report an informational message and exit when linting is requested without specifying any
-              requirements files.
+            title: >-
+              The tool shall report an informational message and exit when linting is
+              requested without specifying any requirements files.
             justification: |
               Reporting a clear message when the lint flag is used without any --requirements
               arguments prevents silent no-op runs and provides actionable feedback to users

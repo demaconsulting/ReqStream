@@ -14,14 +14,13 @@ them into a unified requirement tree, and exposes that tree to the rest of the t
 
 The `Modeling` subsystem contains the following software units:
 
-| Unit                 | File                             | Responsibility                                                         |
-|----------------------|----------------------------------|------------------------------------------------------------------------|
-| `LintIssue`          | `Modeling/LintIssue.cs`          | Lint issue with severity, file location, and description.              |
-| `LoadResult`         | `Modeling/LoadResult.cs`         | Combined result of loading requirements and associated lint issues.     |
-| `Requirement`        | `Modeling/Requirement.cs`        | Single requirement with ID, title, tags, and test links.               |
-| `Requirements`       | `Modeling/Requirements.cs`       | YAML parsing, section merging, and requirements document.              |
-| `RequirementsLoader` | `Modeling/RequirementsLoader.cs` | YAML deserializer and lint validator for individual requirements files. |
-| `Section`            | `Modeling/Section.cs`            | Named group of requirements within a requirements document.            |
+- **`LintIssue`** (`Modeling/LintIssue.cs`) — Lint issue with severity, file location, and description.
+- **`LoadResult`** (`Modeling/LoadResult.cs`) — Combined result of loading requirements and associated lint issues.
+- **`Requirement`** (`Modeling/Requirement.cs`) — Single requirement with ID, title, tags, and test links.
+- **`Requirements`** (`Modeling/Requirements.cs`) — YAML parsing, section merging, and requirements document.
+- **`RequirementsLoader`** (`Modeling/RequirementsLoader.cs`) — YAML deserializer and lint validator
+  for individual requirements files.
+- **`Section`** (`Modeling/Section.cs`) — Named group of requirements within a requirements document.
 
 ## Interfaces
 
