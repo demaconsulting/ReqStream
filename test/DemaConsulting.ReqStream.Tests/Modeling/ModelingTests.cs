@@ -138,12 +138,11 @@ public class ModelingTests
 
         // Assert: an error-level lint issue was detected
         Assert.IsTrue(result.HasErrors);
-        Assert.IsTrue(result.Issues.Count > 0, "Expected at least one lint issue to be reported.");
-        Assert.IsTrue(result.Issues.Any(i => i.Severity == LintSeverity.Error), "Expected at least one Error-severity lint issue.");
+        Assert.IsNotEmpty(result.Issues, "Expected at least one lint issue to be reported.");
+        Assert.Contains(i => i.Severity == LintSeverity.Error, result.Issues, "Expected at least one Error-severity lint issue.");
     }
 
     /// <summary>
-    /// Test that a requirements Markdown report is generated correctly.
     /// </summary>
     [TestMethod]
     public void Modeling_Export_Requirements_GeneratesMarkdownFile()
@@ -229,8 +228,8 @@ public class ModelingTests
         // Assert: an error-level lint issue is reported and requirements are null
         Assert.IsTrue(result.HasErrors);
         Assert.IsNull(result.Requirements);
-        Assert.IsTrue(result.Issues.Count > 0, "Expected at least one lint issue to be reported.");
-        Assert.IsTrue(result.Issues.Any(i => i.Severity == LintSeverity.Error), "Expected at least one Error-severity lint issue.");
+        Assert.IsNotEmpty(result.Issues, "Expected at least one lint issue to be reported.");
+        Assert.Contains(i => i.Severity == LintSeverity.Error, result.Issues, "Expected at least one Error-severity lint issue.");
     }
 
     /// <summary>
@@ -285,7 +284,7 @@ public class ModelingTests
 
         // Assert: both lint issues are reported (not just HasErrors == true)
         Assert.IsTrue(result.HasErrors);
-        Assert.IsTrue(result.Issues.Count >= 2,
+        Assert.IsGreaterThanOrEqualTo(2, result.Issues.Count,
             $"Expected at least 2 lint issues but got {result.Issues.Count}.");
         Assert.IsTrue(result.Issues.All(i => i.Severity == LintSeverity.Error),
             "All reported issues should be Error severity.");
