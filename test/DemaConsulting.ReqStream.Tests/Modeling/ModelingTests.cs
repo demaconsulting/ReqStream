@@ -143,6 +143,7 @@ public class ModelingTests
     }
 
     /// <summary>
+    /// Test that a requirements Markdown report is generated correctly.
     /// </summary>
     [TestMethod]
     public void Modeling_Export_Requirements_GeneratesMarkdownFile()
