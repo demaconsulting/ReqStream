@@ -93,7 +93,6 @@ after the test completes, regardless of whether the test passes or fails.
 | Unit | Nature of interaction |
 | ---- | --------------------- |
 | `Context` | Reads `ResultsFile`, `Silent`; calls `WriteLine` for headers and summary |
-| `Program` | Reads `Program.Version` static string to print the tool version in the header |
-| `Program` | `Run` internally exercises `Program.Run` or individual workflow methods |
+| `Program` | Reads `Program.Version`; `Run` exercises `Program.Run` or individual workflow methods |
 | `Requirements` | Tests exercise `Requirements.Load` with fixture YAML files |
 | `TraceMatrix` | Tests exercise `TraceMatrix` construction with fixture test-result files |

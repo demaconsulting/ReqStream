@@ -103,7 +103,7 @@ internal static class Program
         // Priority 1: Version query
         if (context.Version)
         {
-            Console.WriteLine(Version);
+            context.WriteLine(Version);
             return;
         }
 
