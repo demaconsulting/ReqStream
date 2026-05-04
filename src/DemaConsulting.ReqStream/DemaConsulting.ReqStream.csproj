@@ -50,7 +50,7 @@
   <ItemGroup>
     <PackageReference Include="DemaConsulting.TestResults" Version="1.7.0" />
     <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="10.0.7" />
-    <PackageReference Include="YamlDotNet" Version="17.0.1" />
+    <PackageReference Include="YamlDotNet" Version="17.1.0" />
   </ItemGroup>
 
   <!-- Build Tool Dependencies -->
