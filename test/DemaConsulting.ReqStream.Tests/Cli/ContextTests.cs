@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using DemaConsulting.ReqStream.Cli;
+using DemaConsulting.ReqStream.Utilities;
 
 namespace DemaConsulting.ReqStream.Tests.Cli;
 
@@ -34,7 +35,7 @@ public sealed class ContextTests : IDisposable
     /// </summary>
     public ContextTests()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
+        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
     }
 
@@ -416,7 +417,7 @@ public sealed class ContextTests : IDisposable
     public void Context_WriteLine_NormalMode_WritesToConsole()
     {
         // Arrange: set up a log file to capture written messages
-        var logPath = Path.Combine(_testDirectory, "output-normal.log");
+        var logPath = PathHelpers.SafePathCombine(_testDirectory, "output-normal.log");
 
         // Act: create context in normal mode with log file, write a message, then dispose
         using (var context = Context.Create(["--log", logPath]))
@@ -437,7 +438,7 @@ public sealed class ContextTests : IDisposable
     public void Context_WriteLine_SilentMode_DoesNotWriteToConsole()
     {
         // Arrange: set up a log file to observe output in silent mode
-        var logPath = Path.Combine(_testDirectory, "output-silent.log");
+        var logPath = PathHelpers.SafePathCombine(_testDirectory, "output-silent.log");
 
         // Act: create context in silent mode with log file, write a message, then dispose
         using (var context = Context.Create(["--silent", "--log", logPath]))
@@ -458,7 +459,7 @@ public sealed class ContextTests : IDisposable
     public void Context_WriteError_NormalMode_WritesToConsole()
     {
         // Arrange: set up a log file to capture error messages
-        var logPath = Path.Combine(_testDirectory, "error-normal.log");
+        var logPath = PathHelpers.SafePathCombine(_testDirectory, "error-normal.log");
         int exitCode;
 
         // Act: create context in normal mode with log file, write an error, then dispose
@@ -482,7 +483,7 @@ public sealed class ContextTests : IDisposable
     public void Context_WriteError_SilentMode_DoesNotWriteToConsole()
     {
         // Arrange: set up a log file to observe output in silent mode
-        var logPath = Path.Combine(_testDirectory, "error-silent.log");
+        var logPath = PathHelpers.SafePathCombine(_testDirectory, "error-silent.log");
         int exitCode;
 
         // Act: create context in silent mode with log file, write an error, then dispose
@@ -506,7 +507,7 @@ public sealed class ContextTests : IDisposable
     public void Context_ExitCode_AfterWriteError_ReturnsOne()
     {
         // Arrange: set up a log file to suppress console noise during the test
-        var logPath = Path.Combine(_testDirectory, "exit-test.log");
+        var logPath = PathHelpers.SafePathCombine(_testDirectory, "exit-test.log");
 
         // Act: create context, check initial exit code, call WriteError, check again
         using var context = Context.Create(["--silent", "--log", logPath]);
@@ -526,7 +527,7 @@ public sealed class ContextTests : IDisposable
     public void Context_Create_WithLogFile_WritesToLogFile()
     {
         // Arrange: set up the log file path in the test directory
-        var logPath = Path.Combine(_testDirectory, "test.log");
+        var logPath = PathHelpers.SafePathCombine(_testDirectory, "test.log");
 
         // Act: create context with log file, write normal and error messages, then dispose
         using (var context = Context.Create(["--log", logPath, "--silent"]))
@@ -549,7 +550,7 @@ public sealed class ContextTests : IDisposable
     public void Context_Create_WithLogFileAndSilent_WritesToLogOnly()
     {
         // Arrange: set up the log file path
-        var logPath = Path.Combine(_testDirectory, "silent_output.log");
+        var logPath = PathHelpers.SafePathCombine(_testDirectory, "silent_output.log");
 
         // Act: create context with log file and silent flag, write messages, then dispose
         int exitCode;
@@ -576,8 +577,8 @@ public sealed class ContextTests : IDisposable
     public void Context_Create_WithRequirementsPattern_ExpandsGlobPattern()
     {
         // Arrange: create test YAML files and change working directory to the test directory
-        var file1 = Path.Combine(_testDirectory, "req1.yaml");
-        var file2 = Path.Combine(_testDirectory, "req2.yaml");
+        var file1 = PathHelpers.SafePathCombine(_testDirectory, "req1.yaml");
+        var file2 = PathHelpers.SafePathCombine(_testDirectory, "req2.yaml");
         File.WriteAllText(file1, "test");
         File.WriteAllText(file2, "test");
 
@@ -608,8 +609,8 @@ public sealed class ContextTests : IDisposable
     public void Context_Create_WithTestsPattern_ExpandsGlobPattern()
     {
         // Arrange: create test TRX files and change working directory to the test directory
-        var file1 = Path.Combine(_testDirectory, "test1.trx");
-        var file2 = Path.Combine(_testDirectory, "test2.trx");
+        var file1 = PathHelpers.SafePathCombine(_testDirectory, "test1.trx");
+        var file2 = PathHelpers.SafePathCombine(_testDirectory, "test2.trx");
         File.WriteAllText(file1, "test");
         File.WriteAllText(file2, "test");
 
@@ -686,7 +687,7 @@ public sealed class ContextTests : IDisposable
     public void Context_Dispose_WithLogFile_ClosesLogFile()
     {
         // Arrange: set up the log file path in the test directory
-        var logPath = Path.Combine(_testDirectory, "test.log");
+        var logPath = PathHelpers.SafePathCombine(_testDirectory, "test.log");
 
         // Act: create context with log file, write a message, then dispose
         using (var context = Context.Create(["--log", logPath, "--silent"]))
@@ -706,7 +707,7 @@ public sealed class ContextTests : IDisposable
     public void Context_Create_InvalidLogPath_ThrowsException()
     {
         // Arrange: construct a path whose parent directory does not exist
-        var invalidPath = Path.Combine(_testDirectory, "nonexistent", "test.log");
+        var invalidPath = PathHelpers.SafePathCombine(PathHelpers.SafePathCombine(_testDirectory, "nonexistent"), "test.log");
 
         // Act: create context with the invalid log path (combined with assertion)
         var ex = Assert.Throws<ArgumentException>(() => Context.Create(["--log", invalidPath]));

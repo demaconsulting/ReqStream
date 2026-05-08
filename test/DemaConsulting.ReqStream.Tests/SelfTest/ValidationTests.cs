@@ -20,6 +20,7 @@
 
 using DemaConsulting.ReqStream.Cli;
 using DemaConsulting.ReqStream.SelfTest;
+using DemaConsulting.ReqStream.Utilities;
 
 namespace DemaConsulting.ReqStream.Tests.SelfTest;
 
@@ -35,7 +36,7 @@ public sealed class ValidationTests : IDisposable
     /// </summary>
     public ValidationTests()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
+        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
     }
 
@@ -70,7 +71,7 @@ public sealed class ValidationTests : IDisposable
     public void Validation_Run_WithSilentContext_CompletesSuccessfully()
     {
         // Arrange - create a log file path and a silent context
-        var logFile = Path.Combine(_testDirectory, "validation.log");
+        var logFile = PathHelpers.SafePathCombine(_testDirectory, "validation.log");
 
         // Act - run validation and dispose context to flush the log file
         using (var context = Context.Create(["--silent", "--log", logFile]))
@@ -102,7 +103,7 @@ public sealed class ValidationTests : IDisposable
     public void Validation_Run_WithTrxResultsFile_WritesTrxFile()
     {
         // Arrange - create a results file path with .trx extension and a silent context
-        var resultsFile = Path.Combine(_testDirectory, "validation-results.trx");
+        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "validation-results.trx");
 
         // Act - run validation and dispose context to flush output
         using (var context = Context.Create(["--silent", "--results", resultsFile]))
@@ -127,7 +128,7 @@ public sealed class ValidationTests : IDisposable
     public void Validation_Run_WithXmlResultsFile_WritesXmlFile()
     {
         // Arrange - create a results file path with .xml extension and a silent context
-        var resultsFile = Path.Combine(_testDirectory, "validation-results.xml");
+        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "validation-results.xml");
 
         // Act - run validation and dispose context to flush output
         using (var context = Context.Create(["--silent", "--results", resultsFile]))
@@ -152,7 +153,7 @@ public sealed class ValidationTests : IDisposable
     public void Validation_Run_WithUnwritableResultsFile_ReportsError()
     {
         // Arrange: create a directory at the results file path to force a write failure
-        var resultsFile = Path.Combine(_testDirectory, "unwritable-results.trx");
+        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "unwritable-results.trx");
         Directory.CreateDirectory(resultsFile);
         using var context = Context.Create(["--silent", "--results", resultsFile]);
 
@@ -170,8 +171,8 @@ public sealed class ValidationTests : IDisposable
     public void Validation_Run_WithUnwritableResultsFile_Continues()
     {
         // Arrange: create a log file to capture output, and a directory at the results path to force a write failure
-        var logFile = Path.Combine(_testDirectory, "validation-continues.log");
-        var resultsFile = Path.Combine(_testDirectory, "unwritable-results2.trx");
+        var logFile = PathHelpers.SafePathCombine(_testDirectory, "validation-continues.log");
+        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "unwritable-results2.trx");
         Directory.CreateDirectory(resultsFile);
 
         // Act: run validation with the unwritable results file, capturing output to the log
@@ -195,7 +196,7 @@ public sealed class ValidationTests : IDisposable
     public void Validation_Run_WithInvalidResultsExtension_ReportsError()
     {
         // Arrange - create a results file path with an unsupported .invalid extension
-        var resultsFile = Path.Combine(_testDirectory, "validation-results.invalid");
+        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "validation-results.invalid");
 
         // Act - run validation and dispose context to flush output
         using var context = Context.Create(["--silent", "--results", resultsFile]);

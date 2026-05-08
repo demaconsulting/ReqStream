@@ -17,6 +17,7 @@ This document covers the detailed design of the following software items, spanni
 
 - **Program** — entry point and execution orchestrator (`Program.cs`)
 - **Context** — command-line argument parser and I/O owner (`Cli/Context.cs`)
+- **GlobMatcher** — glob-pattern file matching utility (`Utilities/GlobMatcher.cs`)
 - **Validation** — self-validation test runner (`SelfTest/Validation.cs`)
 - **LintIssue and LoadResult** — lint severity classification, issue data model, and load-result
   encapsulation (`Modeling/LintIssue.cs`, `Modeling/LoadResult.cs`)
@@ -42,6 +43,9 @@ ReqStream (System)
 ├── Program (Unit)
 ├── Cli (Subsystem)
 │   └── Context (Unit)
+├── Utilities (Subsystem)
+│   ├── GlobMatcher (Unit)
+│   └── PathHelpers (Unit)
 ├── Modeling (Subsystem)
 │   ├── LintIssue (Unit)
 │   ├── LoadResult (Unit)
@@ -71,6 +75,10 @@ docs/design/
     ├── cli.md                              — Cli subsystem design
     ├── cli/
     │   └── context.md                      — Context unit design
+    ├── utilities.md                        — Utilities subsystem design
+    ├── utilities/
+    │   ├── glob-matcher.md                 — GlobMatcher unit design
+    │   └── path-helpers.md                 — PathHelpers unit design
     ├── modeling.md                         — Modeling subsystem design
     ├── modeling/
     │   ├── lint-issue.md                   — LintIssue unit design
@@ -95,6 +103,9 @@ src/DemaConsulting.ReqStream/
 ├── Program.cs                  — entry point and execution orchestrator
 ├── Cli/
 │   └── Context.cs              — command-line argument parser and I/O owner
+├── Utilities/
+│   ├── GlobMatcher.cs          — glob-pattern file matching utility
+│   └── PathHelpers.cs          — safe path combination with traversal protection
 ├── Modeling/
 │   ├── LintIssue.cs            — lint issue severity and data model
 │   ├── LoadResult.cs           — combined result of loading requirements and associated lint issues

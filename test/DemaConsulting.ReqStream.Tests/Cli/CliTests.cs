@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using DemaConsulting.ReqStream.Cli;
+using DemaConsulting.ReqStream.Utilities;
 
 namespace DemaConsulting.ReqStream.Tests.Cli;
 
@@ -35,7 +36,7 @@ public sealed class CliTests : IDisposable
     /// </summary>
     public CliTests()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_cli_{Guid.NewGuid()}");
+        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_cli_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
     }
 
@@ -115,7 +116,7 @@ public sealed class CliTests : IDisposable
     public void Cli_Output_LogFlag_WritesOutputToLogFile()
     {
         // Arrange: define path for the log output file
-        var logFile = Path.Combine(_testDirectory, "output.log");
+        var logFile = PathHelpers.SafePathCombine(_testDirectory, "output.log");
 
         // Act: create a context with the --log flag, write a message, then dispose to flush
         using (var context = Context.Create(["--silent", "--log", logFile]))
@@ -160,7 +161,7 @@ public sealed class CliTests : IDisposable
     public void Cli_Interface_LogFileOpenFailure_ThrowsArgumentException()
     {
         // Arrange: use a path inside a directory that does not exist
-        var invalidLogPath = Path.Combine(_testDirectory, "nonexistent-subdir", "output.log");
+        var invalidLogPath = PathHelpers.SafePathCombine(PathHelpers.SafePathCombine(_testDirectory, "nonexistent-subdir"), "output.log");
 
         // Act + Assert: creating a context with an inaccessible log file throws ArgumentException
         Assert.Throws<ArgumentException>(() => Context.Create(["--log", invalidLogPath]));

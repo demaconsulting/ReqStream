@@ -20,6 +20,7 @@
 
 using DemaConsulting.ReqStream.Modeling;
 using DemaConsulting.ReqStream.Tracing;
+using DemaConsulting.ReqStream.Utilities;
 using DemaConsulting.TestResults;
 using DemaConsulting.TestResults.IO;
 using TestResult = DemaConsulting.TestResults.TestResult;
@@ -40,7 +41,7 @@ public sealed class TraceMatrixExportTests : IDisposable
     /// </summary>
     public TraceMatrixExportTests()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
+        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
     }
 
@@ -74,7 +75,7 @@ sections:
           - ""Test_Credentials_Valid""
           - ""Test_Credentials_Invalid""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -99,14 +100,14 @@ sections:
             Duration = TimeSpan.FromSeconds(1)
         });
 
-        var trxPath = Path.Combine(_testDirectory, "results.trx");
+        var trxPath = PathHelpers.SafePathCombine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
         // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, trxPath);
 
-        var mdPath = Path.Combine(_testDirectory, "tracematrix.md");
+        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "tracematrix.md");
         matrix.Export(mdPath);
 
         // Assert:
@@ -141,7 +142,7 @@ sections:
         tests:
           - ""Test_Credentials_Valid""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -158,14 +159,14 @@ sections:
             Duration = TimeSpan.FromSeconds(1)
         });
 
-        var trxPath = Path.Combine(_testDirectory, "results.trx");
+        var trxPath = PathHelpers.SafePathCombine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
         // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, trxPath);
 
-        var mdPath = Path.Combine(_testDirectory, "tracematrix.md");
+        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "tracematrix.md");
         matrix.Export(mdPath, depth: 2);
 
         // Assert:
@@ -194,7 +195,7 @@ sections:
           - ""Test_Credentials_Valid""
           - ""Test_Credentials_Invalid""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -220,14 +221,14 @@ sections:
             Duration = TimeSpan.FromSeconds(1)
         });
 
-        var trxPath = Path.Combine(_testDirectory, "results.trx");
+        var trxPath = PathHelpers.SafePathCombine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
         // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, trxPath);
 
-        var mdPath = Path.Combine(_testDirectory, "tracematrix.md");
+        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "tracematrix.md");
         matrix.Export(mdPath);
 
         // Assert:
@@ -256,7 +257,7 @@ sections:
           - ""Test_Credentials_Valid""
           - ""Test_Credentials_Invalid""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -273,14 +274,14 @@ sections:
             Duration = TimeSpan.FromSeconds(1)
         });
 
-        var trxPath = Path.Combine(_testDirectory, "results.trx");
+        var trxPath = PathHelpers.SafePathCombine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
         // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, trxPath);
 
-        var mdPath = Path.Combine(_testDirectory, "tracematrix.md");
+        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "tracematrix.md");
         matrix.Export(mdPath);
 
         // Assert:
@@ -315,7 +316,7 @@ sections:
             tests:
               - ""Test_Logging""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -340,14 +341,14 @@ sections:
             Duration = TimeSpan.FromSeconds(1)
         });
 
-        var trxPath = Path.Combine(_testDirectory, "results.trx");
+        var trxPath = PathHelpers.SafePathCombine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
         // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, trxPath);
 
-        var mdPath = Path.Combine(_testDirectory, "tracematrix.md");
+        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "tracematrix.md");
         matrix.Export(mdPath);
 
         // Assert:
@@ -377,7 +378,7 @@ sections:
         tests:
           - ""Test_Credentials_Valid""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -408,7 +409,7 @@ sections:
         tests:
           - ""Test_Credentials_Valid""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -445,7 +446,7 @@ sections:
         tests:
           - ""Test_Credentials_Valid""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -462,14 +463,14 @@ sections:
             Duration = TimeSpan.FromSeconds(1)
         });
 
-        var trxPath = Path.Combine(_testDirectory, "results.trx");
+        var trxPath = PathHelpers.SafePathCombine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
         // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, trxPath);
 
-        var mdPath = Path.Combine(_testDirectory, "tracematrix.md");
+        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "tracematrix.md");
         matrix.Export(mdPath);
 
         // Assert:
@@ -495,7 +496,7 @@ sections:
       - id: ""AUTH-001""
         title: ""Validate user credentials""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -505,7 +506,7 @@ sections:
         // Create TraceMatrix with no test results
         var matrix = new TraceMatrix(requirements);
 
-        var mdPath = Path.Combine(_testDirectory, "tracematrix.md");
+        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "tracematrix.md");
         matrix.Export(mdPath);
 
         // Assert:
@@ -535,7 +536,7 @@ sections:
         tests:
           - ""Test_Credentials""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -552,14 +553,14 @@ sections:
             Duration = TimeSpan.FromSeconds(1)
         });
 
-        var trxPath = Path.Combine(_testDirectory, "results.trx");
+        var trxPath = PathHelpers.SafePathCombine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
         // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, trxPath);
 
-        var mdPath = Path.Combine(_testDirectory, "tracematrix.md");
+        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "tracematrix.md");
         matrix.Export(mdPath);
 
         // Assert:
@@ -593,7 +594,7 @@ sections:
         tests:
           - Test_Performance
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -618,13 +619,13 @@ sections:
             Duration = TimeSpan.FromSeconds(1)
         });
 
-        var trxPath = Path.Combine(_testDirectory, "results.trx");
+        var trxPath = PathHelpers.SafePathCombine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
         // Act:
         // Create TraceMatrix and export with filter
         var matrix = new TraceMatrix(requirements, trxPath);
-        var mdPath = Path.Combine(_testDirectory, "tracematrix.md");
+        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "tracematrix.md");
         var filterTags = new HashSet<string> { "security" };
         matrix.Export(mdPath, filterTags: filterTags);
 
@@ -668,7 +669,7 @@ sections:
         tests:
           - Test_Performance
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -693,7 +694,7 @@ sections:
             Duration = TimeSpan.FromSeconds(1)
         });
 
-        var trxPath = Path.Combine(_testDirectory, "results.trx");
+        var trxPath = PathHelpers.SafePathCombine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
         // Act:
@@ -731,7 +732,7 @@ sections:
         tags:
           - performance
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);

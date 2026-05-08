@@ -20,6 +20,7 @@
 
 using DemaConsulting.ReqStream.Cli;
 using DemaConsulting.ReqStream.SelfTest;
+using DemaConsulting.ReqStream.Utilities;
 
 namespace DemaConsulting.ReqStream.Tests.SelfTest;
 
@@ -36,7 +37,7 @@ public sealed class SelfTestTests : IDisposable
     /// </summary>
     public SelfTestTests()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_self_test_{Guid.NewGuid()}");
+        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_self_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
     }
 
@@ -75,7 +76,7 @@ public sealed class SelfTestTests : IDisposable
     public void SelfTest_ResultsOutput_TrxResultsPath_WritesTrxFile()
     {
         // Arrange: define path for the TRX results output file
-        var resultsFile = Path.Combine(_testDirectory, "validation-results.trx");
+        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "validation-results.trx");
         using var context = Context.Create(["--silent", "--results", resultsFile]);
 
         // Act: run self-validation
@@ -95,7 +96,7 @@ public sealed class SelfTestTests : IDisposable
     public void SelfTest_ResultsOutput_XmlResultsPath_WritesJUnitFile()
     {
         // Arrange: define path for the JUnit XML results output file
-        var resultsFile = Path.Combine(_testDirectory, "validation-results.xml");
+        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "validation-results.xml");
         using var context = Context.Create(["--silent", "--results", resultsFile]);
 
         // Act: run self-validation
@@ -115,8 +116,8 @@ public sealed class SelfTestTests : IDisposable
     public void SelfTest_FailureReporting_WithErrors_SetsExitCode1()
     {
         // Arrange: create a results file path with an unsupported extension to trigger an error
-        var resultsFile = Path.Combine(_testDirectory, "validation-results.invalid");
-        var logFile = Path.Combine(_testDirectory, "failure-test.log");
+        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "validation-results.invalid");
+        var logFile = PathHelpers.SafePathCombine(_testDirectory, "failure-test.log");
 
         int exitCode;
         using (var context = Context.Create(["--silent", "--log", logFile, "--results", resultsFile]))

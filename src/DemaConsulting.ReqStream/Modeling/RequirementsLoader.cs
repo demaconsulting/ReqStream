@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.ReqStream.Utilities;
 using YamlDotNet.Core;
 using YamlDotNet.RepresentationModel;
 
@@ -205,7 +206,18 @@ internal static class RequirementsLoader
             "Each 'includes' entry cannot be blank");
         foreach (var include in includes)
         {
-            LoadFile(requirements, issues, Path.Combine(baseDirectory, include), seenIds, allRequirements, visitedFiles);
+            string includePath;
+            try
+            {
+                includePath = PathHelpers.SafePathCombine(baseDirectory, include);
+            }
+            catch (ArgumentException ex)
+            {
+                issues.Add(new LintIssue(path, LintSeverity.Error, $"Invalid 'includes' path '{include}': {ex.Message}"));
+                continue;
+            }
+
+            LoadFile(requirements, issues, includePath, seenIds, allRequirements, visitedFiles);
         }
     }
 

@@ -20,6 +20,7 @@
 
 using DemaConsulting.ReqStream.Modeling;
 using DemaConsulting.ReqStream.Tracing;
+using DemaConsulting.ReqStream.Utilities;
 using DemaConsulting.TestResults;
 using DemaConsulting.TestResults.IO;
 using TestResult = DemaConsulting.TestResults.TestResult;
@@ -39,7 +40,7 @@ public sealed class TracingTests : IDisposable
     /// </summary>
     public TracingTests()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_tracing_{Guid.NewGuid()}");
+        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_tracing_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
     }
 
@@ -62,7 +63,7 @@ public sealed class TracingTests : IDisposable
     public void Tracing_TestResults_TrxFile_LoadsTestResults()
     {
         // Arrange: create a requirements file with one traceable requirement
-        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: Tracing Test Requirements
@@ -86,7 +87,7 @@ public sealed class TracingTests : IDisposable
             Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var trxFile = Path.Combine(_testDirectory, "results.trx");
+        var trxFile = PathHelpers.SafePathCombine(_testDirectory, "results.trx");
         File.WriteAllText(trxFile, TrxSerializer.Serialize(testResults));
 
         // Act: create a trace matrix loading the TRX file
@@ -105,7 +106,7 @@ public sealed class TracingTests : IDisposable
     public void Tracing_TestResults_JUnitFile_LoadsTestResults()
     {
         // Arrange: create a requirements file with one traceable requirement
-        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: Tracing Test Requirements
@@ -129,7 +130,7 @@ public sealed class TracingTests : IDisposable
             Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var junitFile = Path.Combine(_testDirectory, "results.xml");
+        var junitFile = PathHelpers.SafePathCombine(_testDirectory, "results.xml");
         File.WriteAllText(junitFile, JUnitSerializer.Serialize(testResults));
 
         // Act: create a trace matrix loading the JUnit XML file
@@ -148,7 +149,7 @@ public sealed class TracingTests : IDisposable
     public void Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied()
     {
         // Arrange: create a requirements file with one requirement to be satisfied
-        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: Enforcement Test Requirements
@@ -172,7 +173,7 @@ public sealed class TracingTests : IDisposable
             Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var trxFile = Path.Combine(_testDirectory, "results.trx");
+        var trxFile = PathHelpers.SafePathCombine(_testDirectory, "results.trx");
         File.WriteAllText(trxFile, TrxSerializer.Serialize(testResults));
 
         // Act: build the trace matrix and check unsatisfied requirements
@@ -190,7 +191,7 @@ public sealed class TracingTests : IDisposable
     public void Tracing_Coverage_WithMissingTests_RequirementIsUnsatisfied()
     {
         // Arrange: create a requirements file with one requirement whose test will not be present
-        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: Enforcement Test Requirements
@@ -206,7 +207,7 @@ public sealed class TracingTests : IDisposable
 
         // Arrange: create a TRX file with no test results (empty run)
         var testResults = new TestResults.TestResults { Name = "EmptyRun" };
-        var trxFile = Path.Combine(_testDirectory, "empty.trx");
+        var trxFile = PathHelpers.SafePathCombine(_testDirectory, "empty.trx");
         File.WriteAllText(trxFile, TrxSerializer.Serialize(testResults));
 
         // Act: build the trace matrix and check unsatisfied requirements
@@ -225,7 +226,7 @@ public sealed class TracingTests : IDisposable
     public void Tracing_FileLoading_NonExistentFile_ThrowsFileNotFoundException()
     {
         // Arrange: create a requirements object and a path to a file that does not exist
-        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: Error Test Requirements
@@ -238,7 +239,7 @@ public sealed class TracingTests : IDisposable
             """);
         var loadResult = Requirements.Load(reqFile);
         Assert.NotNull(loadResult.Requirements);
-        var missingFile = Path.Combine(_testDirectory, "does-not-exist.trx");
+        var missingFile = PathHelpers.SafePathCombine(_testDirectory, "does-not-exist.trx");
 
         // Act and Assert: constructing a TraceMatrix with a missing file throws FileNotFoundException
         Assert.Throws<FileNotFoundException>(() =>
@@ -253,7 +254,7 @@ public sealed class TracingTests : IDisposable
     public void Tracing_FileLoading_MalformedFile_ThrowsInvalidOperationException()
     {
         // Arrange: create a requirements object and a file with invalid (non-XML) content
-        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: Error Test Requirements
@@ -266,7 +267,7 @@ public sealed class TracingTests : IDisposable
             """);
         var loadResult = Requirements.Load(reqFile);
         Assert.NotNull(loadResult.Requirements);
-        var malformedFile = Path.Combine(_testDirectory, "malformed.trx");
+        var malformedFile = PathHelpers.SafePathCombine(_testDirectory, "malformed.trx");
         File.WriteAllText(malformedFile, "this is not valid xml or json content @@##!!");
 
         // Act and Assert: constructing a TraceMatrix with a malformed file throws InvalidOperationException
@@ -283,7 +284,7 @@ public sealed class TracingTests : IDisposable
     public void Tracing_Reporting_SimpleMatrix_CreatesMarkdownFile()
     {
         // Arrange: create a requirements file with one traceable requirement
-        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: Reporting Test Requirements
@@ -307,12 +308,12 @@ public sealed class TracingTests : IDisposable
             Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var trxFile = Path.Combine(_testDirectory, "results.trx");
+        var trxFile = PathHelpers.SafePathCombine(_testDirectory, "results.trx");
         File.WriteAllText(trxFile, TrxSerializer.Serialize(testResults));
 
         // Act: build the trace matrix and export the report
         var matrix = new TraceMatrix(loadResult.Requirements, trxFile);
-        var mdFile = Path.Combine(_testDirectory, "trace-matrix.md");
+        var mdFile = PathHelpers.SafePathCombine(_testDirectory, "trace-matrix.md");
         matrix.Export(mdFile);
 
         // Assert: the Markdown report file exists and contains required sections
