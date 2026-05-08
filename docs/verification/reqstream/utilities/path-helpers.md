@@ -3,7 +3,7 @@
 #### Verification Strategy
 
 The PathHelpers unit is verified using xUnit unit tests in `PathHelpersTests.cs`. Tests assert
-correct behaviour for valid path combinations and verify that path-traversal attempts are
+correct behavior for valid path combinations and verify that path-traversal attempts are
 rejected with `ArgumentException`.
 
 #### Test Scenarios

@@ -31,7 +31,7 @@ null inputs and `ArgumentException` for path-traversal attempts or invalid path 
 #### Security Rationale
 
 `Path.Combine` on its own accepts relative components such as `../../etc/passwd` and absolute
-components that completely override the base. By normalising both sides with `Path.GetFullPath`
+components that completely override the base. By normalizing both sides with `Path.GetFullPath`
 and calling `Path.GetRelativePath`, `SafePathCombine` detects any escape attempt independent of
 platform separator style or case-sensitivity. The CodeQL `cs/path-combine` rule is suppressed
 specifically for `PathHelpers.cs` because this is the one location where the raw `Path.Combine`

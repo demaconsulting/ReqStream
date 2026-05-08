@@ -56,6 +56,6 @@ tuple. The algorithm is:
 
 #### Interactions with Other Units
 
-| Unit      | Nature of interaction |
-| --------- | --------------------- |
-| `Context` | Calls `GlobMatcher.FindMatchingFiles` to expand `--requirements` and `--tests` patterns |
+| Unit        | Nature of interaction                                                                    |
+| ----------- | ---------------------------------------------------------------------------------------- |
+| `Context`   | Calls `GlobMatcher.FindMatchingFiles` to expand `--requirements` and `--tests` patterns  |

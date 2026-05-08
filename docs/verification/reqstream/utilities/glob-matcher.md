@@ -42,7 +42,8 @@ Tests verify that multiple patterns are combined and deduplicated correctly.
 Test methods:
 
 - `GlobMatcher_FindMatchingFiles_MultiplePatterns_DeduplicatesResults` — overlapping patterns do not produce duplicate paths
-- `GlobMatcher_FindMatchingFiles_MultiplePatterns_CombinesFromDifferentSources` — patterns from separate directories are merged
+- `GlobMatcher_FindMatchingFiles_MultiplePatterns_CombinesFromDifferentSources` — patterns from separate
+  directories are merged
 
 ##### SplitAbsolutePattern Scenario
 
