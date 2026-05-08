@@ -35,6 +35,15 @@ Test methods:
 
 - `GlobMatcher_FindMatchingFiles_ReturnsAbsolutePaths` — all returned paths are rooted
 
+##### Multi-Pattern Scenario
+
+Tests verify that multiple patterns are combined and deduplicated correctly.
+
+Test methods:
+
+- `GlobMatcher_FindMatchingFiles_MultiplePatterns_DeduplicatesResults` — overlapping patterns do not produce duplicate paths
+- `GlobMatcher_FindMatchingFiles_MultiplePatterns_CombinesFromDifferentSources` — patterns from separate directories are merged
+
 ##### SplitAbsolutePattern Scenario
 
 Tests verify that `SplitAbsolutePattern` correctly decomposes absolute patterns.

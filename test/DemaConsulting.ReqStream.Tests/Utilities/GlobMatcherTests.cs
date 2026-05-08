@@ -69,7 +69,7 @@ public sealed class GlobMatcherTests : IDisposable
             Directory.SetCurrentDirectory(_testDirectory);
 
             // Act: find files using a relative glob pattern
-            var files = GlobMatcher.FindMatchingFiles("*.yaml");
+            var files = GlobMatcher.FindMatchingFiles(["*.yaml"]);
 
             // Assert: both files are found
             Assert.Equal(2, files.Count);
@@ -96,7 +96,7 @@ public sealed class GlobMatcherTests : IDisposable
 
         // Act: find files using an absolute glob pattern
         var pattern = Path.Combine(_testDirectory, "*.trx");
-        var files = GlobMatcher.FindMatchingFiles(pattern);
+        var files = GlobMatcher.FindMatchingFiles([pattern]);
 
         // Assert: both files are found
         Assert.Equal(2, files.Count);
@@ -120,7 +120,7 @@ public sealed class GlobMatcherTests : IDisposable
 
         // Act: find files using an absolute glob pattern with **
         var pattern = Path.Combine(_testDirectory, "**", "*.trx");
-        var files = GlobMatcher.FindMatchingFiles(pattern);
+        var files = GlobMatcher.FindMatchingFiles([pattern]);
 
         // Assert: both files are found
         Assert.Equal(2, files.Count);
@@ -139,7 +139,7 @@ public sealed class GlobMatcherTests : IDisposable
         File.WriteAllText(file, "test");
 
         // Act: find file using an absolute literal path (no wildcards)
-        var files = GlobMatcher.FindMatchingFiles(file);
+        var files = GlobMatcher.FindMatchingFiles([file]);
 
         // Assert: exactly that file is found
         Assert.Single(files);
@@ -157,7 +157,7 @@ public sealed class GlobMatcherTests : IDisposable
         var pattern = Path.Combine(nonExistentDir, "*.yaml");
 
         // Act: find files using the pattern
-        var files = GlobMatcher.FindMatchingFiles(pattern);
+        var files = GlobMatcher.FindMatchingFiles([pattern]);
 
         // Assert: no files are returned
         Assert.Empty(files);
@@ -179,7 +179,7 @@ public sealed class GlobMatcherTests : IDisposable
             Directory.SetCurrentDirectory(_testDirectory);
 
             // Act: find file using a relative pattern
-            var files = GlobMatcher.FindMatchingFiles("abs.yaml");
+            var files = GlobMatcher.FindMatchingFiles(["abs.yaml"]);
 
             // Assert: the returned path is absolute
             Assert.Single(files);
@@ -242,5 +242,55 @@ public sealed class GlobMatcherTests : IDisposable
         Assert.Equal(_testDirectory, rootDir);
         Assert.Contains("**", relativePattern);
         Assert.Contains("*.trx", relativePattern);
+    }
+
+    /// <summary>
+    /// Test that multiple patterns are combined and duplicate files are deduplicated.
+    /// </summary>
+    [Fact]
+    public void GlobMatcher_FindMatchingFiles_MultiplePatterns_DeduplicatesResults()
+    {
+        // Arrange: create test files
+        var file1 = Path.Combine(_testDirectory, "shared1.yaml");
+        var file2 = Path.Combine(_testDirectory, "shared2.yaml");
+        File.WriteAllText(file1, "test");
+        File.WriteAllText(file2, "test");
+
+        // Act: two patterns that both match the same files
+        var absoluteWildcard = Path.Combine(_testDirectory, "*.yaml");
+        var absoluteLiteral1 = Path.Combine(_testDirectory, "shared1.yaml");
+        var files = GlobMatcher.FindMatchingFiles([absoluteWildcard, absoluteLiteral1]);
+
+        // Assert: each file appears only once despite being matched by multiple patterns
+        Assert.Equal(2, files.Count);
+        Assert.Single(files, f => f.EndsWith("shared1.yaml"));
+        Assert.Single(files, f => f.EndsWith("shared2.yaml"));
+    }
+
+    /// <summary>
+    /// Test that multiple patterns from different directories are combined into one result.
+    /// </summary>
+    [Fact]
+    public void GlobMatcher_FindMatchingFiles_MultiplePatterns_CombinesFromDifferentSources()
+    {
+        // Arrange: create files in two separate subdirectories
+        var dir1 = Path.Combine(_testDirectory, "dir1");
+        var dir2 = Path.Combine(_testDirectory, "dir2");
+        Directory.CreateDirectory(dir1);
+        Directory.CreateDirectory(dir2);
+        var file1 = Path.Combine(dir1, "req1.yaml");
+        var file2 = Path.Combine(dir2, "req2.yaml");
+        File.WriteAllText(file1, "test");
+        File.WriteAllText(file2, "test");
+
+        // Act: one pattern per directory
+        var pattern1 = Path.Combine(dir1, "*.yaml");
+        var pattern2 = Path.Combine(dir2, "*.yaml");
+        var files = GlobMatcher.FindMatchingFiles([pattern1, pattern2]);
+
+        // Assert: files from both directories are returned
+        Assert.Equal(2, files.Count);
+        Assert.Single(files, f => f.EndsWith("req1.yaml"));
+        Assert.Single(files, f => f.EndsWith("req2.yaml"));
     }
 }

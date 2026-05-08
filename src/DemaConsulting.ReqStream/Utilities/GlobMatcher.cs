@@ -29,44 +29,70 @@ namespace DemaConsulting.ReqStream.Utilities;
 internal static class GlobMatcher
 {
     /// <summary>
-    ///     Finds all files matching the specified glob pattern.
+    ///     Finds all files matching the specified glob patterns.
     /// </summary>
-    /// <param name="pattern">
-    ///     A glob pattern to match. The pattern may be relative (matched against the current
-    ///     working directory) or absolute (matched from the rooted prefix of the pattern).
+    /// <param name="patterns">
+    ///     Glob patterns to match. Patterns may be relative (matched against the current working
+    ///     directory) or absolute (matched from the rooted prefix of the pattern).
     /// </param>
     /// <returns>
-    ///     List of full file paths matching the supplied pattern.
+    ///     Sorted list of full file paths matching any of the supplied patterns. Duplicate paths
+    ///     are removed using the file-system-appropriate comparer (ordinal ignore-case on Windows,
+    ///     ordinal on case-sensitive systems).
     /// </returns>
-    internal static List<string> FindMatchingFiles(string pattern)
+    internal static List<string> FindMatchingFiles(IEnumerable<string> patterns)
     {
-        if (Path.IsPathRooted(pattern))
-        {
-            // Handle absolute path by extracting the root directory and relative pattern
-            var (rootDir, relativePattern) = SplitAbsolutePattern(pattern);
-            if (!Directory.Exists(rootDir))
-            {
-                return [];
-            }
+        // Use a comparer that matches the underlying file-system's case-sensitivity so that
+        // deduplication is correct: case-insensitive on Windows, case-sensitive elsewhere.
+        var fsComparer = OperatingSystem.IsWindows()
+            ? StringComparer.OrdinalIgnoreCase
+            : StringComparer.Ordinal;
+        var files = new HashSet<string>(fsComparer);
+        var relativePatterns = new List<string>();
 
-            var matcher = new Matcher();
-            matcher.AddInclude(relativePattern);
-            var result = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(rootDir)));
-            return result.Files
-                .Select(f => Path.GetFullPath(Path.Combine(rootDir, f.Path)))
-                .ToList();
-        }
-        else
+        foreach (var pattern in patterns)
         {
-            // Handle relative pattern against the current working directory
+            if (Path.IsPathRooted(pattern))
+            {
+                // Handle absolute path by extracting the root directory and relative pattern
+                var (rootDir, relativePattern) = SplitAbsolutePattern(pattern);
+                if (!Directory.Exists(rootDir))
+                {
+                    continue;
+                }
+
+                var matcher = new Matcher();
+                matcher.AddInclude(relativePattern);
+                var result = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(rootDir)));
+                foreach (var file in result.Files)
+                {
+                    files.Add(Path.GetFullPath(Path.Combine(rootDir, file.Path)));
+                }
+            }
+            else
+            {
+                relativePatterns.Add(pattern);
+            }
+        }
+
+        // Handle all relative patterns together against the current working directory
+        if (relativePatterns.Count > 0)
+        {
             var currentDirectory = Directory.GetCurrentDirectory();
             var matcher = new Matcher();
-            matcher.AddInclude(pattern);
+            foreach (var pattern in relativePatterns)
+            {
+                matcher.AddInclude(pattern);
+            }
+
             var result = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(currentDirectory)));
-            return result.Files
-                .Select(f => Path.GetFullPath(Path.Combine(currentDirectory, f.Path)))
-                .ToList();
+            foreach (var file in result.Files)
+            {
+                files.Add(Path.GetFullPath(Path.Combine(currentDirectory, file.Path)));
+            }
         }
+
+        return files.OrderBy(f => f, fsComparer).ToList();
     }
 
     /// <summary>

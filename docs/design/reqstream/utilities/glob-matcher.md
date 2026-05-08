@@ -12,20 +12,22 @@ patterns in either form without special-casing.
 
 #### Methods
 
-##### `FindMatchingFiles(pattern)`
+##### `FindMatchingFiles(patterns)`
 
-`FindMatchingFiles` accepts a single glob pattern string and returns a `List<string>` of
-absolute file paths that match the pattern.
+`FindMatchingFiles` accepts a collection of glob pattern strings and returns a `List<string>` of
+absolute file paths that match any of the supplied patterns. Duplicates are removed using a
+`HashSet<string>` with the appropriate file-system comparer (ordinal ignore-case on Windows,
+ordinal on case-sensitive systems). Results are sorted using the same comparer.
 
-The method first checks `Path.IsPathRooted(pattern)`:
+For each pattern in `patterns`, the method checks `Path.IsPathRooted(pattern)`:
 
 - **Absolute pattern** — calls `SplitAbsolutePattern` to decompose the pattern into a root
-  directory and a relative sub-pattern. If the root directory does not exist the method
-  returns an empty list immediately. Otherwise it creates a `Matcher`, adds the relative
-  sub-pattern as an include rule, executes the matcher against the root directory, and
-  assembles the results into absolute paths using `Path.GetFullPath`.
-- **Relative pattern** — resolves against `Directory.GetCurrentDirectory()` using the same
-  `Matcher` approach, assembling results into absolute paths using `Path.GetFullPath`.
+  directory and a relative sub-pattern. If the root directory does not exist the pattern is
+  skipped. Otherwise a `Matcher` is created with the relative sub-pattern as an include rule,
+  executed against the root directory, and the results are added to the deduplication set.
+- **Relative pattern** — collected into a list and processed together after all absolute
+  patterns. A single `Matcher` with all relative include rules is executed against
+  `Directory.GetCurrentDirectory()`, and results are added to the deduplication set.
 
 The method never throws for non-matching patterns or non-existent directories; it returns an
 empty list in those cases.

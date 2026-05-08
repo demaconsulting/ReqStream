@@ -155,8 +155,8 @@ public sealed class Context : IDisposable
         var enforce = false;
 
         // Initialize collection variables
-        var requirementsFiles = new List<string>();
-        var testFiles = new List<string>();
+        var requirementsPatterns = new List<string>();
+        var testPatterns = new List<string>();
         HashSet<string>? filterTags = null;
 
         // Initialize optional parameters
@@ -266,7 +266,7 @@ public sealed class Context : IDisposable
                         throw new ArgumentException($"{arg} requires a pattern argument", nameof(args));
                     }
 
-                    requirementsFiles.AddRange(GlobMatcher.FindMatchingFiles(args[i++]));
+                    requirementsPatterns.Add(args[i++]);
                     break;
 
                 case "--tests":
@@ -276,7 +276,7 @@ public sealed class Context : IDisposable
                         throw new ArgumentException($"{arg} requires a pattern argument", nameof(args));
                     }
 
-                    testFiles.AddRange(GlobMatcher.FindMatchingFiles(args[i++]));
+                    testPatterns.Add(args[i++]);
                     break;
 
                 case "--report":
@@ -373,8 +373,8 @@ public sealed class Context : IDisposable
             ResultsFile = resultsFile,
             Enforce = enforce,
             FilterTags = filterTags,
-            RequirementsFiles = requirementsFiles,
-            TestFiles = testFiles,
+            RequirementsFiles = GlobMatcher.FindMatchingFiles(requirementsPatterns),
+            TestFiles = GlobMatcher.FindMatchingFiles(testPatterns),
             RequirementsReport = requirementsReport,
             Depth = depth,
             ReportDepth = reportDepth ?? depth,

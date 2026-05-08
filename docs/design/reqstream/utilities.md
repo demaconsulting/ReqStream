@@ -21,9 +21,10 @@ The `Utilities` subsystem contains the following software unit:
 
 The `Utilities` subsystem exposes the following interface to the rest of the tool:
 
-- **`GlobMatcher.FindMatchingFiles`** — Returns a list of absolute file paths that match a
-  given glob pattern. Supports both relative patterns (resolved against the current working
-  directory) and absolute patterns (resolved from the rooted prefix of the pattern).
+- **`GlobMatcher.FindMatchingFiles`** — Returns a sorted, deduplicated list of absolute file
+  paths that match any of the supplied glob patterns. Supports both relative patterns (resolved
+  against the current working directory) and absolute patterns (resolved from the rooted prefix
+  of the pattern).
 
 ### Interactions
 

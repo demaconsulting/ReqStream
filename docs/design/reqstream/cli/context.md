@@ -64,11 +64,12 @@ specified; otherwise each report inherits the value of `Depth`.
 
 ##### Glob Resolution
 
-`Create` delegates glob pattern resolution to `GlobMatcher.FindMatchingFiles` (in the `Utilities`
-subsystem) for each `--requirements` and `--tests` value. `GlobMatcher` supports both relative
-patterns (resolved against the current working directory) and absolute patterns (resolved from the
-rooted prefix of the pattern). The resolved absolute file paths are appended to `requirementsFiles`
-or `testFiles` respectively.
+`Create` accumulates each `--requirements` and `--tests` pattern value into a separate list
+during argument parsing. After all arguments are parsed, `GlobMatcher.FindMatchingFiles` is
+called once per list, receiving all patterns together. `GlobMatcher` supports both relative
+patterns (resolved against the current working directory) and absolute patterns (resolved from
+the rooted prefix of the pattern), and deduplicates results across all supplied patterns. The
+resolved absolute file paths are stored in `RequirementsFiles` and `TestFiles` respectively.
 
 ##### `WriteLine(message)`
 
