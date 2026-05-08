@@ -1,6 +1,6 @@
-# Requirements Unit Design
+### Requirements Unit Design
 
-## Overview
+#### Overview
 
 `Requirements` is the root of the requirements section tree and the public API entry point for
 the Modeling subsystem. It extends `Section` to inherit the container properties (title,
@@ -11,9 +11,9 @@ requirements list, child sections list) and adds the `Load` static factory metho
 entirely to `RequirementsLoader`. Its role is to provide the public surface through which callers
 load and export requirements data.
 
-## Factory Method
+#### Factory Method
 
-### `Load(paths)`
+##### `Load(paths)`
 
 `Load` is the single static factory method. It accepts one or more file paths, delegates to
 `RequirementsLoader.Load`, and returns the resulting `LoadResult` containing the populated
@@ -22,7 +22,7 @@ load and export requirements data.
 Callers that need to abort on errors check `result.HasErrors` or `result.Requirements == null`.
 Callers that need to surface issues to the user call `result.ReportIssues(context)`.
 
-## Export Methods
+#### Export Methods
 
 | Method | Output | Notes |
 | ------ | ------ | ----- |
@@ -51,7 +51,7 @@ catch or suppress I/O exceptions.
 - Each requirement with a non-null `Justification` produces a sub-heading and the justification
   text.
 
-## Interactions with Other Units
+#### Interactions with Other Units
 
 | Unit | Nature of interaction |
 | ---- | --------------------- |

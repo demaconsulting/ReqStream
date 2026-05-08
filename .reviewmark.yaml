@@ -32,152 +32,228 @@ reviews:
   - id: Purpose
     title: Review that Advertised Features Match System Design
     paths:
-      - "README.md"                                         # user-facing documentation
-      - "docs/user_guide/**/*.md"                           # user guide
-      - "docs/reqstream/reqstream/reqstream.yaml"           # system requirements
-      - "docs/design/introduction.md"                       # design introduction
-      - "docs/design/reqstream/reqstream.md"                # system design
+      - "README.md"                                               # user-facing documentation
+      - "docs/user_guide/**/*.md"                                 # user guide
+      - "docs/reqstream/reqstream.yaml"                 # system requirements
+      - "docs/design/introduction.md"                             # design introduction
+      - "docs/design/reqstream.md"                      # system design
 
-  # ReqStream-Architecture Review (one per system)
+  # ReqStream - Specials
   - id: ReqStream-Architecture
     title: Review that ReqStream Architecture Satisfies Requirements
     paths:
-      - "docs/reqstream/reqstream/reqstream.yaml"           # system requirements
-      - "docs/design/introduction.md"                       # design introduction
-      - "docs/design/reqstream/reqstream.md"                # system design
-      - "test/**/IntegrationTests.cs"                       # system integration tests
-      - "test/**/Runner.cs"                                 # test runner infrastructure
-      - "test/**/AssemblyInfo.cs"                           # test infrastructure
+      - "docs/reqstream/reqstream.yaml"                 # system requirements
+      - "docs/design/introduction.md"                             # design introduction
+      - "docs/design/reqstream.md"                          # system design
+      - "docs/verification/introduction.md"                       # verification introduction
+      - "docs/verification/reqstream.md"                          # system verification design
+      - "test/**/IntegrationTests.cs"                             # system integration tests
+      - "test/**/Runner.cs"                                       # test runner infrastructure
+      - "test/**/AssemblyInfo.cs"                                 # test infrastructure
 
-  # ReqStream-Design Review (one per system)
   - id: ReqStream-Design
     title: Review that ReqStream Design is Consistent and Complete
     paths:
-      - "docs/reqstream/reqstream/reqstream.yaml"           # system requirements
-      - "docs/reqstream/reqstream/platform-requirements.yaml"  # platform requirements
-      - "docs/design/introduction.md"                       # design introduction
-      - "docs/design/reqstream/**/*.md"                     # all system design documents
+      - "docs/reqstream/reqstream.yaml"                   # system requirements
+      - "docs/reqstream/reqstream/platform-requirements.yaml"     # platform requirements
+      - "docs/design/introduction.md"                             # design introduction
+      - "docs/design/reqstream.md"                               # system design
+      - "docs/design/reqstream/**/*.md"                           # all system design documents
+      - "docs/verification/introduction.md"                       # verification introduction
+      - "docs/verification/ots.md"                                # OTS verification overview
 
-  # ReqStream-AllRequirements Review (one per system)
   - id: ReqStream-AllRequirements
     title: Review that All ReqStream Requirements are Complete
     paths:
-      - "requirements.yaml"                                 # root requirements file
-      - "docs/reqstream/reqstream/**/*.yaml"                # all system requirements files
-      - "docs/reqstream/ots/**/*.yaml"                      # OTS requirements files
+      - "requirements.yaml"                                       # root requirements file
+      - "docs/reqstream/reqstream.yaml"                           # system requirements file
+      - "docs/reqstream/reqstream/**/*.yaml"                      # all subsystem requirements files
+      - "docs/reqstream/ots/**/*.yaml"                            # OTS requirements files
 
-  # ReqStream-Cli Review (one per subsystem)
-  - id: ReqStream-Cli
-    title: Review that ReqStream Cli Satisfies Subsystem Requirements
-    paths:
-      - "docs/reqstream/reqstream/cli/cli.yaml"             # subsystem requirements
-      - "docs/design/reqstream/cli/cli.md"                  # subsystem design
-      - "test/**/Cli/CliTests.cs"                          # subsystem tests
-
-  - id: ReqStream-Modeling
-    title: Review that ReqStream Modeling Satisfies Subsystem Requirements
-    paths:
-      - "docs/reqstream/reqstream/modeling/modeling.yaml"   # subsystem requirements
-      - "docs/design/reqstream/modeling/modeling.md"        # subsystem design
-      - "test/**/Modeling/ModelingTests.cs"                # subsystem tests
-
-  - id: ReqStream-Tracing
-    title: Review that ReqStream Tracing Satisfies Subsystem Requirements
-    paths:
-      - "docs/reqstream/reqstream/tracing/tracing.yaml"     # subsystem requirements
-      - "docs/design/reqstream/tracing/tracing.md"          # subsystem design
-      - "test/**/Tracing/TracingTests.cs"                  # subsystem tests
-
-  - id: ReqStream-SelfTest
-    title: Review that ReqStream SelfTest Satisfies Subsystem Requirements
-    paths:
-      - "docs/reqstream/reqstream/self-test/self-test.yaml"  # subsystem requirements
-      - "docs/design/reqstream/self-test/self-test.md"      # subsystem design
-      - "test/**/SelfTest/SelfTestTests.cs"                # subsystem tests
-
-  # ── Unit Reviews ──────────────────────────────────────────────────────────────
+  # ReqStream - Program
   - id: ReqStream-Program
     title: Review that ReqStream Program Implementation is Correct
     paths:
-      - "docs/reqstream/reqstream/program.yaml"             # unit requirements
-      - "docs/design/reqstream/program.md"                  # unit design
-      - "src/**/Program.cs"                                 # implementation
-      - "test/**/ProgramTests.cs"                           # unit tests
+      - "docs/reqstream/reqstream/program.yaml"                   # unit requirements
+      - "docs/design/reqstream/program.md"                        # unit design
+      - "docs/verification/reqstream/program.md"                  # unit verification design
+      - "src/**/Program.cs"                                       # implementation
+      - "test/**/ProgramTests.cs"                                 # unit tests
+
+  # ReqStream - Cli
+  - id: ReqStream-Cli
+    title: Review that ReqStream Cli Satisfies Subsystem Requirements
+    paths:
+      - "docs/reqstream/reqstream/cli.yaml"                       # subsystem requirements
+      - "docs/design/reqstream/cli.md"                            # subsystem design
+      - "docs/verification/reqstream/cli.md"                      # subsystem verification design
+      - "test/**/Cli/CliTests.cs"                                 # subsystem tests
 
   - id: ReqStream-Cli-Context
     title: Review that ReqStream Cli Context Implementation is Correct
     paths:
-      - "docs/reqstream/reqstream/cli/context.yaml"         # unit requirements
-      - "docs/design/reqstream/cli/context.md"              # unit design
-      - "src/**/Cli/Context.cs"                             # implementation
-      - "test/**/Cli/ContextTests.cs"                       # unit tests
+      - "docs/reqstream/reqstream/cli/context.yaml"               # unit requirements
+      - "docs/design/reqstream/cli/context.md"                    # unit design
+      - "docs/verification/reqstream/cli/context.md"              # unit verification design
+      - "src/**/Cli/Context.cs"                                   # implementation
+      - "test/**/Cli/ContextTests.cs"                             # unit tests
+
+  # ReqStream - Modeling
+  - id: ReqStream-Modeling
+    title: Review that ReqStream Modeling Satisfies Subsystem Requirements
+    paths:
+      - "docs/reqstream/reqstream/modeling.yaml"                  # subsystem requirements
+      - "docs/design/reqstream/modeling.md"                       # subsystem design
+      - "docs/verification/reqstream/modeling.md"                 # subsystem verification design
+      - "test/**/Modeling/ModelingTests.cs"                       # subsystem tests
 
   - id: ReqStream-Modeling-LintIssue
     title: Review that ReqStream Modeling LintIssue Implementation is Correct
     paths:
-      - "docs/reqstream/reqstream/modeling/lint-issue.yaml"     # unit requirements
-      - "docs/design/reqstream/modeling/lint-issue.md"          # unit design
-      - "src/**/Modeling/LintIssue.cs"                          # implementation
-      - "test/**/Modeling/LintIssueTests.cs"                    # unit tests
+      - "docs/reqstream/reqstream/modeling/lint-issue.yaml"       # unit requirements
+      - "docs/design/reqstream/modeling/lint-issue.md"            # unit design
+      - "docs/verification/reqstream/modeling/lint-issue.md"      # unit verification design
+      - "src/**/Modeling/LintIssue.cs"                            # implementation
+      - "test/**/Modeling/LintIssueTests.cs"                      # unit tests
 
   - id: ReqStream-Modeling-LoadResult
     title: Review that ReqStream Modeling LoadResult Implementation is Correct
     paths:
-      - "docs/reqstream/reqstream/modeling/load-result.yaml"    # unit requirements
-      - "docs/design/reqstream/modeling/load-result.md"         # unit design
-      - "src/**/Modeling/LoadResult.cs"                         # implementation
-      - "test/**/Modeling/LoadResultTests.cs"                   # unit tests
-      - "test/**/Modeling/RequirementsLoadTests.cs"             # load result integration tests
+      - "docs/reqstream/reqstream/modeling/load-result.yaml"      # unit requirements
+      - "docs/design/reqstream/modeling/load-result.md"           # unit design
+      - "docs/verification/reqstream/modeling/load-result.md"     # unit verification design
+      - "src/**/Modeling/LoadResult.cs"                           # implementation
+      - "test/**/Modeling/LoadResultTests.cs"                     # unit tests
+      - "test/**/Modeling/RequirementsLoadTests.cs"               # load result integration tests
 
   - id: ReqStream-Modeling-Requirement
     title: Review that ReqStream Modeling Requirement Implementation is Correct
     paths:
-      - "docs/reqstream/reqstream/modeling/requirement.yaml"    # unit requirements
-      - "docs/design/reqstream/modeling/requirement.md"         # unit design
-      - "src/**/Modeling/Requirement.cs"                        # implementation
-      - "test/**/Modeling/RequirementTests.cs"                  # unit tests
+      - "docs/reqstream/reqstream/modeling/requirement.yaml"      # unit requirements
+      - "docs/design/reqstream/modeling/requirement.md"           # unit design
+      - "docs/verification/reqstream/modeling/requirement.md"     # unit verification design
+      - "src/**/Modeling/Requirement.cs"                          # implementation
+      - "test/**/Modeling/RequirementTests.cs"                    # unit tests
 
   - id: ReqStream-Modeling-Requirements
     title: Review that ReqStream Modeling Requirements Implementation is Correct
     paths:
-      - "docs/reqstream/reqstream/modeling/requirements.yaml"   # unit requirements
-      - "docs/design/reqstream/modeling/requirements.md"        # unit design
-      - "src/**/Modeling/Requirements.cs"                       # implementation
-      - "test/**/Modeling/RequirementsLoadTests.cs"             # unit tests
-      - "test/**/Modeling/RequirementsLoadParsingTests.cs"      # unit tests
-      - "test/**/Modeling/RequirementsExportTests.cs"           # unit tests
+      - "docs/reqstream/reqstream/modeling/requirements.yaml"     # unit requirements
+      - "docs/design/reqstream/modeling/requirements.md"          # unit design
+      - "docs/verification/reqstream/modeling/requirements.md"    # unit verification design
+      - "src/**/Modeling/Requirements.cs"                         # implementation
+      - "test/**/Modeling/RequirementsLoadTests.cs"               # unit tests
+      - "test/**/Modeling/RequirementsLoadParsingTests.cs"        # unit tests
+      - "test/**/Modeling/RequirementsExportTests.cs"             # unit tests
 
   - id: ReqStream-Modeling-RequirementsLoader
     title: Review that ReqStream Modeling RequirementsLoader Implementation is Correct
     paths:
-      - "docs/reqstream/reqstream/modeling/requirements-loader.yaml"  # unit requirements
-      - "docs/design/reqstream/modeling/requirements-loader.md"       # unit design
-      - "src/**/Modeling/RequirementsLoader.cs"                       # implementation
-      - "test/**/Modeling/RequirementsLoaderTests.cs"                 # unit tests
+      - "docs/reqstream/reqstream/modeling/requirements-loader.yaml"   # unit requirements
+      - "docs/design/reqstream/modeling/requirements-loader.md"        # unit design
+      - "docs/verification/reqstream/modeling/requirements-loader.md"  # unit verification design
+      - "src/**/Modeling/RequirementsLoader.cs"                        # implementation
+      - "test/**/Modeling/RequirementsLoaderTests.cs"                  # unit tests
 
   - id: ReqStream-Modeling-Section
     title: Review that ReqStream Modeling Section Implementation is Correct
     paths:
-      - "docs/reqstream/reqstream/modeling/section.yaml"        # unit requirements
-      - "docs/design/reqstream/modeling/section.md"             # unit design
-      - "src/**/Modeling/Section.cs"                            # implementation
-      - "test/**/Modeling/SectionTests.cs"                      # unit tests
-      - "test/**/Modeling/RequirementsExportTests.cs"           # section hierarchy export tests
+      - "docs/reqstream/reqstream/modeling/section.yaml"          # unit requirements
+      - "docs/design/reqstream/modeling/section.md"               # unit design
+      - "docs/verification/reqstream/modeling/section.md"         # unit verification design
+      - "src/**/Modeling/Section.cs"                              # implementation
+      - "test/**/Modeling/SectionTests.cs"                        # unit tests
+      - "test/**/Modeling/RequirementsExportTests.cs"             # section hierarchy export tests
+
+  # ReqStream - Tracing
+  - id: ReqStream-Tracing
+    title: Review that ReqStream Tracing Satisfies Subsystem Requirements
+    paths:
+      - "docs/reqstream/reqstream/tracing.yaml"                   # subsystem requirements
+      - "docs/design/reqstream/tracing.md"                        # subsystem design
+      - "docs/verification/reqstream/tracing.md"                  # subsystem verification design
+      - "test/**/Tracing/TracingTests.cs"                         # subsystem tests
 
   - id: ReqStream-Tracing-TraceMatrix
     title: Review that ReqStream Tracing TraceMatrix Implementation is Correct
     paths:
-      - "docs/reqstream/reqstream/tracing/trace-matrix.yaml"  # unit requirements
-      - "docs/design/reqstream/tracing/trace-matrix.md"     # unit design
-      - "src/**/Tracing/TraceMatrix.cs"                     # implementation
-      - "test/**/Tracing/TraceMatrixTests.cs"               # unit tests
-      - "test/**/Tracing/TraceMatrixReadTests.cs"           # unit tests
-      - "test/**/Tracing/TraceMatrixExportTests.cs"         # unit tests
+      - "docs/reqstream/reqstream/tracing/trace-matrix.yaml"      # unit requirements
+      - "docs/design/reqstream/tracing/trace-matrix.md"           # unit design
+      - "docs/verification/reqstream/tracing/trace-matrix.md"     # unit verification design
+      - "src/**/Tracing/TraceMatrix.cs"                           # implementation
+      - "test/**/Tracing/TraceMatrixTests.cs"                     # unit tests
+      - "test/**/Tracing/TraceMatrixReadTests.cs"                 # unit tests
+      - "test/**/Tracing/TraceMatrixExportTests.cs"               # unit tests
+
+  # ReqStream - SelfTest
+  - id: ReqStream-SelfTest
+    title: Review that ReqStream SelfTest Satisfies Subsystem Requirements
+    paths:
+      - "docs/reqstream/reqstream/self-test.yaml"                 # subsystem requirements
+      - "docs/design/reqstream/self-test.md"                      # subsystem design
+      - "docs/verification/reqstream/self-test.md"                # subsystem verification design
+      - "test/**/SelfTest/SelfTestTests.cs"                       # subsystem tests
 
   - id: ReqStream-SelfTest-Validation
     title: Review that ReqStream SelfTest Validation Implementation is Correct
     paths:
-      - "docs/reqstream/reqstream/self-test/validation.yaml"  # unit requirements
-      - "docs/design/reqstream/self-test/validation.md"     # unit design
-      - "src/**/SelfTest/Validation.cs"                     # implementation
-      - "test/**/SelfTest/ValidationTests.cs"               # unit tests
+      - "docs/reqstream/reqstream/self-test/validation.yaml"      # unit requirements
+      - "docs/design/reqstream/self-test/validation.md"           # unit design
+      - "docs/verification/reqstream/self-test/validation.md"     # unit verification design
+      - "src/**/SelfTest/Validation.cs"                           # implementation
+      - "test/**/SelfTest/ValidationTests.cs"                     # unit tests
+
+  # OTS Items
+  - id: OTS-BuildMark
+    title: Review that BuildMark Provides Required Functionality
+    paths:
+      - "docs/reqstream/ots/buildmark.yaml"                       # OTS requirements
+      - "docs/verification/ots/buildmark.md"                      # OTS verification
+
+  - id: OTS-FileAssert
+    title: Review that FileAssert Provides Required Functionality
+    paths:
+      - "docs/reqstream/ots/fileassert.yaml"                      # OTS requirements
+      - "docs/verification/ots/fileassert.md"                     # OTS verification
+
+  - id: OTS-XUnit
+    title: Review that xUnit Provides Required Functionality
+    paths:
+      - "docs/reqstream/ots/xunit.yaml"                           # OTS requirements
+      - "docs/verification/ots/xunit.md"                          # OTS verification
+
+  - id: OTS-Pandoc
+    title: Review that Pandoc Provides Required Functionality
+    paths:
+      - "docs/reqstream/ots/pandoc.yaml"                          # OTS requirements
+      - "docs/verification/ots/pandoc.md"                         # OTS verification
+
+  - id: OTS-ReviewMark
+    title: Review that ReviewMark Provides Required Functionality
+    paths:
+      - "docs/reqstream/ots/reviewmark.yaml"                      # OTS requirements
+      - "docs/verification/ots/reviewmark.md"                     # OTS verification
+
+  - id: OTS-SarifMark
+    title: Review that SarifMark Provides Required Functionality
+    paths:
+      - "docs/reqstream/ots/sarifmark.yaml"                       # OTS requirements
+      - "docs/verification/ots/sarifmark.md"                      # OTS verification
+
+  - id: OTS-SonarMark
+    title: Review that SonarMark Provides Required Functionality
+    paths:
+      - "docs/reqstream/ots/sonarmark.yaml"                       # OTS requirements
+      - "docs/verification/ots/sonarmark.md"                      # OTS verification
+
+  - id: OTS-VersionMark
+    title: Review that VersionMark Provides Required Functionality
+    paths:
+      - "docs/reqstream/ots/versionmark.yaml"                     # OTS requirements
+      - "docs/verification/ots/versionmark.md"                    # OTS verification
+
+  - id: OTS-WeasyPrint
+    title: Review that WeasyPrint Provides Required Functionality
+    paths:
+      - "docs/reqstream/ots/weasyprint.yaml"                      # OTS requirements
+      - "docs/verification/ots/weasyprint.md"                     # OTS verification

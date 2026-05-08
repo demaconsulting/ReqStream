@@ -1,16 +1,16 @@
-# Tracing Subsystem Design
+## Tracing Subsystem Design
 
 The `Tracing` subsystem provides test result loading and requirement-to-test traceability
 for ReqStream. It maps test execution evidence to requirements and supports enforcement of
 full test coverage.
 
-## Overview
+### Overview
 
 The `Tracing` subsystem reads test result files in TRX or JUnit XML format, correlates
 each test result with the requirements that reference it, and produces a trace matrix report
 or coverage enforcement decision.
 
-## Units
+### Units
 
 The `Tracing` subsystem contains the following software unit:
 
@@ -18,7 +18,7 @@ The `Tracing` subsystem contains the following software unit:
 |---------------|-------------------------|----------------------------------------------------------------------|
 | `TraceMatrix` | `Tracing/TraceMatrix.cs`| Test result loading, requirement mapping, and coverage enforcement.  |
 
-## Interfaces
+### Interfaces
 
 The `Tracing` subsystem exposes the following interface to the rest of the tool:
 
@@ -31,7 +31,7 @@ The `Tracing` subsystem exposes the following interface to the rest of the tool:
 | `TraceMatrix.GetTestResult` | Returns pass/fail counts for a named test across results. |
 | `TraceMatrix.GetAllTestResults` | Returns pass/fail `TestMetrics` for all tests referenced in requirements. |
 
-## Interactions
+### Interactions
 
 | Dependency     | Direction | Purpose                                                                |
 |----------------|-----------|------------------------------------------------------------------------|
@@ -39,7 +39,7 @@ The `Tracing` subsystem exposes the following interface to the rest of the tool:
 | `Requirements` | Uses      | Receives the requirement tree to map tests to requirements.            |
 | `Program`      | Used by   | Constructs `TraceMatrix` and calls enforcement/export methods.         |
 
-## Error Handling
+### Error Handling
 
 The `Tracing` subsystem raises the following exceptions at the subsystem boundary. Both
 exceptions are thrown by the `TraceMatrix` constructor and propagate to `Program` for

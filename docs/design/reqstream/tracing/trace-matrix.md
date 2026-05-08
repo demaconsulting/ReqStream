@@ -1,15 +1,15 @@
-# TraceMatrix Unit Design
+### TraceMatrix Unit Design
 
-## Overview
+#### Overview
 
 `TraceMatrix` maps test execution results to requirements and calculates requirement-coverage
 metrics. It consumes an already-validated `Requirements` tree and a list of test-result file paths,
 then provides lookup and satisfaction-analysis methods used by `Program` to generate reports and
 enforce coverage.
 
-## Supporting Value Types
+#### Supporting Value Types
 
-### `TestMetrics`
+##### `TestMetrics`
 
 `TestMetrics` is an immutable record that aggregates pass/fail counts for a single named test
 across all loaded result files.
@@ -24,7 +24,7 @@ across all loaded result files.
 `GetTestResult` returns `TestMetrics(0, 0)` when the test name has no recorded executions, so
 callers always receive a valid object.
 
-### `TestExecution`
+##### `TestExecution`
 
 `TestExecution` is an immutable record that holds the results for one test name from one
 result file.
@@ -35,23 +35,23 @@ result file.
 | `Name` | `string` | Test name as it appears in the result file |
 | `Metrics` | `TestMetrics` | Aggregated pass/fail counts for this test in this file |
 
-## Private State
+#### Private State
 
 | Field | Type | Purpose |
 | ----- | ---- | ------- |
 | `_testExecutions` | `Dictionary<string, List<TestExecution>>` | Maps test names to lists of `TestExecution` entries |
 | `_requirements` | `Requirements` | The validated requirement tree; held for iteration in analysis methods |
 
-## Construction
+#### Construction
 
-### `TraceMatrix(requirements, testResultFiles)`
+##### `TraceMatrix(requirements, testResultFiles)`
 
 The constructor stores the `Requirements` tree for later iteration and calls
 `ProcessTestResultFile` for each path in `testResultFiles` to populate `_testExecutions`. After
 construction, `_testExecutions` contains every unique test name seen, each mapped to one
 `TestExecution` record per result file that contained that test name.
 
-### `ProcessTestResultFile(filePath)`
+##### `ProcessTestResultFile(filePath)`
 
 `ProcessTestResultFile` reads one test-result file, auto-detects its format (TRX or JUnit) via
 `DemaConsulting.TestResults.IO.Serializer.Deserialize`, and adds a `TestExecution` record to
@@ -59,9 +59,9 @@ construction, `_testExecutions` contains every unique test name seen, each mappe
 in an `InvalidOperationException` that includes `filePath` — this ensures the caller can identify
 the offending file without inspecting nested exception detail.
 
-## Methods
+#### Methods
 
-### `GetTestResult(testName)`
+##### `GetTestResult(testName)`
 
 `GetTestResult` returns aggregated `TestMetrics` for a named test. When `testName` contains a
 `'@'` separator (not at position 0 or end), it applies source-specific filtering: the part before
@@ -75,7 +75,7 @@ files. If the test name is not found in `_testExecutions`, the method returns `T
 ensuring callers always receive a valid object. See the Test Name Format Summary table below
 for a quick reference of both formats.
 
-### `GetAllTestResults()`
+##### `GetAllTestResults()`
 
 `GetAllTestResults` returns a read-only dictionary mapping each test name (referenced by any
 requirement in the tree) to its aggregated `TestMetrics`. Only tests that have been executed at
@@ -85,21 +85,21 @@ called by `Export` or `ExportTesting`: the Testing section is built by calling
 unexecuted tests showing `0 / 0` counts. `GetAllTestResults` is available for callers that
 want an executed-only summary without generating a full report.
 
-### `GetUnsatisfiedRequirements(filterTags)`
+##### `GetUnsatisfiedRequirements(filterTags)`
 
 `GetUnsatisfiedRequirements` returns a list of requirement IDs that are not satisfied (subject to
 `filterTags` filtering). A requirement is unsatisfied if it has no tests or if any of its tests
 have not been executed or have failed. This is the inverse of `IsRequirementSatisfied` applied
 across all requirements in the tree.
 
-### `CalculateSatisfiedRequirements(filterTags)`
+##### `CalculateSatisfiedRequirements(filterTags)`
 
 `CalculateSatisfiedRequirements` iterates every requirement in the tree (subject to `filterTags`
 filtering) and returns a `(satisfied, total)` tuple. It calls `IsRequirementSatisfied` for each
 requirement to determine whether all associated tests have passed. This provides `Program` with the
 counts needed to report coverage status and determine whether `--enforce` should fail.
 
-### `CollectAllTests(requirement, rootSection, allTests)`
+##### `CollectAllTests(requirement, rootSection, allTests)`
 
 `CollectAllTests` returns the union of all test names associated with a requirement and its
 entire descendant subtree. Child requirements inherit their parent's coverage obligations, so a
@@ -107,14 +107,14 @@ requirement is only considered covered when all tests across its whole subtree p
 `RequirementsLoader.ValidateCycles()` has already confirmed the child graph is acyclic, this method
 recurses without a cycle guard.
 
-### `IsRequirementSatisfied(requirement)`
+##### `IsRequirementSatisfied(requirement)`
 
 `IsRequirementSatisfied` returns `true` if and only if the requirement has at least one test
 mapped (directly or via descendants) and every one of those tests has `AllPassed == true`. A
 requirement with no tests is never satisfied, enforcing the design expectation that every
 requirement must be traced to at least one passing test.
 
-### `Export(filePath, depth, filterTags)`
+##### `Export(filePath, depth, filterTags)`
 
 `Export` writes the trace matrix to a Markdown file at `filePath`. The output has three sections,
 written in this order by three helper methods: `ExportSummary`, `ExportRequirements`, and
@@ -154,14 +154,14 @@ while the Summary reflects full-subtree satisfaction.
   not appear in the Testing table. Defaults to `null`.
 - `rootSection`: `_requirements` is used internally as the root to iterate the requirement tree.
 
-## Test Name Format Summary
+#### Test Name Format Summary
 
 | Format | Example | Matching rule |
 | ------ | ------- | ------------- |
 | Plain | `TestFeature_Valid_Passes` | Aggregates across all result files |
 | Source-specific | `ubuntu@TestFeature_Valid_Passes` | Restricted to files whose base name contains `ubuntu` |
 
-## Interactions with Other Units
+#### Interactions with Other Units
 
 - **`Program`** — Constructs `TraceMatrix`; calls `CalculateSatisfiedRequirements`, `GetUnsatisfiedRequirements`, and `Export`.
 - **`Requirements`** — Provides the requirement tree; iterated during analysis.

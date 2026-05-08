@@ -8,12 +8,12 @@
 # - Subsystem requirements describe the YAML parsing and data model behavior
 
 includes:
-  - lint-issue.yaml
-  - load-result.yaml
-  - requirement.yaml
-  - requirements.yaml
-  - requirements-loader.yaml
-  - section.yaml
+  - modeling/lint-issue.yaml
+  - modeling/load-result.yaml
+  - modeling/requirement.yaml
+  - modeling/requirements.yaml
+  - modeling/requirements-loader.yaml
+  - modeling/section.yaml
 
 sections:
   - title: Modeling Subsystem Requirements

@@ -1,17 +1,17 @@
 ---
 includes:
   # System-level requirements
-  - docs/reqstream/reqstream/reqstream.yaml
+  - docs/reqstream/reqstream.yaml
   # Program unit
   - docs/reqstream/reqstream/program.yaml
-  # Cli subsystem (includes context.yaml via cli.yaml)
-  - docs/reqstream/reqstream/cli/cli.yaml
+  # Cli subsystem (includes cli/context.yaml via cli.yaml)
+  - docs/reqstream/reqstream/cli.yaml
   # Modeling subsystem
-  - docs/reqstream/reqstream/modeling/modeling.yaml
-  # Tracing subsystem (includes trace-matrix.yaml via tracing.yaml)
-  - docs/reqstream/reqstream/tracing/tracing.yaml
-  # SelfTest subsystem (includes validation.yaml via self-test.yaml)
-  - docs/reqstream/reqstream/self-test/self-test.yaml
+  - docs/reqstream/reqstream/modeling.yaml
+  # Tracing subsystem (includes tracing/trace-matrix.yaml via tracing.yaml)
+  - docs/reqstream/reqstream/tracing.yaml
+  # SelfTest subsystem (includes self-test/validation.yaml via self-test.yaml)
+  - docs/reqstream/reqstream/self-test.yaml
   # Platform support and OTS software
   - docs/reqstream/reqstream/platform-requirements.yaml
   - docs/reqstream/ots/xunit.yaml

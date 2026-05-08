@@ -1,17 +1,17 @@
-# Cli Subsystem Design
+## Cli Subsystem Design
 
 The `Cli` subsystem provides the command-line interface for ReqStream.
 It is responsible for accepting user input from the command line and routing output to
 the console and an optional log file.
 
-## Overview
+### Overview
 
 The `Cli` subsystem acts as the primary boundary between the user's shell invocation and
 the tool's internal logic. It owns argument parsing, output formatting, and error tracking.
 All other subsystems receive a `Context` object from the `Cli` subsystem to read parsed
 flags and write output.
 
-## Units
+### Units
 
 The `Cli` subsystem contains the following software unit:
 
@@ -19,7 +19,7 @@ The `Cli` subsystem contains the following software unit:
 |-------------------------------|------------------|---------------------------------------------------------------|
 | `Context`                     | `Cli/Context.cs` | Argument parsing, output channels, and exit code.             |
 
-## Interfaces
+### Interfaces
 
 The `Cli` subsystem exposes the following interface to the rest of the tool:
 
@@ -47,13 +47,13 @@ The `Cli` subsystem exposes the following interface to the rest of the tool:
 - **`Context.ExitCode`** — Returns 0 for success or 1 when errors have been reported.
 - **`Context.Dispose`** — Closes the log file writer and releases resources.
 
-## Interactions
+### Interactions
 
 The `Cli` subsystem has no dependencies on other tool subsystems. It uses only .NET base
 class library types. The `Program` unit at system level creates the `Context` and passes it
 to all subsystems that need to produce output.
 
-## Error Handling
+### Error Handling
 
 `Context.Create` throws `ArgumentException` under the following conditions:
 
@@ -63,7 +63,7 @@ to all subsystems that need to produce output.
   or `--justifications-depth` value is not a positive integer.
 - **Log file open failure** — The file path provided to `--log` cannot be opened for writing.
 
-## Depth Inheritance
+### Depth Inheritance
 
 `Context.ReportDepth`, `Context.MatrixDepth`, and `Context.JustificationsDepth` all default
 to `Context.Depth` when not individually overridden by `--report-depth`, `--matrix-depth`, or

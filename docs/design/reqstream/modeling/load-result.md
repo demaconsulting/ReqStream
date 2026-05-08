@@ -1,6 +1,6 @@
-# LoadResult Unit Design
+### LoadResult Unit Design
 
-## Overview
+#### Overview
 
 `LoadResult` encapsulates the combined outcome of a `Requirements.Load` call. It holds the
 parsed `Requirements` tree (or `null` if error-level issues prevented successful loading) and
@@ -8,7 +8,7 @@ the complete list of `LintIssue` objects collected during the load. By combining
 single return value, `LoadResult` ensures that the requirements tree and the lint issues are
 always consistent with each other and can be inspected by the caller in any order.
 
-## Properties
+#### Properties
 
 | Member | Type | Notes |
 | ------ | ---- | ----- |
@@ -16,9 +16,9 @@ always consistent with each other and can be inspected by the caller in any orde
 | `Issues` | `IReadOnlyList<LintIssue>` | All lint issues collected during loading |
 | `HasErrors` | `bool` | `true` when any issue has `LintSeverity.Error` |
 
-## Methods
+#### Methods
 
-### `ReportIssues(context)`
+##### `ReportIssues(context)`
 
 `ReportIssues` routes each `LintIssue` in `Issues` to the appropriate output channel of the
 supplied `Context`:
@@ -29,14 +29,14 @@ supplied `Context`:
 This method exists to decouple `LoadResult` from knowledge of how issues are displayed; it
 delegates all formatting and routing decisions to the `Context` unit.
 
-## Construction
+#### Construction
 
 `LoadResult` has an `internal` constructor called only by `RequirementsLoader.Load`. The
 constructor accepts the `Requirements?` tree and the collected `IReadOnlyList<LintIssue>`.
 `HasErrors` is a computed property that evaluates `Issues.Any(i => i.Severity == LintSeverity.Error)`
 on each access.
 
-## Interactions with Other Units
+#### Interactions with Other Units
 
 | Unit | Nature of interaction |
 | ---- | --------------------- |

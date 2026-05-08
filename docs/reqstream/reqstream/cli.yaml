@@ -7,7 +7,7 @@
 # - Subsystem requirements describe the externally visible command-line interface behavior
 
 includes:
-  - context.yaml
+  - cli/context.yaml
 
 sections:
   - title: Cli Subsystem Requirements

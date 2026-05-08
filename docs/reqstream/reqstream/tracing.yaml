@@ -7,7 +7,7 @@
 # - Subsystem requirements describe the traceability and coverage enforcement behavior
 
 includes:
-  - trace-matrix.yaml
+  - tracing/trace-matrix.yaml
 
 sections:
   - title: Tracing Subsystem Requirements

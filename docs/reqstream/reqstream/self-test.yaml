@@ -7,7 +7,7 @@
 # - Subsystem requirements describe the self-validation mechanism for tool qualification
 
 includes:
-  - validation.yaml
+  - self-test/validation.yaml
 
 sections:
   - title: SelfTest Subsystem Requirements

@@ -1,16 +1,16 @@
-# Modeling Subsystem Design
+## Modeling Subsystem Design
 
 The `Modeling` subsystem provides the data model and YAML parsing for ReqStream requirements
 documents. It is responsible for reading, validating, and structuring requirement data for use
 by the tracing, reporting, and enforcement subsystems.
 
-## Overview
+### Overview
 
 The `Modeling` subsystem handles all YAML file parsing and requirement data structures. It
 reads one or more requirement YAML files (including those referenced via `includes`), merges
 them into a unified requirement tree, and exposes that tree to the rest of the tool.
 
-## Units
+### Units
 
 The `Modeling` subsystem contains the following software units:
 
@@ -22,7 +22,7 @@ The `Modeling` subsystem contains the following software units:
   for individual requirements files.
 - **`Section`** (`Modeling/Section.cs`) — Named group of requirements within a requirements document.
 
-## Interfaces
+### Interfaces
 
 The `Modeling` subsystem exposes the following interface to the rest of the tool:
 
@@ -34,7 +34,7 @@ The `Modeling` subsystem exposes the following interface to the rest of the tool
 | `LoadResult.ReportIssues` | Reports lint issues discovered during loading via the context. |
 | `RequirementsLoader.Load` | Deserializes a single requirements file and collects lint issues. |
 
-## Interactions
+### Interactions
 
 | Dependency                         | Direction | Purpose                                                             |
 |------------------------------------|-----------|---------------------------------------------------------------------|
@@ -42,7 +42,7 @@ The `Modeling` subsystem exposes the following interface to the rest of the tool
 | `TraceMatrix`                      | Used by   | Receives the requirement tree to map test results to requirements.  |
 | `Program`                          | Used by   | Calls `Requirements.Load` to load requirements.                     |
 
-## Operation
+### Operation
 
 A call to `Requirements.Load(paths)` follows this sequence:
 
@@ -55,7 +55,7 @@ A call to `Requirements.Load(paths)` follows this sequence:
 4. **Result assembly** — if any Error-level lint issue is present, `Requirements` is set to `null`
    in the returned `LoadResult`; otherwise it contains the populated `Requirements` tree.
 
-## Lint Check Categories
+### Lint Check Categories
 
 `RequirementsLoader` performs structural validation during loading. For the complete list of
 lint check categories and checked conditions, see the RequirementsLoader unit design documentation.
@@ -63,15 +63,15 @@ lint check categories and checked conditions, see the RequirementsLoader unit de
 No Warning-level issues are emitted by the current implementation; all detected conditions are
 Error-level and cause `LoadResult.Requirements` to be `null`.
 
-## Error Handling
+### Error Handling
 
-### Severity Classification
+#### Severity Classification
 
 All lint issues emitted by the Modeling subsystem carry `LintSeverity.Error`. There are no
 Warning-level conditions in the current implementation. Any single Error causes `LoadResult`
 to return `null` for `Requirements`.
 
-### Include Loop Guard and LoadResult Contract
+#### Include Loop Guard and LoadResult Contract
 
 For the include-loop deduplication strategy, see the RequirementsLoader unit design documentation.
 For the `LoadResult` null-on-error contract, see the LoadResult unit design documentation.

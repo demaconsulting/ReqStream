@@ -1,15 +1,15 @@
-# Program Unit Design
+## Program Unit Design
 
-## Overview
+### Overview
 
 `Program` is the entry point of the ReqStream executable. It owns the top-level execution flow,
 dispatches to the appropriate subsystem based on the parsed command-line options, and establishes the
 error-handling boundary for the entire process. All meaningful work is delegated to `Context`,
 `Validation`, `Requirements`, and `TraceMatrix`; `Program` itself contains no domain logic.
 
-## Properties
+### Properties
 
-### `Version`
+#### `Version`
 
 `Version` is a static read-only property backed by the private `_version` field, which is
 initialized once at class startup to avoid repeated reflection on every access.
@@ -27,9 +27,9 @@ labels and build metadata. If the attribute is absent or empty the numeric `Asse
 string is used. If neither is available the string `"Unknown"` is returned so that the property
 never throws and never returns `null`.
 
-## Methods
+### Methods
 
-### `Main(args)`
+#### `Main(args)`
 
 `Main` is the process entry point. Its responsibilities are:
 
@@ -50,7 +50,7 @@ never throws and never returns `null`.
 its message is sufficient for diagnosis. All other exceptions are re-thrown so the operating
 system or process supervisor captures the full stack trace for unexpected failures.
 
-### `Run(context)`
+#### `Run(context)`
 
 `Run` implements the priority-ordered dispatch shown in the table below. Return steps exit
 immediately; the banner step (row 2) prints the banner and then falls through to the next step.
@@ -68,7 +68,7 @@ immediately; the banner step (row 2) prints the banner and then falls through to
 With priorities 5 and 6 the `Run` method enters the `if (context.Lint)` block. Priority 5 guards
 the early-exit path for the no-files case; priority 6 is the normal lint path that follows.
 
-### `PrintBanner`
+#### `PrintBanner`
 
 `PrintBanner` writes three lines to `context`: the tool name with version string, the copyright
 notice, and a blank line. It is called at priority step 2 for all invocations except version
@@ -76,12 +76,12 @@ queries and lint runs, so that every non-trivial invocation identifies the runni
 The banner is suppressed during lint to keep output clean for lint script integration — only
 actionable issue lines are emitted.
 
-### `PrintHelp`
+#### `PrintHelp`
 
 `PrintHelp` writes the full option listing to `context`. It documents every supported flag and
 argument, grouped logically. It is only called when `--help` is present.
 
-### `ProcessRequirements`
+#### `ProcessRequirements`
 
 `ProcessRequirements` orchestrates the normal (non-version, non-help, non-validate, non-lint) run.
 If `context.RequirementsFiles` is empty, it writes "No requirements files specified." and returns
@@ -95,7 +95,7 @@ If `--enforce` is active, `EnforceRequirementsCoverage` is called last so that a
 generated even when coverage fails. All export methods respect `context.FilterTags` for tag-filtered
 output.
 
-### `EnforceRequirementsCoverage`
+#### `EnforceRequirementsCoverage`
 
 `EnforceRequirementsCoverage` evaluates whether all requirements are covered by passing tests. If
 no `TraceMatrix` was built (i.e., no `--tests` argument was provided), it reports an error
@@ -108,7 +108,7 @@ requirement IDs and reports each one via `context.WriteError`.
 This method never throws; all failure signalling goes through `context.WriteError`, which sets the
 internal error flag and eventually produces a non-zero exit code.
 
-## Interactions with Other Units
+### Interactions with Other Units
 
 | Unit | Nature of interaction |
 | ---- | --------------------- |
