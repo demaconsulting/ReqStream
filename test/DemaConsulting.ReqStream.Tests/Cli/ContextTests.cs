@@ -915,6 +915,7 @@ public sealed class ContextTests : IDisposable
     {
         // Act: create context with a default depth of 2 and a report-specific depth of 3
         using var context = Context.Create(["--depth", "2", "--report-depth", "3"]);
+
         // Assert: report depth uses the override value and other depths inherit the default
         Assert.Equal(2, context.Depth);
         Assert.Equal(3, context.ReportDepth);

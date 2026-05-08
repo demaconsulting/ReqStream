@@ -233,6 +233,7 @@ public sealed class CliTests : IDisposable
 
         // Act: create a context with only --depth 3 (no per-report overrides)
         using var context = Context.Create(["--depth", "3"]);
+
         // Assert: all per-report depth properties inherit the --depth value
         Assert.Equal(3, context.ReportDepth);
         Assert.Equal(3, context.MatrixDepth);
