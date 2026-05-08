@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using DemaConsulting.ReqStream.Modeling;
+using DemaConsulting.ReqStream.Utilities;
 
 namespace DemaConsulting.ReqStream.Tests.Modeling;
 
@@ -35,7 +36,7 @@ public sealed class RequirementsLoaderTests : IDisposable
     /// </summary>
     public RequirementsLoaderTests()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_loader_test_{Guid.NewGuid()}");
+        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_loader_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
     }
 
@@ -82,7 +83,7 @@ public sealed class RequirementsLoaderTests : IDisposable
     public void RequirementsLoader_Load_WithValidFile_ReportsNoIssues()
     {
         // Arrange: create a valid requirements YAML file
-        var reqFile = Path.Combine(_testDirectory, "valid.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "valid.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     requirements:
@@ -139,7 +140,7 @@ public sealed class RequirementsLoaderTests : IDisposable
         }
 
         // Arrange: create a YAML file and remove all permissions so it cannot be read
-        var reqFile = Path.Combine(_testDirectory, "unreadable.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "unreadable.yaml");
         File.WriteAllText(reqFile, "sections: []");
         File.SetUnixFileMode(reqFile, UnixFileMode.None);
         try
@@ -181,7 +182,7 @@ public sealed class RequirementsLoaderTests : IDisposable
     public void RequirementsLoader_Load_WithMalformedYaml_ReportsError()
     {
         // Arrange: create a YAML file with invalid syntax
-        var reqFile = Path.Combine(_testDirectory, "malformed.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "malformed.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Bad
     requirements: [
@@ -204,7 +205,7 @@ public sealed class RequirementsLoaderTests : IDisposable
     public void RequirementsLoader_Load_WithEmptyFile_ReportsNoIssues()
     {
         // Arrange: create an empty YAML file
-        var reqFile = Path.Combine(_testDirectory, "empty.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "empty.yaml");
         File.WriteAllText(reqFile, string.Empty);
 
         // Act: load the empty requirements file
@@ -223,7 +224,7 @@ public sealed class RequirementsLoaderTests : IDisposable
     public void RequirementsLoader_Load_WithUnknownDocumentField_ReportsError()
     {
         // Arrange: create a YAML file with an unknown field at document root
-        var reqFile = Path.Combine(_testDirectory, "unknown-field.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "unknown-field.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test
 unknown_field: value
@@ -244,7 +245,7 @@ unknown_field: value
     public void RequirementsLoader_Load_WithSectionMissingTitle_ReportsError()
     {
         // Arrange: create a YAML file with a section that has no title
-        var reqFile = Path.Combine(_testDirectory, "missing-title.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "missing-title.yaml");
         File.WriteAllText(reqFile, @"sections:
   - requirements:
       - id: REQ-001
@@ -266,7 +267,7 @@ unknown_field: value
     public void RequirementsLoader_Load_WithBlankSectionTitle_ReportsError()
     {
         // Arrange: create a YAML file with a section whose title is blank
-        var reqFile = Path.Combine(_testDirectory, "blank-title.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "blank-title.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: ''
     requirements:
@@ -289,7 +290,7 @@ unknown_field: value
     public void RequirementsLoader_Load_WithUnknownSectionField_ReportsError()
     {
         // Arrange: create a YAML file with an unknown field inside a section
-        var reqFile = Path.Combine(_testDirectory, "unknown-section-field.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "unknown-section-field.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test
     unknown_field: value
@@ -310,7 +311,7 @@ unknown_field: value
     public void RequirementsLoader_Load_WithRequirementMissingId_ReportsError()
     {
         // Arrange: create a YAML file with a requirement that has no id field
-        var reqFile = Path.Combine(_testDirectory, "missing-id.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "missing-id.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     requirements:
@@ -332,7 +333,7 @@ unknown_field: value
     public void RequirementsLoader_Load_WithRequirementMissingTitle_ReportsError()
     {
         // Arrange: create a YAML file with a requirement that has no title field
-        var reqFile = Path.Combine(_testDirectory, "missing-req-title.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "missing-req-title.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     requirements:
@@ -354,7 +355,7 @@ unknown_field: value
     public void RequirementsLoader_Load_WithUnknownRequirementField_ReportsError()
     {
         // Arrange: create a YAML file with a requirement that has an unknown field
-        var reqFile = Path.Combine(_testDirectory, "unknown-req-field.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "unknown-req-field.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     requirements:
@@ -378,7 +379,7 @@ unknown_field: value
     public void RequirementsLoader_Load_WithDuplicateIds_ReportsError()
     {
         // Arrange: create a YAML file with two requirements sharing the same ID
-        var reqFile = Path.Combine(_testDirectory, "duplicates.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "duplicates.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     requirements:
@@ -403,7 +404,7 @@ unknown_field: value
     public void RequirementsLoader_Load_WithDuplicateIdsAcrossFiles_ReportsError()
     {
         // Arrange: create two YAML files that each define the same requirement ID
-        var reqFile1 = Path.Combine(_testDirectory, "file1.yaml");
+        var reqFile1 = PathHelpers.SafePathCombine(_testDirectory, "file1.yaml");
         File.WriteAllText(reqFile1, @"sections:
   - title: Section 1
     requirements:
@@ -411,7 +412,7 @@ unknown_field: value
         title: First requirement
 ");
 
-        var reqFile2 = Path.Combine(_testDirectory, "file2.yaml");
+        var reqFile2 = PathHelpers.SafePathCombine(_testDirectory, "file2.yaml");
         File.WriteAllText(reqFile2, @"sections:
   - title: Section 2
     requirements:
@@ -434,7 +435,7 @@ unknown_field: value
     public void RequirementsLoader_Load_WithMultipleIssues_ReportsAllIssues()
     {
         // Arrange: create a YAML file with multiple structural errors
-        var reqFile = Path.Combine(_testDirectory, "multiple-issues.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "multiple-issues.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     unknown_section_field: bad
@@ -465,7 +466,7 @@ unknown_root_field: bad
     public void RequirementsLoader_Load_WithIncludes_LintsIncludedFiles()
     {
         // Arrange: create an included YAML file with an unknown field and a root file that includes it
-        var includedFile = Path.Combine(_testDirectory, "included.yaml");
+        var includedFile = PathHelpers.SafePathCombine(_testDirectory, "included.yaml");
         File.WriteAllText(includedFile, @"sections:
   - title: Included Section
     requirements:
@@ -474,7 +475,7 @@ unknown_root_field: bad
         unknown_field: bad
 ");
 
-        var rootFile = Path.Combine(_testDirectory, "root.yaml");
+        var rootFile = PathHelpers.SafePathCombine(_testDirectory, "root.yaml");
         File.WriteAllText(rootFile, $@"includes:
   - included.yaml
 sections:
@@ -499,7 +500,7 @@ sections:
     public void RequirementsLoader_Load_WithUnknownMappingField_ReportsError()
     {
         // Arrange: create a YAML file with an unknown field inside a mapping block
-        var reqFile = Path.Combine(_testDirectory, "unknown-mapping-field.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "unknown-mapping-field.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     requirements:
@@ -527,7 +528,7 @@ mappings:
     public void RequirementsLoader_Load_WithMappingMissingId_ReportsError()
     {
         // Arrange: create a YAML file with a mapping block that has no id field
-        var reqFile = Path.Combine(_testDirectory, "mapping-missing-id.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "mapping-missing-id.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     requirements:
@@ -553,7 +554,7 @@ mappings:
     public void RequirementsLoader_Load_WithNestedSectionIssues_ReportsError()
     {
         // Arrange: create a YAML file with an issue inside a nested child section
-        var reqFile = Path.Combine(_testDirectory, "nested.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "nested.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Parent Section
     sections:
@@ -581,7 +582,7 @@ mappings:
     public void RequirementsLoader_Load_ErrorFormat_IncludesFileAndLocation()
     {
         // Arrange: create a YAML file with a single unknown root field
-        var reqFile = Path.Combine(_testDirectory, "format-test.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "format-test.yaml");
         File.WriteAllText(reqFile, @"unknown_field: value
 ");
 
@@ -601,7 +602,7 @@ mappings:
     public void RequirementsLoader_Load_WithBlankRequirementId_ReportsError()
     {
         // Arrange: create a YAML file with a requirement whose id is blank
-        var reqFile = Path.Combine(_testDirectory, "blank-req-id.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "blank-req-id.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     requirements:
@@ -624,7 +625,7 @@ mappings:
     public void RequirementsLoader_Load_WithBlankRequirementTitle_ReportsError()
     {
         // Arrange: create a YAML file with a requirement whose title is blank
-        var reqFile = Path.Combine(_testDirectory, "blank-req-title.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "blank-req-title.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     requirements:
@@ -647,7 +648,7 @@ mappings:
     public void RequirementsLoader_Load_WithBlankMappingId_ReportsError()
     {
         // Arrange: create a YAML file with a mapping block whose id is blank
-        var reqFile = Path.Combine(_testDirectory, "blank-mapping-id.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "blank-mapping-id.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     requirements:
@@ -674,7 +675,7 @@ mappings:
     public void RequirementsLoader_Load_WithBlankTestName_ReportsError()
     {
         // Arrange: create a YAML file with a requirement that has a blank test name
-        var reqFile = Path.Combine(_testDirectory, "blank-test-name.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "blank-test-name.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     requirements:
@@ -699,7 +700,7 @@ mappings:
     public void RequirementsLoader_Load_WithBlankTagName_ReportsError()
     {
         // Arrange: create a YAML file with a requirement that has a blank tag name
-        var reqFile = Path.Combine(_testDirectory, "blank-tag-name.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "blank-tag-name.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     requirements:
@@ -724,7 +725,7 @@ mappings:
     public void RequirementsLoader_Load_WithBlankMappingTestName_ReportsError()
     {
         // Arrange: create a YAML file with a mapping block that has a blank test name
-        var reqFile = Path.Combine(_testDirectory, "blank-mapping-test-name.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "blank-mapping-test-name.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     requirements:
@@ -751,7 +752,7 @@ mappings:
     public void RequirementsLoader_Load_WithNonMappingRoot_ReportsError()
     {
         // Arrange: create a YAML file whose root is a sequence rather than a mapping
-        var reqFile = Path.Combine(_testDirectory, "non-mapping-root.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "non-mapping-root.yaml");
         File.WriteAllText(reqFile, @"- item1
 - item2
 ");
@@ -771,7 +772,7 @@ mappings:
     public void RequirementsLoader_Load_WithNonScalarTestEntry_ReportsError()
     {
         // Arrange: create a YAML file with a mapping node instead of a scalar in the tests list
-        var reqFile = Path.Combine(_testDirectory, "non-scalar-test.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "non-scalar-test.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     requirements:
@@ -796,7 +797,7 @@ mappings:
     public void RequirementsLoader_Load_WithNonScalarChildEntry_ReportsError()
     {
         // Arrange: create a YAML file with a mapping node instead of a scalar in the children list
-        var reqFile = Path.Combine(_testDirectory, "non-scalar-child.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "non-scalar-child.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     requirements:
@@ -821,7 +822,7 @@ mappings:
     public void RequirementsLoader_Load_WithNonScalarTagEntry_ReportsError()
     {
         // Arrange: create a YAML file with a mapping node instead of a scalar in the tags list
-        var reqFile = Path.Combine(_testDirectory, "non-scalar-tag.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "non-scalar-tag.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     requirements:
@@ -846,7 +847,7 @@ mappings:
     public void RequirementsLoader_Load_WithNonScalarMappingTestEntry_ReportsError()
     {
         // Arrange: create a YAML file with a mapping node instead of a scalar in a mapping tests list
-        var reqFile = Path.Combine(_testDirectory, "non-scalar-mapping-test.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "non-scalar-mapping-test.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     requirements:
@@ -873,7 +874,7 @@ mappings:
     public void RequirementsLoader_Load_WithNonScalarIncludeEntry_ReportsError()
     {
         // Arrange: create a YAML file with a mapping node instead of a scalar in the includes list
-        var reqFile = Path.Combine(_testDirectory, "non-scalar-include.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "non-scalar-include.yaml");
         File.WriteAllText(reqFile, @"includes:
   - key: value
 ");
@@ -893,7 +894,7 @@ mappings:
     public void RequirementsLoader_Load_WithMultipleCycles_ReportsAllCycles()
     {
         // Arrange: create a YAML file with two separate back-edges creating two cycles
-        var reqFile = Path.Combine(_testDirectory, "multiple-cycles.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "multiple-cycles.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     requirements:
@@ -931,7 +932,7 @@ mappings:
     public void RequirementsLoader_Load_WithUnknownChildReference_ReportsError()
     {
         // Arrange: create a YAML file with a requirement that references a non-existent child
-        var reqFile = Path.Combine(_testDirectory, "unknown-child.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "unknown-child.yaml");
         File.WriteAllText(reqFile, @"sections:
   - title: Test Section
     requirements:

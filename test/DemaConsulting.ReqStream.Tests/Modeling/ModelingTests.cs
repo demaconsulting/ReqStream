@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using DemaConsulting.ReqStream.Modeling;
+using DemaConsulting.ReqStream.Utilities;
 
 namespace DemaConsulting.ReqStream.Tests.Modeling;
 
@@ -35,7 +36,7 @@ public sealed class ModelingTests : IDisposable
     /// </summary>
     public ModelingTests()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_modeling_{Guid.NewGuid()}");
+        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_modeling_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
     }
 
@@ -58,7 +59,7 @@ public sealed class ModelingTests : IDisposable
     public void Modeling_YamlParsing_ValidFile_LoadsRequirements()
     {
         // Arrange: create a valid requirements YAML file
-        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: Modeling Test Requirements
@@ -87,7 +88,7 @@ public sealed class ModelingTests : IDisposable
     public void Modeling_YamlParsing_ValidFile_ReturnsNoLintIssues()
     {
         // Arrange: create a structurally valid requirements YAML file with no duplicate IDs
-        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: Lint Test Requirements
@@ -114,7 +115,7 @@ public sealed class ModelingTests : IDisposable
     public void Modeling_YamlParsing_DuplicateIds_DetectsLintError()
     {
         // Arrange: create a requirements YAML file containing duplicate requirement IDs
-        var reqFile = Path.Combine(_testDirectory, "invalid.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "invalid.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: Duplicate ID Test
@@ -147,7 +148,7 @@ public sealed class ModelingTests : IDisposable
     public void Modeling_Export_Requirements_GeneratesMarkdownFile()
     {
         // Arrange: create a requirements file with one testable requirement
-        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: Modeling Test Requirements
@@ -161,7 +162,7 @@ public sealed class ModelingTests : IDisposable
         var loadResult = Requirements.Load(reqFile);
         Assert.NotNull(loadResult.Requirements);
 
-        var reportFile = Path.Combine(_testDirectory, "requirements.md");
+        var reportFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.md");
 
         // Act: export the requirements to a Markdown file
         loadResult.Requirements.Export(reportFile);
@@ -180,7 +181,7 @@ public sealed class ModelingTests : IDisposable
     public void Modeling_Export_Justifications_GeneratesMarkdownFile()
     {
         // Arrange: create a requirements file with one justified requirement
-        var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: Modeling Test Requirements
@@ -194,7 +195,7 @@ public sealed class ModelingTests : IDisposable
         var loadResult = Requirements.Load(reqFile);
         Assert.NotNull(loadResult.Requirements);
 
-        var justificationsFile = Path.Combine(_testDirectory, "justifications.md");
+        var justificationsFile = PathHelpers.SafePathCombine(_testDirectory, "justifications.md");
 
         // Act: export the justifications to a Markdown file
         loadResult.Requirements.ExportJustifications(justificationsFile);
@@ -213,7 +214,7 @@ public sealed class ModelingTests : IDisposable
     public void Modeling_Linting_MalformedYaml_DetectsError()
     {
         // Arrange: create a requirements file containing malformed YAML
-        var reqFile = Path.Combine(_testDirectory, "malformed.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "malformed.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: Bad Requirements
@@ -238,7 +239,7 @@ public sealed class ModelingTests : IDisposable
     public void Modeling_Linting_ValidFile_ReturnsNoIssues()
     {
         // Arrange: create a structurally valid requirements YAML file
-        var reqFile = Path.Combine(_testDirectory, "valid.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "valid.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: Valid Linting Requirements
@@ -268,7 +269,7 @@ public sealed class ModelingTests : IDisposable
         // Arrange: create a requirements file with two independent lint errors:
         //   (1) a section missing its title field
         //   (2) a requirement missing its title field
-        var reqFile = Path.Combine(_testDirectory, "multi_lint.yaml");
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "multi_lint.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - requirements:
@@ -296,7 +297,7 @@ public sealed class ModelingTests : IDisposable
     public void Modeling_MultiFileLoading_WithIncludes_LoadsRequirementsFromAllFiles()
     {
         // Arrange: create a second file with distinct requirements
-        var includedFile = Path.Combine(_testDirectory, "included.yaml");
+        var includedFile = PathHelpers.SafePathCombine(_testDirectory, "included.yaml");
         File.WriteAllText(includedFile, """
             sections:
               - title: Included Requirements
@@ -309,7 +310,7 @@ public sealed class ModelingTests : IDisposable
             """);
 
         // Arrange: create a main file that references the second file via includes
-        var mainFile = Path.Combine(_testDirectory, "main.yaml");
+        var mainFile = PathHelpers.SafePathCombine(_testDirectory, "main.yaml");
         File.WriteAllText(mainFile, """
             includes:
               - included.yaml

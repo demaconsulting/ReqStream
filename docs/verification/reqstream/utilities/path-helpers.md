@@ -1,0 +1,44 @@
+### PathHelpers Unit Verification
+
+#### Verification Strategy
+
+The PathHelpers unit is verified using xUnit unit tests in `PathHelpersTests.cs`. Tests assert
+correct behaviour for valid path combinations and verify that path-traversal attempts are
+rejected with `ArgumentException`.
+
+#### Test Scenarios
+
+##### Valid Path Scenario
+
+Tests verify that `SafePathCombine` correctly combines paths that remain within the base
+directory.
+
+Test methods:
+
+- `PathHelpers_SafePathCombine_ValidRelativePath_ReturnsCombinedPath` — simple relative file name
+- `PathHelpers_SafePathCombine_ValidSubdirectory_ReturnsCombinedPath` — subdirectory component
+
+##### Path Traversal Scenario
+
+Tests verify that path-traversal attempts are rejected.
+
+Test methods:
+
+- `PathHelpers_SafePathCombine_DotDotPath_ThrowsArgumentException` — `..` single traversal
+- `PathHelpers_SafePathCombine_DeepDotDotPath_ThrowsArgumentException` — nested `../..` traversal
+- `PathHelpers_SafePathCombine_AbsoluteOverridePath_ThrowsArgumentException` — absolute path override
+
+##### Null Input Scenario
+
+Tests verify that null inputs are rejected.
+
+Test methods:
+
+- `PathHelpers_SafePathCombine_NullBasePath_ThrowsArgumentNullException` — null base
+- `PathHelpers_SafePathCombine_NullRelativePath_ThrowsArgumentNullException` — null relative
+
+#### Coverage Summary
+
+| Requirement ID | Test Method(s) |
+| --- | --- |
+| (security hardening — no explicit requirement) | All `PathHelpers_SafePathCombine_*` methods |

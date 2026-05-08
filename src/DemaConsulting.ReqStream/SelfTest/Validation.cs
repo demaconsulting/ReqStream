@@ -21,6 +21,7 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 using DemaConsulting.ReqStream.Cli;
+using DemaConsulting.ReqStream.Utilities;
 using DemaConsulting.TestResults.IO;
 
 namespace DemaConsulting.ReqStream.SelfTest;
@@ -112,7 +113,7 @@ public static class Validation
             using var tempDir = new TemporaryDirectory();
 
             // Create a simple requirements file
-            var reqFile = Path.Combine(tempDir.DirectoryPath, "test-requirements.yaml");
+            var reqFile = PathHelpers.SafePathCombine(tempDir.DirectoryPath, "test-requirements.yaml");
             var yaml = @"sections:
   - title: Test Requirements
     requirements:
@@ -124,7 +125,7 @@ public static class Validation
             File.WriteAllText(reqFile, yaml);
 
             // Create a log file to capture output
-            var logFile = Path.Combine(tempDir.DirectoryPath, "requirements-test.log");
+            var logFile = PathHelpers.SafePathCombine(tempDir.DirectoryPath, "requirements-test.log");
 
             using (new DirectorySwitch(tempDir.DirectoryPath))
             {
@@ -186,7 +187,7 @@ public static class Validation
             using var tempDir = new TemporaryDirectory();
 
             // Create requirements and test results files
-            var reqFile = Path.Combine(tempDir.DirectoryPath, "matrix-requirements.yaml");
+            var reqFile = PathHelpers.SafePathCombine(tempDir.DirectoryPath, "matrix-requirements.yaml");
             var reqYaml = @"sections:
   - title: Matrix Test
     requirements:
@@ -198,7 +199,7 @@ public static class Validation
             File.WriteAllText(reqFile, reqYaml);
 
             // Create a simple TRX file
-            var trxFile = Path.Combine(tempDir.DirectoryPath, "test-results.trx");
+            var trxFile = PathHelpers.SafePathCombine(tempDir.DirectoryPath, "test-results.trx");
             var testData = new DemaConsulting.TestResults.TestResults { Name = "ValidationTests" };
             testData.Results.Add(new DemaConsulting.TestResults.TestResult
             {
@@ -222,7 +223,7 @@ public static class Validation
                 }
 
                 // Check if execution succeeded and matrix file was created (check after context disposed)
-                var matrixFile = Path.Combine(tempDir.DirectoryPath, "matrix.md");
+                var matrixFile = PathHelpers.SafePathCombine(tempDir.DirectoryPath, "matrix.md");
                 if (exitCode == 0 && File.Exists(matrixFile))
                 {
                     var matrixContent = File.ReadAllText(matrixFile);
@@ -271,7 +272,7 @@ public static class Validation
             using var tempDir = new TemporaryDirectory();
 
             // Create a requirements file
-            var reqFile = Path.Combine(tempDir.DirectoryPath, "export-requirements.yaml");
+            var reqFile = PathHelpers.SafePathCombine(tempDir.DirectoryPath, "export-requirements.yaml");
             var reqYaml = @"sections:
   - title: Export Test
     requirements:
@@ -292,7 +293,7 @@ public static class Validation
                 }
 
                 // Check if execution succeeded and report file was created (check after context disposed)
-                var reportFile = Path.Combine(tempDir.DirectoryPath, "report.md");
+                var reportFile = PathHelpers.SafePathCombine(tempDir.DirectoryPath, "report.md");
                 if (exitCode == 0 && File.Exists(reportFile))
                 {
                     var reportContent = File.ReadAllText(reportFile);
@@ -341,7 +342,7 @@ public static class Validation
             using var tempDir = new TemporaryDirectory();
 
             // Create requirements file with tagged requirements
-            var reqFile = Path.Combine(tempDir.DirectoryPath, "requirements.yaml");
+            var reqFile = PathHelpers.SafePathCombine(tempDir.DirectoryPath, "requirements.yaml");
             var reqYaml = @"sections:
   - title: Test Section
     requirements:
@@ -366,7 +367,7 @@ public static class Validation
                 }
 
                 // Check if execution succeeded and filtered report was created
-                var filteredReportPath = Path.Combine(tempDir.DirectoryPath, "filtered.md");
+                var filteredReportPath = PathHelpers.SafePathCombine(tempDir.DirectoryPath, "filtered.md");
                 if (exitCode == 0 && File.Exists(filteredReportPath))
                 {
                     var reportContent = File.ReadAllText(filteredReportPath);
@@ -415,7 +416,7 @@ public static class Validation
             using var tempDir = new TemporaryDirectory();
 
             // Create a requirements file with a requirement linked to a test
-            var reqFile = Path.Combine(tempDir.DirectoryPath, "enforce-requirements.yaml");
+            var reqFile = PathHelpers.SafePathCombine(tempDir.DirectoryPath, "enforce-requirements.yaml");
             var reqYaml = @"sections:
   - title: Enforce Test
     requirements:
@@ -427,7 +428,7 @@ public static class Validation
             File.WriteAllText(reqFile, reqYaml);
 
             // Create a TRX file with a passing test
-            var trxFile = Path.Combine(tempDir.DirectoryPath, "test-results.trx");
+            var trxFile = PathHelpers.SafePathCombine(tempDir.DirectoryPath, "test-results.trx");
             var testData = new DemaConsulting.TestResults.TestResults { Name = "EnforceTests" };
             testData.Results.Add(new DemaConsulting.TestResults.TestResult
             {
@@ -459,7 +460,7 @@ public static class Validation
                 else
                 {
                     // Create an unsatisfied requirements file for the second check
-                    var unsatisfiedReqFile = Path.Combine(tempDir.DirectoryPath, "unsatisfied-requirements.yaml");
+                    var unsatisfiedReqFile = PathHelpers.SafePathCombine(tempDir.DirectoryPath, "unsatisfied-requirements.yaml");
                     var unsatisfiedYaml = @"sections:
   - title: Unsatisfied Test
     requirements:
@@ -515,7 +516,7 @@ public static class Validation
             using var tempDir = new TemporaryDirectory();
 
             // Create a valid requirements file
-            var reqFile = Path.Combine(tempDir.DirectoryPath, "lint-requirements.yaml");
+            var reqFile = PathHelpers.SafePathCombine(tempDir.DirectoryPath, "lint-requirements.yaml");
             var reqYaml = @"sections:
   - title: Lint Test
     requirements:
@@ -525,7 +526,7 @@ public static class Validation
             File.WriteAllText(reqFile, reqYaml);
 
             // Create a requirements file with a known issue (duplicate ID)
-            var badReqFile = Path.Combine(tempDir.DirectoryPath, "bad-requirements.yaml");
+            var badReqFile = PathHelpers.SafePathCombine(tempDir.DirectoryPath, "bad-requirements.yaml");
             var badReqYaml = @"sections:
   - title: Bad Lint Test
     requirements:
@@ -539,7 +540,7 @@ public static class Validation
                 // Test 1: Lint a valid file - should succeed with no issues
                 int exitCode;
                 string logContent;
-                var logFile = Path.Combine(tempDir.DirectoryPath, "lint-test.log");
+                var logFile = PathHelpers.SafePathCombine(tempDir.DirectoryPath, "lint-test.log");
 
                 using (var testContext = Context.Create(["--silent", "--log", "lint-test.log", "--lint",
                                                           "--requirements", "lint-requirements.yaml"]))
@@ -560,7 +561,7 @@ public static class Validation
                 }
 
                 // Test 2: Lint a file with a duplicate ID - should fail
-                var logFile2 = Path.Combine(tempDir.DirectoryPath, "lint-test2.log");
+                var logFile2 = PathHelpers.SafePathCombine(tempDir.DirectoryPath, "lint-test2.log");
                 using (var testContext = Context.Create(["--silent", "--log", "lint-test2.log", "--lint",
                                                           "--requirements", "lint-requirements.yaml",
                                                           "--requirements", "bad-requirements.yaml"]))
@@ -698,7 +699,7 @@ public static class Validation
         /// </summary>
         public TemporaryDirectory()
         {
-            DirectoryPath = Path.Combine(Path.GetTempPath(), $"reqstream_validation_{Guid.NewGuid()}");
+            DirectoryPath = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_validation_{Guid.NewGuid()}");
             Directory.CreateDirectory(DirectoryPath);
         }
 

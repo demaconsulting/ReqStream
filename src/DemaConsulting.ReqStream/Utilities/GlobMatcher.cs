@@ -66,7 +66,7 @@ internal static class GlobMatcher
                 var result = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(rootDir)));
                 foreach (var file in result.Files)
                 {
-                    files.Add(Path.GetFullPath(Path.Combine(rootDir, file.Path)));
+                    files.Add(Path.GetFullPath(PathHelpers.SafePathCombine(rootDir, file.Path)));
                 }
             }
             else
@@ -88,7 +88,7 @@ internal static class GlobMatcher
             var result = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(currentDirectory)));
             foreach (var file in result.Files)
             {
-                files.Add(Path.GetFullPath(Path.Combine(currentDirectory, file.Path)));
+                files.Add(Path.GetFullPath(PathHelpers.SafePathCombine(currentDirectory, file.Path)));
             }
         }
 

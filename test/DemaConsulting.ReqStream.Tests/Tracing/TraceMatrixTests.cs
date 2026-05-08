@@ -20,6 +20,7 @@
 
 using DemaConsulting.ReqStream.Modeling;
 using DemaConsulting.ReqStream.Tracing;
+using DemaConsulting.ReqStream.Utilities;
 using DemaConsulting.TestResults;
 using DemaConsulting.TestResults.IO;
 using TestResult = DemaConsulting.TestResults.TestResult;
@@ -38,7 +39,7 @@ public sealed class TraceMatrixTests : IDisposable
     /// </summary>
     public TraceMatrixTests()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
+        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
     }
 
@@ -75,7 +76,7 @@ sections:
         tests:
           - ""ubuntu-latest@Test_PlatformBasic""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -91,7 +92,7 @@ sections:
             Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var windowsPath = Path.Combine(_testDirectory, "test-results-windows-latest.trx");
+        var windowsPath = PathHelpers.SafePathCombine(_testDirectory, "test-results-windows-latest.trx");
         File.WriteAllText(windowsPath, TrxSerializer.Serialize(windowsResults));
 
         // Create Linux test results
@@ -104,7 +105,7 @@ sections:
             Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var linuxPath = Path.Combine(_testDirectory, "test-results-ubuntu-latest.trx");
+        var linuxPath = PathHelpers.SafePathCombine(_testDirectory, "test-results-ubuntu-latest.trx");
         File.WriteAllText(linuxPath, TrxSerializer.Serialize(linuxResults));
 
         // Act:
@@ -146,7 +147,7 @@ sections:
         tests:
           - ""windows@Test_WindowsOnly""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -162,7 +163,7 @@ sections:
             Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var linuxPath = Path.Combine(_testDirectory, "test-results-ubuntu-latest.trx");
+        var linuxPath = PathHelpers.SafePathCombine(_testDirectory, "test-results-ubuntu-latest.trx");
         File.WriteAllText(linuxPath, TrxSerializer.Serialize(linuxResults));
 
         // Act:
@@ -192,7 +193,7 @@ sections:
         tests:
           - ""Test_CrossPlatform""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -208,7 +209,7 @@ sections:
             Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var windowsPath = Path.Combine(_testDirectory, "windows-results.trx");
+        var windowsPath = PathHelpers.SafePathCombine(_testDirectory, "windows-results.trx");
         File.WriteAllText(windowsPath, TrxSerializer.Serialize(windowsResults));
 
         // Create Linux test results
@@ -221,7 +222,7 @@ sections:
             Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var linuxPath = Path.Combine(_testDirectory, "linux-results.trx");
+        var linuxPath = PathHelpers.SafePathCombine(_testDirectory, "linux-results.trx");
         File.WriteAllText(linuxPath, TrxSerializer.Serialize(linuxResults));
 
         // Act:
@@ -255,7 +256,7 @@ sections:
           - ""windows@Test_WindowsSpecific""
           - ""linux@Test_LinuxSpecific""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -279,7 +280,7 @@ sections:
             Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var windowsPath = Path.Combine(_testDirectory, "test-windows.trx");
+        var windowsPath = PathHelpers.SafePathCombine(_testDirectory, "test-windows.trx");
         File.WriteAllText(windowsPath, TrxSerializer.Serialize(windowsResults));
 
         // Create Linux test results
@@ -300,7 +301,7 @@ sections:
             Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var linuxPath = Path.Combine(_testDirectory, "test-linux.trx");
+        var linuxPath = PathHelpers.SafePathCombine(_testDirectory, "test-linux.trx");
         File.WriteAllText(linuxPath, TrxSerializer.Serialize(linuxResults));
 
         // Act:
@@ -348,7 +349,7 @@ sections:
         tests:
           - ""windows@Test_CaseSensitive""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -364,7 +365,7 @@ sections:
             Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var testPath = Path.Combine(_testDirectory, "test-results-WINDOWS-latest.trx");
+        var testPath = PathHelpers.SafePathCombine(_testDirectory, "test-results-WINDOWS-latest.trx");
         File.WriteAllText(testPath, TrxSerializer.Serialize(testResults));
 
         // Act:
@@ -396,7 +397,7 @@ sections:
         tests:
           - ""ubuntu@Test_Partial""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -412,7 +413,7 @@ sections:
             Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var testPath = Path.Combine(_testDirectory, "test-results-ubuntu-22.04-latest.trx");
+        var testPath = PathHelpers.SafePathCombine(_testDirectory, "test-results-ubuntu-22.04-latest.trx");
         File.WriteAllText(testPath, TrxSerializer.Serialize(testResults));
 
         // Act:
@@ -449,7 +450,7 @@ sections:
         tests:
           - ""dotnet8.x@Test_Platform""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -465,7 +466,7 @@ sections:
             Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var testPath = Path.Combine(_testDirectory, "integration-test-windows-latest-dotnet8.x.trx");
+        var testPath = PathHelpers.SafePathCombine(_testDirectory, "integration-test-windows-latest-dotnet8.x.trx");
         File.WriteAllText(testPath, TrxSerializer.Serialize(testResults));
 
         // Act:
@@ -514,7 +515,7 @@ sections:
         tests:
           - ""Test_SharedTest""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -530,7 +531,7 @@ sections:
             Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var testPath = Path.Combine(_testDirectory, "test-results-windows-latest.trx");
+        var testPath = PathHelpers.SafePathCombine(_testDirectory, "test-results-windows-latest.trx");
         File.WriteAllText(testPath, TrxSerializer.Serialize(testResults));
 
         // Act:
@@ -574,7 +575,7 @@ sections:
           - ""Test_ExecutedTest""
           - ""Test_NotExecutedTest""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -598,7 +599,7 @@ sections:
             Outcome = TestOutcome.NotExecuted,
             Duration = TimeSpan.Zero
         });
-        var testPath = Path.Combine(_testDirectory, "test-results.trx");
+        var testPath = PathHelpers.SafePathCombine(_testDirectory, "test-results.trx");
         File.WriteAllText(testPath, TrxSerializer.Serialize(testResults));
 
         // Act:
@@ -640,7 +641,7 @@ sections:
           - ""Test_NotExecuted1""
           - ""Test_NotExecuted2""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -664,7 +665,7 @@ sections:
             Outcome = TestOutcome.NotExecuted,
             Duration = TimeSpan.Zero
         });
-        var testPath = Path.Combine(_testDirectory, "test-results.trx");
+        var testPath = PathHelpers.SafePathCombine(_testDirectory, "test-results.trx");
         File.WriteAllText(testPath, TrxSerializer.Serialize(testResults));
 
         // Act:
@@ -704,7 +705,7 @@ sections:
           - ""Test_Failed""
           - ""Test_NotExecuted""
 ";
-        var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
+        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -737,7 +738,7 @@ sections:
             Outcome = TestOutcome.NotExecuted,
             Duration = TimeSpan.Zero
         });
-        var testPath = Path.Combine(_testDirectory, "test-results.trx");
+        var testPath = PathHelpers.SafePathCombine(_testDirectory, "test-results.trx");
         File.WriteAllText(testPath, TrxSerializer.Serialize(testResults));
 
         // Act:

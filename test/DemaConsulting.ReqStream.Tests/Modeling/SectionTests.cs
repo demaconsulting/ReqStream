@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using DemaConsulting.ReqStream.Modeling;
+using DemaConsulting.ReqStream.Utilities;
 
 namespace DemaConsulting.ReqStream.Tests.Modeling;
 
@@ -35,7 +36,7 @@ public sealed class SectionTests : IDisposable
     /// </summary>
     public SectionTests()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_section_test_{Guid.NewGuid()}");
+        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_section_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
     }
 
@@ -65,7 +66,7 @@ sections:
       - id: ""SYS-SEC-001""
         title: ""The system shall support credentials authentication.""
 ";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -102,7 +103,7 @@ sections:
           - id: ""LOG-001""
             title: ""All requests shall be logged.""
 ";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -135,7 +136,7 @@ sections:
       - id: ""SYS-SEC-001""
         title: ""The system shall support credentials authentication.""
 ";
-        var filePath = Path.Combine(_testDirectory, "requirements.yaml");
+        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file

@@ -25,6 +25,17 @@ Test methods:
 - `GlobMatcher_SplitAbsolutePattern_LiteralPath_SplitsAtLastSeparator` — literal splits at separator
 - `GlobMatcher_SplitAbsolutePattern_DoubleStarWildcard_SplitsBeforeWildcard` — `**` splits before wildcard
 
+#### PathHelpers Scenario
+
+Tests verify that `PathHelpers.SafePathCombine` correctly combines paths and rejects
+path-traversal attempts.
+
+Test methods:
+
+- `PathHelpers_SafePathCombine_ValidRelativePath_ReturnsCombinedPath` — normal relative path is combined
+- `PathHelpers_SafePathCombine_PathTraversal_ThrowsArgumentException` — `..` path traversal is rejected
+- `PathHelpers_SafePathCombine_AbsoluteOverride_ThrowsArgumentException` — absolute override is rejected
+
 ### Coverage Summary
 
 | Requirement ID | Test Method(s) |
