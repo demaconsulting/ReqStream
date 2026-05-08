@@ -147,5 +147,5 @@ For example, the `Requirements` unit maps to:
 
 ## References
 
-- [ReqStream System Requirements](../reqstream/reqstream.yaml)
-- [ReqStream Requirements Root](../../requirements.yaml)
+- ReqStream System Requirements document
+- ReqStream Requirements Root document

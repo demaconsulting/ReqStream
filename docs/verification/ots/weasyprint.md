@@ -11,7 +11,7 @@ documentation build pipeline.
 WeasyPrint is verified by CI pipeline step evidence combined with FileAssert document
 validation. Each HTML document (build notes, code quality report, review plan, review report,
 design document, user guide, requirements document, requirements report, and verification
-document) is converted to PDF by WeasyPrint in the CI pipeline.FileAssert then asserts that each generated
+document) is converted to PDF by WeasyPrint in the CI pipeline. FileAssert then asserts that each generated
 PDF file exists, has a non-trivial size, contains at least one page, and includes expected
 document content in the rendered text. Passing FileAssert assertions confirm WeasyPrint
 executed correctly and produced meaningful output.

@@ -32,7 +32,7 @@ This document covers verification of the following software units:
 - **SelfTest** subsystem:
   - **Validation** unit — self-validation test runner (`SelfTest/Validation.cs`)
 
-The following nine OTS items are also verified:
+The following eleven OTS items are also verified:
 
 - **BuildMark** — build-notes documentation generator
 - **FileAssert** — document assertion tool
@@ -43,6 +43,8 @@ The following nine OTS items are also verified:
 - **SonarMark** — SonarCloud quality reporter
 - **VersionMark** — version tracking tool
 - **WeasyPrint** — HTML to PDF converter
+- **YamlDotNet** — YAML parsing library
+- **DemaConsulting.TestResults** — test result file reader
 
 The following topics are out of scope:
 

@@ -11,7 +11,7 @@ documentation build pipeline.
 Pandoc is verified by CI pipeline step evidence combined with FileAssert document validation.
 Each Markdown document collection (build notes, code quality report, review plan, review
 report, design document, user guide, requirements document, requirements report, and
-verification document) is converted to HTML by Pandoc in the CI pipeline.FileAssert then asserts that each generated
+verification document) is converted to HTML by Pandoc in the CI pipeline. FileAssert then asserts that each generated
 HTML file exists, has a non-trivial size, contains a valid HTML title element, and includes
 expected document content. Passing FileAssert assertions confirm Pandoc executed correctly
 and produced meaningful output.
