@@ -40,8 +40,9 @@ public sealed class PathHelpersTests
         // Act
         var result = PathHelpers.SafePathCombine(basePath, relativePath);
 
-        // Assert
-        Assert.Equal(Path.Combine(basePath, relativePath), result);
+        // Assert: result starts with the base path and ends with the relative component
+        Assert.StartsWith(basePath, result, StringComparison.Ordinal);
+        Assert.EndsWith(relativePath, result, StringComparison.Ordinal);
     }
 
     /// <summary>

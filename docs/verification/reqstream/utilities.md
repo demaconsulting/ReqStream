@@ -33,8 +33,12 @@ path-traversal attempts.
 Test methods:
 
 - `PathHelpers_SafePathCombine_ValidRelativePath_ReturnsCombinedPath` — normal relative path is combined
-- `PathHelpers_SafePathCombine_PathTraversal_ThrowsArgumentException` — `..` path traversal is rejected
-- `PathHelpers_SafePathCombine_AbsoluteOverride_ThrowsArgumentException` — absolute override is rejected
+- `PathHelpers_SafePathCombine_ValidSubdirectory_ReturnsCombinedPath` — subdirectory component is combined
+- `PathHelpers_SafePathCombine_DotDotPath_ThrowsArgumentException` — `..` single traversal is rejected
+- `PathHelpers_SafePathCombine_DeepDotDotPath_ThrowsArgumentException` — nested `../..` traversal is rejected
+- `PathHelpers_SafePathCombine_AbsoluteOverridePath_ThrowsArgumentException` — absolute path override is rejected
+- `PathHelpers_SafePathCombine_NullBasePath_ThrowsArgumentNullException` — null base path is rejected
+- `PathHelpers_SafePathCombine_NullRelativePath_ThrowsArgumentNullException` — null relative path is rejected
 
 ### Coverage Summary
 

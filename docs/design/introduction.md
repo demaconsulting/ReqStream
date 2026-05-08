@@ -44,7 +44,8 @@ ReqStream (System)
 ├── Cli (Subsystem)
 │   └── Context (Unit)
 ├── Utilities (Subsystem)
-│   └── GlobMatcher (Unit)
+│   ├── GlobMatcher (Unit)
+│   └── PathHelpers (Unit)
 ├── Modeling (Subsystem)
 │   ├── LintIssue (Unit)
 │   ├── LoadResult (Unit)
@@ -76,7 +77,8 @@ docs/design/
     │   └── context.md                      — Context unit design
     ├── utilities.md                        — Utilities subsystem design
     ├── utilities/
-    │   └── glob-matcher.md                 — GlobMatcher unit design
+    │   ├── glob-matcher.md                 — GlobMatcher unit design
+    │   └── path-helpers.md                 — PathHelpers unit design
     ├── modeling.md                         — Modeling subsystem design
     ├── modeling/
     │   ├── lint-issue.md                   — LintIssue unit design
@@ -102,7 +104,8 @@ src/DemaConsulting.ReqStream/
 ├── Cli/
 │   └── Context.cs              — command-line argument parser and I/O owner
 ├── Utilities/
-│   └── GlobMatcher.cs          — glob-pattern file matching utility
+│   ├── GlobMatcher.cs          — glob-pattern file matching utility
+│   └── PathHelpers.cs          — safe path combination with traversal protection
 ├── Modeling/
 │   ├── LintIssue.cs            — lint issue severity and data model
 │   ├── LoadResult.cs           — combined result of loading requirements and associated lint issues
