@@ -24,8 +24,6 @@ Test evidence names:
 - `WeasyPrint_ReviewReportPdf` — review report PDF document validated
 - `WeasyPrint_DesignPdf` — design document PDF validated
 - `WeasyPrint_UserGuidePdf` — user guide PDF document validated
-- `WeasyPrint_RequirementsPdf` — requirements document PDF validated
-- `WeasyPrint_RequirementsReportPdf` — requirements report PDF validated
 - `WeasyPrint_VerificationPdf` — verification document PDF validated
 
 ### Coverage Summary
@@ -38,6 +36,4 @@ Test evidence names:
 | `ReqStream-OTS-WeasyPrint` | `WeasyPrint_ReviewReportPdf` |
 | `ReqStream-OTS-WeasyPrint` | `WeasyPrint_DesignPdf` |
 | `ReqStream-OTS-WeasyPrint` | `WeasyPrint_UserGuidePdf` |
-| `ReqStream-OTS-WeasyPrint` | `WeasyPrint_RequirementsPdf` |
-| `ReqStream-OTS-WeasyPrint` | `WeasyPrint_RequirementsReportPdf` |
 | `ReqStream-OTS-WeasyPrint` | `WeasyPrint_VerificationPdf` |

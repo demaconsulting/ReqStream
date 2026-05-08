@@ -171,7 +171,7 @@ Test methods: `dotnet10.x@ReqStream_VersionDisplay`, `dotnet10.x@ReqStream_HelpD
 | `ReqStream-System-TagFilter` | `ReqStream_System_TagFilter_Flag_FiltersRequirements` |
 | `ReqStream-System-OutputRouting` | `ReqStream_System_OutputControl_LogFlag_WritesOutputToFile`, `ReqStream_System_OutputControl_SilentFlag_SuppressesConsoleOutput` |
 | `ReqStream-System-ReportDepth` | `ReqStream_System_ReportDepth_DepthFlag_GeneratesReportWithCorrectHeadingLevel` |
-| `ReqStream-System-CrossPlatform` | `windows@ReqStream_VersionDisplay`, `ubuntu@ReqStream_VersionDisplay`, `macos@ReqStream_VersionDisplay` |
+| `ReqStream-System-CrossPlatform` | Satisfied by children: `ReqStream-Platform-Windows`, `ReqStream-Platform-Linux`, `ReqStream-Platform-MacOS`, `ReqStream-Platform-Net8`, `ReqStream-Platform-Net9`, `ReqStream-Platform-Net10` |
 | `ReqStream-System-FileIncludes` | `ReqStream_System_FileIncludes_RequirementsWithIncludes_LoadsAllRequirements` |
 | `ReqStream-Platform-Windows` | `windows@ReqStream_VersionDisplay`, `windows@ReqStream_HelpDisplay` |
 | `ReqStream-Platform-Linux` | `ubuntu@ReqStream_VersionDisplay`, `ubuntu@ReqStream_HelpDisplay` |

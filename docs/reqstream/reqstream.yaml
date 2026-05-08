@@ -221,13 +221,6 @@ sections:
               test references from the CI matrix job, scoped to the specific platform or runtime
               it represents. Satisfaction of all children constitutes complete evidence for this
               system-level requirement.
-            tests:
-              - "windows@ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces"
-              - "ubuntu@ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces"
-              - "macos@ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces"
-              - "dotnet8.x@ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces"
-              - "dotnet9.x@ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces"
-              - "dotnet10.x@ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces"
             children:
               # Each child carries source-filtered test references from the CI matrix job,
               # providing platform- and runtime-specific evidence. Satisfaction of all

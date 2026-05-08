@@ -24,8 +24,6 @@ Test evidence names:
 - `Pandoc_ReviewReportHtml` — review report HTML document validated
 - `Pandoc_DesignHtml` — design document HTML validated
 - `Pandoc_UserGuideHtml` — user guide HTML document validated
-- `Pandoc_RequirementsHtml` — requirements document HTML validated
-- `Pandoc_RequirementsReportHtml` — requirements report HTML validated
 - `Pandoc_VerificationHtml` — verification document HTML validated
 
 ### Coverage Summary
@@ -38,6 +36,4 @@ Test evidence names:
 | `ReqStream-OTS-Pandoc` | `Pandoc_ReviewReportHtml` |
 | `ReqStream-OTS-Pandoc` | `Pandoc_DesignHtml` |
 | `ReqStream-OTS-Pandoc` | `Pandoc_UserGuideHtml` |
-| `ReqStream-OTS-Pandoc` | `Pandoc_RequirementsHtml` |
-| `ReqStream-OTS-Pandoc` | `Pandoc_RequirementsReportHtml` |
 | `ReqStream-OTS-Pandoc` | `Pandoc_VerificationHtml` |
