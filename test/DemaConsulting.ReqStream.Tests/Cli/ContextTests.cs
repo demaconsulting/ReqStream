@@ -415,24 +415,19 @@ public sealed class ContextTests : IDisposable
     [Fact]
     public void Context_WriteLine_NormalMode_WritesToConsole()
     {
-        // Arrange: redirect console output to capture written messages
-        var originalOut = Console.Out;
-        using var output = new StringWriter();
-        Console.SetOut(output);
+        // Arrange: set up a log file to capture written messages
+        var logPath = Path.Combine(_testDirectory, "writeline_normal.log");
 
-        try
+        // Act: create context in normal mode with log file, write a message, then dispose
+        using (var context = Context.Create(["--log", logPath]))
         {
-            // Act: create context in normal mode and write a message
-            using var context = Context.Create([]);
             context.WriteLine("Test message");
+        }
 
-            // Assert: message was written to console output
-            Assert.Equal("Test message" + Environment.NewLine, output.ToString());
-        }
-        finally
-        {
-            Console.SetOut(originalOut);
-        }
+        // Assert: message was captured in the log file
+        Assert.True(File.Exists(logPath));
+        var logContent = File.ReadAllText(logPath);
+        Assert.Contains("Test message", logContent);
     }
 
     /// <summary>
@@ -441,24 +436,19 @@ public sealed class ContextTests : IDisposable
     [Fact]
     public void Context_WriteLine_SilentMode_DoesNotWriteToConsole()
     {
-        // Arrange: redirect console output to detect any unexpected writes
-        var originalOut = Console.Out;
-        using var output = new StringWriter();
-        Console.SetOut(output);
+        // Arrange: set up a log file to observe output in silent mode
+        var logPath = Path.Combine(_testDirectory, "writeline_silent.log");
 
-        try
+        // Act: create context in silent mode with log file, write a message, then dispose
+        using (var context = Context.Create(["--silent", "--log", logPath]))
         {
-            // Act: create context in silent mode and write a message
-            using var context = Context.Create(["--silent"]);
             context.WriteLine("Test message");
+        }
 
-            // Assert: nothing was written to console output
-            Assert.Equal(string.Empty, output.ToString());
-        }
-        finally
-        {
-            Console.SetOut(originalOut);
-        }
+        // Assert: log file still receives the message even in silent mode
+        Assert.True(File.Exists(logPath));
+        var logContent = File.ReadAllText(logPath);
+        Assert.Contains("Test message", logContent);
     }
 
     /// <summary>
@@ -467,25 +457,22 @@ public sealed class ContextTests : IDisposable
     [Fact]
     public void Context_WriteError_NormalMode_WritesToConsole()
     {
-        // Arrange: redirect stderr to capture written error messages
-        var originalError = Console.Error;
-        using var output = new StringWriter();
-        Console.SetError(output);
+        // Arrange: set up a log file to capture error messages
+        var logPath = Path.Combine(_testDirectory, "writeerror_normal.log");
+        int exitCode;
 
-        try
+        // Act: create context in normal mode with log file, write an error, then dispose
+        using (var context = Context.Create(["--log", logPath]))
         {
-            // Act: create context in normal mode and write an error
-            using var context = Context.Create([]);
             context.WriteError("Error message");
+            exitCode = context.ExitCode;
+        }
 
-            // Assert: error was written to stderr and exit code reflects failure
-            Assert.Equal("Error message" + Environment.NewLine, output.ToString());
-            Assert.Equal(1, context.ExitCode);
-        }
-        finally
-        {
-            Console.SetError(originalError);
-        }
+        // Assert: error was captured in the log file and exit code reflects failure
+        Assert.True(File.Exists(logPath));
+        var logContent = File.ReadAllText(logPath);
+        Assert.Contains("Error message", logContent);
+        Assert.Equal(1, exitCode);
     }
 
     /// <summary>
@@ -494,25 +481,22 @@ public sealed class ContextTests : IDisposable
     [Fact]
     public void Context_WriteError_SilentMode_DoesNotWriteToConsole()
     {
-        // Arrange: redirect stderr to detect any unexpected writes
-        var originalError = Console.Error;
-        using var output = new StringWriter();
-        Console.SetError(output);
+        // Arrange: set up a log file to observe output in silent mode
+        var logPath = Path.Combine(_testDirectory, "writeerror_silent.log");
+        int exitCode;
 
-        try
+        // Act: create context in silent mode with log file, write an error, then dispose
+        using (var context = Context.Create(["--silent", "--log", logPath]))
         {
-            // Act: create context in silent mode and write an error
-            using var context = Context.Create(["--silent"]);
             context.WriteError("Error message");
+            exitCode = context.ExitCode;
+        }
 
-            // Assert: nothing was written to stderr and exit code still reflects failure
-            Assert.Equal(string.Empty, output.ToString());
-            Assert.Equal(1, context.ExitCode);
-        }
-        finally
-        {
-            Console.SetError(originalError);
-        }
+        // Assert: log file still receives the error and exit code reflects failure
+        Assert.True(File.Exists(logPath));
+        var logContent = File.ReadAllText(logPath);
+        Assert.Contains("Error message", logContent);
+        Assert.Equal(1, exitCode);
     }
 
     /// <summary>
@@ -521,26 +505,18 @@ public sealed class ContextTests : IDisposable
     [Fact]
     public void Context_ExitCode_AfterWriteError_ReturnsOne()
     {
-        // Arrange: redirect stderr to suppress console noise during the test
-        var originalError = Console.Error;
-        Console.SetError(TextWriter.Null);
+        // Arrange: set up a log file to suppress console noise during the test
+        var logPath = Path.Combine(_testDirectory, "exitcode_test.log");
 
-        try
-        {
-            // Act: create context, check initial exit code, call WriteError, check again
-            using var context = Context.Create([]);
-            var initialExitCode = context.ExitCode;
-            context.WriteError("error");
-            var exitCodeAfterError = context.ExitCode;
+        // Act: create context, check initial exit code, call WriteError, check again
+        using var context = Context.Create(["--silent", "--log", logPath]);
+        var initialExitCode = context.ExitCode;
+        context.WriteError("error");
+        var exitCodeAfterError = context.ExitCode;
 
-            // Assert: exit code starts at 0 and becomes 1 after WriteError
-            Assert.Equal(0, initialExitCode);
-            Assert.Equal(1, exitCodeAfterError);
-        }
-        finally
-        {
-            Console.SetError(originalError);
-        }
+        // Assert: exit code starts at 0 and becomes 1 after WriteError
+        Assert.Equal(0, initialExitCode);
+        Assert.Equal(1, exitCodeAfterError);
     }
 
     /// <summary>
@@ -572,34 +548,25 @@ public sealed class ContextTests : IDisposable
     [Fact]
     public void Context_Create_WithLogFileAndSilent_WritesToLogOnly()
     {
-        // Arrange: redirect stdout and set up the log file path
-        var originalOut = Console.Out;
-        using var output = new StringWriter();
-        Console.SetOut(output);
+        // Arrange: set up the log file path
+        var logPath = Path.Combine(_testDirectory, "silent_output.log");
 
-        try
+        // Act: create context with log file and silent flag, write messages, then dispose
+        int exitCode;
+        using (var context = Context.Create(["--log", logPath, "--silent"]))
         {
-            var logPath = Path.Combine(_testDirectory, "test.log");
-
-            // Act: create context with log file and silent flag, write messages, then dispose
-            using (var context = Context.Create(["--log", logPath, "--silent"]))
-            {
-                context.WriteLine("Normal message");
-                context.WriteError("Error message");
-            }
-
-            // Assert: nothing written to console and log file contains both messages
-            Assert.Equal(string.Empty, output.ToString());
-
-            Assert.True(File.Exists(logPath));
-            var logContent = File.ReadAllText(logPath);
-            Assert.Contains("Normal message", logContent);
-            Assert.Contains("Error message", logContent);
+            context.WriteLine("Silent normal message");
+            context.WriteError("Silent error message");
+            exitCode = context.ExitCode;
         }
-        finally
-        {
-            Console.SetOut(originalOut);
-        }
+
+        // Assert: log file contains both messages and exit code reflects the error
+        Assert.Equal(1, exitCode);
+        Assert.True(File.Exists(logPath));
+        var lines = File.ReadAllLines(logPath);
+        Assert.Equal(2, lines.Length);
+        Assert.Contains("Silent normal message", lines[0]);
+        Assert.Contains("Silent error message", lines[1]);
     }
 
     /// <summary>

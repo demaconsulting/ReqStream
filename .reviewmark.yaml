@@ -164,6 +164,7 @@ reviews:
       - "src/**/Modeling/Section.cs"                              # implementation
       - "test/**/Modeling/SectionTests.cs"                        # unit tests
       - "test/**/Modeling/RequirementsExportTests.cs"             # section hierarchy export tests
+      - "test/**/Modeling/RequirementsLoadParsingTests.cs"     # section title-merging tests
 
   # ReqStream - Tracing
   - id: ReqStream-Tracing
@@ -227,6 +228,18 @@ reviews:
     paths:
       - "docs/reqstream/ots/pandoc.yaml"                          # OTS requirements
       - "docs/verification/ots/pandoc.md"                         # OTS verification
+
+  - id: OTS-YamlDotNet
+    title: Review that YamlDotNet Provides Required Functionality
+    paths:
+      - "docs/reqstream/ots/yamldotnet.yaml"                       # OTS requirements
+      - "docs/verification/ots/yamldotnet.md"                      # OTS verification
+
+  - id: OTS-TestResults
+    title: Review that DemaConsulting.TestResults Provides Required Functionality
+    paths:
+      - "docs/reqstream/ots/testresults.yaml"                      # OTS requirements
+      - "docs/verification/ots/testresults.md"                     # OTS verification
 
   - id: OTS-ReviewMark
     title: Review that ReviewMark Provides Required Functionality

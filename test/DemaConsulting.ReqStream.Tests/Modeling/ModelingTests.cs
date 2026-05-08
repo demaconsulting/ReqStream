@@ -287,4 +287,53 @@ public sealed class ModelingTests : IDisposable
         Assert.True(result.Issues.All(i => i.Severity == LintSeverity.Error),
             "All reported issues should be Error severity.");
     }
+
+    /// <summary>
+    /// Test that the Modeling subsystem loads requirements from multiple YAML files
+    /// following includes directives transitively.
+    /// </summary>
+    [Fact]
+    public void Modeling_MultiFileLoading_WithIncludes_LoadsRequirementsFromAllFiles()
+    {
+        // Arrange: create a second file with distinct requirements
+        var includedFile = Path.Combine(_testDirectory, "included.yaml");
+        File.WriteAllText(includedFile, """
+            sections:
+              - title: Included Requirements
+                requirements:
+                  - id: Modeling-Included-Req1
+                    title: The system shall satisfy the included requirement.
+                    justification: Included requirement justification.
+                    tests:
+                      - IncludedTest1
+            """);
+
+        // Arrange: create a main file that references the second file via includes
+        var mainFile = Path.Combine(_testDirectory, "main.yaml");
+        File.WriteAllText(mainFile, """
+            includes:
+              - included.yaml
+            sections:
+              - title: Main Requirements
+                requirements:
+                  - id: Modeling-Main-Req1
+                    title: The system shall satisfy the main requirement.
+                    justification: Main requirement justification.
+                    tests:
+                      - MainTest1
+            """);
+
+        // Act: load the main requirements file
+        var result = Requirements.Load(mainFile);
+
+        // Assert: requirements from both files appear in the result
+        Assert.NotNull(result.Requirements);
+        Assert.False(result.HasErrors);
+        var allIds = result.Requirements.Sections
+            .SelectMany(s => s.Requirements)
+            .Select(r => r.Id)
+            .ToList();
+        Assert.Contains("Modeling-Main-Req1", allIds);
+        Assert.Contains("Modeling-Included-Req1", allIds);
+    }
 }

@@ -1,22 +1,22 @@
-## Requirements Unit Verification
+### Requirements Unit Verification
 
-### Verification Strategy
+#### Verification Strategy
 
 The Requirements unit is verified using xUnit integration tests across multiple test files:
 `RequirementsLoadTests.cs`, `RequirementsLoadParsingTests.cs`, and `RequirementsExportTests.cs`.
 Tests create YAML requirements files with various structures, invoke `Requirements.Load`, and
 assert on the parsed data model, lint issues, and generated Markdown exports.
 
-### Test Scenarios
+#### Test Scenarios
 
-#### YAML Processing Scenario
+##### YAML Processing Scenario
 
 Test methods:
 
 - `Section_Load_SimpleRequirement_ParsesCorrectly` — single requirement parsed
 - `Requirements_Load_ComplexStructure_ParsesCorrectly` — complex structure parsed
 
-#### Validation Scenario
+##### Validation Scenario
 
 Test methods:
 
@@ -27,14 +27,14 @@ Test methods:
 - `Requirements_Load_DuplicateRequirementId_ErrorIncludesFileLocation` — error includes location
 - `Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation` — YAML error → error
 
-#### Hierarchy Scenario
+##### Hierarchy Scenario
 
 Test methods:
 
 - `Section_Load_NestedSections_ParsesHierarchyCorrectly` — nested sections parsed
 - `Requirements_Export_NestedSections_CreatesHierarchy` — nested sections exported
 
-#### Includes Scenario
+##### Includes Scenario
 
 Test methods:
 
@@ -42,14 +42,14 @@ Test methods:
 - `Requirements_Load_MultipleFiles_MergesAllFiles` — multiple files merged
 - `Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop` — include loops handled
 
-#### Section Merging Scenario
+##### Section Merging Scenario
 
 Test methods:
 
 - `Requirements_Load_IdenticalSections_MergesCorrectly` — same-title sections merged
 - `Requirements_Load_MultipleFilesWithSameSections_MergesSections` — cross-file merging
 
-#### Export Scenario
+##### Export Scenario
 
 Test methods:
 
@@ -65,7 +65,7 @@ Test methods:
 - `Requirements_ExportJustifications_WithCustomDepth_UsesCorrectHeaderLevel` — custom depth
 - `Requirements_ExportJustifications_WithFilterTags_ExportsOnlyMatchingRequirements` — tag filter
 
-#### Load Result Scenario
+##### Load Result Scenario
 
 Test methods:
 
@@ -77,7 +77,7 @@ Test methods:
 - `Requirements_Load_WithIncludes_LintsIncludedFiles` — included files linted
 - `Requirements_Load_WithLintError_IssueIncludesLocation` — issue includes location
 
-### Coverage Summary
+#### Coverage Summary
 
 | Requirement ID | Test Method(s) |
 | --- | --- |

@@ -107,12 +107,13 @@ requirement is only considered covered when all tests across its whole subtree p
 `RequirementsLoader.ValidateCycles()` has already confirmed the child graph is acyclic, this method
 recurses without a cycle guard.
 
-##### `IsRequirementSatisfied(requirement)`
+##### `IsRequirementSatisfied(requirement, rootSection)`
 
 `IsRequirementSatisfied` returns `true` if and only if the requirement has at least one test
 mapped (directly or via descendants) and every one of those tests has `AllPassed == true`. A
 requirement with no tests is never satisfied, enforcing the design expectation that every
-requirement must be traced to at least one passing test.
+requirement must be traced to at least one passing test. The `rootSection` parameter provides
+the root section for requirement lookup during satisfaction checking.
 
 ##### `Export(filePath, depth, filterTags)`
 
@@ -141,7 +142,7 @@ while the Summary reflects full-subtree satisfaction.
 
 **Parameter behavior**:
 
-- `filePath`: required; an `ArgumentException` is thrown when `filePath` is null or empty.
+- `filePath`: required; an `ArgumentException` is thrown when `filePath` is null, empty, or whitespace-only.
   On file-system write failure (for example, permission denied or an invalid path), the
   underlying `IOException` or `UnauthorizedAccessException` is propagated to the caller without
   wrapping.

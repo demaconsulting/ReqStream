@@ -44,7 +44,7 @@ Test methods:
 | --- | --- |
 | `ReqStream-Modeling-YamlParsing` | `Modeling_YamlParsing_ValidFile_LoadsRequirements`, `Modeling_YamlParsing_ValidFile_ReturnsNoLintIssues`, `Modeling_YamlParsing_DuplicateIds_DetectsLintError` |
 | `ReqStream-Modeling-Export` | `Modeling_Export_Requirements_GeneratesMarkdownFile`, `Modeling_Export_Justifications_GeneratesMarkdownFile` |
-| `ReqStream-Modeling-MultiFileLoading` | `Modeling_YamlParsing_ValidFile_LoadsRequirements` |
+| `ReqStream-Modeling-MultiFileLoading` | `Modeling_YamlParsing_ValidFile_LoadsRequirements`, `Modeling_MultiFileLoading_WithIncludes_LoadsRequirementsFromAllFiles` |
 | `ReqStream-Modeling-Linting` | `Modeling_YamlParsing_DuplicateIds_DetectsLintError`, `Modeling_Linting_MalformedYaml_DetectsError`, `Modeling_Linting_ValidFile_ReturnsNoIssues` |
 | `ReqStream-Modeling-LintingValidation` | `Modeling_Linting_MalformedYaml_DetectsError`, `Modeling_Linting_ValidFile_ReturnsNoIssues` |
-| `ReqStream-Modeling-LintingReporting` | `Modeling_YamlParsing_DuplicateIds_DetectsLintError` |
+| `ReqStream-Modeling-LintingReporting` | `Modeling_YamlParsing_DuplicateIds_DetectsLintError`, `Modeling_LintingReporting_MultipleConditions_ReportsAllIssues` |

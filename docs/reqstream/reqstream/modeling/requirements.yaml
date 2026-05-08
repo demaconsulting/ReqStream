@@ -79,6 +79,8 @@ sections:
             tests:
               - Requirements_Load_IdenticalSections_MergesCorrectly
               - Requirements_Load_MultipleFilesWithSameSections_MergesSections
+            children:
+              - ReqStream-Section-TitleMerging
 
       - title: Reporting
         requirements:

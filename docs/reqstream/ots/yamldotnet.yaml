@@ -1,0 +1,23 @@
+---
+# YamlDotNet OTS Software Requirements
+#
+# Requirements for the YamlDotNet YAML parsing library.
+
+sections:
+  - title: OTS Software Requirements
+    sections:
+      - title: YamlDotNet Requirements
+        requirements:
+          - id: ReqStream-OTS-YamlDotNet
+            title: YamlDotNet shall parse YAML requirements files into a structured data model.
+            justification: |
+              YamlDotNet is the YAML parsing library used to deserialize requirements files.
+              It must correctly parse well-formed YAML and report deserialization errors with
+              location information for malformed files.
+            tags: [ots]
+            tests:
+              - Requirements_Load_ValidFile_ReturnsRequirementsAndNoIssues
+              - Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation
+              - Requirements_Load_MalformedYaml_ReturnsNullAndIssues
+              - Section_Load_SimpleRequirement_ParsesCorrectly
+              - Requirements_Load_ComplexStructure_ParsesCorrectly

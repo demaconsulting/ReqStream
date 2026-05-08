@@ -19,12 +19,12 @@ when the enclosing `using` block in `Program.Main` exits.
 
 | Property | Type | CLI flag | Notes |
 | -------- | ---- | -------- | ----- |
-| `Version` | `bool` | `--version` | Print version and exit |
-| `Help` | `bool` | `--help` | Print usage and exit |
+| `Version` | `bool` | `--version` / `-v` | Print version and exit |
+| `Help` | `bool` | `--help` / `-?` / `-h` | Print usage and exit |
 | `Silent` | `bool` | `--silent` | Suppress console output |
 | `Validate` | `bool` | `--validate` | Run self-validation tests |
 | `Lint` | `bool` | `--lint` | Lint requirements files |
-| `ResultsFile` | `string?` | `--results` | Path for validation test-results output file |
+| `ResultsFile` | `string?` | `--results` / `--result` | Path for validation test-results output file |
 | `Enforce` | `bool` | `--enforce` | Fail if requirements are not fully covered |
 | `FilterTags` | `HashSet<string>?` | `--filter` | Comma-separated tag filter; `null` when not specified |
 | `RequirementsFiles` | `List<string>` | `--requirements` | Expanded list of requirement file paths |

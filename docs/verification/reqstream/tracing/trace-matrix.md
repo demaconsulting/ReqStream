@@ -1,15 +1,15 @@
-## TraceMatrix Unit Verification
+### TraceMatrix Unit Verification
 
-### Verification Strategy
+#### Verification Strategy
 
 The TraceMatrix unit is verified using xUnit unit tests across `TraceMatrixTests.cs`,
 `TraceMatrixReadTests.cs`, and `TraceMatrixExportTests.cs`. Tests create temporary TRX and
 JUnit XML test result files, construct `TraceMatrix` instances, and assert on test result
 retrieval, coverage queries, and Markdown export output.
 
-### Test Scenarios
+#### Test Scenarios
 
-#### Constructor Scenario
+##### Constructor Scenario
 
 Tests verify that TraceMatrix handles various file conditions correctly.
 
@@ -24,7 +24,7 @@ Test methods:
 - `TraceMatrix_Constructor_WithJUnitFailedTests_TracksFailures` — JUnit failures tracked
 - `TraceMatrix_Constructor_WithMixedFormats_ProcessesBoth` — mixed formats processed
 
-#### Test Result Retrieval Scenario
+##### Test Result Retrieval Scenario
 
 Tests verify the `GetTestResult` method with various test name formats.
 
@@ -39,7 +39,7 @@ Test methods:
 - `TraceMatrix_GetTestResult_WithMixedTestNames_MatchesAppropriately` — mixed types match
 - `TraceMatrix_GetTestResult_WithMixedFilterAndPlainReferences_MatchesBoth` — mixed refs
 
-#### Export Scenario
+##### Export Scenario
 
 Tests verify Markdown trace matrix export.
 
@@ -55,7 +55,7 @@ Test methods:
 - `TraceMatrix_CalculateSatisfiedRequirements_WithFilterTags_CountsOnlyMatchingRequirements` — tag filter count
 - `TraceMatrix_GetUnsatisfiedRequirements_WithFilterTags_ReturnsOnlyMatchingRequirements` — tag filter unsatisfied
 
-### Coverage Summary
+#### Coverage Summary
 
 | Requirement ID | Test Method(s) |
 | --- | --- |

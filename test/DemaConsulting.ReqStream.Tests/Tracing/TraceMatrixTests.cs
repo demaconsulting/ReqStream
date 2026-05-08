@@ -60,6 +60,7 @@ public sealed class TraceMatrixTests : IDisposable
     [Fact]
     public void TraceMatrix_GetTestResult_WithSourceSpecificTests_MatchesCorrectly()
     {
+        // Arrange:
         // Create requirements with source-specific test names
         var reqYaml = @"---
 sections:
@@ -106,9 +107,11 @@ sections:
         var linuxPath = Path.Combine(_testDirectory, "test-results-ubuntu-latest.trx");
         File.WriteAllText(linuxPath, TrxSerializer.Serialize(linuxResults));
 
+        // Act:
         // Create TraceMatrix with both files
         var matrix = new TraceMatrix(requirements, windowsPath, linuxPath);
 
+        // Assert:
         // Verify Windows test is tracked separately
         var windowsResult = matrix.GetTestResult("windows-latest@Test_PlatformBasic");
         Assert.NotNull(windowsResult);
@@ -132,6 +135,7 @@ sections:
     [Fact]
     public void TraceMatrix_GetTestResult_WithSourceSpecificTests_DoesNotMatchOtherSources()
     {
+        // Arrange:
         // Create requirements with Windows-specific test name
         var reqYaml = @"---
 sections:
@@ -161,9 +165,11 @@ sections:
         var linuxPath = Path.Combine(_testDirectory, "test-results-ubuntu-latest.trx");
         File.WriteAllText(linuxPath, TrxSerializer.Serialize(linuxResults));
 
+        // Act:
         // Create TraceMatrix with Linux file only
         var matrix = new TraceMatrix(requirements, linuxPath);
 
+        // Assert:
         // Verify Windows-specific test is not tracked from Linux file
         var result = matrix.GetTestResult("windows@Test_WindowsOnly");
         Assert.Equal(0, result.Executed);
@@ -175,6 +181,7 @@ sections:
     [Fact]
     public void TraceMatrix_GetTestResult_WithPlainTestNames_MatchesAllSources()
     {
+        // Arrange:
         // Create requirements with plain test name
         var reqYaml = @"---
 sections:
@@ -217,9 +224,11 @@ sections:
         var linuxPath = Path.Combine(_testDirectory, "linux-results.trx");
         File.WriteAllText(linuxPath, TrxSerializer.Serialize(linuxResults));
 
+        // Act:
         // Create TraceMatrix with both files
         var matrix = new TraceMatrix(requirements, windowsPath, linuxPath);
 
+        // Assert:
         // Verify test is aggregated from both sources
         var result = matrix.GetTestResult("Test_CrossPlatform");
         Assert.NotNull(result);
@@ -233,6 +242,7 @@ sections:
     [Fact]
     public void TraceMatrix_GetTestResult_WithMixedTestNames_MatchesAppropriately()
     {
+        // Arrange:
         // Create requirements with both plain and source-specific test names
         var reqYaml = @"---
 sections:
@@ -293,9 +303,11 @@ sections:
         var linuxPath = Path.Combine(_testDirectory, "test-linux.trx");
         File.WriteAllText(linuxPath, TrxSerializer.Serialize(linuxResults));
 
+        // Act:
         // Create TraceMatrix with both files
         var matrix = new TraceMatrix(requirements, windowsPath, linuxPath);
 
+        // Assert:
         // Verify common test is aggregated
         var commonResult = matrix.GetTestResult("Test_Common");
         Assert.NotNull(commonResult);
@@ -325,6 +337,7 @@ sections:
     [Fact]
     public void TraceMatrix_GetTestResult_WithSourceSpecificTests_IsCaseInsensitive()
     {
+        // Arrange:
         // Create requirements with lowercase file part
         var reqYaml = @"---
 sections:
@@ -354,9 +367,11 @@ sections:
         var testPath = Path.Combine(_testDirectory, "test-results-WINDOWS-latest.trx");
         File.WriteAllText(testPath, TrxSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, testPath);
 
+        // Assert:
         // Verify test is matched despite case difference
         var result = matrix.GetTestResult("windows@Test_CaseSensitive");
         Assert.NotNull(result);
@@ -370,6 +385,7 @@ sections:
     [Fact]
     public void TraceMatrix_GetTestResult_WithSourceSpecificTests_MatchesPartialFilename()
     {
+        // Arrange:
         // Create requirements with partial file name
         var reqYaml = @"---
 sections:
@@ -399,9 +415,11 @@ sections:
         var testPath = Path.Combine(_testDirectory, "test-results-ubuntu-22.04-latest.trx");
         File.WriteAllText(testPath, TrxSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, testPath);
 
+        // Assert:
         // Verify test is matched with partial filename
         var result = matrix.GetTestResult("ubuntu@Test_Partial");
         Assert.NotNull(result);
@@ -416,6 +434,7 @@ sections:
     [Fact]
     public void TraceMatrix_GetTestResult_WithMultipleSourceSpecifiers_MatchesAllRequirements()
     {
+        // Arrange:
         // Create requirements with multiple source-specific tests for the same test name
         var reqYaml = @"---
 sections:
@@ -449,9 +468,11 @@ sections:
         var testPath = Path.Combine(_testDirectory, "integration-test-windows-latest-dotnet8.x.trx");
         File.WriteAllText(testPath, TrxSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, testPath);
 
+        // Assert:
         // Verify the test matches both source-specific requirements
         var windowsResult = matrix.GetTestResult("windows@Test_Platform");
         Assert.NotNull(windowsResult);
@@ -478,6 +499,7 @@ sections:
     [Fact]
     public void TraceMatrix_GetTestResult_WithMixedFilterAndPlainReferences_MatchesBoth()
     {
+        // Arrange:
         // Create requirements where the same test is referenced with and without file filter
         var reqYaml = @"---
 sections:
@@ -511,16 +533,18 @@ sections:
         var testPath = Path.Combine(_testDirectory, "test-results-windows-latest.trx");
         File.WriteAllText(testPath, TrxSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, testPath);
 
+        // Assert:
         // Verify the source-specific test is tracked
         var sourceSpecificResult = matrix.GetTestResult("windows@Test_SharedTest");
         Assert.NotNull(sourceSpecificResult);
         Assert.Equal(1, sourceSpecificResult.Executed);
         Assert.Equal(1, sourceSpecificResult.Passes);
 
-        // Verify the plain test is ALSO tracked (this is the bug - it won't be tracked)
+        // Verify the plain test is ALSO tracked (regression: was not tracked before fix)
         var plainResult = matrix.GetTestResult("Test_SharedTest");
         Assert.NotNull(plainResult);
         Assert.Equal(1, plainResult.Executed);
@@ -538,6 +562,7 @@ sections:
     [Fact]
     public void TraceMatrix_GetTestResult_WithNotExecutedTests_IgnoresNonExecutedTests()
     {
+        // Arrange:
         // Create requirements with test references
         var reqYaml = @"---
 sections:
@@ -576,9 +601,11 @@ sections:
         var testPath = Path.Combine(_testDirectory, "test-results.trx");
         File.WriteAllText(testPath, TrxSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, testPath);
 
+        // Assert:
         // Verify executed test is tracked
         var executedResult = matrix.GetTestResult("Test_ExecutedTest");
         Assert.NotNull(executedResult);
@@ -601,6 +628,7 @@ sections:
     [Fact]
     public void TraceMatrix_GetTestResult_WithOnlyNotExecutedTests_TreatsAsNoTests()
     {
+        // Arrange:
         // Create requirements with test references
         var reqYaml = @"---
 sections:
@@ -639,9 +667,11 @@ sections:
         var testPath = Path.Combine(_testDirectory, "test-results.trx");
         File.WriteAllText(testPath, TrxSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, testPath);
 
+        // Assert:
         // Verify no tests are tracked
         var result1 = matrix.GetTestResult("Test_NotExecuted1");
         Assert.Equal(0, result1.Executed);
@@ -661,6 +691,7 @@ sections:
     [Fact]
     public void TraceMatrix_GetTestResult_WithMixedOutcomes_OnlyCountsExecutedTests()
     {
+        // Arrange:
         // Create requirements with test references
         var reqYaml = @"---
 sections:
@@ -709,9 +740,11 @@ sections:
         var testPath = Path.Combine(_testDirectory, "test-results.trx");
         File.WriteAllText(testPath, TrxSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, testPath);
 
+        // Assert:
         // Verify passed test is tracked
         var passedResult = matrix.GetTestResult("Test_Passed");
         Assert.NotNull(passedResult);

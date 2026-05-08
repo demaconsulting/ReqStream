@@ -57,27 +57,23 @@ public sealed class ProgramTests : IDisposable
     [Fact]
     public void Program_Run_WithVersionFlag_PrintsVersion()
     {
-        // Arrange: redirect stdout to capture output
-        var originalOut = Console.Out;
-        using var output = new StringWriter();
-        Console.SetOut(output);
+        // Arrange: create log file path to capture output
+        var logFile = Path.Combine(_testDirectory, "version.log");
 
-        try
+        // Act: run with version flag, capturing output to log file
+        using (var context = Context.Create(["--version", "--log", logFile]))
         {
-            // Act: run with version flag
-            using var context = Context.Create(["--version"]);
             Program.Run(context);
 
             // Assert: version string is printed without banner or help
-            var outputText = output.ToString().Trim();
-            Assert.False(string.IsNullOrWhiteSpace(outputText));
-            Assert.DoesNotContain("Copyright", outputText);
-            Assert.DoesNotContain("Usage", outputText);
+            Assert.Equal(0, context.ExitCode);
         }
-        finally
-        {
-            Console.SetOut(originalOut);
-        }
+
+        // Assert: log file contains version output (read after context disposal to ensure flush)
+        var outputText = File.ReadAllText(logFile).Trim();
+        Assert.False(string.IsNullOrWhiteSpace(outputText));
+        Assert.DoesNotContain("Copyright", outputText);
+        Assert.DoesNotContain("Usage", outputText);
     }
 
     /// <summary>
@@ -86,28 +82,21 @@ public sealed class ProgramTests : IDisposable
     [Fact]
     public void Program_Run_WithHelpFlag_PrintsHelp()
     {
-        // Arrange: redirect stdout to capture output
-        var originalOut = Console.Out;
-        using var output = new StringWriter();
-        Console.SetOut(output);
+        // Arrange: create log file path to capture output
+        var logFile = Path.Combine(_testDirectory, "help.log");
 
-        try
+        // Act: run with help flag, capturing output to log file
+        using (var context = Context.Create(["--help", "--log", logFile]))
         {
-            // Act: run with help flag
-            using var context = Context.Create(["--help"]);
             Program.Run(context);
+        }
 
-            // Assert: banner and usage information are printed
-            var outputText = output.ToString();
-            Assert.Contains("ReqStream version", outputText);
-            Assert.Contains("Copyright", outputText);
-            Assert.Contains("Usage:", outputText);
-            Assert.Contains("Options:", outputText);
-        }
-        finally
-        {
-            Console.SetOut(originalOut);
-        }
+        // Assert: banner and usage information are printed
+        var outputText = File.ReadAllText(logFile);
+        Assert.Contains("ReqStream version", outputText);
+        Assert.Contains("Copyright", outputText);
+        Assert.Contains("Usage:", outputText);
+        Assert.Contains("Options:", outputText);
     }
 
     /// <summary>
@@ -219,25 +208,21 @@ public sealed class ProgramTests : IDisposable
     [Fact]
     public void Program_Run_WithNoFiles_PrintsMessage()
     {
-        // Arrange: redirect stdout to capture output
-        var originalOut = Console.Out;
-        using var output = new StringWriter();
-        Console.SetOut(output);
+        // Arrange: create log file path to capture output
+        var logFile = Path.Combine(_testDirectory, "no-files.log");
 
-        try
+        // Act: run program with no arguments, capturing output to log file
+        using (var context = Context.Create(["--log", logFile]))
         {
-            // Act: run program with no arguments
-            using var context = Context.Create([]);
             Program.Run(context);
 
-            // Assert: exit code is 0 and message includes "No requirements files specified"
+            // Assert: exit code is 0
             Assert.Equal(0, context.ExitCode);
-            Assert.Contains("No requirements files specified", output.ToString());
         }
-        finally
-        {
-            Console.SetOut(originalOut);
-        }
+
+        // Assert: message includes "No requirements files specified"
+        var outputText = File.ReadAllText(logFile);
+        Assert.Contains("No requirements files specified", outputText);
     }
 
     /// <summary>
@@ -246,12 +231,21 @@ public sealed class ProgramTests : IDisposable
     [Fact]
     public void Program_Run_WithNoRequirementsFiles_ShowsMessage()
     {
-        // Act: run with no arguments
-        using var context = Context.Create([]);
-        Program.Run(context);
+        // Arrange: create log file path to capture output
+        var logFile = Path.Combine(_testDirectory, "no-req-files.log");
 
-        // Assert: completes without errors
-        Assert.Equal(0, context.ExitCode);
+        // Act: run with no arguments, capturing output to log file
+        using (var context = Context.Create(["--log", logFile]))
+        {
+            Program.Run(context);
+
+            // Assert: completes without errors
+            Assert.Equal(0, context.ExitCode);
+        }
+
+        // Assert: message indicates no requirements files specified
+        var output = File.ReadAllText(logFile);
+        Assert.Contains("No requirements files specified.", output);
     }
 
     /// <summary>
@@ -395,27 +389,20 @@ sections:
     [Fact]
     public void Program_Run_WithVersionAndHelp_ProcessesVersionFirst()
     {
-        // Arrange: redirect stdout to capture output
-        var originalOut = Console.Out;
-        using var output = new StringWriter();
-        Console.SetOut(output);
+        // Arrange: create log file path to capture output
+        var logFile = Path.Combine(_testDirectory, "version-and-help.log");
 
-        try
+        // Act: run with both version and help flags, capturing output to log file
+        using (var context = Context.Create(["--version", "--help", "--log", logFile]))
         {
-            // Act: run with both version and help flags
-            using var context = Context.Create(["--version", "--help"]);
             Program.Run(context);
+        }
 
-            // Assert: only version string is printed (help is skipped)
-            var outputText = output.ToString().Trim();
-            Assert.False(string.IsNullOrWhiteSpace(outputText));
-            Assert.DoesNotContain("Usage:", outputText);
-            Assert.DoesNotContain("Copyright", outputText);
-        }
-        finally
-        {
-            Console.SetOut(originalOut);
-        }
+        // Assert: only version string is printed (help is skipped)
+        var outputText = File.ReadAllText(logFile).Trim();
+        Assert.False(string.IsNullOrWhiteSpace(outputText));
+        Assert.DoesNotContain("Usage:", outputText);
+        Assert.DoesNotContain("Copyright", outputText);
     }
 
     /// <summary>
@@ -424,26 +411,19 @@ sections:
     [Fact]
     public void Program_Run_WithHelpAndValidate_ProcessesHelpFirst()
     {
-        // Arrange: redirect stdout to capture output
-        var originalOut = Console.Out;
-        using var output = new StringWriter();
-        Console.SetOut(output);
+        // Arrange: create log file path to capture output
+        var logFile = Path.Combine(_testDirectory, "help-and-validate.log");
 
-        try
+        // Act: run with both help and validate flags, capturing output to log file
+        using (var context = Context.Create(["--help", "--validate", "--log", logFile]))
         {
-            // Act: run with both help and validate flags
-            using var context = Context.Create(["--help", "--validate"]);
             Program.Run(context);
+        }
 
-            // Assert: help is printed (validation is skipped)
-            var outputText = output.ToString();
-            Assert.Contains("Usage:", outputText);
-            Assert.DoesNotContain("Self-validation", outputText);
-        }
-        finally
-        {
-            Console.SetOut(originalOut);
-        }
+        // Assert: help is printed (validation is skipped)
+        var outputText = File.ReadAllText(logFile);
+        Assert.Contains("Usage:", outputText);
+        Assert.DoesNotContain("Self-validation", outputText);
     }
 
     /// <summary>
@@ -654,7 +634,7 @@ sections:
     [Fact]
     public void Program_Run_WithLintFlag_SuppressesBanner()
     {
-        // Arrange: create a valid requirements file and redirect stdout to capture output
+        // Arrange: create a valid requirements file and log file to capture output
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqFile, @"
 sections:
@@ -664,17 +644,15 @@ sections:
         title: Test Requirement
 ");
 
-        var originalOut = Console.Out;
-        using var output = new StringWriter();
-        Console.SetOut(output);
+        var logFile = Path.Combine(_testDirectory, "lint-banner.log");
 
         var originalDir = Directory.GetCurrentDirectory();
         try
         {
             Directory.SetCurrentDirectory(_testDirectory);
 
-            // Act: run with lint flag
-            using var context = Context.Create(["--lint", "--requirements", "*.yaml"]);
+            // Act: run with lint flag, capturing output to log file
+            using var context = Context.Create(["--lint", "--requirements", "*.yaml", "--log", logFile]);
             Program.Run(context);
 
             // Assert: lint succeeds with no output
@@ -683,11 +661,10 @@ sections:
         finally
         {
             Directory.SetCurrentDirectory(originalDir);
-            Console.SetOut(originalOut);
         }
 
         // Assert: banner and summary are not printed during lint
-        var outputText = output.ToString();
+        var outputText = File.ReadAllText(logFile);
         Assert.DoesNotContain("ReqStream version", outputText);
         Assert.DoesNotContain("Copyright", outputText);
         Assert.DoesNotContain("No issues found", outputText);
@@ -812,12 +789,21 @@ sections:
     [Fact]
     public void Program_Run_WithLintAndNoRequirements_PrintsInformationalMessage()
     {
-        // Act: run with lint flag but no requirements files
-        using var context = Context.Create(["--lint"]);
-        Program.Run(context);
+        // Arrange: create log file path to capture output
+        var logFile = Path.Combine(_testDirectory, "lint-no-req.log");
 
-        // Assert: completes without error exit code
-        Assert.Equal(0, context.ExitCode);
+        // Act: run with lint flag but no requirements files
+        using (var context = Context.Create(["--lint", "--log", logFile]))
+        {
+            Program.Run(context);
+
+            // Assert: completes without error exit code
+            Assert.Equal(0, context.ExitCode);
+        }
+
+        // Assert: informational message is present
+        var output = File.ReadAllText(logFile);
+        Assert.Contains("No requirements files specified.", output);
     }
 
     /// <summary>

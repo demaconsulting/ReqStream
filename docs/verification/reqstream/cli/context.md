@@ -1,15 +1,15 @@
-## Context Unit Verification
+### Context Unit Verification
 
-### Verification Strategy
+#### Verification Strategy
 
 The Context unit is verified using xUnit unit tests in `ContextTests.cs`. Tests create `Context`
 instances with specific command-line argument arrays and assert the resulting property values,
 file system effects, and exception behavior. Temporary directories are created for tests
 requiring file system access.
 
-### Test Scenarios
+#### Test Scenarios
 
-#### CLI Parsing Scenario
+##### CLI Parsing Scenario
 
 Tests verify that Context correctly parses all supported command-line arguments.
 
@@ -28,14 +28,14 @@ Test methods:
 - `Context_Create_MissingResultsFilename_ThrowsException` — `--results` without value throws
 - `Context_Create_FilterArgumentMissingValue_ThrowsException` — `--filter` without value throws
 
-#### Requirements and Tests Pattern Scenario
+##### Requirements and Tests Pattern Scenario
 
 Test methods:
 
 - `Context_Create_WithRequirementsPattern_ExpandsGlobPattern` — glob patterns for requirements
 - `Context_Create_WithTestsPattern_ExpandsGlobPattern` — glob patterns for test results
 
-#### Results and Report Flags Scenario
+##### Results and Report Flags Scenario
 
 Test methods:
 
@@ -48,7 +48,7 @@ Test methods:
 - `Context_Create_JustificationsFile_SetsJustificationsFileProperty` — `--justifications` sets path
 - `Context_Create_MissingJustificationsFilename_ThrowsException` — `--justifications` without value throws
 
-#### Depth Flags Scenario
+##### Depth Flags Scenario
 
 Test methods:
 
@@ -62,7 +62,7 @@ Test methods:
 - `Context_Create_MissingJustificationsDepth_ThrowsException` — missing justifications depth throws
 - `Context_Create_InvalidJustificationsDepth_ThrowsException` — invalid justifications depth throws
 
-#### Tag Filter Scenario
+##### Tag Filter Scenario
 
 Test methods:
 
@@ -71,7 +71,7 @@ Test methods:
 - `Context_Create_FilterSingleTag_ParsesCorrectly` — single tag parsed
 - `Context_Create_MultipleFilterArguments_MergesIntoSingleSet` — multiple `--filter` merged
 
-#### Output Channel Scenario
+##### Output Channel Scenario
 
 Test methods:
 
@@ -80,7 +80,7 @@ Test methods:
 - `Context_WriteError_NormalMode_WritesToConsole` — normal mode writes to stderr
 - `Context_ExitCode_AfterWriteError_ReturnsOne` — exit code is 1 after error
 
-#### Log File Scenario
+##### Log File Scenario
 
 Test methods:
 
@@ -89,7 +89,7 @@ Test methods:
 - `Context_Dispose_WithLogFile_ClosesLogFile` — dispose closes log file
 - `Context_Create_InvalidLogPath_ThrowsException` — invalid log path throws
 
-### Coverage Summary
+#### Coverage Summary
 
 | Requirement ID | Test Method(s) |
 | --- | --- |
@@ -99,7 +99,9 @@ Test methods:
 | `ReqStream-Command-Silent` | `Context_Create_SilentFlag_SetsSilentProperty`, `Context_WriteLine_SilentMode_DoesNotWriteToConsole`, `Context_WriteError_SilentMode_DoesNotWriteToConsole` |
 | `ReqStream-Command-ErrorOutput` | `Context_WriteError_NormalMode_WritesToConsole` |
 | `ReqStream-Command-UnknownArgs` | `Context_Create_UnsupportedArgument_ThrowsException` |
-| `ReqStream-Command-MalformedArgs` | `Context_Create_MissingLogFilename_ThrowsException`, `Context_Create_MissingResultsFilename_ThrowsException`, `Context_Create_FilterArgumentMissingValue_ThrowsException` |
+| `ReqStream-Command-MissingLogValue` | `Context_Create_MissingLogFilename_ThrowsException` |
+| `ReqStream-Command-MissingResultsValue` | `Context_Create_MissingResultsFilename_ThrowsException` |
+| `ReqStream-Command-MissingFilterValue` | `Context_Create_FilterArgumentMissingValue_ThrowsException` |
 | `ReqStream-Command-RequirementsGlobPatterns` | `Context_Create_WithRequirementsPattern_ExpandsGlobPattern` |
 | `ReqStream-Command-TestGlobPatterns` | `Context_Create_WithTestsPattern_ExpandsGlobPattern` |
 | `ReqStream-Command-Validate` | `Context_Create_ValidateFlag_SetsValidateProperty` |

@@ -1,19 +1,9 @@
 ---
+# cspell:ignore yamldotnet testresults
 includes:
-  # System-level requirements
+  # System requirements (includes all subsystems)
   - docs/reqstream/reqstream.yaml
-  # Program unit
-  - docs/reqstream/reqstream/program.yaml
-  # Cli subsystem (includes cli/context.yaml via cli.yaml)
-  - docs/reqstream/reqstream/cli.yaml
-  # Modeling subsystem
-  - docs/reqstream/reqstream/modeling.yaml
-  # Tracing subsystem (includes tracing/trace-matrix.yaml via tracing.yaml)
-  - docs/reqstream/reqstream/tracing.yaml
-  # SelfTest subsystem (includes self-test/validation.yaml via self-test.yaml)
-  - docs/reqstream/reqstream/self-test.yaml
-  # Platform support and OTS software
-  - docs/reqstream/reqstream/platform-requirements.yaml
+  # OTS requirements
   - docs/reqstream/ots/xunit.yaml
   - docs/reqstream/ots/buildmark.yaml
   - docs/reqstream/ots/versionmark.yaml
@@ -23,3 +13,5 @@ includes:
   - docs/reqstream/ots/pandoc.yaml
   - docs/reqstream/ots/weasyprint.yaml
   - docs/reqstream/ots/fileassert.yaml
+  - docs/reqstream/ots/yamldotnet.yaml
+  - docs/reqstream/ots/testresults.yaml

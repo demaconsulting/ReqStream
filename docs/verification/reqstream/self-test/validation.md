@@ -1,14 +1,14 @@
-## Validation Unit Verification
+### Validation Unit Verification
 
-### Verification Strategy
+#### Verification Strategy
 
 The Validation unit is verified using xUnit unit tests in `ValidationTests.cs`. Tests invoke
 `Validation.Run` with `Context` instances configured for specific scenarios and assert on exit
 codes, log file content, and result file content.
 
-### Test Scenarios
+#### Test Scenarios
 
-#### Self-Validation Scenario
+##### Self-Validation Scenario
 
 Tests verify that `Validation.Run` completes successfully and produces expected output.
 
@@ -19,7 +19,7 @@ Test methods:
 - `Validation_Run_WithTrxResultsFile_WritesTrxFile` — TRX file written and contains TestRun
 - `Validation_Run_WithXmlResultsFile_WritesXmlFile` — JUnit XML file written and contains testsuite
 
-#### Error and Continuation Scenario
+##### Error and Continuation Scenario
 
 Tests verify error handling when result files cannot be written.
 
@@ -29,7 +29,7 @@ Test methods:
 - `Validation_Run_WithUnwritableResultsFile_Continues` — write failure → summary still produced
 - `Validation_Run_WithInvalidResultsExtension_ReportsError` — unsupported extension → exit code 1
 
-### Coverage Summary
+#### Coverage Summary
 
 | Requirement ID | Test Method(s) |
 | --- | --- |

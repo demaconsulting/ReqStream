@@ -18,8 +18,9 @@ sections:
           - id: ReqStream-Command-Version
             title: The tool shall accept a `--version` flag.
             justification: |
-              Recording the version flag in Context allows Program to detect the request and print
-              version information without requiring Context to have any knowledge of the version string.
+              Users need a standard way to verify which version of the tool is installed without
+              running a full operation. A dedicated version flag follows CLI conventions and enables
+              scripts and CI pipelines to confirm the expected version before proceeding.
             tags:
               - cli
             tests:
@@ -28,8 +29,9 @@ sections:
           - id: ReqStream-Command-Help
             title: The tool shall accept a `--help` flag.
             justification: |
-              Recording the help flag in Context allows Program to detect the request and print
-              usage documentation without coupling help content to the argument-parsing layer.
+              Users need a standard way to discover available options and usage without consulting
+              external documentation. A built-in help flag follows CLI conventions and provides
+              immediate, context-accurate guidance at the point of use.
             tags:
               - cli
             tests:
@@ -68,16 +70,34 @@ sections:
             tests:
               - Context_Create_UnsupportedArgument_ThrowsException
 
-          - id: ReqStream-Command-MalformedArgs
-            title: The tool shall reject malformed command-line arguments with a descriptive error.
+          - id: ReqStream-Command-MissingLogValue
+            title: The tool shall reject a --log flag that is not followed by a filename.
             justification: |
-              Providing clear feedback when a flag that requires a value is missing its value
-              helps users quickly correct mistakes and prevents silent misconfiguration.
+              Providing clear feedback when --log is missing its value prevents silent
+              misconfiguration and helps users quickly correct the command line.
             tags:
               - cli
             tests:
               - Context_Create_MissingLogFilename_ThrowsException
+
+          - id: ReqStream-Command-MissingResultsValue
+            title: The tool shall reject a --results flag that is not followed by a filename.
+            justification: |
+              Providing clear feedback when --results is missing its value prevents silent
+              misconfiguration and helps users quickly correct the command line.
+            tags:
+              - cli
+            tests:
               - Context_Create_MissingResultsFilename_ThrowsException
+
+          - id: ReqStream-Command-MissingFilterValue
+            title: The tool shall reject a --filter flag that is not followed by a value.
+            justification: |
+              Providing clear feedback when --filter is missing its value prevents silent
+              misconfiguration and helps users quickly correct the command line.
+            tags:
+              - cli
+            tests:
               - Context_Create_FilterArgumentMissingValue_ThrowsException
 
           - id: ReqStream-Command-RequirementsGlobPatterns

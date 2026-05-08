@@ -1,14 +1,14 @@
-## LintIssue Unit Verification
+### LintIssue Unit Verification
 
-### Verification Strategy
+#### Verification Strategy
 
 The LintIssue unit is verified using xUnit unit tests in `LintIssueTests.cs`. Tests create
 `LintIssue` instances with specific severity and content values and assert on the formatted
 `ToString()` output.
 
-### Test Scenarios
+#### Test Scenarios
 
-#### Issue Formatting Scenario
+##### Issue Formatting Scenario
 
 Tests verify that `LintIssue.ToString()` formats the issue correctly for both error and
 warning severities.
@@ -20,7 +20,7 @@ Test methods:
 - `LintIssue_ToString_EmptyLocation_FormatsCorrectly` — empty location still formats correctly
 - `LintIssue_ToString_EmptyDescription_FormatsCorrectly` — empty description still formats correctly
 
-### Coverage Summary
+#### Coverage Summary
 
 | Requirement ID | Test Method(s) |
 | --- | --- |

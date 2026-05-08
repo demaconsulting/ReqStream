@@ -32,13 +32,12 @@ The `Modeling` subsystem exposes the following interface to the rest of the tool
 | `Requirements.Export` | Exports to Markdown; `depth` sets header level (default 1); `filterTags` restricts by tag. |
 | `Requirements.ExportJustifications` | Exports justifications to Markdown. Supports `depth` and `filterTags`. |
 | `LoadResult.ReportIssues` | Reports lint issues discovered during loading via the context. |
-| `RequirementsLoader.Load` | Deserializes a single requirements file and collects lint issues. |
 
 ### Interactions
 
 | Dependency                         | Direction | Purpose                                                             |
 |------------------------------------|-----------|---------------------------------------------------------------------|
-| `Context`                          | Uses      | Receives file paths from `Context.RequirementsFiles`.               |
+| `Cli (Context)`                    | Uses      | `LoadResult.ReportIssues` accepts a `Context` to route lint issues to output streams. |
 | `TraceMatrix`                      | Used by   | Receives the requirement tree to map test results to requirements.  |
 | `Program`                          | Used by   | Calls `Requirements.Load` to load requirements.                     |
 

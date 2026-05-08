@@ -2,7 +2,7 @@
 
 ## Overview
 
-The ReqStream tool uses nine OTS (Off-The-Shelf) software items to provide build, test,
+The ReqStream tool uses eleven OTS (Off-The-Shelf) software items to provide build, test,
 documentation, and quality-reporting functionality. OTS items are not developed in-house and
 have no design documentation. Verification evidence is collected from CI pipeline run results,
 self-validation output, and integration test execution rather than from unit tests of internal
@@ -29,14 +29,16 @@ The following table lists all OTS items and their primary evidence type. Full ve
 details for each item are provided in the individual OTS item verification documents under
 `docs/verification/ots/`.
 
-| OTS Item    | Primary Evidence Type                                                  |
-| ----------- | ---------------------------------------------------------------------- |
-| BuildMark   | CI pipeline step evidence                                              |
-| FileAssert  | Self-validation                                                        |
-| xUnit       | Integration test evidence                                              |
-| Pandoc      | CI pipeline step evidence combined with FileAssert document validation |
-| ReviewMark  | CI pipeline step evidence                                              |
-| SarifMark   | CI pipeline step evidence                                              |
-| SonarMark   | CI pipeline step evidence                                              |
-| VersionMark | CI pipeline step evidence                                              |
-| WeasyPrint  | CI pipeline step evidence combined with FileAssert document validation |
+| OTS Item                   | Primary Evidence Type                                                  |
+| -------------------------- | ---------------------------------------------------------------------- |
+| BuildMark                  | CI pipeline step evidence                                              |
+| FileAssert                 | Self-validation                                                        |
+| xUnit                      | Integration test evidence                                              |
+| Pandoc                     | CI pipeline step evidence combined with FileAssert document validation |
+| ReviewMark                 | CI pipeline step evidence                                              |
+| SarifMark                  | CI pipeline step evidence                                              |
+| SonarMark                  | CI pipeline step evidence                                              |
+| VersionMark                | CI pipeline step evidence                                              |
+| WeasyPrint                 | CI pipeline step evidence combined with FileAssert document validation |
+| YamlDotNet                 | Integration test evidence                                              |
+| DemaConsulting.TestResults | Integration test evidence                                              |

@@ -80,6 +80,10 @@ sections:
           misconfiguration and helps users quickly identify and correct command-line errors.
         tests:
           - Cli_Interface_MissingArgumentValue_ThrowsArgumentException
+        children:
+          - ReqStream-Command-MissingLogValue
+          - ReqStream-Command-MissingResultsValue
+          - ReqStream-Command-MissingFilterValue
 
       - id: ReqStream-Cli-InvalidDepthValue
         title: The Cli subsystem shall reject a non-integer depth value with a descriptive error.

@@ -1,14 +1,14 @@
-## RequirementsLoader Unit Verification
+### RequirementsLoader Unit Verification
 
-### Verification Strategy
+#### Verification Strategy
 
 The RequirementsLoader unit is verified using xUnit unit tests in `RequirementsLoaderTests.cs`.
 Tests create YAML requirements files with specific structural conditions (unknown fields, missing
 fields, duplicate IDs, circular references, etc.) and assert on the lint issues reported.
 
-### Test Scenarios
+#### Test Scenarios
 
-#### File Loading Scenario
+##### File Loading Scenario
 
 Tests verify that file path errors are correctly reported.
 
@@ -20,7 +20,7 @@ Test methods:
 - `RequirementsLoader_Load_WithNonMappingRoot_ReportsError` — non-mapping root → error
 - `RequirementsLoader_Load_WithMalformedYaml_ReportsError` — malformed YAML → error
 
-#### Document Structure Scenario
+##### Document Structure Scenario
 
 Test methods:
 
@@ -29,7 +29,7 @@ Test methods:
 - `RequirementsLoader_Load_WithSectionMissingTitle_ReportsError` — missing section title
 - `RequirementsLoader_Load_WithBlankSectionTitle_ReportsError` — blank section title
 
-#### Requirement Structure Scenario
+##### Requirement Structure Scenario
 
 Test methods:
 
@@ -40,7 +40,7 @@ Test methods:
 - `RequirementsLoader_Load_WithRequirementMissingTitle_ReportsError` — missing requirement title
 - `RequirementsLoader_Load_WithBlankRequirementTitle_ReportsError` — blank requirement title
 
-#### Duplicate and Reference Scenario
+##### Duplicate and Reference Scenario
 
 Test methods:
 
@@ -49,7 +49,7 @@ Test methods:
 - `RequirementsLoader_Load_WithMultipleCycles_ReportsAllCycles` — all circular refs reported
 - `RequirementsLoader_Load_WithUnknownChildReference_ReportsError` — unknown child reference
 
-#### Validation and Reporting Scenario
+##### Validation and Reporting Scenario
 
 Test methods:
 
@@ -59,7 +59,7 @@ Test methods:
 - `RequirementsLoader_Load_WithEmptyFile_ReportsNoIssues` — empty file → no issues
 - `RequirementsLoader_Load_ErrorFormat_IncludesFileAndLocation` — error format includes file path
 
-#### Mapping and List Scenario
+##### Mapping and List Scenario
 
 Test methods:
 
@@ -75,7 +75,7 @@ Test methods:
 - `RequirementsLoader_Load_WithNonScalarMappingTestEntry_ReportsError` — non-scalar mapping test
 - `RequirementsLoader_Load_WithNonScalarIncludeEntry_ReportsError` — non-scalar include entry
 
-### Coverage Summary
+#### Coverage Summary
 
 | Requirement ID | Test Method(s) |
 | --- | --- |

@@ -6,7 +6,8 @@
 files. It walks the YAML DOM, merges sections into the shared `Requirements` tree, validates
 all required fields, and collects `LintIssue` objects for every problem found. It is the only
 unit that reads from the file system for requirements data and the only unit with knowledge of
-the YAML DOM representation.
+the YAML DOM representation. `RequirementsLoader` is declared `internal static`; it has no
+instances and is inaccessible outside the assembly.
 
 #### YAML DOM Traversal
 

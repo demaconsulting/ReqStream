@@ -17,12 +17,12 @@ the tests correctly. The following representative test methods are linked as evi
 - `Context_Create_HelpFlags_SetsHelpProperty`
 - `Section_Load_SimpleRequirement_ParsesCorrectly`
 - `Requirement_Properties_DefaultValues`
-- `TraceMatrix_Load_EmptyTestResults_NoCoverage`
+- `TraceMatrix_Constructor_WithNoFiles_CreatesEmptyMatrix`
 - `Program_Run_WithVersionFlag_PrintsVersion`
-- `Validation_Run_WithSilentContext_PrintsSummary`
+- `Validation_Run_WithSilentContext_CompletesSuccessfully`
 
 ### Coverage Summary
 
 | Requirement ID | Test Method(s) |
 | --- | --- |
-| `ReqStream-OTS-XUnit` | `Context_Create_NoArguments_ReturnsDefaultContext`, `Context_Create_VersionFlag_SetsVersionProperty`, `Context_Create_HelpFlags_SetsHelpProperty`, `Section_Load_SimpleRequirement_ParsesCorrectly`, `Requirement_Properties_DefaultValues`, `TraceMatrix_Load_EmptyTestResults_NoCoverage`, `Program_Run_WithVersionFlag_PrintsVersion`, `Validation_Run_WithSilentContext_PrintsSummary` |
+| `ReqStream-OTS-XUnit` | `Context_Create_NoArguments_ReturnsDefaultContext`, `Context_Create_VersionFlag_SetsVersionProperty`, `Context_Create_HelpFlags_SetsHelpProperty`, `Section_Load_SimpleRequirement_ParsesCorrectly`, `Requirement_Properties_DefaultValues`, `TraceMatrix_Constructor_WithNoFiles_CreatesEmptyMatrix`, `Program_Run_WithVersionFlag_PrintsVersion`, `Validation_Run_WithSilentContext_CompletesSuccessfully` |

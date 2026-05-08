@@ -18,6 +18,7 @@ load and export requirements data.
 `Load` is the single static factory method. It accepts one or more file paths, delegates to
 `RequirementsLoader.Load`, and returns the resulting `LoadResult` containing the populated
 `Requirements` tree (or `null` on error) and the complete list of `LintIssue` objects.
+Throws `ArgumentException` when no paths are provided.
 
 Callers that need to abort on errors check `result.HasErrors` or `result.Requirements == null`.
 Callers that need to surface issues to the user call `result.ReportIssues(context)`.

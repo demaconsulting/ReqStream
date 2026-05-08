@@ -32,29 +32,43 @@ sections:
           - Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation
 
       - id: ReqStream-Requirements-ParentChild
-        title: >-
-          Requirement shall support parent-child relationships to other requirements,
-          and blank child IDs shall be rejected.
+        title: Requirement shall support parent-child relationships to other requirements.
         justification: |
-          Parent-child relationships enable hierarchical requirement decomposition, allowing high-level
-          requirements to be satisfied through lower-level requirements. Rejecting blank child IDs
-          prevents silent failures in cycle detection and trace matrix generation.
+          Parent-child relationships enable hierarchical requirement decomposition, allowing
+          high-level requirements to be satisfied through lower-level requirements.
         tags:
           - requirements
         tests:
           - Requirements_Load_RequirementWithChildren_ParsesChildrenCorrectly
+
+      - id: ReqStream-Requirements-BlankChildId
+        title: The tool shall reject blank child IDs in requirement definitions.
+        justification: |
+          Rejecting blank child IDs prevents silent failures in cycle detection and
+          trace matrix generation, providing clear error feedback to authors.
+        tags:
+          - requirements
+        tests:
           - Requirements_Load_BlankChildIdInRequirement_ReportsErrorWithFileLocation
 
       - id: ReqStream-Requirements-Tags
-        title: >-
-          Requirement shall support optional tags, and blank tag names shall be rejected.
+        title: Requirement shall support an optional list of tags for categorisation.
         justification: |
-          Tags allow requirements to be categorized and filtered for targeted exports. Rejecting blank
-          tag names prevents silent failures in tag-based filtering and export operations.
+          Tags enable filtering requirements by category (e.g. "cli", "lint", "reporting"),
+          allowing targeted trace matrix exports and focused coverage analysis.
         tags:
           - requirements
         tests:
           - Requirements_Load_RequirementWithTags_ParsesTagsCorrectly
+
+      - id: ReqStream-Requirements-BlankTagName
+        title: The tool shall reject blank tag names in requirement definitions.
+        justification: |
+          Blank tag names produce meaningless filter keys that silently match or exclude
+          requirements in unexpected ways. Rejecting them provides clear error feedback.
+        tags:
+          - requirements
+        tests:
           - Requirements_Load_BlankTagName_ReportsErrorWithFileLocation
 
       - id: ReqStream-Requirements-Justification

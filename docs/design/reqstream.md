@@ -53,6 +53,12 @@ non-validate, non-lint) invocation:
    `TraceMatrix.GetUnsatisfiedRequirements`. Tag filtering is therefore applied transparently
    at each operation in steps 3, 5, and 6 rather than as a separate pipeline stage; only
    requirements carrying at least one matching tag are included in reports and enforcement.
+8. **Report depth** — the `--depth` flag sets a default heading level for all reports.
+   Per-report overrides (`--report-depth`, `--matrix-depth`, `--justifications-depth`) take
+   precedence over the default. When generating reports in steps 3 and 5,
+   `Context.ReportDepth`, `Context.MatrixDepth`, and `Context.JustificationsDepth` are passed
+   as the `depth` parameter to `Requirements.Export`, `Requirements.ExportJustifications`, and
+   `TraceMatrix.Export`. This satisfies `ReqStream-System-ReportDepth`.
 
 ## Source-Specific Test Matching
 

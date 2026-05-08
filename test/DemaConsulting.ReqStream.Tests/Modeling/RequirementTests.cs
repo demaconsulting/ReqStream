@@ -52,6 +52,25 @@ public sealed class RequirementTests : IDisposable
     }
 
     /// <summary>
+    /// Test that a default Requirement instance has the expected default property values.
+    /// </summary>
+    [Fact]
+    public void Requirement_Properties_DefaultValues()
+    {
+        // Arrange / Act:
+        var requirement = new Requirement();
+
+        // Assert:
+        Assert.Equal(string.Empty, requirement.Id);
+        Assert.Equal(string.Empty, requirement.Title);
+        Assert.Null(requirement.Justification);
+        Assert.Empty(requirement.Tags);
+        Assert.Empty(requirement.Tests);
+        Assert.Empty(requirement.Children);
+        Assert.Null(requirement.Location);
+    }
+
+    /// <summary>
     /// Test reading a requirement with tests.
     /// </summary>
     [Fact]

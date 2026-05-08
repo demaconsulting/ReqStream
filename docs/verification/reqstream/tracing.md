@@ -5,7 +5,9 @@
 The Tracing subsystem is verified using xUnit integration tests in `TracingTests.cs`. Tests
 create temporary YAML requirements files and TRX/JUnit test result files, construct a
 `TraceMatrix`, and assert on test result retrieval, coverage determination, error handling,
-and Markdown report generation.
+and Markdown report generation. No dependencies are mocked; isolation is achieved by creating
+all required YAML requirement files and test result files in a per-test temporary directory
+that is deleted on disposal.
 
 ### Test Scenarios
 
@@ -33,8 +35,8 @@ Tests verify that missing and malformed files produce appropriate exceptions.
 
 Test methods:
 
-- `TraceMatrix_Constructor_NonExistentFile_ThrowsFileNotFoundException` — missing file → FileNotFoundException
-- `TraceMatrix_Constructor_MalformedFile_ThrowsInvalidOperationException` — malformed → InvalidOperationException
+- `Tracing_FileLoading_NonExistentFile_ThrowsFileNotFoundException` — missing file → FileNotFoundException
+- `Tracing_FileLoading_MalformedFile_ThrowsInvalidOperationException` — malformed → InvalidOperationException
 
 #### Reporting Scenario
 
@@ -51,6 +53,6 @@ Test methods:
 | `ReqStream-Tracing-TestResults` | `Tracing_TestResults_TrxFile_LoadsTestResults`, `Tracing_TestResults_JUnitFile_LoadsTestResults` |
 | `ReqStream-Tracing-Mapping` | `Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied` |
 | `ReqStream-Tracing-Coverage` | `Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied`, `Tracing_Coverage_WithMissingTests_RequirementIsUnsatisfied` |
-| `ReqStream-Tracing-MissingFile` | `TraceMatrix_Constructor_NonExistentFile_ThrowsFileNotFoundException` |
-| `ReqStream-Tracing-MalformedFile` | `TraceMatrix_Constructor_MalformedFile_ThrowsInvalidOperationException` |
+| `ReqStream-Tracing-MissingFile` | `Tracing_FileLoading_NonExistentFile_ThrowsFileNotFoundException` |
+| `ReqStream-Tracing-MalformedFile` | `Tracing_FileLoading_MalformedFile_ThrowsInvalidOperationException` |
 | `ReqStream-Tracing-Reporting` | `Tracing_Reporting_SimpleMatrix_CreatesMarkdownFile` |

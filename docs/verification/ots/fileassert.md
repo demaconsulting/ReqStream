@@ -9,14 +9,14 @@ expected content. It also provides verification evidence for Pandoc and WeasyPri
 
 ### Verification Approach
 
-FileAssert is verified using self-validation evidence. The tool is invoked with `--version`
-and `--help` flags in the CI pipeline. A zero exit code and expected output confirm the tool
-is operational before it validates the generated documents.
+FileAssert is verified by CI pipeline step evidence. The tool's built-in `--validate`
+command is executed in the CI pipeline and writes test method results to a TRX file.
+The TRX file is consumed by ReqStream to satisfy the OTS requirement.
 
-Test evidence names:
+Test evidence names (test methods written to the TRX file by `dotnet fileassert --validate`):
 
-- `FileAssert_VersionDisplay` — confirms FileAssert responds correctly to `--version`
-- `FileAssert_HelpDisplay` — confirms FileAssert responds correctly to `--help`
+- `FileAssert_VersionDisplay` — validates that FileAssert responds correctly to `--version`
+- `FileAssert_HelpDisplay` — validates that FileAssert responds correctly to `--help`
 
 ### Coverage Summary
 

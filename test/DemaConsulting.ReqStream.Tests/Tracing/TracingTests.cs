@@ -222,7 +222,7 @@ public sealed class TracingTests : IDisposable
     /// Test that constructing a TraceMatrix with a non-existent file path throws FileNotFoundException.
     /// </summary>
     [Fact]
-    public void TraceMatrix_Constructor_NonExistentFile_ThrowsFileNotFoundException()
+    public void Tracing_FileLoading_NonExistentFile_ThrowsFileNotFoundException()
     {
         // Arrange: create a requirements object and a path to a file that does not exist
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");
@@ -250,7 +250,7 @@ public sealed class TracingTests : IDisposable
     /// containing the offending file path in the message.
     /// </summary>
     [Fact]
-    public void TraceMatrix_Constructor_MalformedFile_ThrowsInvalidOperationException()
+    public void Tracing_FileLoading_MalformedFile_ThrowsInvalidOperationException()
     {
         // Arrange: create a requirements object and a file with invalid (non-XML) content
         var reqFile = Path.Combine(_testDirectory, "requirements.yaml");

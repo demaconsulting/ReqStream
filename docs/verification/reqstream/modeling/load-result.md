@@ -33,6 +33,6 @@ Test methods:
 
 | Requirement ID | Test Method(s) |
 | --- | --- |
-| `ReqStream-Requirements-UnifiedLoad` | `LoadResult_ReportIssues_ErrorIssue_SetsContextError`, `LoadResult_ReportIssues_WarningIssue_DoesNotSetContextError`, `LoadResult_ReportIssues_NoIssues_ProducesNoOutput` |
-| `ReqStream-LoadResult-ReportIssues` | `LoadResult_ReportIssues_ErrorIssue_SetsContextError`, `LoadResult_ReportIssues_WarningIssue_DoesNotSetContextError` |
+| `ReqStream-Requirements-UnifiedLoad` | `Requirements_Load_ValidFile_ReturnsRequirementsAndNoIssues`, `Requirements_Load_WithLintError_ReturnsNullAndIssues`, `Requirements_Load_MissingFile_ReturnsNullAndIssues`, `Requirements_Load_MalformedYaml_ReturnsNullAndIssues`, `Requirements_Load_WithMultipleLintErrors_ReportsAllIssues`, `Requirements_Load_WithIncludes_LintsIncludedFiles`, `Requirements_Load_WithLintError_IssueIncludesLocation` |
+| `ReqStream-LoadResult-ReportIssues` | `LoadResult_ReportIssues_ErrorIssue_SetsContextError`, `LoadResult_ReportIssues_WarningIssue_DoesNotSetContextError`, `LoadResult_ReportIssues_NoIssues_ProducesNoOutput` |
 | `ReqStream-LoadResult-HasErrors` | `LoadResult_HasErrors_WithErrorIssue_ReturnsTrue`, `LoadResult_HasErrors_WithOnlyWarnings_ReturnsFalse` |
