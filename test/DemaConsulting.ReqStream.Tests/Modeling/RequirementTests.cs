@@ -26,16 +26,14 @@ namespace DemaConsulting.ReqStream.Tests.Modeling;
 /// Unit tests for the Requirement class, proving it correctly holds its data fields
 /// and that invalid values are detected during loading.
 /// </summary>
-[TestClass]
-public class RequirementTests
+public sealed class RequirementTests : IDisposable
 {
-    private string _testDirectory = string.Empty;
+    private readonly string _testDirectory;
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
-    [TestInitialize]
-    public void TestInitialize()
+    public RequirementTests()
     {
         _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_requirement_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
@@ -44,19 +42,38 @@ public class RequirementTests
     /// <summary>
     /// Clean up test by deleting the temporary test directory.
     /// </summary>
-    [TestCleanup]
-    public void TestCleanup()
+    public void Dispose()
     {
         if (Directory.Exists(_testDirectory))
         {
             Directory.Delete(_testDirectory, recursive: true);
         }
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Test that a default Requirement instance has the expected default property values.
+    /// </summary>
+    [Fact]
+    public void Requirement_Properties_DefaultValues()
+    {
+        // Arrange / Act:
+        var requirement = new Requirement();
+
+        // Assert:
+        Assert.Equal(string.Empty, requirement.Id);
+        Assert.Equal(string.Empty, requirement.Title);
+        Assert.Null(requirement.Justification);
+        Assert.Empty(requirement.Tags);
+        Assert.Empty(requirement.Tests);
+        Assert.Empty(requirement.Children);
+        Assert.Null(requirement.Location);
     }
 
     /// <summary>
     /// Test reading a requirement with tests.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_RequirementWithTests_ParsesTestsCorrectly()
     {
         // Arrange: create a YAML file with a requirement that has test references
@@ -76,23 +93,23 @@ sections:
 
         // Act: load the requirements file
         var result = Requirements.Load(filePath);
-        Assert.IsFalse(result.HasErrors);
+        Assert.False(result.HasErrors);
         var requirements = result.Requirements;
 
         // Assert: tests parsed correctly
-        Assert.IsNotNull(requirements);
+        Assert.NotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
-        Assert.AreEqual("AUTH-001", req.Id);
-        Assert.HasCount(3, req.Tests);
-        Assert.AreEqual("Credentials_Valid_Allowed", req.Tests[0]);
-        Assert.AreEqual("Credentials_Invalid_Refused", req.Tests[1]);
-        Assert.AreEqual("Credentials_Missing_Refused", req.Tests[2]);
+        Assert.Equal("AUTH-001", req.Id);
+        Assert.Equal(3, req.Tests.Count);
+        Assert.Equal("Credentials_Valid_Allowed", req.Tests[0]);
+        Assert.Equal("Credentials_Invalid_Refused", req.Tests[1]);
+        Assert.Equal("Credentials_Missing_Refused", req.Tests[2]);
     }
 
     /// <summary>
     /// Test reading a requirement with child requirements.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_RequirementWithChildren_ParsesChildrenCorrectly()
     {
         // Arrange: create a YAML file with a requirement that has child references
@@ -115,22 +132,22 @@ sections:
 
         // Act: load the requirements file
         var result = Requirements.Load(filePath);
-        Assert.IsFalse(result.HasErrors);
+        Assert.False(result.HasErrors);
         var requirements = result.Requirements;
 
         // Assert: children parsed correctly
-        Assert.IsNotNull(requirements);
+        Assert.NotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
-        Assert.AreEqual("SYS-SEC-001", req.Id);
-        Assert.HasCount(2, req.Children);
-        Assert.AreEqual("AUTH-001", req.Children[0]);
-        Assert.AreEqual("AUTH-002", req.Children[1]);
+        Assert.Equal("SYS-SEC-001", req.Id);
+        Assert.Equal(2, req.Children.Count);
+        Assert.Equal("AUTH-001", req.Children[0]);
+        Assert.Equal("AUTH-002", req.Children[1]);
     }
 
     /// <summary>
     /// Test reading a requirement with justification.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_RequirementWithJustification_ParsesJustificationCorrectly()
     {
         // Arrange: create a YAML file with a requirement that has a justification
@@ -149,15 +166,15 @@ sections:
 
         // Act: load the requirements file
         var result = Requirements.Load(filePath);
-        Assert.IsFalse(result.HasErrors);
+        Assert.False(result.HasErrors);
         var requirements = result.Requirements;
 
         // Assert: justification parsed correctly
-        Assert.IsNotNull(requirements);
+        Assert.NotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
-        Assert.AreEqual("SYS-SEC-001", req.Id);
-        Assert.AreEqual("The system shall support credentials authentication.", req.Title);
-        Assert.IsNotNull(req.Justification);
+        Assert.Equal("SYS-SEC-001", req.Id);
+        Assert.Equal("The system shall support credentials authentication.", req.Title);
+        Assert.NotNull(req.Justification);
         Assert.Contains("authorized users", req.Justification);
         Assert.Contains("data security", req.Justification);
     }
@@ -165,7 +182,7 @@ sections:
     /// <summary>
     ///     Test reading a requirement with tags.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_RequirementWithTags_ParsesTagsCorrectly()
     {
         // Arrange: create a YAML file with a requirement that has tags
@@ -184,22 +201,22 @@ sections:
 
         // Act: load the requirements file
         var result = Requirements.Load(filePath);
-        Assert.IsFalse(result.HasErrors);
+        Assert.False(result.HasErrors);
         var requirements = result.Requirements;
 
         // Assert: tags parsed correctly
-        Assert.IsNotNull(requirements);
+        Assert.NotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
-        Assert.AreEqual("SYS-SEC-001", req.Id);
-        Assert.HasCount(2, req.Tags);
-        Assert.AreEqual("security", req.Tags[0]);
-        Assert.AreEqual("critical", req.Tags[1]);
+        Assert.Equal("SYS-SEC-001", req.Id);
+        Assert.Equal(2, req.Tags.Count);
+        Assert.Equal("security", req.Tags[0]);
+        Assert.Equal("critical", req.Tags[1]);
     }
 
     /// <summary>
     /// Test that duplicate requirement IDs report an error issue.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_DuplicateRequirementId_ReportsError()
     {
         // Arrange: create a YAML file with two requirements sharing the same ID
@@ -219,16 +236,16 @@ sections:
         var result = Requirements.Load(filePath);
 
         // Assert: error reported for duplicate ID
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("SYS-SEC-001"), result.Issues);
-        Assert.Contains(i => i.Description.Contains("Duplicate requirement ID"), result.Issues);
+        Assert.True(result.HasErrors);
+        Assert.Null(result.Requirements);
+        Assert.Contains(result.Issues, i => i.Description.Contains("SYS-SEC-001"));
+        Assert.Contains(result.Issues, i => i.Description.Contains("Duplicate requirement ID"));
     }
 
     /// <summary>
     ///     Test that duplicate requirement ID message includes file location.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_DuplicateRequirementId_ErrorIncludesFileLocation()
     {
         // Arrange: create a YAML file with two requirements sharing the same ID
@@ -248,17 +265,17 @@ sections:
         var result = Requirements.Load(filePath);
 
         // Assert: error reported with file location for the duplicate ID
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("SYS-SEC-001"), result.Issues);
-        Assert.Contains(i => i.Description.Contains("Duplicate requirement ID"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
+        Assert.True(result.HasErrors);
+        Assert.Null(result.Requirements);
+        Assert.Contains(result.Issues, i => i.Description.Contains("SYS-SEC-001"));
+        Assert.Contains(result.Issues, i => i.Description.Contains("Duplicate requirement ID"));
+        Assert.Contains(result.Issues, i => i.Location.Contains(filePath));
     }
 
     /// <summary>
     ///     Test that a blank requirement ID reports an error issue with file location.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation()
     {
         // Arrange: create a YAML file with a blank requirement ID
@@ -276,16 +293,16 @@ sections:
         var result = Requirements.Load(filePath);
 
         // Assert: error reported with file location for the blank ID
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Requirement 'id' cannot be blank"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
+        Assert.True(result.HasErrors);
+        Assert.Null(result.Requirements);
+        Assert.Contains(result.Issues, i => i.Description.Contains("Requirement 'id' cannot be blank"));
+        Assert.Contains(result.Issues, i => i.Location.Contains(filePath));
     }
 
     /// <summary>
     ///     Test that a blank requirement title reports an error issue with file location.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation()
     {
         // Arrange: create a YAML file with a blank requirement title
@@ -303,16 +320,16 @@ sections:
         var result = Requirements.Load(filePath);
 
         // Assert: error reported with file location for the blank title
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Requirement 'title' cannot be blank"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
+        Assert.True(result.HasErrors);
+        Assert.Null(result.Requirements);
+        Assert.Contains(result.Issues, i => i.Description.Contains("Requirement 'title' cannot be blank"));
+        Assert.Contains(result.Issues, i => i.Location.Contains(filePath));
     }
 
     /// <summary>
     ///     Test that a blank test name in a requirement reports an error issue with file location.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_BlankTestNameInRequirement_ReportsErrorWithFileLocation()
     {
         // Arrange: create a YAML file with a blank test name entry in a requirement
@@ -334,16 +351,16 @@ sections:
         var result = Requirements.Load(filePath);
 
         // Assert: error reported with file location for the blank test name
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Test name cannot be blank"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
+        Assert.True(result.HasErrors);
+        Assert.Null(result.Requirements);
+        Assert.Contains(result.Issues, i => i.Description.Contains("Test name cannot be blank"));
+        Assert.Contains(result.Issues, i => i.Location.Contains(filePath));
     }
 
     /// <summary>
     ///     Test that a blank test name in a mapping reports an error issue with file location.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_BlankTestNameInMapping_ReportsErrorWithFileLocation()
     {
         // Arrange: create a YAML file with a blank test name in a mapping
@@ -367,16 +384,16 @@ mappings:
         var result = Requirements.Load(filePath);
 
         // Assert: error reported with file location for the blank mapping test name
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Test name cannot be blank"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
+        Assert.True(result.HasErrors);
+        Assert.Null(result.Requirements);
+        Assert.Contains(result.Issues, i => i.Description.Contains("Test name cannot be blank"));
+        Assert.Contains(result.Issues, i => i.Location.Contains(filePath));
     }
 
     /// <summary>
     ///     Test that a blank mapping ID reports an error issue with file location.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation()
     {
         // Arrange: create a YAML file with a blank mapping ID
@@ -399,16 +416,16 @@ mappings:
         var result = Requirements.Load(filePath);
 
         // Assert: error reported with file location for the blank mapping ID
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Mapping 'id' cannot be blank"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
+        Assert.True(result.HasErrors);
+        Assert.Null(result.Requirements);
+        Assert.Contains(result.Issues, i => i.Description.Contains("Mapping 'id' cannot be blank"));
+        Assert.Contains(result.Issues, i => i.Location.Contains(filePath));
     }
 
     /// <summary>
     /// Test reading test mappings that are separate from requirements.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_TestMappings_AppliesMappingsCorrectly()
     {
         // Arrange: create a YAML file with a mapping block that adds tests to an existing requirement
@@ -430,22 +447,22 @@ mappings:
 
         // Act: load the requirements file
         var result = Requirements.Load(filePath);
-        Assert.IsFalse(result.HasErrors);
+        Assert.False(result.HasErrors);
         var requirements = result.Requirements;
 
         // Assert: mappings applied correctly
-        Assert.IsNotNull(requirements);
+        Assert.NotNull(requirements);
         var req = requirements.Sections[0].Requirements[0];
-        Assert.AreEqual("DATA-001", req.Id);
-        Assert.HasCount(2, req.Tests);
-        Assert.AreEqual("Logging_ValidRequest_Logged", req.Tests[0]);
-        Assert.AreEqual("Logging_InvalidRequest_Logged", req.Tests[1]);
+        Assert.Equal("DATA-001", req.Id);
+        Assert.Equal(2, req.Tests.Count);
+        Assert.Equal("Logging_ValidRequest_Logged", req.Tests[0]);
+        Assert.Equal("Logging_InvalidRequest_Logged", req.Tests[1]);
     }
 
     /// <summary>
     ///     Test that circular requirements (A -> B -> A) throw an exception at read time.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_CircularRequirements_ThrowsInvalidOperationException()
     {
         // Arrange: create a YAML file with circular child references
@@ -469,17 +486,17 @@ sections:
         var result = Requirements.Load(filePath);
 
         // Assert: circular reference error reported
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Circular requirement reference detected"), result.Issues);
-        Assert.Contains(i => i.Description.Contains("REQ-A"), result.Issues);
-        Assert.Contains(i => i.Description.Contains("REQ-B"), result.Issues);
+        Assert.True(result.HasErrors);
+        Assert.Null(result.Requirements);
+        Assert.Contains(result.Issues, i => i.Description.Contains("Circular requirement reference detected"));
+        Assert.Contains(result.Issues, i => i.Description.Contains("REQ-A"));
+        Assert.Contains(result.Issues, i => i.Description.Contains("REQ-B"));
     }
 
     /// <summary>
     ///     Test that a self-referencing requirement (A -> A) reports an error issue at load time.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_SelfReferencingRequirement_ReportsCircularReferenceError()
     {
         // Arrange: create a YAML file with a self-referencing child
@@ -499,16 +516,16 @@ sections:
         var result = Requirements.Load(filePath);
 
         // Assert: circular reference error reported
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Circular requirement reference detected"), result.Issues);
-        Assert.Contains(i => i.Description.Contains("REQ-A"), result.Issues);
+        Assert.True(result.HasErrors);
+        Assert.Null(result.Requirements);
+        Assert.Contains(result.Issues, i => i.Description.Contains("Circular requirement reference detected"));
+        Assert.Contains(result.Issues, i => i.Description.Contains("REQ-A"));
     }
 
     /// <summary>
     ///     Test that duplicate IDs across multiple files are detected.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_MultipleFilesWithDuplicateIds_ReportsError()
     {
         // Arrange: create two YAML files that share a requirement ID
@@ -535,17 +552,17 @@ sections:
         var result = Requirements.Load(file1Path, file2Path);
 
         // Assert: error reported for duplicate ID across files
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("SYS-SEC-001"), result.Issues);
-        Assert.Contains(i => i.Description.Contains("Duplicate requirement ID"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(file2Path), result.Issues);
+        Assert.True(result.HasErrors);
+        Assert.Null(result.Requirements);
+        Assert.Contains(result.Issues, i => i.Description.Contains("SYS-SEC-001"));
+        Assert.Contains(result.Issues, i => i.Description.Contains("Duplicate requirement ID"));
+        Assert.Contains(result.Issues, i => i.Location.Contains(file2Path));
     }
 
     /// <summary>
     ///     Test that a blank tag name reports an error issue with file location.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_BlankTagName_ReportsErrorWithFileLocation()
     {
         // Arrange: create a YAML file with a blank tag name
@@ -567,16 +584,16 @@ sections:
         var result = Requirements.Load(filePath);
 
         // Assert: error reported with file location for the blank tag name
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Tag name cannot be blank"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
+        Assert.True(result.HasErrors);
+        Assert.Null(result.Requirements);
+        Assert.Contains(result.Issues, i => i.Description.Contains("Tag name cannot be blank"));
+        Assert.Contains(result.Issues, i => i.Location.Contains(filePath));
     }
 
     /// <summary>
     ///     Test that a blank child ID in a requirement reports an error issue with file location.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_BlankChildIdInRequirement_ReportsErrorWithFileLocation()
     {
         // Arrange: create a YAML file with a blank entry in a requirement's children list
@@ -599,9 +616,9 @@ sections:
         var result = Requirements.Load(filePath);
 
         // Assert: error reported with file location for the blank child ID
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Child requirement reference cannot be blank"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
+        Assert.True(result.HasErrors);
+        Assert.Null(result.Requirements);
+        Assert.Contains(result.Issues, i => i.Description.Contains("Child requirement reference cannot be blank"));
+        Assert.Contains(result.Issues, i => i.Location.Contains(filePath));
     }
 }

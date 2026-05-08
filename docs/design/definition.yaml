@@ -11,15 +11,20 @@ resource-path:
 input-files:
   - docs/design/title.txt
   - docs/design/introduction.md
-  - docs/design/reqstream/reqstream.md
+  - docs/design/reqstream.md
   - docs/design/reqstream/program.md
-  - docs/design/reqstream/cli/cli.md
+  - docs/design/reqstream/cli.md
   - docs/design/reqstream/cli/context.md
-  - docs/design/reqstream/modeling/modeling.md
+  - docs/design/reqstream/modeling.md
+  - docs/design/reqstream/modeling/lint-issue.md
+  - docs/design/reqstream/modeling/load-result.md
+  - docs/design/reqstream/modeling/requirement.md
   - docs/design/reqstream/modeling/requirements.md
-  - docs/design/reqstream/tracing/tracing.md
+  - docs/design/reqstream/modeling/requirements-loader.md
+  - docs/design/reqstream/modeling/section.md
+  - docs/design/reqstream/tracing.md
   - docs/design/reqstream/tracing/trace-matrix.md
-  - docs/design/reqstream/self-test/self-test.md
+  - docs/design/reqstream/self-test.md
   - docs/design/reqstream/self-test/validation.md
 template: template.html
 

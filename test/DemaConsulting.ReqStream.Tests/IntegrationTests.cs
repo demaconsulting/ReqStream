@@ -24,20 +24,18 @@ namespace DemaConsulting.ReqStream.Tests;
 /// Integration tests for the ReqStream system, exercising the full pipeline across
 /// multiple subsystems in end-to-end scenarios.
 /// </summary>
-[TestClass]
-public class IntegrationTests
+public sealed class IntegrationTests : IDisposable
 {
-    private string _dllPath = string.Empty;
-    private string _testDirectory = string.Empty;
+    private readonly string _dllPath;
+    private readonly string _testDirectory;
 
     /// <summary>
     /// Initialize test by locating the DLL and creating a temporary test directory.
     /// </summary>
-    [TestInitialize]
-    public void TestInitialize()
+    public IntegrationTests()
     {
         _dllPath = Path.Combine(AppContext.BaseDirectory, "DemaConsulting.ReqStream.dll");
-        Assert.IsTrue(File.Exists(_dllPath), $"Could not find ReqStream DLL at {_dllPath}");
+        Assert.True(File.Exists(_dllPath), $"Could not find ReqStream DLL at {_dllPath}");
 
         _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
@@ -46,13 +44,13 @@ public class IntegrationTests
     /// <summary>
     /// Clean up test by deleting the temporary test directory.
     /// </summary>
-    [TestCleanup]
-    public void TestCleanup()
+    public void Dispose()
     {
         if (Directory.Exists(_testDirectory))
         {
             Directory.Delete(_testDirectory, recursive: true);
         }
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
@@ -60,7 +58,7 @@ public class IntegrationTests
     /// results, generate a requirements report, justifications, and trace matrix, and enforce
     /// coverage — all subsystems working together correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces()
     {
         // Arrange: create requirements file with one covered requirement
@@ -96,7 +94,7 @@ public class IntegrationTests
 
         // Act: run the full pipeline as an external process
         var exitCode = Runner.RunInDirectory(
-            out var output,
+            out _,
             _testDirectory,
             "dotnet",
             _dllPath,
@@ -108,12 +106,12 @@ public class IntegrationTests
             "--enforce");
 
         // Assert: enforcement passed (exit code 0)
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
+        Assert.Equal(0, exitCode);
 
         // Assert: all three output files were generated
-        Assert.IsTrue(File.Exists(reportFile), "Requirements report should be generated.");
-        Assert.IsTrue(File.Exists(justificationsFile), "Justifications report should be generated.");
-        Assert.IsTrue(File.Exists(matrixFile), "Trace matrix report should be generated.");
+        Assert.True(File.Exists(reportFile), "Requirements report should be generated.");
+        Assert.True(File.Exists(justificationsFile), "Justifications report should be generated.");
+        Assert.True(File.Exists(matrixFile), "Trace matrix report should be generated.");
 
         // Assert: report contains the requirement ID and title
         var reportContent = File.ReadAllText(reportFile);
@@ -130,7 +128,7 @@ public class IntegrationTests
     /// Integration test verifying that enforcement mode causes a non-zero exit code when a
     /// requirement has no passing test evidence, confirming the CI/CD gate operates correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ReqStream_EnforcementMode_RequirementLacksTestEvidence_FailsWithNonZeroExitCode()
     {
         // Arrange: create requirements file with one requirement that has no matching test
@@ -154,7 +152,7 @@ public class IntegrationTests
 
         // Act: run enforcement mode as an external process
         var exitCode = Runner.RunInDirectory(
-            out var output,
+            out _,
             _testDirectory,
             "dotnet",
             _dllPath,
@@ -163,7 +161,7 @@ public class IntegrationTests
             "--enforce");
 
         // Assert: enforcement failed with a non-zero exit code
-        Assert.AreNotEqual(0, exitCode, $"Enforcement should fail with non-zero exit code when a requirement lacks test evidence. Output: {output}");
+        Assert.NotEqual(0, exitCode);
     }
 
     /// <summary>
@@ -171,7 +169,7 @@ public class IntegrationTests
     /// to tests from the named result file, and that enforcement passes when the named source
     /// provides the required passing test.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ReqStream_SourceFilter_NamedSourceInRequirement_MatchesTestsBySourceFile()
     {
         // Arrange: create requirements file with source-specific test reference
@@ -216,7 +214,7 @@ public class IntegrationTests
 
         // Act: run enforcement using both result files as external process
         var exitCode = Runner.RunInDirectory(
-            out var output,
+            out _,
             _testDirectory,
             "dotnet",
             _dllPath,
@@ -226,14 +224,14 @@ public class IntegrationTests
             "--enforce");
 
         // Assert: enforcement passed because platform-a.trx satisfies the source-filtered requirement
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
+        Assert.Equal(0, exitCode);
     }
 
     /// <summary>
     /// Integration test verifying that the --lint flag exits silently with code 0 when a valid
     /// requirements file is provided, confirming the no-output-on-success design.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ReqStream_System_Lint_ValidRequirementsFile_ExitsSilentlyWithZero()
     {
         // Arrange: create a structurally valid requirements file
@@ -258,17 +256,17 @@ public class IntegrationTests
             "--requirements", "requirements.yaml");
 
         // Assert: lint exits with code 0 because no issues were found
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 from lint on valid file, but got {exitCode}. Output: {output}");
+        Assert.Equal(0, exitCode);
 
         // Assert: no output was produced (silent on success)
-        Assert.AreEqual(string.Empty, output.Trim(), $"Expected no output from lint on valid file, but got: {output}");
+        Assert.Equal(string.Empty, output.Trim());
     }
 
     /// <summary>
     /// Integration test verifying that the --lint flag lints requirements files and reports
     /// structural issues in a single invocation, exercising the system-level lint behavior.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ReqStream_System_Lint_Flag_ReportsLintIssues()
     {
         // Arrange: create a requirements file with a structural issue (missing title)
@@ -290,10 +288,10 @@ public class IntegrationTests
             "--requirements", "requirements.yaml");
 
         // Assert: lint exits with a non-zero code because an issue was found
-        Assert.AreNotEqual(0, exitCode, $"Expected non-zero exit code from lint, but got {exitCode}. Output: {output}");
+        Assert.NotEqual(0, exitCode);
 
         // Assert: lint reported an issue about the missing title
-        Assert.IsTrue(
+        Assert.True(
             output.Contains("Integration-System-MissingTitle") || output.Contains("title"),
             $"Expected lint output to reference the missing-title issue. Output: {output}");
     }
@@ -302,7 +300,7 @@ public class IntegrationTests
     /// Integration test verifying that the --validate flag runs the built-in self-test suite
     /// and exits successfully, exercising the system-level validate behavior.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ReqStream_System_Validate_Flag_RunsSelfValidation()
     {
         // Act: run validate as an external process
@@ -313,10 +311,10 @@ public class IntegrationTests
             "--validate");
 
         // Assert: self-validation passes (exit code 0)
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 from --validate, but got {exitCode}. Output: {output}");
+        Assert.Equal(0, exitCode);
 
         // Assert: output contains the validation summary header
-        Assert.IsTrue(
+        Assert.True(
             output.Contains("Passed") || output.Contains("Total Tests"),
             $"Expected validation output to contain test summary. Output: {output}");
     }
@@ -325,7 +323,7 @@ public class IntegrationTests
     /// Integration test verifying that the --validate --results flags write the self-test results
     /// to the specified file, exercising the system-level validate results output behavior.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ReqStream_System_ValidateResultsOutput_ResultsFlag_WritesResultsFile()
     {
         // Arrange: create a temporary file path for the results output
@@ -333,27 +331,27 @@ public class IntegrationTests
 
         // Act: run validate with results flag as an external process
         var exitCode = Runner.Run(
-            out var output,
+            out _,
             "dotnet",
             _dllPath,
             "--validate",
             "--results", resultsFile);
 
         // Assert: self-validation passes (exit code 0)
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 from --validate --results, but got {exitCode}. Output: {output}");
+        Assert.Equal(0, exitCode);
 
         // Assert: results file was created
-        Assert.IsTrue(File.Exists(resultsFile), "Results file should be created by --results flag.");
+        Assert.True(File.Exists(resultsFile), "Results file should be created by --results flag.");
 
         // Assert: results file is non-empty
-        Assert.IsGreaterThan(0, new FileInfo(resultsFile).Length, "Results file should be non-empty.");
+        Assert.True(new FileInfo(resultsFile).Length > 0, "Results file should be non-empty.");
     }
 
     /// <summary>
     /// Integration test verifying that the --filter flag restricts requirements output to only
     /// those matching the specified tag, exercising the system-level tag-filter behavior.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ReqStream_System_TagFilter_Flag_FiltersRequirements()
     {
         // Arrange: create requirements file with two requirements, each with a different tag
@@ -382,7 +380,7 @@ public class IntegrationTests
 
         // Act: run with --filter alpha to export only alpha-tagged requirements
         var exitCode = Runner.RunInDirectory(
-            out var output,
+            out _,
             _testDirectory,
             "dotnet",
             _dllPath,
@@ -391,28 +389,22 @@ public class IntegrationTests
             "--filter", "alpha");
 
         // Assert: tool exited successfully
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
+        Assert.Equal(0, exitCode);
 
         // Assert: report was generated
-        Assert.IsTrue(File.Exists(reportFile), "Filtered requirements report should be generated.");
+        Assert.True(File.Exists(reportFile), "Filtered requirements report should be generated.");
 
         // Assert: report contains the alpha requirement but not the beta requirement
         var reportContent = File.ReadAllText(reportFile);
-        Assert.Contains(
-            "Integration-System-TaggedAlpha",
-            reportContent,
-            "Filtered report should contain the alpha-tagged requirement.");
-        Assert.DoesNotContain(
-            "Integration-System-TaggedBeta",
-            reportContent,
-            "Filtered report should not contain the beta-tagged requirement.");
+        Assert.Contains("Integration-System-TaggedAlpha", reportContent);
+        Assert.DoesNotContain("Integration-System-TaggedBeta", reportContent);
     }
 
     /// <summary>
     /// Integration test verifying that the --version flag causes the tool to print version
     /// information and exit with code 0, exercising the system-level CLI interface behavior.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ReqStream_System_CliInterface_VersionFlag_PrintsVersion()
     {
         // Act: run with --version flag as an external process
@@ -423,18 +415,18 @@ public class IntegrationTests
             "--version");
 
         // Assert: tool exits successfully
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
+        Assert.Equal(0, exitCode);
 
         // Assert: output contains a version string (non-empty, no banner/help)
-        Assert.IsFalse(string.IsNullOrWhiteSpace(output), "Expected version output to be non-empty.");
-        Assert.DoesNotContain("Usage:", output, "Version output should not contain usage help.");
+        Assert.False(string.IsNullOrWhiteSpace(output), "Expected version output to be non-empty.");
+        Assert.DoesNotContain("Usage:", output);
     }
 
     /// <summary>
     /// Integration test verifying that the --help flag causes the tool to print usage information
     /// and exit with code 0, exercising the system-level CLI interface behavior.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ReqStream_System_CliInterface_HelpFlag_PrintsHelp()
     {
         // Act: run with --help flag as an external process
@@ -445,18 +437,18 @@ public class IntegrationTests
             "--help");
 
         // Assert: tool exits successfully
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
+        Assert.Equal(0, exitCode);
 
         // Assert: output contains usage information
-        Assert.Contains("Usage:", output, $"Expected help output to contain 'Usage:'. Output: {output}");
-        Assert.Contains("Options:", output, $"Expected help output to contain 'Options:'. Output: {output}");
+        Assert.Contains("Usage:", output);
+        Assert.Contains("Options:", output);
     }
 
     /// <summary>
     /// Integration test verifying that the --log flag routes all output to the specified log file,
     /// exercising the system-level output control behavior.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ReqStream_System_OutputControl_LogFlag_WritesOutputToFile()
     {
         // Arrange: create a minimal requirements file
@@ -484,19 +476,19 @@ public class IntegrationTests
             "--log", logFile);
 
         // Assert: tool exited successfully
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}.");
+        Assert.Equal(0, exitCode);
 
         // Assert: log file was created with tool output
-        Assert.IsTrue(File.Exists(logFile), "Log file should have been created.");
+        Assert.True(File.Exists(logFile), "Log file should have been created.");
         var logContent = File.ReadAllText(logFile);
-        Assert.IsFalse(string.IsNullOrWhiteSpace(logContent), "Log file should contain output.");
+        Assert.False(string.IsNullOrWhiteSpace(logContent), "Log file should contain output.");
     }
 
     /// <summary>
     /// Integration test verifying that the --silent flag suppresses console output,
     /// exercising the system-level output control behavior.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ReqStream_System_OutputControl_SilentFlag_SuppressesConsoleOutput()
     {
         // Arrange: create a minimal requirements file
@@ -521,15 +513,15 @@ public class IntegrationTests
             "--silent");
 
         // Assert: tool exited successfully and produced no console output
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
-        Assert.IsTrue(string.IsNullOrWhiteSpace(output), $"Expected no console output with --silent. Got: {output}");
+        Assert.Equal(0, exitCode);
+        Assert.True(string.IsNullOrWhiteSpace(output), $"Expected no console output with --silent. Got: {output}");
     }
 
     /// <summary>
     /// Integration test verifying that requirements files using file includes correctly load
     /// all requirements from included files, exercising the system-level file includes behavior.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ReqStream_System_FileIncludes_RequirementsWithIncludes_LoadsAllRequirements()
     {
         // Arrange: create a child requirements file
@@ -562,7 +554,7 @@ public class IntegrationTests
 
         // Act: run with the root requirements file that uses includes
         var exitCode = Runner.RunInDirectory(
-            out var output,
+            out _,
             _testDirectory,
             "dotnet",
             _dllPath,
@@ -570,26 +562,20 @@ public class IntegrationTests
             "--report", reportFile);
 
         // Assert: tool exited successfully
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
+        Assert.Equal(0, exitCode);
 
         // Assert: report was generated containing requirements from both files
-        Assert.IsTrue(File.Exists(reportFile), "Report file should have been generated.");
+        Assert.True(File.Exists(reportFile), "Report file should have been generated.");
         var reportContent = File.ReadAllText(reportFile);
-        Assert.Contains(
-            "Integration-Root-Requirement",
-            reportContent,
-            "Report should contain the root requirement.");
-        Assert.Contains(
-            "Integration-Child-Requirement",
-            reportContent,
-            "Report should contain the included child requirement.");
+        Assert.Contains("Integration-Root-Requirement", reportContent);
+        Assert.Contains("Integration-Child-Requirement", reportContent);
     }
 
     /// <summary>
     /// Integration test verifying that the --log flag routes output to a file without
     /// requiring --silent, confirming independent operation of the log flag.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ReqStream_System_OutputControl_LogFlag_WithoutSilent_WritesOutputToFileAndConsole()
     {
         // Arrange: create a minimal requirements file
@@ -616,22 +602,22 @@ public class IntegrationTests
             "--log", logFile);
 
         // Assert: tool exited successfully
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}.");
+        Assert.Equal(0, exitCode);
 
         // Assert: log file was created with tool output
-        Assert.IsTrue(File.Exists(logFile), "Log file should have been created.");
+        Assert.True(File.Exists(logFile), "Log file should have been created.");
         var logContent = File.ReadAllText(logFile);
-        Assert.IsFalse(string.IsNullOrWhiteSpace(logContent), "Log file should contain output.");
+        Assert.False(string.IsNullOrWhiteSpace(logContent), "Log file should contain output.");
 
         // Assert: console output was also produced (--silent was not specified)
-        Assert.IsFalse(string.IsNullOrWhiteSpace(output), "Console output should not be suppressed without --silent.");
+        Assert.False(string.IsNullOrWhiteSpace(output), "Console output should not be suppressed without --silent.");
     }
 
     /// <summary>
     /// Integration test verifying that the --depth flag controls the Markdown heading level
     /// in the generated requirements report, exercising the system-level report depth behavior.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ReqStream_System_ReportDepth_DepthFlag_GeneratesReportWithCorrectHeadingLevel()
     {
         // Arrange: create a minimal requirements file
@@ -650,7 +636,7 @@ public class IntegrationTests
 
         // Act: run with --depth 3 to use heading level 3 (###)
         var exitCode = Runner.RunInDirectory(
-            out var output,
+            out _,
             _testDirectory,
             "dotnet",
             _dllPath,
@@ -659,10 +645,10 @@ public class IntegrationTests
             "--depth", "3");
 
         // Assert: tool exited successfully
-        Assert.AreEqual(0, exitCode, $"Expected exit code 0 but got {exitCode}. Output: {output}");
+        Assert.Equal(0, exitCode);
 
         // Assert: report was generated with heading level 3
-        Assert.IsTrue(File.Exists(reportFile), "Report file should have been generated.");
+        Assert.True(File.Exists(reportFile), "Report file should have been generated.");
         var reportContent = File.ReadAllText(reportFile);
         Assert.Contains("### Depth Test Section", reportContent);
     }

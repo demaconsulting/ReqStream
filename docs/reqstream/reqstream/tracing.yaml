@@ -7,7 +7,7 @@
 # - Subsystem requirements describe the traceability and coverage enforcement behavior
 
 includes:
-  - trace-matrix.yaml
+  - tracing/trace-matrix.yaml
 
 sections:
   - title: Tracing Subsystem Requirements
@@ -17,6 +17,8 @@ sections:
         justification: |
           Supporting both TRX and JUnit XML formats ensures the tool works with the major
           test frameworks used in .NET development, maximizing interoperability.
+        tags:
+          - testing
         tests:
           - Tracing_TestResults_TrxFile_LoadsTestResults
           - Tracing_TestResults_JUnitFile_LoadsTestResults
@@ -31,6 +33,8 @@ sections:
         justification: |
           Mapping each test execution to the requirements it references enables traceability
           evidence that links implementation testing to specific software requirements.
+        tags:
+          - testing
         tests:
           - Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied
         children:
@@ -46,6 +50,8 @@ sections:
         justification: |
           Determining requirement coverage from mapped test results enables enforcement of full
           test coverage as a quality gate.
+        tags:
+          - testing
         tests:
           - Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied
           - Tracing_Coverage_WithMissingTests_RequirementIsUnsatisfied
@@ -57,16 +63,20 @@ sections:
         justification: |
           Raising a FileNotFoundException with the offending path allows callers to report a clear
           fatal error, preventing silent data loss from ignored missing files.
+        tags:
+          - testing
         tests:
-          - TraceMatrix_Constructor_NonExistentFile_ThrowsFileNotFoundException
+          - Tracing_FileLoading_NonExistentFile_ThrowsFileNotFoundException
 
       - id: ReqStream-Tracing-MalformedFile
         title: The Tracing subsystem shall raise InvalidOperationException when a test result file cannot be parsed.
         justification: |
           Raising an InvalidOperationException with the offending path and the original parse
           exception as the inner exception allows callers to provide actionable diagnostic output.
+        tags:
+          - testing
         tests:
-          - TraceMatrix_Constructor_MalformedFile_ThrowsInvalidOperationException
+          - Tracing_FileLoading_MalformedFile_ThrowsInvalidOperationException
 
       - id: ReqStream-Tracing-Reporting
         title: The Tracing subsystem shall export a trace matrix report to a Markdown file.
@@ -74,6 +84,8 @@ sections:
           Exporting a trace matrix as a Markdown file provides human-readable coverage evidence
           that can be embedded in documentation, reviewed in pull requests, and consumed by
           reporting pipelines.
+        tags:
+          - reporting
         tests:
           - Tracing_Reporting_SimpleMatrix_CreatesMarkdownFile
         children:

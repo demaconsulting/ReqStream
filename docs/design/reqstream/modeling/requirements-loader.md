@@ -1,14 +1,15 @@
-# RequirementsLoader Unit Design
+### RequirementsLoader Unit Design
 
-## Overview
+#### Overview
 
 `RequirementsLoader` is the YAML deserializer and structural lint validator for requirements
 files. It walks the YAML DOM, merges sections into the shared `Requirements` tree, validates
 all required fields, and collects `LintIssue` objects for every problem found. It is the only
 unit that reads from the file system for requirements data and the only unit with knowledge of
-the YAML DOM representation.
+the YAML DOM representation. `RequirementsLoader` is declared `internal static`; it has no
+instances and is inaccessible outside the assembly.
 
-## YAML DOM Traversal
+#### YAML DOM Traversal
 
 YAML is parsed using `YamlDotNet`'s `RepresentationModel` (DOM) API. `RequirementsLoader` reads
 the raw YAML text into a `YamlStream`, then walks the resulting node tree directly:
@@ -25,7 +26,7 @@ structural level (`KnownDocumentFields`, `KnownSectionFields`, `KnownRequirement
 classes; each DOM node is consumed directly and converted to the long-lived `Requirement`,
 `Section`, and `Requirements` objects during the walk.
 
-## Shared State
+#### Shared State
 
 `RequirementsLoader.Load` allocates and shares the following state across all files loaded in
 one call:
@@ -38,9 +39,9 @@ one call:
 | `visitedFiles` | `HashSet<string>` | Fully-resolved paths of already-processed files (include-loop guard) |
 | `issues` | `List<LintIssue>` | All issues collected during the load |
 
-## Methods
+#### Methods
 
-### `Load(paths)`
+##### `Load(paths)`
 
 `Load` initializes shared state, calls `LoadFile` for each path in `paths`, then calls
 `ValidateCycles` and assembles the `LoadResult`. If any error-level issue was collected,
@@ -50,7 +51,7 @@ one call:
 loaded (e.g. all files were empty or contained only `---`), cycle detection is skipped entirely
 because there are no nodes to traverse.
 
-### `LoadFile(path)`
+##### `LoadFile(path)`
 
 `LoadFile` loads a single YAML file and merges its content into the shared `Requirements` tree.
 Four design points govern its behavior:
@@ -70,7 +71,7 @@ Four design points govern its behavior:
 - **Recursive includes**: each path in the document's `includes` block is resolved relative to
   the current file's directory and passed to `LoadFile` recursively.
 
-### `ValidateCycles()`
+##### `ValidateCycles()`
 
 `ValidateCycles` performs a depth-first search (DFS) over all requirements to detect circular
 child references. It is called once after all files are loaded.
@@ -96,7 +97,7 @@ child references. It is called once after all files are loaded.
 Because `ValidateCycles` runs before any downstream analysis, `TraceMatrix.CollectAllTests` can
 recurse through child requirements without its own cycle guard.
 
-## Lint Check Categories
+#### Lint Check Categories
 
 `RequirementsLoader` checks the following categories of structural issues, all reported as
 Error-level:
@@ -113,7 +114,7 @@ Error-level:
 - **Mapping rules** — Mapping entry is not a mapping node; missing or blank mapping `id`; unknown field in mapping.
 - **Graph rules** — Unknown child requirement reference; circular `children` reference (DFS cycle detection).
 
-## Validation Error Table
+#### Validation Error Table
 
 | Check | Condition | Error text |
 | ----- | --------- | ---------- |
@@ -124,7 +125,7 @@ Error-level:
 | Test name | Blank entry in `tests` list | `Test name cannot be blank` |
 | Mapping ID | Blank | `Mapping 'id' cannot be blank` |
 
-## Interactions with Other Units
+#### Interactions with Other Units
 
 | Unit | Nature of interaction |
 | ---- | --------------------- |

@@ -29,16 +29,14 @@ namespace DemaConsulting.ReqStream.Tests.Tracing;
 /// <summary>
 ///     Unit tests for TraceMatrix reading functionality.
 /// </summary>
-[TestClass]
-public class TraceMatrixReadTests
+public sealed class TraceMatrixReadTests : IDisposable
 {
-    private string _testDirectory = string.Empty;
+    private readonly string _testDirectory;
 
     /// <summary>
     ///     Initialize test by creating a temporary test directory.
     /// </summary>
-    [TestInitialize]
-    public void TestInitialize()
+    public TraceMatrixReadTests()
     {
         _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
@@ -47,21 +45,22 @@ public class TraceMatrixReadTests
     /// <summary>
     ///     Clean up test by deleting the temporary test directory.
     /// </summary>
-    [TestCleanup]
-    public void TestCleanup()
+    public void Dispose()
     {
         if (Directory.Exists(_testDirectory))
         {
             Directory.Delete(_testDirectory, recursive: true);
         }
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
     ///     Test TraceMatrix with a TRX test result file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Constructor_WithTrxFile_ParsesCorrectly()
     {
+        // Arrange:
         // Create requirements
         var reqYaml = @"---
 sections:
@@ -76,7 +75,7 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Create TRX file using the TestResults library
@@ -101,27 +100,30 @@ sections:
         var trxPath = Path.Combine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, trxPath);
 
+        // Assert:
         // Verify results
         var result1 = matrix.GetTestResult("Test_Credentials_Valid");
-        Assert.IsNotNull(result1);
-        Assert.AreEqual(1, result1.Executed);
-        Assert.AreEqual(1, result1.Passes);
+        Assert.NotNull(result1);
+        Assert.Equal(1, result1.Executed);
+        Assert.Equal(1, result1.Passes);
 
         var result2 = matrix.GetTestResult("Test_Credentials_Invalid");
-        Assert.IsNotNull(result2);
-        Assert.AreEqual(1, result2.Executed);
-        Assert.AreEqual(1, result2.Passes);
+        Assert.NotNull(result2);
+        Assert.Equal(1, result2.Executed);
+        Assert.Equal(1, result2.Passes);
     }
 
     /// <summary>
     ///     Test TraceMatrix with multiple test result files (matrix testing scenario).
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Constructor_WithMultipleFiles_AggregatesResults()
     {
+        // Arrange:
         // Create requirements
         var reqYaml = @"---
 sections:
@@ -135,7 +137,7 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Create first TRX file (Windows, passed)
@@ -178,22 +180,25 @@ sections:
         var trx3Path = Path.Combine(_testDirectory, "macos-results.trx");
         File.WriteAllText(trx3Path, TrxSerializer.Serialize(testResults3));
 
+        // Act:
         // Create TraceMatrix with all three files
         var matrix = new TraceMatrix(requirements, trx1Path, trx2Path, trx3Path);
 
+        // Assert:
         // Verify aggregated results
         var result = matrix.GetTestResult("Test_PlatformBasic");
-        Assert.IsNotNull(result);
-        Assert.AreEqual(3, result.Executed, "Test should have been executed 3 times");
-        Assert.AreEqual(2, result.Passes, "Test should have passed 2 times");
+        Assert.NotNull(result);
+        Assert.Equal(3, result.Executed);
+        Assert.Equal(2, result.Passes);
     }
 
     /// <summary>
     ///     Test that extra tests (beyond those in requirements) are ignored.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Constructor_WithExtraTests_IgnoresUnreferencedTests()
     {
+        // Arrange:
         // Create requirements with only one test
         var reqYaml = @"---
 sections:
@@ -207,7 +212,7 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Create TRX with multiple tests
@@ -240,50 +245,54 @@ sections:
         var trxPath = Path.Combine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, trxPath);
 
+        // Assert:
         // Verify only the referenced test is tracked
         var result1 = matrix.GetTestResult("Test_Auth_Valid");
-        Assert.IsNotNull(result1);
-        Assert.AreEqual(1, result1.Executed);
-        Assert.AreEqual(1, result1.Passes);
+        Assert.NotNull(result1);
+        Assert.Equal(1, result1.Executed);
+        Assert.Equal(1, result1.Passes);
 
         // Extra tests are now tracked (all tests captured)
         var result2 = matrix.GetTestResult("Test_ExtraNotInRequirements");
-        Assert.IsNotNull(result2);
-        Assert.AreEqual(1, result2.Executed);
-        Assert.AreEqual(1, result2.Passes);
+        Assert.NotNull(result2);
+        Assert.Equal(1, result2.Executed);
+        Assert.Equal(1, result2.Passes);
 
         var result3 = matrix.GetTestResult("Test_AnotherExtra");
-        Assert.IsNotNull(result3);
-        Assert.AreEqual(1, result3.Executed);
-        Assert.AreEqual(1, result3.Passes);
+        Assert.NotNull(result3);
+        Assert.Equal(1, result3.Executed);
+        Assert.Equal(1, result3.Passes);
 
         // GetAllTestResults only returns tests referenced in requirements
         var allResults = matrix.GetAllTestResults();
-        Assert.HasCount(1, allResults);
-        Assert.IsTrue(allResults.ContainsKey("Test_Auth_Valid"));
-        Assert.IsFalse(allResults.ContainsKey("Test_ExtraNotInRequirements"));
-        Assert.IsFalse(allResults.ContainsKey("Test_AnotherExtra"));
+        Assert.Single(allResults);
+        Assert.True(allResults.ContainsKey("Test_Auth_Valid"));
+        Assert.False(allResults.ContainsKey("Test_ExtraNotInRequirements"));
+        Assert.False(allResults.ContainsKey("Test_AnotherExtra"));
     }
 
     /// <summary>
     ///     Test that null requirements throws ArgumentNullException.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Constructor_NullRequirements_ThrowsArgumentNullException()
     {
-        var ex = Assert.ThrowsExactly<ArgumentNullException>(() => _ = new TraceMatrix(null!, Array.Empty<string>()));
+        // Act / Assert:
+        var ex = Assert.Throws<ArgumentNullException>(() => _ = new TraceMatrix(null!, Array.Empty<string>()));
         Assert.Contains("requirements", ex.Message);
     }
 
     /// <summary>
     ///     Test that missing test result file throws FileNotFoundException.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Constructor_MissingFile_ThrowsFileNotFoundException()
     {
+        // Arrange:
         // Create minimal requirements
         var reqYaml = @"---
 sections:
@@ -297,21 +306,23 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         var nonExistentPath = Path.Combine(_testDirectory, "nonexistent.trx");
 
-        var ex = Assert.ThrowsExactly<FileNotFoundException>(() => _ = new TraceMatrix(requirements, nonExistentPath));
+        // Act / Assert:
+        var ex = Assert.Throws<FileNotFoundException>(() => _ = new TraceMatrix(requirements, nonExistentPath));
         Assert.Contains("Test result file not found", ex.Message);
     }
 
     /// <summary>
     ///     Test TraceMatrix with failed tests.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Constructor_WithFailedTests_TracksFailures()
     {
+        // Arrange:
         // Create requirements
         var reqYaml = @"---
 sections:
@@ -326,7 +337,7 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Create TRX with passed and failed tests
@@ -352,28 +363,31 @@ sections:
         var trxPath = Path.Combine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, trxPath);
 
+        // Assert:
         // Verify passing test
         var result1 = matrix.GetTestResult("Test_Passing");
-        Assert.IsNotNull(result1);
-        Assert.AreEqual(1, result1.Executed);
-        Assert.AreEqual(1, result1.Passes);
+        Assert.NotNull(result1);
+        Assert.Equal(1, result1.Executed);
+        Assert.Equal(1, result1.Passes);
 
         // Verify failing test
         var result2 = matrix.GetTestResult("Test_Failing");
-        Assert.IsNotNull(result2);
-        Assert.AreEqual(1, result2.Executed);
-        Assert.AreEqual(0, result2.Passes, "Failed test should have 0 passes");
+        Assert.NotNull(result2);
+        Assert.Equal(1, result2.Executed);
+        Assert.Equal(0, result2.Passes);
     }
 
     /// <summary>
     ///     Test TraceMatrix with no test result files.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Constructor_WithNoFiles_CreatesEmptyMatrix()
     {
+        // Arrange:
         // Create requirements
         var reqYaml = @"---
 sections:
@@ -387,26 +401,29 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act:
         // Create TraceMatrix with no files
         var matrix = new TraceMatrix(requirements);
 
+        // Assert:
         // Verify no results
         var allResults = matrix.GetAllTestResults();
-        Assert.IsEmpty(allResults);
+        Assert.Empty(allResults);
 
         var result = matrix.GetTestResult("SomeTest");
-        Assert.AreEqual(0, result.Executed);
+        Assert.Equal(0, result.Executed);
     }
 
     /// <summary>
     ///     Test TraceMatrix with a JUnit test result file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Constructor_WithJUnitFile_ParsesCorrectly()
     {
+        // Arrange:
         // Create requirements
         var reqYaml = @"---
 sections:
@@ -421,7 +438,7 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Create JUnit file using the TestResults library
@@ -446,27 +463,30 @@ sections:
         var junitPath = Path.Combine(_testDirectory, "results.xml");
         File.WriteAllText(junitPath, JUnitSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, junitPath);
 
+        // Assert:
         // Verify results
         var result1 = matrix.GetTestResult("Test_ValidData");
-        Assert.IsNotNull(result1);
-        Assert.AreEqual(1, result1.Executed);
-        Assert.AreEqual(1, result1.Passes);
+        Assert.NotNull(result1);
+        Assert.Equal(1, result1.Executed);
+        Assert.Equal(1, result1.Passes);
 
         var result2 = matrix.GetTestResult("Test_InvalidData");
-        Assert.IsNotNull(result2);
-        Assert.AreEqual(1, result2.Executed);
-        Assert.AreEqual(1, result2.Passes);
+        Assert.NotNull(result2);
+        Assert.Equal(1, result2.Executed);
+        Assert.Equal(1, result2.Passes);
     }
 
     /// <summary>
     ///     Test TraceMatrix with mixed TRX and JUnit files.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Constructor_WithMixedFormats_ProcessesBoth()
     {
+        // Arrange:
         // Create requirements
         var reqYaml = @"---
 sections:
@@ -481,7 +501,7 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Create TRX file
@@ -510,28 +530,31 @@ sections:
         var junitPath = Path.Combine(_testDirectory, "results.xml");
         File.WriteAllText(junitPath, JUnitSerializer.Serialize(junitResults));
 
+        // Act:
         // Create TraceMatrix with both files
         var matrix = new TraceMatrix(requirements, trxPath, junitPath);
 
+        // Assert:
         // Verify results from TRX
         var result1 = matrix.GetTestResult("Test_TrxFormat");
-        Assert.IsNotNull(result1);
-        Assert.AreEqual(1, result1.Executed);
-        Assert.AreEqual(1, result1.Passes);
+        Assert.NotNull(result1);
+        Assert.Equal(1, result1.Executed);
+        Assert.Equal(1, result1.Passes);
 
         // Verify results from JUnit
         var result2 = matrix.GetTestResult("Test_JUnitFormat");
-        Assert.IsNotNull(result2);
-        Assert.AreEqual(1, result2.Executed);
-        Assert.AreEqual(1, result2.Passes);
+        Assert.NotNull(result2);
+        Assert.Equal(1, result2.Executed);
+        Assert.Equal(1, result2.Passes);
     }
 
     /// <summary>
     ///     Test TraceMatrix with JUnit file containing failed tests.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Constructor_WithJUnitFailedTests_TracksFailures()
     {
+        // Arrange:
         // Create requirements
         var reqYaml = @"---
 sections:
@@ -546,7 +569,7 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Create JUnit file with passed and failed tests
@@ -572,19 +595,21 @@ sections:
         var junitPath = Path.Combine(_testDirectory, "results.xml");
         File.WriteAllText(junitPath, JUnitSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, junitPath);
 
+        // Assert:
         // Verify passing test
         var result1 = matrix.GetTestResult("Test_JUnit_Passing");
-        Assert.IsNotNull(result1);
-        Assert.AreEqual(1, result1.Executed);
-        Assert.AreEqual(1, result1.Passes);
+        Assert.NotNull(result1);
+        Assert.Equal(1, result1.Executed);
+        Assert.Equal(1, result1.Passes);
 
         // Verify failing test
         var result2 = matrix.GetTestResult("Test_JUnit_Failing");
-        Assert.IsNotNull(result2);
-        Assert.AreEqual(1, result2.Executed);
-        Assert.AreEqual(0, result2.Passes, "Failed test should have 0 passes");
+        Assert.NotNull(result2);
+        Assert.Equal(1, result2.Executed);
+        Assert.Equal(0, result2.Passes);
     }
 }

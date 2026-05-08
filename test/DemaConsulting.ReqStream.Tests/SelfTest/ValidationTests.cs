@@ -26,17 +26,14 @@ namespace DemaConsulting.ReqStream.Tests.SelfTest;
 /// <summary>
 /// Unit tests for the Validation class.
 /// </summary>
-[TestClass]
-[DoNotParallelize]
-public class ValidationTests
+public sealed class ValidationTests : IDisposable
 {
-    private string _testDirectory = string.Empty;
+    private readonly string _testDirectory;
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
-    [TestInitialize]
-    public void TestInitialize()
+    public ValidationTests()
     {
         _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
@@ -45,31 +42,31 @@ public class ValidationTests
     /// <summary>
     /// Clean up test by deleting the temporary test directory.
     /// </summary>
-    [TestCleanup]
-    public void TestCleanup()
+    public void Dispose()
     {
         if (Directory.Exists(_testDirectory))
         {
             Directory.Delete(_testDirectory, recursive: true);
         }
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
     /// Test that Run throws ArgumentNullException when context is null.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Validation_Run_WithNullContext_ThrowsArgumentNullException()
     {
         // Arrange - nothing to arrange; null is the input
 
         // Act + Assert - calling Run with null should throw ArgumentNullException
-        Assert.ThrowsExactly<ArgumentNullException>(() => Validation.Run(null!));
+        Assert.Throws<ArgumentNullException>(() => Validation.Run(null!));
     }
 
     /// <summary>
     /// Test that Run completes successfully with a silent context and log file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Validation_Run_WithSilentContext_CompletesSuccessfully()
     {
         // Arrange - create a log file path and a silent context
@@ -81,11 +78,11 @@ public class ValidationTests
             Validation.Run(context);
 
             // Validation should succeed with exit code 0
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
         }
 
         // Assert - log file must exist and contain expected validation output
-        Assert.IsTrue(File.Exists(logFile), "Log file should exist");
+        Assert.True(File.Exists(logFile), "Log file should exist");
         var logContent = File.ReadAllText(logFile);
         Assert.Contains("DEMA Consulting ReqStream", logContent);
         Assert.Contains("ReqStream Version", logContent);
@@ -101,7 +98,7 @@ public class ValidationTests
     /// <summary>
     /// Test that Run writes a TRX results file when the results path has a .trx extension.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Validation_Run_WithTrxResultsFile_WritesTrxFile()
     {
         // Arrange - create a results file path with .trx extension and a silent context
@@ -113,11 +110,11 @@ public class ValidationTests
             Validation.Run(context);
 
             // Validation should succeed with exit code 0
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
         }
 
         // Assert - TRX file must exist and contain valid TRX XML content
-        Assert.IsTrue(File.Exists(resultsFile), "TRX results file should exist");
+        Assert.True(File.Exists(resultsFile), "TRX results file should exist");
         var trxContent = File.ReadAllText(resultsFile);
         Assert.StartsWith("<?xml", trxContent);
         Assert.Contains("TestRun", trxContent);
@@ -126,7 +123,7 @@ public class ValidationTests
     /// <summary>
     /// Test that Run writes a JUnit XML results file when the results path has a .xml extension.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Validation_Run_WithXmlResultsFile_WritesXmlFile()
     {
         // Arrange - create a results file path with .xml extension and a silent context
@@ -138,11 +135,11 @@ public class ValidationTests
             Validation.Run(context);
 
             // Validation should succeed with exit code 0
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
         }
 
         // Assert - XML file must exist and contain valid JUnit XML content
-        Assert.IsTrue(File.Exists(resultsFile), "JUnit XML results file should exist");
+        Assert.True(File.Exists(resultsFile), "JUnit XML results file should exist");
         var xmlContent = File.ReadAllText(resultsFile);
         Assert.StartsWith("<?xml", xmlContent);
         Assert.Contains("testsuite", xmlContent);
@@ -151,7 +148,7 @@ public class ValidationTests
     /// <summary>
     /// Test that Run reports an error and continues when the results file cannot be written.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Validation_Run_WithUnwritableResultsFile_ReportsError()
     {
         // Arrange: create a directory at the results file path to force a write failure
@@ -163,13 +160,13 @@ public class ValidationTests
         Validation.Run(context);
 
         // Assert: exit code must be 1 indicating the write failure was reported
-        Assert.AreEqual(1, context.ExitCode);
+        Assert.Equal(1, context.ExitCode);
     }
 
     /// <summary>
     /// Test that Run continues and produces a summary when the results file cannot be written.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Validation_Run_WithUnwritableResultsFile_Continues()
     {
         // Arrange: create a log file to capture output, and a directory at the results path to force a write failure
@@ -184,7 +181,7 @@ public class ValidationTests
         }
 
         // Assert: the summary block is still present in the log despite the write failure
-        Assert.IsTrue(File.Exists(logFile), "Log file should exist");
+        Assert.True(File.Exists(logFile), "Log file should exist");
         var logContent = File.ReadAllText(logFile);
         Assert.Contains("Total Tests:", logContent);
         Assert.Contains("Passed:", logContent);
@@ -194,7 +191,7 @@ public class ValidationTests
     /// <summary>
     /// Test that Run reports an error when the results file has an unsupported extension.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Validation_Run_WithInvalidResultsExtension_ReportsError()
     {
         // Arrange - create a results file path with an unsupported .invalid extension
@@ -205,6 +202,6 @@ public class ValidationTests
         Validation.Run(context);
 
         // Assert - exit code must be 1 indicating an error was reported for the unsupported format
-        Assert.AreEqual(1, context.ExitCode);
+        Assert.Equal(1, context.ExitCode);
     }
 }

@@ -26,16 +26,14 @@ namespace DemaConsulting.ReqStream.Tests.Cli;
 /// Tests for the Cli subsystem, proving the Context class is sufficient to implement
 /// the Cli subsystem requirements.
 /// </summary>
-[TestClass]
-public class CliTests
+public sealed class CliTests : IDisposable
 {
-    private string _testDirectory = string.Empty;
+    private readonly string _testDirectory;
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
-    [TestInitialize]
-    public void TestInitialize()
+    public CliTests()
     {
         _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_cli_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
@@ -44,19 +42,19 @@ public class CliTests
     /// <summary>
     /// Clean up test by deleting the temporary test directory.
     /// </summary>
-    [TestCleanup]
-    public void TestCleanup()
+    public void Dispose()
     {
         if (Directory.Exists(_testDirectory))
         {
             Directory.Delete(_testDirectory, recursive: true);
         }
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
     /// Test that the --version flag sets the Version property on the context.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_Interface_VersionFlag_SetsVersionProperty()
     {
         // Arrange: nothing to arrange - the --version flag alone is the input
@@ -65,13 +63,13 @@ public class CliTests
         using var context = Context.Create(["--version"]);
 
         // Assert: the Version property is true
-        Assert.IsTrue(context.Version);
+        Assert.True(context.Version);
     }
 
     /// <summary>
     /// Test that the --help flag sets the Help property on the context.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_Interface_HelpFlag_SetsHelpProperty()
     {
         // Arrange: nothing to arrange - the --help flag alone is the input
@@ -80,25 +78,25 @@ public class CliTests
         using var context = Context.Create(["--help"]);
 
         // Assert: the Help property is true
-        Assert.IsTrue(context.Help);
+        Assert.True(context.Help);
     }
 
     /// <summary>
     /// Test that an unrecognized argument throws an ArgumentException.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_Interface_UnknownArgument_ThrowsArgumentException()
     {
         // Arrange: nothing to arrange - the unknown argument is the input
 
         // Act + Assert: creating a context with an unknown argument throws ArgumentException
-        Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--unknown-argument-xyz"]));
+        Assert.Throws<ArgumentException>(() => Context.Create(["--unknown-argument-xyz"]));
     }
 
     /// <summary>
     /// Test that the --silent flag sets the Silent property on the context.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_Output_SilentFlag_SetsSilentProperty()
     {
         // Arrange: nothing to arrange - the --silent flag alone is the input
@@ -107,13 +105,13 @@ public class CliTests
         using var context = Context.Create(["--silent"]);
 
         // Assert: the Silent property is true
-        Assert.IsTrue(context.Silent);
+        Assert.True(context.Silent);
     }
 
     /// <summary>
     /// Test that the --log flag causes output to be written to the specified file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_Output_LogFlag_WritesOutputToLogFile()
     {
         // Arrange: define path for the log output file
@@ -126,7 +124,7 @@ public class CliTests
         }
 
         // Assert: log file exists and contains the written message
-        Assert.IsTrue(File.Exists(logFile), $"Expected log file at {logFile}");
+        Assert.True(File.Exists(logFile), $"Expected log file at {logFile}");
         var content = File.ReadAllText(logFile);
         Assert.Contains("test output message", content);
     }
@@ -134,45 +132,44 @@ public class CliTests
     /// <summary>
     /// Test that --log without a filename throws an ArgumentException.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_Interface_MissingArgumentValue_ThrowsArgumentException()
     {
         // Arrange: nothing to arrange - the missing value is the input
 
         // Act + Assert: creating a context with --log but no filename throws ArgumentException
-        Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--log"]));
+        Assert.Throws<ArgumentException>(() => Context.Create(["--log"]));
     }
 
     /// <summary>
     /// Test that an invalid depth value throws an ArgumentException.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_Interface_InvalidDepthValue_ThrowsArgumentException()
     {
         // Arrange: nothing to arrange - the invalid depth is the input
 
         // Act + Assert: creating a context with a non-integer depth throws ArgumentException
-        Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--depth", "not-a-number"]));
+        Assert.Throws<ArgumentException>(() => Context.Create(["--depth", "not-a-number"]));
     }
 
     /// <summary>
     /// Test that a log file path that cannot be opened throws an ArgumentException.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_Interface_LogFileOpenFailure_ThrowsArgumentException()
     {
         // Arrange: use a path inside a directory that does not exist
         var invalidLogPath = Path.Combine(_testDirectory, "nonexistent-subdir", "output.log");
 
         // Act + Assert: creating a context with an inaccessible log file throws ArgumentException
-        Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--log", invalidLogPath]));
+        Assert.Throws<ArgumentException>(() => Context.Create(["--log", invalidLogPath]));
     }
 
     /// <summary>
     /// Test that WriteError writes to the error channel, not standard output.
     /// </summary>
-    [TestMethod]
-    [DoNotParallelize]
+    [Fact]
     public void Cli_Output_WriteError_WritesToErrorChannel()
     {
         // Arrange: redirect both stdout and stderr to capture writes separately
@@ -190,7 +187,7 @@ public class CliTests
             context.WriteError("error message");
 
             // Assert: the error went to stderr, not stdout
-            Assert.AreEqual(string.Empty, stdoutCapture.ToString(), "Error must not appear on stdout");
+            Assert.Equal(string.Empty, stdoutCapture.ToString());
             Assert.Contains("error message", stderrCapture.ToString());
         }
         finally
@@ -203,8 +200,7 @@ public class CliTests
     /// <summary>
     /// Test that ExitCode returns 1 after WriteError is called.
     /// </summary>
-    [TestMethod]
-    [DoNotParallelize]
+    [Fact]
     public void Cli_Output_WriteError_SetsExitCodeToOne()
     {
         // Arrange: redirect stderr to suppress console noise during the test
@@ -218,7 +214,7 @@ public class CliTests
             context.WriteError("error message");
 
             // Assert: exit code is 1 after an error is reported
-            Assert.AreEqual(1, context.ExitCode);
+            Assert.Equal(1, context.ExitCode);
         }
         finally
         {
@@ -229,7 +225,7 @@ public class CliTests
     /// <summary>
     /// Test that --depth sets the default for all per-report depth options.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_Interface_DepthFlag_SetsDefaultForAllReportDepths()
     {
         // Arrange: nothing to arrange - the --depth flag alone is the input
@@ -238,8 +234,8 @@ public class CliTests
         using var context = Context.Create(["--depth", "3"]);
 
         // Assert: all per-report depth properties inherit the --depth value
-        Assert.AreEqual(3, context.ReportDepth);
-        Assert.AreEqual(3, context.MatrixDepth);
-        Assert.AreEqual(3, context.JustificationsDepth);
+        Assert.Equal(3, context.ReportDepth);
+        Assert.Equal(3, context.MatrixDepth);
+        Assert.Equal(3, context.JustificationsDepth);
     }
 }

@@ -97,6 +97,11 @@ internal static class Program
     ///     <see cref="Main"/> so that tests can supply a pre-constructed <see cref="Cli.Context"/>
     ///     and exercise the full dispatch path without spawning a child process.
     /// </summary>
+    /// <remarks>
+    ///     This method writes output via <see cref="Cli.Context.WriteLine"/> and
+    ///     <see cref="Cli.Context.WriteError"/>. A non-zero <see cref="Cli.Context.ExitCode"/>
+    ///     after this method returns signals that an error was reported during execution.
+    /// </remarks>
     /// <param name="context">The context containing command line arguments and program state.</param>
     public static void Run(Context context)
     {

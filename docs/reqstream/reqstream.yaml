@@ -1,4 +1,12 @@
 ---
+includes:
+  - reqstream/cli.yaml
+  - reqstream/modeling.yaml
+  - reqstream/tracing.yaml
+  - reqstream/self-test.yaml
+  - reqstream/program.yaml
+  - reqstream/platform-requirements.yaml
+
 sections:
   - title: ReqStream Requirements
     sections:
@@ -93,6 +101,8 @@ sections:
               - ReqStream-Modeling-Linting
               - ReqStream-Program-LintVerbosity
               - ReqStream-Program-LintNoFiles
+              - ReqStream-Program-LintFailure
+              - ReqStream-Program-LintNoBanner
 
           - id: ReqStream-System-Validate
             title: >-
@@ -106,6 +116,7 @@ sections:
             children:
               - ReqStream-Program-Validate
               - ReqStream-SelfTest-Qualification
+              - ReqStream-SelfTest-FailureReporting
 
           - id: ReqStream-System-ValidateResultsOutput
             title: >-
@@ -233,3 +244,29 @@ sections:
               - ReqStream_System_FileIncludes_RequirementsWithIncludes_LoadsAllRequirements
             children:
               - ReqStream-Requirements-Includes
+
+          - id: ReqStream-System-SectionMerging
+            title: >-
+              The system shall automatically merge sections with the same hierarchy path
+              when loading requirements from multiple YAML files.
+            justification: |
+              Title-based section merging enables modular requirements management without any
+              explicit namespace or import declaration. Multiple files can contribute to the same
+              logical section, allowing requirements to be organized by feature, component, or
+              responsibility while still producing one coherent requirement tree.
+            tests:
+              - ReqStream_System_FileIncludes_RequirementsWithIncludes_LoadsAllRequirements
+            children:
+              - ReqStream-Requirements-SectionMerging
+              - ReqStream-Section-TitleMerging
+
+          - id: ReqStream-System-CircularIncludeDetection
+            title: >-
+              The system shall detect and report circular include references in requirements
+              files.
+            justification: |
+              Circular includes (A includes B, B includes A) would cause infinite loading loops.
+              Detecting and reporting them prevents hangs and provides users with a clear error
+              message identifying the problematic file.
+            children:
+              - ReqStream-Lint-CircularReferences

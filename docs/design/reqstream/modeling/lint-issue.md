@@ -1,15 +1,15 @@
-# LintIssue Unit Design
+### LintIssue Unit Design
 
-## Overview
+#### Overview
 
 `LintIssue` and its companion enum `LintSeverity` represent a single structural issue discovered
 during requirements loading or linting. They are simple value types with no dependencies on other
 units; they carry the three pieces of information needed to display and route a lint diagnostic:
 where the issue occurred, how severe it is, and what the problem is.
 
-## Data Model
+#### Data Model
 
-### `LintSeverity`
+##### `LintSeverity`
 
 `LintSeverity` is an enum that classifies the severity of a lint issue.
 
@@ -18,7 +18,7 @@ where the issue occurred, how severe it is, and what the problem is.
 | `Warning` | A non-fatal issue; processing can continue. |
 | `Error` | A fatal issue that prevents successful requirements loading. |
 
-### `LintIssue`
+##### `LintIssue`
 
 `LintIssue` represents a single issue found during requirements linting or loading.
 
@@ -30,7 +30,7 @@ where the issue occurred, how severe it is, and what the problem is.
 | `Description` | `string` | A human-readable description of the issue |
 | `ToString()` | `string` | Returns the issue formatted as `"location: severity: description"` |
 
-## Formatting
+#### Formatting
 
 `ToString()` returns the issue in the standard diagnostic format:
 
@@ -48,7 +48,7 @@ The `LintSeverity` enum values map to the following lowercase strings in `ToStri
 This format is recognized by editors and CI tools that can parse file locations and navigate to
 the line containing the issue.
 
-## Interactions with Other Units
+#### Interactions with Other Units
 
 | Unit | Nature of interaction |
 | ---- | --------------------- |

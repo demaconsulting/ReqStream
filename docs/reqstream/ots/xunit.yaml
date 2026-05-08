@@ -1,0 +1,26 @@
+---
+# xUnit OTS Software Requirements
+#
+# Requirements for the xUnit testing framework functionality.
+
+sections:
+  - title: OTS Software Requirements
+    sections:
+      - title: xUnit Requirements
+        requirements:
+          - id: ReqStream-OTS-XUnit
+            title: xUnit shall execute unit tests and report results.
+            justification: |
+              xUnit (xunit.v3 and xunit.runner.visualstudio) is the unit-testing framework used
+              by the project. It discovers and runs all test methods. Passing tests confirm the
+              framework is functioning correctly.
+            tags: [ots]
+            tests:
+              - Context_Create_NoArguments_ReturnsDefaultContext
+              - Context_Create_VersionFlag_SetsVersionProperty
+              - Context_Create_HelpFlags_SetsHelpProperty
+              - Section_Load_SimpleRequirement_ParsesCorrectly
+              - Requirement_Properties_DefaultValues
+              - TraceMatrix_Constructor_WithNoFiles_CreatesEmptyMatrix
+              - Program_Run_WithVersionFlag_PrintsVersion
+              - Validation_Run_WithSilentContext_CompletesSuccessfully

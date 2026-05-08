@@ -87,7 +87,7 @@ sections:
           - RequirementsLoader_Load_WithUnknownSectionField_ReportsError
 
       - id: ReqStream-Lint-MissingSectionTitle
-        title: The requirements loader shall report an error when a section is missing the required title field.
+        title: The requirements loader shall report an error when a section is missing or has a blank title field.
         justification: |
           The title field is mandatory for all sections. Missing it prevents the section from being
           correctly identified in reports and trace matrices.

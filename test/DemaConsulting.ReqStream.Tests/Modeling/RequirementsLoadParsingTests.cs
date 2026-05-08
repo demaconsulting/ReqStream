@@ -25,16 +25,14 @@ namespace DemaConsulting.ReqStream.Tests.Modeling;
 /// <summary>
 /// Unit tests for Requirements YAML loading and model parsing functionality.
 /// </summary>
-[TestClass]
-public class RequirementsLoadParsingTests
+public sealed class RequirementsLoadParsingTests : IDisposable
 {
-    private string _testDirectory = string.Empty;
+    private readonly string _testDirectory;
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
-    [TestInitialize]
-    public void TestInitialize()
+    public RequirementsLoadParsingTests()
     {
         _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
@@ -43,19 +41,19 @@ public class RequirementsLoadParsingTests
     /// <summary>
     /// Clean up test by deleting the temporary test directory.
     /// </summary>
-    [TestCleanup]
-    public void TestCleanup()
+    public void Dispose()
     {
         if (Directory.Exists(_testDirectory))
         {
             Directory.Delete(_testDirectory, recursive: true);
         }
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
     /// Test reading a file with includes.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_WithIncludes_MergesFilesCorrectly()
     {
         // Arrange: create a main YAML file with an include directive pointing to an additional file
@@ -83,22 +81,22 @@ sections:
 
         // Act: load the main requirements file
         var result = Requirements.Load(mainPath);
-        Assert.IsFalse(result.HasErrors);
+        Assert.False(result.HasErrors);
         var requirements = result.Requirements;
 
         // Assert: requirements from both files merged into the tree
-        Assert.IsNotNull(requirements);
-        Assert.HasCount(2, requirements.Sections);
-        Assert.AreEqual("System Security", requirements.Sections[0].Title);
-        Assert.AreEqual("Data Management", requirements.Sections[1].Title);
-        Assert.AreEqual("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
-        Assert.AreEqual("DATA-001", requirements.Sections[1].Requirements[0].Id);
+        Assert.NotNull(requirements);
+        Assert.Equal(2, requirements.Sections.Count);
+        Assert.Equal("System Security", requirements.Sections[0].Title);
+        Assert.Equal("Data Management", requirements.Sections[1].Title);
+        Assert.Equal("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
+        Assert.Equal("DATA-001", requirements.Sections[1].Requirements[0].Id);
     }
 
     /// <summary>
     /// Test that identical sections are merged.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_IdenticalSections_MergesCorrectly()
     {
         // Arrange: create two YAML files with the same section title
@@ -126,22 +124,22 @@ sections:
 
         // Act: load the main requirements file
         var result = Requirements.Load(mainPath);
-        Assert.IsFalse(result.HasErrors);
+        Assert.False(result.HasErrors);
         var requirements = result.Requirements;
 
         // Assert: identical sections merged into one with both requirements
-        Assert.IsNotNull(requirements);
-        Assert.HasCount(1, requirements.Sections);
-        Assert.AreEqual("System Security", requirements.Sections[0].Title);
-        Assert.HasCount(2, requirements.Sections[0].Requirements);
-        Assert.AreEqual("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
-        Assert.AreEqual("SYS-SEC-002", requirements.Sections[0].Requirements[1].Id);
+        Assert.NotNull(requirements);
+        Assert.Single(requirements.Sections);
+        Assert.Equal("System Security", requirements.Sections[0].Title);
+        Assert.Equal(2, requirements.Sections[0].Requirements.Count);
+        Assert.Equal("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
+        Assert.Equal("SYS-SEC-002", requirements.Sections[0].Requirements[1].Id);
     }
 
     /// <summary>
     /// Test that include loops are prevented.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop()
     {
         // Arrange: create two YAML files that include each other
@@ -174,17 +172,17 @@ includes:
         var result = Requirements.Load(pathA);
 
         // Assert: loading completes without infinite loop and both sections are present
-        Assert.IsFalse(result.HasErrors);
+        Assert.False(result.HasErrors);
         var requirements = result.Requirements;
 
-        Assert.IsNotNull(requirements);
-        Assert.HasCount(2, requirements.Sections);
+        Assert.NotNull(requirements);
+        Assert.Equal(2, requirements.Sections.Count);
     }
 
     /// <summary>
     /// Test that a missing file reports an error issue.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_FileNotFound_ReportsError()
     {
         // Arrange: create a path to a file that does not exist
@@ -194,16 +192,16 @@ includes:
         var result = Requirements.Load(nonExistentPath);
 
         // Assert: error reported with the missing file location
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("File not found"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(nonExistentPath), result.Issues);
+        Assert.True(result.HasErrors);
+        Assert.Null(result.Requirements);
+        Assert.Contains(result.Issues, i => i.Description.Contains("File not found"));
+        Assert.Contains(result.Issues, i => i.Location.Contains(nonExistentPath));
     }
 
     /// <summary>
     /// Test that an invalid YAML content (schema error) throws an InvalidOperationException with the file location.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation()
     {
         // Arrange: create a YAML file with an invalid property name
@@ -221,17 +219,17 @@ sections:
         var result = Requirements.Load(filePath);
 
         // Assert: error reported with file location for the unknown field
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Unknown field 'text' in requirement"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
-        Assert.Contains(i => i.Location.Contains($"{filePath}("), result.Issues);
+        Assert.True(result.HasErrors);
+        Assert.Null(result.Requirements);
+        Assert.Contains(result.Issues, i => i.Description.Contains("Unknown field 'text' in requirement"));
+        Assert.Contains(result.Issues, i => i.Location.Contains(filePath));
+        Assert.Contains(result.Issues, i => i.Location.Contains($"{filePath}("));
     }
 
     /// <summary>
     /// Test reading an empty YAML file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_EmptyFile_ReturnsEmptyRequirements()
     {
         // Arrange: create an empty YAML file
@@ -242,19 +240,19 @@ sections:
 
         // Act: load the requirements file
         var result = Requirements.Load(filePath);
-        Assert.IsFalse(result.HasErrors);
+        Assert.False(result.HasErrors);
         var requirements = result.Requirements;
 
         // Assert: empty requirements returned with no sections
-        Assert.IsNotNull(requirements);
-        Assert.IsEmpty(requirements.Sections);
-        Assert.IsEmpty(requirements.Requirements);
+        Assert.NotNull(requirements);
+        Assert.Empty(requirements.Sections);
+        Assert.Empty(requirements.Requirements);
     }
 
     /// <summary>
     /// Test reading a complex nested structure.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_ComplexStructure_ParsesCorrectly()
     {
         // Arrange: create a YAML file with a complex nested structure including children, tests, and mappings
@@ -294,40 +292,40 @@ mappings:
 
         // Act: load the requirements file
         var result = Requirements.Load(filePath);
-        Assert.IsFalse(result.HasErrors);
+        Assert.False(result.HasErrors);
         var requirements = result.Requirements;
 
         // Assert: complex structure parsed correctly
-        Assert.IsNotNull(requirements);
-        Assert.HasCount(2, requirements.Sections);
+        Assert.NotNull(requirements);
+        Assert.Equal(2, requirements.Sections.Count);
 
         var sysSec = requirements.Sections[0];
-        Assert.AreEqual("System Security", sysSec.Title);
-        Assert.HasCount(1, sysSec.Requirements);
-        Assert.AreEqual("SYS-SEC-001", sysSec.Requirements[0].Id);
-        Assert.HasCount(1, sysSec.Requirements[0].Children);
-        Assert.AreEqual("AUTH-001", sysSec.Requirements[0].Children[0]);
+        Assert.Equal("System Security", sysSec.Title);
+        Assert.Single(sysSec.Requirements);
+        Assert.Equal("SYS-SEC-001", sysSec.Requirements[0].Id);
+        Assert.Single(sysSec.Requirements[0].Children);
+        Assert.Equal("AUTH-001", sysSec.Requirements[0].Children[0]);
 
         var dataManagement = requirements.Sections[1];
-        Assert.AreEqual("Data Management", dataManagement.Title);
-        Assert.HasCount(2, dataManagement.Sections);
+        Assert.Equal("Data Management", dataManagement.Title);
+        Assert.Equal(2, dataManagement.Sections.Count);
 
         var auth = dataManagement.Sections[0];
-        Assert.AreEqual("User Authentication", auth.Title);
-        Assert.AreEqual("AUTH-001", auth.Requirements[0].Id);
-        Assert.HasCount(3, auth.Requirements[0].Tests);
+        Assert.Equal("User Authentication", auth.Title);
+        Assert.Equal("AUTH-001", auth.Requirements[0].Id);
+        Assert.Equal(3, auth.Requirements[0].Tests.Count);
 
         var logging = dataManagement.Sections[1];
-        Assert.AreEqual("Logging", logging.Title);
-        Assert.AreEqual("DATA-001", logging.Requirements[0].Id);
-        Assert.HasCount(2, logging.Requirements[0].Tests);
-        Assert.AreEqual("Logging_ValidRequest_Logged", logging.Requirements[0].Tests[0]);
+        Assert.Equal("Logging", logging.Title);
+        Assert.Equal("DATA-001", logging.Requirements[0].Id);
+        Assert.Equal(2, logging.Requirements[0].Tests.Count);
+        Assert.Equal("Logging_ValidRequest_Logged", logging.Requirements[0].Tests[0]);
     }
 
     /// <summary>
     ///     Test reading multiple files with params array.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_MultipleFiles_MergesAllFiles()
     {
         // Arrange: create three YAML files with different sections
@@ -361,24 +359,24 @@ sections:
 
         // Act: load all three files
         var result = Requirements.Load(file1Path, file2Path, file3Path);
-        Assert.IsFalse(result.HasErrors);
+        Assert.False(result.HasErrors);
         var requirements = result.Requirements;
 
         // Assert: all three sections merged into the requirements tree
-        Assert.IsNotNull(requirements);
-        Assert.HasCount(3, requirements.Sections);
-        Assert.AreEqual("System Security", requirements.Sections[0].Title);
-        Assert.AreEqual("Data Management", requirements.Sections[1].Title);
-        Assert.AreEqual("Performance", requirements.Sections[2].Title);
-        Assert.AreEqual("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
-        Assert.AreEqual("DATA-001", requirements.Sections[1].Requirements[0].Id);
-        Assert.AreEqual("PERF-001", requirements.Sections[2].Requirements[0].Id);
+        Assert.NotNull(requirements);
+        Assert.Equal(3, requirements.Sections.Count);
+        Assert.Equal("System Security", requirements.Sections[0].Title);
+        Assert.Equal("Data Management", requirements.Sections[1].Title);
+        Assert.Equal("Performance", requirements.Sections[2].Title);
+        Assert.Equal("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
+        Assert.Equal("DATA-001", requirements.Sections[1].Requirements[0].Id);
+        Assert.Equal("PERF-001", requirements.Sections[2].Requirements[0].Id);
     }
 
     /// <summary>
     ///     Test reading multiple files that merge sections.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_MultipleFilesWithSameSections_MergesSections()
     {
         // Arrange: create two YAML files with the same section title
@@ -403,22 +401,22 @@ sections:
 
         // Act: load both files
         var result = Requirements.Load(file1Path, file2Path);
-        Assert.IsFalse(result.HasErrors);
+        Assert.False(result.HasErrors);
         var requirements = result.Requirements;
 
         // Assert: sections with the same title merged into one section with both requirements
-        Assert.IsNotNull(requirements);
-        Assert.HasCount(1, requirements.Sections);
-        Assert.AreEqual("System Security", requirements.Sections[0].Title);
-        Assert.HasCount(2, requirements.Sections[0].Requirements);
-        Assert.AreEqual("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
-        Assert.AreEqual("SYS-SEC-002", requirements.Sections[0].Requirements[1].Id);
+        Assert.NotNull(requirements);
+        Assert.Single(requirements.Sections);
+        Assert.Equal("System Security", requirements.Sections[0].Title);
+        Assert.Equal(2, requirements.Sections[0].Requirements.Count);
+        Assert.Equal("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
+        Assert.Equal("SYS-SEC-002", requirements.Sections[0].Requirements[1].Id);
     }
 
     /// <summary>
     ///     Test reading single file with params array (backwards compatibility).
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_SingleFileWithParamsArray_WorksCorrectly()
     {
         // Arrange: create a YAML file with one requirement
@@ -434,36 +432,36 @@ sections:
 
         // Act: load the requirements file
         var result = Requirements.Load(filePath);
-        Assert.IsFalse(result.HasErrors);
+        Assert.False(result.HasErrors);
         var requirements = result.Requirements;
 
         // Assert: requirement loaded correctly
-        Assert.IsNotNull(requirements);
-        Assert.HasCount(1, requirements.Sections);
-        Assert.AreEqual("System Security", requirements.Sections[0].Title);
-        Assert.HasCount(1, requirements.Sections[0].Requirements);
-        Assert.AreEqual("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
+        Assert.NotNull(requirements);
+        Assert.Single(requirements.Sections);
+        Assert.Equal("System Security", requirements.Sections[0].Title);
+        Assert.Single(requirements.Sections[0].Requirements);
+        Assert.Equal("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
     }
 
     /// <summary>
     ///     Test that calling Read with no arguments throws ArgumentException.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_NoArguments_ThrowsArgumentException()
     {
         // Act + Assert: calling Load with no arguments throws ArgumentException
-        var ex = Assert.ThrowsExactly<ArgumentException>(() => Requirements.Load());
+        var ex = Assert.Throws<ArgumentException>(() => Requirements.Load());
         Assert.Contains("At least one file path must be provided", ex.Message);
     }
 
     /// <summary>
     ///     Test that calling Read with null throws ArgumentException.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_NullArgument_ThrowsArgumentException()
     {
         // Act + Assert: calling Load with null throws ArgumentException
-        var ex = Assert.ThrowsExactly<ArgumentException>(() => Requirements.Load(null!));
+        var ex = Assert.Throws<ArgumentException>(() => Requirements.Load(null!));
         Assert.Contains("At least one file path must be provided", ex.Message);
     }
 }

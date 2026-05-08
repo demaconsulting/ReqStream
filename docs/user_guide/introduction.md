@@ -1455,6 +1455,13 @@ For more information, visit the [ReqStream GitHub repository][repo].
 
 For support, please [open an issue][issues] or [start a discussion][discussions].
 
+## References
+
+- [Continuous Compliance](https://github.com/demaconsulting/ContinuousCompliance) — the
+  methodology that ReqStream is designed to support.
+- [ReqStream GitHub Repository](https://github.com/demaconsulting/ReqStream) — source code,
+  issues, and releases.
+
 <!-- Link References -->
 [dotnet-sdk]: https://dotnet.microsoft.com/download
 [repo]: https://github.com/demaconsulting/ReqStream

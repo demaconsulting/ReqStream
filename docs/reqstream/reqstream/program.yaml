@@ -74,16 +74,25 @@ sections:
             tests:
               - Program_Run_WithLintFlag_RunsLinter
 
-          - id: ReqStream-Program-LintVerbosity
-            title: The tool shall suppress the banner and produce no output when linting finds no issues.
+          - id: ReqStream-Program-LintNoBanner
+            title: The tool shall suppress the application banner when the lint flag is provided.
             justification: |
-              Suppressing the banner and the "No issues found" summary during lint allows lint scripts
-              to treat silence as success and only inspect reported issue lines, simplifying integration
-              into build pipelines and editors that parse tool output.
+              Suppressing the banner during lint allows lint scripts to treat silence as success
+              and only inspect reported issue lines, simplifying integration into build pipelines
+              and editors that parse tool output.
             tags:
               - cli
             tests:
               - Program_Run_WithLintFlag_SuppressesBanner
+
+          - id: ReqStream-Program-LintVerbosity
+            title: The tool shall produce no output when linting is requested and no issues are found.
+            justification: |
+              Producing no output when linting finds no issues allows build pipelines and scripts
+              to treat silence as success without needing to parse a "No issues found" summary.
+            tags:
+              - cli
+            tests:
               - Program_Run_WithLintFlag_OnlyOutputsIssues
 
           - id: ReqStream-Program-LintFailure

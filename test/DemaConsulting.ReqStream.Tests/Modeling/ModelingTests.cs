@@ -26,16 +26,14 @@ namespace DemaConsulting.ReqStream.Tests.Modeling;
 /// Tests for the Modeling subsystem, proving the Requirements class is sufficient to
 /// implement the Modeling subsystem requirements.
 /// </summary>
-[TestClass]
-public class ModelingTests
+public sealed class ModelingTests : IDisposable
 {
-    private string _testDirectory = string.Empty;
+    private readonly string _testDirectory;
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
-    [TestInitialize]
-    public void TestInitialize()
+    public ModelingTests()
     {
         _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_modeling_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
@@ -44,19 +42,19 @@ public class ModelingTests
     /// <summary>
     /// Clean up test by deleting the temporary test directory.
     /// </summary>
-    [TestCleanup]
-    public void TestCleanup()
+    public void Dispose()
     {
         if (Directory.Exists(_testDirectory))
         {
             Directory.Delete(_testDirectory, recursive: true);
         }
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
     /// Test that loading a valid YAML file produces a requirements model with no errors.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Modeling_YamlParsing_ValidFile_LoadsRequirements()
     {
         // Arrange: create a valid requirements YAML file
@@ -76,16 +74,16 @@ public class ModelingTests
         var result = Requirements.Load(reqFile);
 
         // Assert: requirements loaded successfully with no errors
-        Assert.IsNotNull(result.Requirements);
-        Assert.IsFalse(result.HasErrors);
-        Assert.HasCount(1, result.Requirements.Sections);
-        Assert.AreEqual("Modeling-Test-Req1", result.Requirements.Sections[0].Requirements[0].Id);
+        Assert.NotNull(result.Requirements);
+        Assert.False(result.HasErrors);
+        Assert.Single(result.Requirements.Sections);
+        Assert.Equal("Modeling-Test-Req1", result.Requirements.Sections[0].Requirements[0].Id);
     }
 
     /// <summary>
     /// Test that loading a valid YAML file produces no lint issues.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Modeling_YamlParsing_ValidFile_ReturnsNoLintIssues()
     {
         // Arrange: create a structurally valid requirements YAML file with no duplicate IDs
@@ -105,14 +103,14 @@ public class ModelingTests
         var result = Requirements.Load(reqFile);
 
         // Assert: no lint issues reported
-        Assert.IsFalse(result.HasErrors);
-        Assert.HasCount(0, result.Issues);
+        Assert.False(result.HasErrors);
+        Assert.Empty(result.Issues);
     }
 
     /// <summary>
     /// Test that loading a YAML file with duplicate requirement IDs reports a lint error.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Modeling_YamlParsing_DuplicateIds_DetectsLintError()
     {
         // Arrange: create a requirements YAML file containing duplicate requirement IDs
@@ -137,15 +135,15 @@ public class ModelingTests
         var result = Requirements.Load(reqFile);
 
         // Assert: an error-level lint issue was detected
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNotEmpty(result.Issues, "Expected at least one lint issue to be reported.");
-        Assert.Contains(i => i.Severity == LintSeverity.Error, result.Issues, "Expected at least one Error-severity lint issue.");
+        Assert.True(result.HasErrors);
+        Assert.NotEmpty(result.Issues);
+        Assert.Contains(result.Issues, i => i.Severity == LintSeverity.Error);
     }
 
     /// <summary>
     /// Test that a requirements Markdown report is generated correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Modeling_Export_Requirements_GeneratesMarkdownFile()
     {
         // Arrange: create a requirements file with one testable requirement
@@ -161,7 +159,7 @@ public class ModelingTests
                       - SomeTest
             """);
         var loadResult = Requirements.Load(reqFile);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
 
         var reportFile = Path.Combine(_testDirectory, "requirements.md");
 
@@ -169,7 +167,7 @@ public class ModelingTests
         loadResult.Requirements.Export(reportFile);
 
         // Assert: report file exists and contains the requirement ID and title
-        Assert.IsTrue(File.Exists(reportFile), "Requirements report should be generated.");
+        Assert.True(File.Exists(reportFile), "Requirements report should be generated.");
         var content = File.ReadAllText(reportFile);
         Assert.Contains("Modeling-Test-Req1", content);
         Assert.Contains("The system shall have a testable requirement.", content);
@@ -178,7 +176,7 @@ public class ModelingTests
     /// <summary>
     /// Test that a justifications Markdown report is generated correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Modeling_Export_Justifications_GeneratesMarkdownFile()
     {
         // Arrange: create a requirements file with one justified requirement
@@ -194,7 +192,7 @@ public class ModelingTests
                       - SomeTest
             """);
         var loadResult = Requirements.Load(reqFile);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
 
         var justificationsFile = Path.Combine(_testDirectory, "justifications.md");
 
@@ -202,7 +200,7 @@ public class ModelingTests
         loadResult.Requirements.ExportJustifications(justificationsFile);
 
         // Assert: report file exists and contains the requirement ID and justification text
-        Assert.IsTrue(File.Exists(justificationsFile), "Justifications report should be generated.");
+        Assert.True(File.Exists(justificationsFile), "Justifications report should be generated.");
         var content = File.ReadAllText(justificationsFile);
         Assert.Contains("Modeling-Test-Req2", content);
         Assert.Contains("This justification explains why the requirement is needed.", content);
@@ -211,7 +209,7 @@ public class ModelingTests
     /// <summary>
     /// Test that the Modeling subsystem detects an error when loading a malformed YAML file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Modeling_Linting_MalformedYaml_DetectsError()
     {
         // Arrange: create a requirements file containing malformed YAML
@@ -227,16 +225,16 @@ public class ModelingTests
         var result = Requirements.Load(reqFile);
 
         // Assert: an error-level lint issue is reported and requirements are null
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.IsNotEmpty(result.Issues, "Expected at least one lint issue to be reported.");
-        Assert.Contains(i => i.Severity == LintSeverity.Error, result.Issues, "Expected at least one Error-severity lint issue.");
+        Assert.True(result.HasErrors);
+        Assert.Null(result.Requirements);
+        Assert.NotEmpty(result.Issues);
+        Assert.Contains(result.Issues, i => i.Severity == LintSeverity.Error);
     }
 
     /// <summary>
     /// Test that the Modeling subsystem reports no issues when loading a valid requirements file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Modeling_Linting_ValidFile_ReturnsNoIssues()
     {
         // Arrange: create a structurally valid requirements YAML file
@@ -256,15 +254,15 @@ public class ModelingTests
         var result = Requirements.Load(reqFile);
 
         // Assert: no lint issues are reported
-        Assert.IsFalse(result.HasErrors);
-        Assert.HasCount(0, result.Issues);
+        Assert.False(result.HasErrors);
+        Assert.Empty(result.Issues);
     }
 
     /// <summary>
     /// Test that the Modeling subsystem reports ALL lint issues when multiple independent
     /// lint conditions are present in one load, not just the first one encountered.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Modeling_LintingReporting_MultipleConditions_ReportsAllIssues()
     {
         // Arrange: create a requirements file with two independent lint errors:
@@ -284,10 +282,58 @@ public class ModelingTests
         var result = Requirements.Load(reqFile);
 
         // Assert: both lint issues are reported (not just HasErrors == true)
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsGreaterThanOrEqualTo(2, result.Issues.Count,
-            $"Expected at least 2 lint issues but got {result.Issues.Count}.");
-        Assert.IsTrue(result.Issues.All(i => i.Severity == LintSeverity.Error),
+        Assert.True(result.HasErrors);
+        Assert.True(result.Issues.Count >= 2, $"Expected at least 2 lint issues but got {result.Issues.Count}.");
+        Assert.True(result.Issues.All(i => i.Severity == LintSeverity.Error),
             "All reported issues should be Error severity.");
+    }
+
+    /// <summary>
+    /// Test that the Modeling subsystem loads requirements from multiple YAML files
+    /// following includes directives transitively.
+    /// </summary>
+    [Fact]
+    public void Modeling_MultiFileLoading_WithIncludes_LoadsRequirementsFromAllFiles()
+    {
+        // Arrange: create a second file with distinct requirements
+        var includedFile = Path.Combine(_testDirectory, "included.yaml");
+        File.WriteAllText(includedFile, """
+            sections:
+              - title: Included Requirements
+                requirements:
+                  - id: Modeling-Included-Req1
+                    title: The system shall satisfy the included requirement.
+                    justification: Included requirement justification.
+                    tests:
+                      - IncludedTest1
+            """);
+
+        // Arrange: create a main file that references the second file via includes
+        var mainFile = Path.Combine(_testDirectory, "main.yaml");
+        File.WriteAllText(mainFile, """
+            includes:
+              - included.yaml
+            sections:
+              - title: Main Requirements
+                requirements:
+                  - id: Modeling-Main-Req1
+                    title: The system shall satisfy the main requirement.
+                    justification: Main requirement justification.
+                    tests:
+                      - MainTest1
+            """);
+
+        // Act: load the main requirements file
+        var result = Requirements.Load(mainFile);
+
+        // Assert: requirements from both files appear in the result
+        Assert.NotNull(result.Requirements);
+        Assert.False(result.HasErrors);
+        var allIds = result.Requirements.Sections
+            .SelectMany(s => s.Requirements)
+            .Select(r => r.Id)
+            .ToList();
+        Assert.Contains("Modeling-Main-Req1", allIds);
+        Assert.Contains("Modeling-Included-Req1", allIds);
     }
 }

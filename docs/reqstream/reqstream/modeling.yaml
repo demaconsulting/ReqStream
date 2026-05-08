@@ -8,12 +8,12 @@
 # - Subsystem requirements describe the YAML parsing and data model behavior
 
 includes:
-  - lint-issue.yaml
-  - load-result.yaml
-  - requirement.yaml
-  - requirements.yaml
-  - requirements-loader.yaml
-  - section.yaml
+  - modeling/lint-issue.yaml
+  - modeling/load-result.yaml
+  - modeling/requirement.yaml
+  - modeling/requirements.yaml
+  - modeling/requirements-loader.yaml
+  - modeling/section.yaml
 
 sections:
   - title: Modeling Subsystem Requirements
@@ -24,6 +24,8 @@ sections:
           YAML-based requirement files enable human-readable and version-control-friendly
           requirements management. The Modeling subsystem must correctly parse these files
           into a structured data model for use by the tracing and reporting subsystems.
+        tags:
+          - modeling
         tests:
           - Modeling_YamlParsing_ValidFile_LoadsRequirements
           - Modeling_YamlParsing_ValidFile_ReturnsNoLintIssues
@@ -35,6 +37,9 @@ sections:
           - ReqStream-Requirements-Hierarchy
           - ReqStream-Section-Container
           - ReqStream-Section-Nesting
+          - ReqStream-Requirements-Tags
+          - ReqStream-Requirements-BlankTagName
+          - ReqStream-Requirements-Justification
 
       - id: ReqStream-Modeling-Export
         title: The Modeling subsystem shall generate Markdown reports from requirements data.
@@ -42,11 +47,15 @@ sections:
           Generating Markdown reports from requirements data enables documentation to be
           produced automatically from the requirements files, reducing manual effort and
           ensuring consistency.
+        tags:
+          - modeling
+          - reporting
         tests:
           - Modeling_Export_Requirements_GeneratesMarkdownFile
           - Modeling_Export_Justifications_GeneratesMarkdownFile
         children:
           - ReqStream-Requirements-ParentChild
+          - ReqStream-Requirements-BlankChildId
           - ReqStream-Requirements-TestMappings
           - ReqStream-Report-MarkdownExport
           - ReqStream-Report-HeaderDepth
@@ -62,8 +71,11 @@ sections:
           Modular requirements management requires the subsystem to resolve `includes` references
           recursively, merging all referenced files into a single requirements tree. This enables
           teams to split requirements across files and directories without losing traceability.
+        tags:
+          - modeling
         tests:
           - Modeling_YamlParsing_ValidFile_LoadsRequirements
+          - Modeling_MultiFileLoading_WithIncludes_LoadsRequirementsFromAllFiles
         children:
           - ReqStream-Requirements-Includes
           - ReqStream-Requirements-SectionMerging
@@ -74,6 +86,9 @@ sections:
           Structural validation during loading catches malformed YAML, missing mandatory fields,
           unknown fields, duplicate IDs, and other problems early. Reporting all issues in a
           single pass allows users to fix all problems at once rather than one at a time.
+        tags:
+          - modeling
+          - lint
         tests:
           - Modeling_YamlParsing_DuplicateIds_DetectsLintError
           - Modeling_Linting_MalformedYaml_DetectsError
@@ -107,6 +122,12 @@ sections:
           - ReqStream-Modeling-LintingValidation
           - ReqStream-Modeling-LintingReporting
           - ReqStream-LoadResult-ReportIssues
+          - ReqStream-Lint-InvalidFilePath
+          - ReqStream-Lint-FileNotFound
+          - ReqStream-Lint-IoReadFailure
+          - ReqStream-Lint-NonMappingRoot
+          - ReqStream-Lint-SeverityString
+          - ReqStream-LoadResult-HasErrors
 
       - id: ReqStream-Modeling-LintingValidation
         title: The Modeling subsystem shall validate requirements file structure.
@@ -114,6 +135,9 @@ sections:
           Structural validation during loading catches malformed YAML, missing mandatory fields,
           unknown fields, duplicate IDs, and other problems early, allowing users to fix all
           problems before running reports or tracing.
+        tags:
+          - modeling
+          - lint
         tests:
           - Modeling_Linting_MalformedYaml_DetectsError
           - Modeling_Linting_ValidFile_ReturnsNoIssues
@@ -123,5 +147,9 @@ sections:
         justification: |
           Reporting all issues in a single pass allows users to fix all problems at once
           rather than one at a time, improving developer productivity and CI turnaround.
+        tags:
+          - modeling
+          - lint
         tests:
           - Modeling_YamlParsing_DuplicateIds_DetectsLintError
+          - Modeling_LintingReporting_MultipleConditions_ReportsAllIssues

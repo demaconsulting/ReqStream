@@ -29,18 +29,16 @@ namespace DemaConsulting.ReqStream.Tests.Tracing;
 /// <summary>
 ///     Unit tests for TraceMatrix Markdown export functionality.
 /// </summary>
-[TestClass]
-public class TraceMatrixExportTests
+public sealed class TraceMatrixExportTests : IDisposable
 {
     private static readonly string[] SplitDelimiter = ["| Test_Credentials |"];
 
-    private string _testDirectory = string.Empty;
+    private readonly string _testDirectory;
 
     /// <summary>
     ///     Initialize test by creating a temporary test directory.
     /// </summary>
-    [TestInitialize]
-    public void TestInitialize()
+    public TraceMatrixExportTests()
     {
         _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
@@ -49,21 +47,22 @@ public class TraceMatrixExportTests
     /// <summary>
     ///     Clean up test by deleting the temporary test directory.
     /// </summary>
-    [TestCleanup]
-    public void TestCleanup()
+    public void Dispose()
     {
         if (Directory.Exists(_testDirectory))
         {
             Directory.Delete(_testDirectory, recursive: true);
         }
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
     ///     Test exporting a simple trace matrix to Markdown.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Export_SimpleTraceMatrix_CreatesMarkdownFile()
     {
+        // Arrange:
         // Create requirements
         var reqYaml = @"---
 sections:
@@ -78,7 +77,7 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Create TRX file
@@ -103,13 +102,15 @@ sections:
         var trxPath = Path.Combine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, trxPath);
 
         var mdPath = Path.Combine(_testDirectory, "tracematrix.md");
         matrix.Export(mdPath);
 
-        Assert.IsTrue(File.Exists(mdPath));
+        // Assert:
+        Assert.True(File.Exists(mdPath));
         var content = File.ReadAllText(mdPath);
         Assert.Contains("# Summary", content);
         Assert.Contains("1 of 1 requirements are satisfied with tests.", content);
@@ -126,9 +127,10 @@ sections:
     /// <summary>
     ///     Test exporting trace matrix with custom depth.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Export_WithCustomDepth_UsesCorrectHeaderLevel()
     {
+        // Arrange:
         // Create requirements
         var reqYaml = @"---
 sections:
@@ -142,7 +144,7 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Create TRX file
@@ -159,12 +161,14 @@ sections:
         var trxPath = Path.Combine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, trxPath);
 
         var mdPath = Path.Combine(_testDirectory, "tracematrix.md");
         matrix.Export(mdPath, depth: 2);
 
+        // Assert:
         var content = File.ReadAllText(mdPath);
         Assert.Contains("## Summary", content);
         Assert.Contains("## Requirements", content);
@@ -175,9 +179,10 @@ sections:
     /// <summary>
     ///     Test exporting trace matrix with failed tests.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Export_WithFailedTests_ShowsFailures()
     {
+        // Arrange:
         // Create requirements
         var reqYaml = @"---
 sections:
@@ -192,7 +197,7 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Create TRX file with one failure
@@ -218,12 +223,14 @@ sections:
         var trxPath = Path.Combine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, trxPath);
 
         var mdPath = Path.Combine(_testDirectory, "tracematrix.md");
         matrix.Export(mdPath);
 
+        // Assert:
         var content = File.ReadAllText(mdPath);
         Assert.Contains("0 of 1 requirements are satisfied with tests.", content);
         Assert.Contains("| AUTH-001 | 2 | 1 | 1 | 0 |", content);
@@ -234,9 +241,10 @@ sections:
     /// <summary>
     ///     Test exporting trace matrix with not executed tests.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Export_WithNotExecutedTests_ShowsNotExecuted()
     {
+        // Arrange:
         // Create requirements
         var reqYaml = @"---
 sections:
@@ -251,7 +259,7 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Create TRX file with only one test
@@ -268,12 +276,14 @@ sections:
         var trxPath = Path.Combine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, trxPath);
 
         var mdPath = Path.Combine(_testDirectory, "tracematrix.md");
         matrix.Export(mdPath);
 
+        // Assert:
         var content = File.ReadAllText(mdPath);
         Assert.Contains("0 of 1 requirements are satisfied with tests.", content);
         Assert.Contains("| AUTH-001 | 2 | 1 | 0 | 1 |", content);
@@ -283,9 +293,10 @@ sections:
     /// <summary>
     ///     Test exporting trace matrix with nested sections.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Export_WithNestedSections_CreatesHierarchy()
     {
+        // Arrange:
         // Create requirements
         var reqYaml = @"---
 sections:
@@ -307,7 +318,7 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Create TRX file
@@ -332,12 +343,14 @@ sections:
         var trxPath = Path.Combine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, trxPath);
 
         var mdPath = Path.Combine(_testDirectory, "tracematrix.md");
         matrix.Export(mdPath);
 
+        // Assert:
         var content = File.ReadAllText(mdPath);
         Assert.Contains("2 of 2 requirements are satisfied with tests.", content);
         Assert.Contains("## Data Management", content);
@@ -350,9 +363,10 @@ sections:
     /// <summary>
     ///     Test that export throws exception when file path is null.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Export_NullFilePath_ThrowsArgumentException()
     {
+        // Arrange:
         // Create requirements
         var reqYaml = @"---
 sections:
@@ -366,22 +380,24 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements);
 
-        var ex = Assert.ThrowsExactly<ArgumentException>(() => matrix.Export(null!));
+        // Act / Assert:
+        var ex = Assert.Throws<ArgumentException>(() => matrix.Export(null!));
         Assert.Contains("File path cannot be null or empty", ex.Message);
     }
 
     /// <summary>
     ///     Test that export throws exception when file path is empty.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Export_EmptyFilePath_ThrowsArgumentException()
     {
+        // Arrange:
         // Create requirements
         var reqYaml = @"---
 sections:
@@ -395,22 +411,24 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements);
 
-        var ex = Assert.ThrowsExactly<ArgumentException>(() => matrix.Export(string.Empty));
+        // Act / Assert:
+        var ex = Assert.Throws<ArgumentException>(() => matrix.Export(string.Empty));
         Assert.Contains("File path cannot be null or empty", ex.Message);
     }
 
     /// <summary>
     ///     Test exporting trace matrix with requirements that have child requirements.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Export_WithChildRequirements_ConsidersChildTests()
     {
+        // Arrange:
         // Create requirements with children
         var reqYaml = @"---
 sections:
@@ -430,7 +448,7 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Create TRX file
@@ -447,12 +465,14 @@ sections:
         var trxPath = Path.Combine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, trxPath);
 
         var mdPath = Path.Combine(_testDirectory, "tracematrix.md");
         matrix.Export(mdPath);
 
+        // Assert:
         var content = File.ReadAllText(mdPath);
         // Both requirements should be satisfied because SYS-SEC-001 has child AUTH-001 which has passing tests
         Assert.Contains("2 of 2 requirements are satisfied with tests.", content);
@@ -463,9 +483,10 @@ sections:
     /// <summary>
     ///     Test exporting trace matrix with requirements that have no tests.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Export_WithNoTests_ShowsNotSatisfied()
     {
+        // Arrange:
         // Create requirements with no tests
         var reqYaml = @"---
 sections:
@@ -477,15 +498,17 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act:
         // Create TraceMatrix with no test results
         var matrix = new TraceMatrix(requirements);
 
         var mdPath = Path.Combine(_testDirectory, "tracematrix.md");
         matrix.Export(mdPath);
 
+        // Assert:
         var content = File.ReadAllText(mdPath);
         Assert.Contains("0 of 1 requirements are satisfied with tests.", content);
         Assert.Contains("| AUTH-001 | 0 | 0 | 0 | 0 |", content);
@@ -494,9 +517,10 @@ sections:
     /// <summary>
     ///     Test exporting trace matrix where a test maps to multiple requirements.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Export_TestMapsToMultipleRequirements_ShowsAllMappings()
     {
+        // Arrange:
         // Create requirements where one test maps to multiple requirements
         var reqYaml = @"---
 sections:
@@ -514,7 +538,7 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Create TRX file
@@ -531,25 +555,28 @@ sections:
         var trxPath = Path.Combine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix
         var matrix = new TraceMatrix(requirements, trxPath);
 
         var mdPath = Path.Combine(_testDirectory, "tracematrix.md");
         matrix.Export(mdPath);
 
+        // Assert:
         var content = File.ReadAllText(mdPath);
         Assert.Contains("2 of 2 requirements are satisfied with tests.", content);
         // Test should appear twice in the testing section, once for each requirement
         var testCredentialsCount = content.Split(SplitDelimiter, StringSplitOptions.None).Length - 1;
-        Assert.AreEqual(2, testCredentialsCount, "Test_Credentials should appear twice in the testing section");
+        Assert.Equal(2, testCredentialsCount);
     }
 
     /// <summary>
     /// Test exporting trace matrix with filter tags.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_Export_WithFilterTags_ExportsOnlyMatchingRequirements()
     {
+        // Arrange:
         var yamlContent = @"sections:
   - title: System Requirements
     requirements:
@@ -569,7 +596,7 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Create test results
@@ -594,12 +621,14 @@ sections:
         var trxPath = Path.Combine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
+        // Act:
         // Create TraceMatrix and export with filter
         var matrix = new TraceMatrix(requirements, trxPath);
         var mdPath = Path.Combine(_testDirectory, "tracematrix.md");
         var filterTags = new HashSet<string> { "security" };
         matrix.Export(mdPath, filterTags: filterTags);
 
+        // Assert:
         var content = File.ReadAllText(mdPath);
 
         // Should show 1 of 1 requirements (only security-tagged requirement)
@@ -615,9 +644,10 @@ sections:
     /// <summary>
     /// Test that trace matrix filtering affects satisfied requirements count.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_CalculateSatisfiedRequirements_WithFilterTags_CountsOnlyMatchingRequirements()
     {
+        // Arrange:
         var yamlContent = @"sections:
   - title: System Requirements
     requirements:
@@ -641,7 +671,7 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Create test results
@@ -666,26 +696,29 @@ sections:
         var trxPath = Path.Combine(_testDirectory, "results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
+        // Act:
         var matrix = new TraceMatrix(requirements, trxPath);
 
+        // Assert:
         // Without filter: should count all 3 requirements (2 satisfied, 1 unsatisfied)
         var (satisfiedAll, totalAll) = matrix.CalculateSatisfiedRequirements();
-        Assert.AreEqual(2, satisfiedAll);
-        Assert.AreEqual(3, totalAll);
+        Assert.Equal(2, satisfiedAll);
+        Assert.Equal(3, totalAll);
 
         // With security filter: should count only 2 security requirements (1 satisfied, 1 unsatisfied)
         var filterTags = new HashSet<string> { "security" };
         var (satisfiedFiltered, totalFiltered) = matrix.CalculateSatisfiedRequirements(filterTags);
-        Assert.AreEqual(1, satisfiedFiltered);
-        Assert.AreEqual(2, totalFiltered);
+        Assert.Equal(1, satisfiedFiltered);
+        Assert.Equal(2, totalFiltered);
     }
 
     /// <summary>
     /// Test that trace matrix filtering affects unsatisfied requirements list.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void TraceMatrix_GetUnsatisfiedRequirements_WithFilterTags_ReturnsOnlyMatchingRequirements()
     {
+        // Arrange:
         var yamlContent = @"sections:
   - title: System Requirements
     requirements:
@@ -701,21 +734,23 @@ sections:
         var reqPath = Path.Combine(_testDirectory, "requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
-        Assert.IsNotNull(loadResult.Requirements);
+        Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
+        // Act:
         var matrix = new TraceMatrix(requirements);
 
+        // Assert:
         // Without filter: should return both unsatisfied requirements
         var unsatisfiedAll = matrix.GetUnsatisfiedRequirements();
-        Assert.HasCount(2, unsatisfiedAll);
+        Assert.Equal(2, unsatisfiedAll.Count);
         Assert.Contains("REQ-001", unsatisfiedAll);
         Assert.Contains("REQ-002", unsatisfiedAll);
 
         // With security filter: should return only security requirement
         var filterTags = new HashSet<string> { "security" };
         var unsatisfiedFiltered = matrix.GetUnsatisfiedRequirements(filterTags);
-        Assert.HasCount(1, unsatisfiedFiltered);
+        Assert.Single(unsatisfiedFiltered);
         Assert.Contains("REQ-001", unsatisfiedFiltered);
         Assert.DoesNotContain("REQ-002", unsatisfiedFiltered);
     }

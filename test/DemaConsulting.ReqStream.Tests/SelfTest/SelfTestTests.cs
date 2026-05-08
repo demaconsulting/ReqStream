@@ -27,16 +27,14 @@ namespace DemaConsulting.ReqStream.Tests.SelfTest;
 /// Tests for the SelfTest subsystem, proving the Validation class is sufficient to
 /// implement the SelfTest subsystem requirements.
 /// </summary>
-[TestClass]
-public class SelfTestTests
+public sealed class SelfTestTests : IDisposable
 {
-    private string _testDirectory = string.Empty;
+    private readonly string _testDirectory;
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
-    [TestInitialize]
-    public void TestInitialize()
+    public SelfTestTests()
     {
         _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_self_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
@@ -45,19 +43,19 @@ public class SelfTestTests
     /// <summary>
     /// Clean up test by deleting the temporary test directory.
     /// </summary>
-    [TestCleanup]
-    public void TestCleanup()
+    public void Dispose()
     {
         if (Directory.Exists(_testDirectory))
         {
             Directory.Delete(_testDirectory, recursive: true);
         }
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
     /// Test that self-validation runs successfully and reports no failures.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void SelfTest_Qualification_Run_PassesAllTests()
     {
         // Arrange: create a silent context to suppress console output during validation
@@ -67,13 +65,13 @@ public class SelfTestTests
         Validation.Run(context);
 
         // Assert: exit code is 0 indicating all self-validation checks passed
-        Assert.AreEqual(0, context.ExitCode);
+        Assert.Equal(0, context.ExitCode);
     }
 
     /// <summary>
     /// Test that self-validation writes a TRX results file when the results path has a .trx extension.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void SelfTest_ResultsOutput_TrxResultsPath_WritesTrxFile()
     {
         // Arrange: define path for the TRX results output file
@@ -84,8 +82,8 @@ public class SelfTestTests
         Validation.Run(context);
 
         // Assert: exit code is 0 and TRX file was created with expected content
-        Assert.AreEqual(0, context.ExitCode);
-        Assert.IsTrue(File.Exists(resultsFile), $"Expected TRX results file at {resultsFile}");
+        Assert.Equal(0, context.ExitCode);
+        Assert.True(File.Exists(resultsFile), $"Expected TRX results file at {resultsFile}");
         var content = File.ReadAllText(resultsFile);
         Assert.Contains("TestRun", content);
     }
@@ -93,7 +91,7 @@ public class SelfTestTests
     /// <summary>
     /// Test that self-validation writes a JUnit XML results file when the results path has a .xml extension.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void SelfTest_ResultsOutput_XmlResultsPath_WritesJUnitFile()
     {
         // Arrange: define path for the JUnit XML results output file
@@ -104,8 +102,8 @@ public class SelfTestTests
         Validation.Run(context);
 
         // Assert: exit code is 0 and JUnit XML file was created with expected content
-        Assert.AreEqual(0, context.ExitCode);
-        Assert.IsTrue(File.Exists(resultsFile), $"Expected JUnit XML results file at {resultsFile}");
+        Assert.Equal(0, context.ExitCode);
+        Assert.True(File.Exists(resultsFile), $"Expected JUnit XML results file at {resultsFile}");
         var content = File.ReadAllText(resultsFile);
         Assert.Contains("testsuite", content);
     }
@@ -113,7 +111,7 @@ public class SelfTestTests
     /// <summary>
     /// Test that self-validation sets exit code 1 and reports errors when failures are encountered.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void SelfTest_FailureReporting_WithErrors_SetsExitCode1()
     {
         // Arrange: create a results file path with an unsupported extension to trigger an error
@@ -129,7 +127,7 @@ public class SelfTestTests
         }
 
         // Assert: exit code is 1 and error output was written to the log (read after context disposed to flush log)
-        Assert.AreEqual(1, exitCode);
+        Assert.Equal(1, exitCode);
         var logContent = File.ReadAllText(logFile);
         Assert.Contains("Error:", logContent);
     }

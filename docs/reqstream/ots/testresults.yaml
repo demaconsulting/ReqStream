@@ -1,0 +1,20 @@
+---
+# DemaConsulting.TestResults OTS Software Requirements
+#
+# Requirements for the DemaConsulting.TestResults test result reading library.
+
+sections:
+  - title: OTS Software Requirements
+    sections:
+      - title: DemaConsulting.TestResults Requirements
+        requirements:
+          - id: ReqStream-OTS-TestResults
+            title: DemaConsulting.TestResults shall read TRX and JUnit XML test result files.
+            justification: |
+              DemaConsulting.TestResults is the library used to read test result files in TRX
+              (MSTest) and JUnit XML formats. It must correctly parse test execution records
+              so that ReqStream can map test results to requirements for coverage analysis.
+            tags: [ots]
+            tests:
+              - TraceMatrix_Constructor_WithTrxFile_ParsesCorrectly
+              - TraceMatrix_Constructor_WithJUnitFile_ParsesCorrectly

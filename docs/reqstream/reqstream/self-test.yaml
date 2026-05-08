@@ -7,13 +7,14 @@
 # - Subsystem requirements describe the self-validation mechanism for tool qualification
 
 includes:
-  - validation.yaml
+  - self-test/validation.yaml
 
 sections:
   - title: SelfTest Subsystem Requirements
     requirements:
       - id: ReqStream-SelfTest-Qualification
         title: The tool shall provide a self-validation mechanism to qualify the tool in its deployment environment.
+        tags: [self-test]
         justification: |
           In regulated environments, tool qualification evidence is required to demonstrate
           that the tool functions correctly in its deployment environment before it is used
@@ -25,9 +26,11 @@ sections:
           - SelfTest_Qualification_Run_PassesAllTests
         children:
           - ReqStream-Validation-SelfValidation
+          - ReqStream-Validation-NullContext
 
       - id: ReqStream-SelfTest-ResultsOutput
         title: The tool shall write self-validation results to a standard test result file when --results is provided.
+        tags: [self-test]
         justification: |
           CI/CD pipelines and requirements traceability tools (such as ReqStream itself)
           consume test result files in standard formats. By supporting both TRX (MSTest) and
@@ -44,6 +47,7 @@ sections:
 
       - id: ReqStream-SelfTest-FailureReporting
         title: The tool shall report an error and set exit code 1 when self-validation encounters failures.
+        tags: [self-test]
         justification: |
           Automated test pipelines and CI/CD systems rely on non-zero exit codes to detect
           tool failures. Reporting each error via WriteError and exiting with code 1 ensures

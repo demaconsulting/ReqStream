@@ -27,16 +27,14 @@ namespace DemaConsulting.ReqStream.Tests.Modeling;
 /// Unit tests for the LoadResult class, proving it correctly encapsulates load outcomes
 /// and routes lint issues to the appropriate context output streams.
 /// </summary>
-[TestClass]
-public class LoadResultTests
+public sealed class LoadResultTests : IDisposable
 {
-    private string _testDirectory = string.Empty;
+    private readonly string _testDirectory;
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
-    [TestInitialize]
-    public void TestInitialize()
+    public LoadResultTests()
     {
         _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_load_result_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
@@ -45,19 +43,19 @@ public class LoadResultTests
     /// <summary>
     /// Clean up test by deleting the temporary test directory.
     /// </summary>
-    [TestCleanup]
-    public void TestCleanup()
+    public void Dispose()
     {
         if (Directory.Exists(_testDirectory))
         {
             Directory.Delete(_testDirectory, recursive: true);
         }
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
     /// Test that ReportIssues routes error-level issues to the context error output.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void LoadResult_ReportIssues_ErrorIssue_SetsContextError()
     {
         // Arrange: load a file with a lint error
@@ -84,7 +82,7 @@ sections:
         }
 
         // Assert: error context exit code set and log contains issue
-        Assert.AreEqual(1, exitCode);
+        Assert.Equal(1, exitCode);
         var log = File.ReadAllText(logFile);
         Assert.Contains("unknown_field", log);
     }
@@ -92,7 +90,7 @@ sections:
     /// <summary>
     /// Test that ReportIssues routes warning-level issues to context normal output.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void LoadResult_ReportIssues_WarningIssue_DoesNotSetContextError()
     {
         // Arrange: create a load result with a single warning issue
@@ -110,7 +108,7 @@ sections:
         }
 
         // Assert: no error exit code and warning written to log
-        Assert.AreEqual(0, exitCode);
+        Assert.Equal(0, exitCode);
         var log = File.ReadAllText(logFile);
         Assert.Contains("A warning", log);
     }
@@ -118,7 +116,7 @@ sections:
     /// <summary>
     /// Test that ReportIssues produces no output when there are no issues.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void LoadResult_ReportIssues_NoIssues_ProducesNoOutput()
     {
         // Arrange: load a valid file with no issues
@@ -144,14 +142,14 @@ sections:
         }
 
         // Assert: no output produced and exit code zero
-        Assert.AreEqual(0, exitCode);
-        Assert.AreEqual(string.Empty, File.ReadAllText(logFile));
+        Assert.Equal(0, exitCode);
+        Assert.Equal(string.Empty, File.ReadAllText(logFile));
     }
 
     /// <summary>
     /// Test that HasErrors is false when there are only warnings.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void LoadResult_HasErrors_WithOnlyWarnings_ReturnsFalse()
     {
         // Arrange: create a load result with a single warning issue
@@ -160,14 +158,14 @@ sections:
             [new LintIssue("file.yaml", LintSeverity.Warning, "A warning")]);
 
         // Assert: HasErrors is false and Requirements is not null for warnings-only results
-        Assert.IsFalse(result.HasErrors);
-        Assert.IsNotNull(result.Requirements);
+        Assert.False(result.HasErrors);
+        Assert.NotNull(result.Requirements);
     }
 
     /// <summary>
     /// Test that HasErrors is true when there are error-level issues.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void LoadResult_HasErrors_WithErrorIssue_ReturnsTrue()
     {
         // Arrange: create a load result with an error issue and null requirements
@@ -176,7 +174,7 @@ sections:
             [new LintIssue("file.yaml", LintSeverity.Error, "An error")]);
 
         // Assert: HasErrors is true and Requirements is null for error results
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
+        Assert.True(result.HasErrors);
+        Assert.Null(result.Requirements);
     }
 }

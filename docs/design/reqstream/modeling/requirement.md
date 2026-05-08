@@ -1,12 +1,12 @@
-# Requirement Unit Design
+### Requirement Unit Design
 
-## Overview
+#### Overview
 
 `Requirement` is the domain model for a single requirement entry. It is a simple mutable
 data-transfer object with no business logic; its fields are populated by `RequirementsLoader`
 during YAML DOM traversal and consumed by `Requirements`, `TraceMatrix`, and the export methods.
 
-## Properties
+#### Properties
 
 | Property | Type | YAML key | Notes |
 | -------- | ---- | -------- | ----- |
@@ -18,7 +18,7 @@ during YAML DOM traversal and consumed by `Requirements`, `TraceMatrix`, and the
 | `Tags` | `List<string>` | `tags` | Optional labels for filtering and export |
 | `Location` | `string?` | — | Source path and line/column where the requirement is defined |
 
-## Constraints
+#### Constraints
 
 - `Id` must be unique across all files loaded in a single `Requirements.Load` call.
   Duplicates are detected and reported by `RequirementsLoader`.
@@ -30,7 +30,7 @@ during YAML DOM traversal and consumed by `Requirements`, `TraceMatrix`, and the
 to empty `List<string>` instances. `Justification` defaults to `null`. `Location` defaults to
 `null`. No property is left uninitialized; callers can safely iterate lists without null checks.
 
-## Interactions with Other Units
+#### Interactions with Other Units
 
 | Unit | Nature of interaction |
 | ---- | --------------------- |

@@ -65,25 +65,25 @@ breakdown above:
 ```text
 docs/design/
 ├── introduction.md                         — document introduction and architecture overview
+├── reqstream.md                            — system integration design
 └── reqstream/
-    ├── reqstream.md                        — system integration design
     ├── program.md                          — Program unit design
+    ├── cli.md                              — Cli subsystem design
     ├── cli/
-    │   ├── cli.md                          — Cli subsystem design
     │   └── context.md                      — Context unit design
+    ├── modeling.md                         — Modeling subsystem design
     ├── modeling/
-    │   ├── modeling.md                     — Modeling subsystem design
     │   ├── lint-issue.md                   — LintIssue unit design
     │   ├── load-result.md                  — LoadResult unit design
     │   ├── requirement.md                  — Requirement unit design
     │   ├── requirements-loader.md          — RequirementsLoader unit design
     │   ├── requirements.md                 — Requirements unit design
     │   └── section.md                      — Section unit design
+    ├── tracing.md                          — Tracing subsystem design
     ├── tracing/
-    │   ├── tracing.md                      — Tracing subsystem design
     │   └── trace-matrix.md                 — TraceMatrix unit design
+    ├── self-test.md                        — SelfTest subsystem design
     └── self-test/
-        ├── self-test.md                    — SelfTest subsystem design
         └── validation.md                   — Validation unit design
 ```
 
@@ -129,6 +129,7 @@ enabling reviewers and auditors to navigate from any one artifact to all related
 Each software item has parallel artifacts organized as follows:
 - Requirements: docs/reqstream/reqstream/.../{item}.yaml  (kebab-case)
 - Design docs:  docs/design/reqstream/.../{item}.md        (kebab-case)
+- Verification: docs/verification/reqstream/.../{item}.md  (kebab-case)
 - Source code:  src/DemaConsulting.ReqStream/.../{Item}.cs (PascalCase)
 - Tests:        test/DemaConsulting.ReqStream.Tests/.../{Item}Tests.cs (PascalCase)
 - Review-sets:  defined in .reviewmark.yaml
@@ -140,5 +141,11 @@ For example, the `Requirements` unit maps to:
 | -------- | ---- |
 | Requirements | `docs/reqstream/reqstream/modeling/requirements.yaml` |
 | Design | `docs/design/reqstream/modeling/requirements.md` |
+| Verification | `docs/verification/reqstream/modeling/requirements.md` |
 | Source | `src/DemaConsulting.ReqStream/Modeling/Requirements.cs` |
 | Tests | `test/DemaConsulting.ReqStream.Tests/Modeling/ModelingTests.cs` |
+
+## References
+
+- ReqStream System Requirements document
+- ReqStream Requirements Root document

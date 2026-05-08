@@ -1,6 +1,6 @@
-# Validation Unit Design
+### Validation Unit Design
 
-## Overview
+#### Overview
 
 `Validation` is the self-validation test runner for ReqStream. Its purpose is to execute a suite
 of end-to-end tests that verify the tool's own behavior and to produce structured test-result
@@ -9,9 +9,9 @@ tool's own requirements — enabling a self-hosting compliance workflow.
 
 All tests run in temporary directories to avoid side effects and are isolated from one another.
 
-## Methods
+#### Methods
 
-### `Run(context)`
+##### `Run(context)`
 
 `Run` is the single public entry point. It prints a header block to `context` containing the tool
 version, machine name, operating system, .NET runtime version, and current UTC timestamp. It then
@@ -45,7 +45,7 @@ Each test runs in a dedicated `TemporaryDirectory` with `DirectorySwitch` active
 files, invokes the relevant workflow, asserts expected outcomes, and returns a `TestResult` with
 outcome `Passed` or `Failed`.
 
-### `WriteResultsFile(context, testResults)`
+##### `WriteResultsFile(context, testResults)`
 
 `WriteResultsFile` serializes the collected `TestResult` list to a structured file.
 
@@ -60,16 +60,16 @@ outcome `Passed` or `Failed`.
 The serializer is called with the assembled `TestResults` object, returning a serialized string.
 The string is then written to the resolved output path via `File.WriteAllText`.
 
-## Supporting Types
+#### Supporting Types
 
-### `TemporaryDirectory` (nested helper class)
+##### `TemporaryDirectory` (nested helper class)
 
 `TemporaryDirectory` is an `IDisposable` helper that creates a uniquely named directory under
 `Path.GetTempPath()` on construction and deletes it recursively on disposal. It exists to give
 each validation test a clean, isolated file-system workspace that is guaranteed to be removed after
 the test completes, regardless of whether the test passes or fails.
 
-### `DirectorySwitch` (nested helper class)
+##### `DirectorySwitch` (nested helper class)
 
 `DirectorySwitch` is an `IDisposable` helper that changes the process working directory to a
 supplied path on construction and restores the original directory on disposal. It exists because
@@ -81,14 +81,14 @@ Each test uses both classes together: `TemporaryDirectory` owns the directory li
 guarantees that each test starts with a clean file system state and that no test artifacts persist
 after the test completes, regardless of whether the test passes or fails.
 
-## Dependencies
+#### Dependencies
 
 | Library / Type | Role |
 | -------------- | ---- |
 | `DemaConsulting.TestResults` | `TestResults`, `TestResult`, `TestOutcome` model types |
 | `DemaConsulting.TestResults.IO.Serializer` | TRX and JUnit file serialization |
 
-## Interactions with Other Units
+#### Interactions with Other Units
 
 | Unit | Nature of interaction |
 | ---- | --------------------- |

@@ -1,6 +1,6 @@
-# Context Unit Design
+### Context Unit Design
 
-## Overview
+#### Overview
 
 `Context` is the command-line argument parser and I/O owner for ReqStream. It is the single
 authoritative source for all runtime options and is the only unit permitted to write to the console
@@ -10,21 +10,21 @@ sole concerns are parsing arguments and surfacing results to the caller.
 `Context` implements `IDisposable` so that the log-file `StreamWriter` is closed deterministically
 when the enclosing `using` block in `Program.Main` exits.
 
-## Private State
+#### Private State
 
 - **`_logWriter`** (`StreamWriter?`, `--log`) — Open writer for the optional log file; `null` when no log file was requested.
 - **`_hasErrors`** (`bool`) — Accumulates error state; initially `false`; set to `true` by `WriteError`.
 
-## Properties
+#### Properties
 
 | Property | Type | CLI flag | Notes |
 | -------- | ---- | -------- | ----- |
-| `Version` | `bool` | `--version` | Print version and exit |
-| `Help` | `bool` | `--help` | Print usage and exit |
+| `Version` | `bool` | `--version` / `-v` | Print version and exit |
+| `Help` | `bool` | `--help` / `-?` / `-h` | Print usage and exit |
 | `Silent` | `bool` | `--silent` | Suppress console output |
 | `Validate` | `bool` | `--validate` | Run self-validation tests |
 | `Lint` | `bool` | `--lint` | Lint requirements files |
-| `ResultsFile` | `string?` | `--results` | Path for validation test-results output file |
+| `ResultsFile` | `string?` | `--results` / `--result` | Path for validation test-results output file |
 | `Enforce` | `bool` | `--enforce` | Fail if requirements are not fully covered |
 | `FilterTags` | `HashSet<string>?` | `--filter` | Comma-separated tag filter; `null` when not specified |
 | `RequirementsFiles` | `List<string>` | `--requirements` | Expanded list of requirement file paths |
@@ -38,9 +38,9 @@ when the enclosing `using` block in `Program.Main` exits.
 | `JustificationsDepth` | `int` | `--justifications-depth` | Justifications report heading depth; defaults to `Depth` |
 | `ExitCode` | `int` | — | Computed: `_hasErrors ? 1 : 0` |
 
-## Methods
+#### Methods
 
-### `Create(args)`
+##### `Create(args)`
 
 `Create` is the static factory method that constructs and returns a fully initialized `Context`. It
 implements a sequential switch-based parser over the `args` array. Each recognized flag sets the
@@ -61,7 +61,7 @@ receives a user-actionable error message rather than an unhandled exception.
 (`--report-depth`, `--matrix-depth`, `--justifications-depth`) override this default if
 specified; otherwise each report inherits the value of `Depth`.
 
-### `ExpandGlobPattern(pattern)`
+##### `ExpandGlobPattern(pattern)`
 
 `ExpandGlobPattern` resolves a single pattern (which may contain `*` or `**` wildcards) to a list
 of absolute file paths using `Microsoft.Extensions.FileSystemGlobbing.Matcher` against the current
@@ -71,24 +71,24 @@ working directory.
 paths. Callers that pass absolute paths directly will receive an empty result set. This is an
 accepted limitation of the underlying library; users should use relative paths or glob wildcards.
 
-### `WriteLine(message)`
+##### `WriteLine(message)`
 
 `WriteLine` writes a message to the console (unless `Silent` is `true`) and to `_logWriter` if a
 log file is open.
 
-### `WriteError(message)`
+##### `WriteError(message)`
 
 `WriteError` sets `_hasErrors = true`, writes the message to `Console.Error` in red (unless
 `Silent` is `true`), and also writes it to `_logWriter` if a log file is open. Setting
 `_hasErrors` ensures that `ExitCode` returns `1` after any error is reported.
 
-### `Dispose()`
+##### `Dispose()`
 
 `Dispose` flushes and closes `_logWriter` if it is not `null`, then sets it to `null`. This
 ensures the log file is not truncated and file handles are not leaked even when the process exits
 via an early return path.
 
-## Interactions with Other Units
+#### Interactions with Other Units
 
 | Unit | Nature of interaction |
 | ---- | --------------------- |
