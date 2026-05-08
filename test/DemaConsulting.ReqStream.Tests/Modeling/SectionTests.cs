@@ -26,16 +26,14 @@ namespace DemaConsulting.ReqStream.Tests.Modeling;
 /// Unit tests for the Section class, proving it correctly holds a title, requirements,
 /// and child sections.
 /// </summary>
-[TestClass]
-public class SectionTests
+public sealed class SectionTests : IDisposable
 {
-    private string _testDirectory = string.Empty;
+    private readonly string _testDirectory;
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
-    [TestInitialize]
-    public void TestInitialize()
+    public SectionTests()
     {
         _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_section_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
@@ -44,19 +42,19 @@ public class SectionTests
     /// <summary>
     /// Clean up test by deleting the temporary test directory.
     /// </summary>
-    [TestCleanup]
-    public void TestCleanup()
+    public void Dispose()
     {
         if (Directory.Exists(_testDirectory))
         {
             Directory.Delete(_testDirectory, recursive: true);
         }
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
     /// Test reading a simple YAML file with a single requirement.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Section_Load_SimpleRequirement_ParsesCorrectly()
     {
         // Arrange: create a YAML file with a single requirement
@@ -75,19 +73,19 @@ sections:
         var requirements = result.Requirements;
 
         // Assert: requirement parsed correctly
-        Assert.IsFalse(result.HasErrors);
-        Assert.IsNotNull(requirements);
-        Assert.HasCount(1, requirements.Sections);
-        Assert.AreEqual("System Security", requirements.Sections[0].Title);
-        Assert.HasCount(1, requirements.Sections[0].Requirements);
-        Assert.AreEqual("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
-        Assert.AreEqual("The system shall support credentials authentication.", requirements.Sections[0].Requirements[0].Title);
+        Assert.False(result.HasErrors);
+        Assert.NotNull(requirements);
+        Assert.Single(requirements.Sections);
+        Assert.Equal("System Security", requirements.Sections[0].Title);
+        Assert.Single(requirements.Sections[0].Requirements);
+        Assert.Equal("SYS-SEC-001", requirements.Sections[0].Requirements[0].Id);
+        Assert.Equal("The system shall support credentials authentication.", requirements.Sections[0].Requirements[0].Title);
     }
 
     /// <summary>
     /// Test reading nested sections.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Section_Load_NestedSections_ParsesHierarchyCorrectly()
     {
         // Arrange: create a YAML file with nested sections
@@ -112,21 +110,21 @@ sections:
         var requirements = result.Requirements;
 
         // Assert: nested section hierarchy parsed correctly
-        Assert.IsFalse(result.HasErrors);
-        Assert.IsNotNull(requirements);
-        Assert.HasCount(1, requirements.Sections);
-        Assert.AreEqual("Data Management", requirements.Sections[0].Title);
-        Assert.HasCount(2, requirements.Sections[0].Sections);
-        Assert.AreEqual("User Authentication", requirements.Sections[0].Sections[0].Title);
-        Assert.AreEqual("Logging", requirements.Sections[0].Sections[1].Title);
-        Assert.AreEqual("AUTH-001", requirements.Sections[0].Sections[0].Requirements[0].Id);
-        Assert.AreEqual("LOG-001", requirements.Sections[0].Sections[1].Requirements[0].Id);
+        Assert.False(result.HasErrors);
+        Assert.NotNull(requirements);
+        Assert.Single(requirements.Sections);
+        Assert.Equal("Data Management", requirements.Sections[0].Title);
+        Assert.Equal(2, requirements.Sections[0].Sections.Count);
+        Assert.Equal("User Authentication", requirements.Sections[0].Sections[0].Title);
+        Assert.Equal("Logging", requirements.Sections[0].Sections[1].Title);
+        Assert.Equal("AUTH-001", requirements.Sections[0].Sections[0].Requirements[0].Id);
+        Assert.Equal("LOG-001", requirements.Sections[0].Sections[1].Requirements[0].Id);
     }
 
     /// <summary>
     ///     Test that a blank section title reports an error issue with file location.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Section_Load_BlankSectionTitle_ReportsErrorWithFileLocation()
     {
         // Arrange: create a YAML file with a blank section title
@@ -144,9 +142,9 @@ sections:
         var result = Requirements.Load(filePath);
 
         // Assert: error reported with file location for the blank section title
-        Assert.IsTrue(result.HasErrors);
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Description.Contains("Section 'title' cannot be blank"), result.Issues);
-        Assert.Contains(i => i.Location.Contains(filePath), result.Issues);
+        Assert.True(result.HasErrors);
+        Assert.Null(result.Requirements);
+        Assert.Contains(result.Issues, i => i.Description.Contains("Section 'title' cannot be blank"));
+        Assert.Contains(result.Issues, i => i.Location.Contains(filePath));
     }
 }

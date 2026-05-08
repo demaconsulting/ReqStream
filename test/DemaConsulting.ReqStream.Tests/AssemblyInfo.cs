@@ -18,9 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 // Configure test parallelization for the test assembly.
 // Tests are configured to run sequentially to avoid resource contention on shared process state
 // (file handles, process limits, and current working directory mutations in self-test validation).
-[assembly: DoNotParallelize]
+[assembly: Xunit.CollectionBehavior(DisableTestParallelization = true)]

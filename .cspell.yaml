@@ -18,6 +18,7 @@ words:
   - DEMA
   - Dema
   - fileassert
+  - hotspot
   - hotspots
   - mstest
   - pandoc
@@ -30,6 +31,8 @@ words:
   - sonarmark
   - testname
   - tracematrix
+  - xunit
+  - Xunit
   - Unwritable
   - venv
   - versionmark
@@ -45,6 +48,7 @@ ignorePaths:
   - "**/thirdparty/**"
   - "**/third-party/**"
   - "**/3rd-party/**"
+  - "**/generated/**"
   - "**/AGENT_REPORT_*.md"
   - "**/.agent-logs/**"
   - "**/bin/**"

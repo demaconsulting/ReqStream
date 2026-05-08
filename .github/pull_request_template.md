@@ -26,16 +26,11 @@ Before submitting this pull request, ensure you have completed the following:
 
 ### Build and Test
 
-- [ ] Code builds successfully: `dotnet build --configuration Release`
-- [ ] All unit tests pass: `dotnet test --configuration Release`
-- [ ] Self-validation tests pass:
-  `dotnet run --project src/DemaConsulting.ReqStream --configuration Release --framework net10.0`
-  `--no-build -- --validate`
+- [ ] Code builds successfully and all tests pass: `pwsh ./build.ps1`
 - [ ] Code produces zero warnings
 
 ### Code Quality
 
-- [ ] Code formatting is correct: `dotnet format --verify-no-changes`
 - [ ] New code has appropriate XML documentation comments
 - [ ] Static analyzer warnings have been addressed
 
@@ -43,9 +38,7 @@ Before submitting this pull request, ensure you have completed the following:
 
 Please run the following checks before submitting:
 
-- [ ] **Spell checker passes**: `cspell "**/*.{md,cs}"`
-- [ ] **Markdown linter passes**: `markdownlint "**/*.md"`
-- [ ] **YAML linter passes**: `yamllint .`
+- [ ] **All linters pass**: `pwsh ./lint.ps1`
 
 ### Testing
 
@@ -57,7 +50,7 @@ Please run the following checks before submitting:
 ### Documentation
 
 - [ ] Updated README.md (if applicable)
-- [ ] Updated ARCHITECTURE.md (if applicable)
+- [ ] Updated docs/ documentation (if applicable)
 - [ ] Added code examples for new features (if applicable)
 - [ ] Updated requirements.yaml (if applicable)
 

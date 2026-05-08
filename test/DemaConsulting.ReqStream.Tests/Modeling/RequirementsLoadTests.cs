@@ -25,16 +25,14 @@ namespace DemaConsulting.ReqStream.Tests.Modeling;
 /// <summary>
 /// Unit tests for Requirements.Load() unified loading with linting.
 /// </summary>
-[TestClass]
-public class RequirementsLoadTests
+public sealed class RequirementsLoadTests : IDisposable
 {
-    private string _testDirectory = string.Empty;
+    private readonly string _testDirectory;
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
-    [TestInitialize]
-    public void TestInitialize()
+    public RequirementsLoadTests()
     {
         _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_load_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
@@ -43,19 +41,19 @@ public class RequirementsLoadTests
     /// <summary>
     /// Clean up test by deleting the temporary test directory.
     /// </summary>
-    [TestCleanup]
-    public void TestCleanup()
+    public void Dispose()
     {
         if (Directory.Exists(_testDirectory))
         {
             Directory.Delete(_testDirectory, recursive: true);
         }
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
     /// Test that loading a valid file returns requirements and no issues.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_ValidFile_ReturnsRequirementsAndNoIssues()
     {
         // Arrange: create a valid YAML file
@@ -73,16 +71,16 @@ sections:
         var result = Requirements.Load(filePath);
 
         // Assert: requirements loaded with no issues
-        Assert.IsNotNull(result.Requirements);
-        Assert.HasCount(0, result.Issues);
-        Assert.HasCount(1, result.Requirements.Sections);
-        Assert.AreEqual("REQ-001", result.Requirements.Sections[0].Requirements[0].Id);
+        Assert.NotNull(result.Requirements);
+        Assert.Empty(result.Issues);
+        Assert.Single(result.Requirements.Sections);
+        Assert.Equal("REQ-001", result.Requirements.Sections[0].Requirements[0].Id);
     }
 
     /// <summary>
     /// Test that loading a file with a lint error returns null requirements and issues.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_WithLintError_ReturnsNullAndIssues()
     {
         // Arrange: create a YAML file with an unknown field
@@ -101,32 +99,32 @@ sections:
         var result = Requirements.Load(filePath);
 
         // Assert: null requirements returned with error issues
-        Assert.IsNull(result.Requirements);
-        Assert.IsNotEmpty(result.Issues);
-        Assert.Contains(i => i.Severity == LintSeverity.Error, result.Issues);
-        Assert.Contains(i => i.Description.Contains("Unknown field 'unknown_field'"), result.Issues);
+        Assert.Null(result.Requirements);
+        Assert.NotEmpty(result.Issues);
+        Assert.Contains(result.Issues, i => i.Severity == LintSeverity.Error);
+        Assert.Contains(result.Issues, i => i.Description.Contains("Unknown field 'unknown_field'"));
     }
 
     /// <summary>
     /// Test that loading a missing file returns null requirements and an error issue.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_MissingFile_ReturnsNullAndIssues()
     {
         // Act: load a non-existent file
         var result = Requirements.Load("/nonexistent/path/missing.yaml");
 
         // Assert: null requirements returned with File not found error
-        Assert.IsNull(result.Requirements);
-        Assert.IsNotEmpty(result.Issues);
-        Assert.Contains(i => i.Severity == LintSeverity.Error, result.Issues);
-        Assert.Contains(i => i.Description.Contains("File not found"), result.Issues);
+        Assert.Null(result.Requirements);
+        Assert.NotEmpty(result.Issues);
+        Assert.Contains(result.Issues, i => i.Severity == LintSeverity.Error);
+        Assert.Contains(result.Issues, i => i.Description.Contains("File not found"));
     }
 
     /// <summary>
     /// Test that loading a file with malformed YAML returns null requirements and an error issue.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_MalformedYaml_ReturnsNullAndIssues()
     {
         // Arrange: create a YAML file with invalid syntax
@@ -142,16 +140,16 @@ sections:
         var result = Requirements.Load(filePath);
 
         // Assert: null requirements returned with malformed YAML error
-        Assert.IsNull(result.Requirements);
-        Assert.IsNotEmpty(result.Issues);
-        Assert.Contains(i => i.Severity == LintSeverity.Error, result.Issues);
-        Assert.Contains(i => i.Description.Contains("Malformed YAML"), result.Issues);
+        Assert.Null(result.Requirements);
+        Assert.NotEmpty(result.Issues);
+        Assert.Contains(result.Issues, i => i.Severity == LintSeverity.Error);
+        Assert.Contains(result.Issues, i => i.Description.Contains("Malformed YAML"));
     }
 
     /// <summary>
     /// Test that lint issues contain location information.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_WithLintError_IssueIncludesLocation()
     {
         // Arrange: create a YAML file with an unknown field at root level
@@ -164,7 +162,7 @@ sections:
         var result = Requirements.Load(filePath);
 
         // Assert: issue location includes the file path and severity text
-        Assert.IsNotEmpty(result.Issues);
+        Assert.NotEmpty(result.Issues);
         var issue = result.Issues[0];
         Assert.Contains(filePath, issue.Location);
         Assert.Contains("error:", issue.ToString());
@@ -173,7 +171,7 @@ sections:
     /// <summary>
     /// Test that loading a file with multiple lint errors reports all of them.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_WithMultipleLintErrors_ReportsAllIssues()
     {
         // Arrange: create a YAML file with multiple structural issues
@@ -195,28 +193,28 @@ unknown_root_field: bad
         var result = Requirements.Load(filePath);
 
         // Assert: all issues reported
-        Assert.IsNull(result.Requirements);
-        Assert.IsGreaterThanOrEqualTo(4, result.Issues.Count);
-        Assert.Contains(i => i.Description.Contains("Unknown field 'unknown_section_field'"), result.Issues);
-        Assert.Contains(i => i.Description.Contains("Requirement missing required field 'id'"), result.Issues);
-        Assert.Contains(i => i.Description.Contains("Duplicate requirement ID 'REQ-001'"), result.Issues);
-        Assert.Contains(i => i.Description.Contains("Unknown field 'unknown_root_field'"), result.Issues);
+        Assert.Null(result.Requirements);
+        Assert.True(result.Issues.Count >= 4);
+        Assert.Contains(result.Issues, i => i.Description.Contains("Unknown field 'unknown_section_field'"));
+        Assert.Contains(result.Issues, i => i.Description.Contains("Requirement missing required field 'id'"));
+        Assert.Contains(result.Issues, i => i.Description.Contains("Duplicate requirement ID 'REQ-001'"));
+        Assert.Contains(result.Issues, i => i.Description.Contains("Unknown field 'unknown_root_field'"));
     }
 
     /// <summary>
     /// Test that loading with no files throws ArgumentException.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_NoFiles_ThrowsArgumentException()
     {
         // Act + Assert: calling Load with no arguments throws ArgumentException
-        Assert.ThrowsExactly<ArgumentException>(() => Requirements.Load());
+        Assert.Throws<ArgumentException>(() => Requirements.Load());
     }
 
     /// <summary>
     /// Test that loading follows includes and lints included files.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Requirements_Load_WithIncludes_LintsIncludedFiles()
     {
         // Arrange: create a root YAML file and an included file with a lint error
@@ -243,9 +241,9 @@ sections:
         var result = Requirements.Load(rootFile);
 
         // Assert: error from included file is reported
-        Assert.IsNull(result.Requirements);
-        Assert.Contains(i => i.Severity == LintSeverity.Error, result.Issues);
-        Assert.Contains(i => i.Description.Contains("Unknown field 'unknown_field'"), result.Issues);
+        Assert.Null(result.Requirements);
+        Assert.Contains(result.Issues, i => i.Severity == LintSeverity.Error);
+        Assert.Contains(result.Issues, i => i.Description.Contains("Unknown field 'unknown_field'"));
     }
 
 }

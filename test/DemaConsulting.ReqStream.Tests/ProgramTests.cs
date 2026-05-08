@@ -26,16 +26,14 @@ namespace DemaConsulting.ReqStream.Tests;
 /// <summary>
 /// Unit tests for the Program class Run method.
 /// </summary>
-[TestClass]
-public class ProgramTests
+public sealed class ProgramTests : IDisposable
 {
-    private string _testDirectory = string.Empty;
+    private readonly string _testDirectory;
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
-    [TestInitialize]
-    public void TestInitialize()
+    public ProgramTests()
     {
         _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
@@ -44,19 +42,19 @@ public class ProgramTests
     /// <summary>
     /// Clean up test by deleting the temporary test directory.
     /// </summary>
-    [TestCleanup]
-    public void TestCleanup()
+    public void Dispose()
     {
         if (Directory.Exists(_testDirectory))
         {
             Directory.Delete(_testDirectory, recursive: true);
         }
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
     /// Test Run with version flag prints version information.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithVersionFlag_PrintsVersion()
     {
         // Arrange: redirect stdout to capture output
@@ -72,7 +70,7 @@ public class ProgramTests
 
             // Assert: version string is printed without banner or help
             var outputText = output.ToString().Trim();
-            Assert.IsFalse(string.IsNullOrWhiteSpace(outputText));
+            Assert.False(string.IsNullOrWhiteSpace(outputText));
             Assert.DoesNotContain("Copyright", outputText);
             Assert.DoesNotContain("Usage", outputText);
         }
@@ -85,7 +83,7 @@ public class ProgramTests
     /// <summary>
     /// Test Run with help flag prints help information.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithHelpFlag_PrintsHelp()
     {
         // Arrange: redirect stdout to capture output
@@ -115,7 +113,7 @@ public class ProgramTests
     /// <summary>
     /// Test running the program with validate flag.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithValidateFlag_RunsValidation()
     {
         // Arrange: set up log file path for validation output
@@ -127,11 +125,11 @@ public class ProgramTests
             Program.Run(context);
 
             // Assert: validation succeeds with exit code 0
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
         }
 
         // Assert: log file contains expected validation output (after context is disposed to flush log)
-        Assert.IsTrue(File.Exists(logFile), "Log file should exist");
+        Assert.True(File.Exists(logFile), "Log file should exist");
         var logContent = File.ReadAllText(logFile);
         Assert.Contains("DEMA Consulting ReqStream", logContent);
         Assert.Contains("ReqStream Version", logContent);
@@ -149,7 +147,7 @@ public class ProgramTests
     /// <summary>
     /// Test running the program with validate flag and results file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithValidateAndResults_WritesResultsFile()
     {
         // Arrange: set up log file and results file paths
@@ -162,11 +160,11 @@ public class ProgramTests
             Program.Run(context);
 
             // Assert: validation succeeds with exit code 0
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
         }
 
         // Assert: results file was created with expected content
-        Assert.IsTrue(File.Exists(resultsFile));
+        Assert.True(File.Exists(resultsFile));
 
         // Assert: results file is valid TRX
         var trxContent = File.ReadAllText(resultsFile);
@@ -184,7 +182,7 @@ public class ProgramTests
     /// <summary>
     /// Test running the program with validate flag and JUnit results file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithValidateAndJUnitResults_WritesJUnitFile()
     {
         // Arrange: set up log file and JUnit results file paths
@@ -197,11 +195,11 @@ public class ProgramTests
             Program.Run(context);
 
             // Assert: validation succeeds with exit code 0
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
         }
 
         // Assert: JUnit results file was created with expected content
-        Assert.IsTrue(File.Exists(resultsFile));
+        Assert.True(File.Exists(resultsFile));
 
         // Assert: JUnit results file contains expected test names
         var xmlContent = File.ReadAllText(resultsFile);
@@ -218,7 +216,7 @@ public class ProgramTests
     /// <summary>
     /// Test Run with no requirements files prints an informational message.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithNoFiles_PrintsMessage()
     {
         // Arrange: redirect stdout to capture output
@@ -233,7 +231,7 @@ public class ProgramTests
             Program.Run(context);
 
             // Assert: exit code is 0 and message includes "No requirements files specified"
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
             Assert.Contains("No requirements files specified", output.ToString());
         }
         finally
@@ -245,7 +243,7 @@ public class ProgramTests
     /// <summary>
     /// Test Run with no requirements files shows message.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithNoRequirementsFiles_ShowsMessage()
     {
         // Act: run with no arguments
@@ -253,13 +251,13 @@ public class ProgramTests
         Program.Run(context);
 
         // Assert: completes without errors
-        Assert.AreEqual(0, context.ExitCode);
+        Assert.Equal(0, context.ExitCode);
     }
 
     /// <summary>
     /// Test Run with requirements files processes them successfully.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithRequirementsFiles_ProcessesSuccessfully()
     {
         // Arrange: create a test requirements file in the temp directory
@@ -282,7 +280,7 @@ sections:
             Program.Run(context);
 
             // Assert: requirements processed successfully
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
         }
         finally
         {
@@ -293,7 +291,7 @@ sections:
     /// <summary>
     /// Test Run with requirements export generates report file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithRequirementsExport_GeneratesReport()
     {
         // Arrange: create a test requirements file and set report output path
@@ -318,8 +316,8 @@ sections:
             Program.Run(context);
 
             // Assert: report file was generated with expected content
-            Assert.AreEqual(0, context.ExitCode);
-            Assert.IsTrue(File.Exists(reportFile));
+            Assert.Equal(0, context.ExitCode);
+            Assert.True(File.Exists(reportFile));
 
             var reportContent = File.ReadAllText(reportFile);
             Assert.Contains("Test Section", reportContent);
@@ -334,7 +332,7 @@ sections:
     /// <summary>
     /// Test Run with trace matrix export generates matrix file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithTraceMatrixExport_GeneratesMatrix()
     {
         // Arrange: create requirements file and TRX test results file
@@ -378,8 +376,8 @@ sections:
             Program.Run(context);
 
             // Assert: matrix file was generated with expected content
-            Assert.AreEqual(0, context.ExitCode);
-            Assert.IsTrue(File.Exists(matrixFile));
+            Assert.Equal(0, context.ExitCode);
+            Assert.True(File.Exists(matrixFile));
 
             var matrixContent = File.ReadAllText(matrixFile);
             Assert.Contains("Summary", matrixContent);
@@ -394,7 +392,7 @@ sections:
     /// <summary>
     /// Test priority order: version takes precedence over help.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithVersionAndHelp_ProcessesVersionFirst()
     {
         // Arrange: redirect stdout to capture output
@@ -410,7 +408,7 @@ sections:
 
             // Assert: only version string is printed (help is skipped)
             var outputText = output.ToString().Trim();
-            Assert.IsFalse(string.IsNullOrWhiteSpace(outputText));
+            Assert.False(string.IsNullOrWhiteSpace(outputText));
             Assert.DoesNotContain("Usage:", outputText);
             Assert.DoesNotContain("Copyright", outputText);
         }
@@ -423,7 +421,7 @@ sections:
     /// <summary>
     /// Test priority order: help takes precedence over validate.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithHelpAndValidate_ProcessesHelpFirst()
     {
         // Arrange: redirect stdout to capture output
@@ -451,7 +449,7 @@ sections:
     /// <summary>
     /// Test enforcement with fully satisfied requirements succeeds.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithEnforcementAndFullySatisfiedRequirements_Succeeds()
     {
         // Arrange: create requirements file and TRX with all requirements covered by passing tests
@@ -494,7 +492,7 @@ sections:
             Program.Run(context);
 
             // Assert: enforcement passes when all requirements are satisfied
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
         }
         finally
         {
@@ -505,7 +503,7 @@ sections:
     /// <summary>
     /// Test enforcement with unsatisfied requirements fails.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithEnforcementAndUnsatisfiedRequirements_Fails()
     {
         // Arrange: create requirements file with one tested and one untested requirement, and a passing TRX
@@ -558,7 +556,7 @@ sections:
             }
 
             // Assert: enforcement fails with unsatisfied requirement listed
-            Assert.AreEqual(1, exitCode);
+            Assert.Equal(1, exitCode);
 
             // Verify error message includes the unsatisfied requirement via log file
             var logContent = File.ReadAllText(logFile);
@@ -575,7 +573,7 @@ sections:
     /// <summary>
     /// Test enforcement without test files fails.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithEnforcementAndNoTests_Fails()
     {
         // Arrange: create a requirements file with no test TRX
@@ -601,7 +599,7 @@ sections:
             Program.Run(context);
 
             // Assert: enforcement fails when no test results are provided
-            Assert.AreEqual(1, context.ExitCode);
+            Assert.Equal(1, context.ExitCode);
         }
         finally
         {
@@ -612,7 +610,7 @@ sections:
     /// <summary>
     /// Test Run with lint flag lints requirements files.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithLintFlag_RunsLinter()
     {
         // Arrange: create a valid requirements file with no issues
@@ -637,7 +635,7 @@ sections:
             Program.Run(context);
 
             // Assert: lint succeeds with exit code 0
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
         }
         finally
         {
@@ -645,15 +643,15 @@ sections:
         }
 
         // Assert: no output is produced when lint finds no issues (no banner, no summary line)
-        Assert.IsTrue(File.Exists(logFile), "Log file should exist");
+        Assert.True(File.Exists(logFile), "Log file should exist");
         var logContent = File.ReadAllText(logFile);
-        Assert.AreEqual(string.Empty, logContent.Trim(), "Lint with no issues should produce no output");
+        Assert.Equal(string.Empty, logContent.Trim());
     }
 
     /// <summary>
     /// Test Run with lint flag does not print the banner.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithLintFlag_SuppressesBanner()
     {
         // Arrange: create a valid requirements file and redirect stdout to capture output
@@ -680,7 +678,7 @@ sections:
             Program.Run(context);
 
             // Assert: lint succeeds with no output
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
         }
         finally
         {
@@ -690,16 +688,16 @@ sections:
 
         // Assert: banner and summary are not printed during lint
         var outputText = output.ToString();
-        Assert.DoesNotContain("ReqStream version", outputText, "Banner should be suppressed during lint");
-        Assert.DoesNotContain("Copyright", outputText, "Banner should be suppressed during lint");
-        Assert.DoesNotContain("No issues found", outputText, "Summary line should be suppressed during lint");
-        Assert.AreEqual(string.Empty, outputText.Trim(), "Output should be empty for clean lint");
+        Assert.DoesNotContain("ReqStream version", outputText);
+        Assert.DoesNotContain("Copyright", outputText);
+        Assert.DoesNotContain("No issues found", outputText);
+        Assert.Equal(string.Empty, outputText.Trim());
     }
 
     /// <summary>
     /// Test Run with lint flag only outputs issue lines (no banner, no summary) when issues are found.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithLintFlag_OnlyOutputsIssues()
     {
         // Arrange: create a valid requirements file and a second file with a duplicate ID
@@ -739,7 +737,7 @@ sections:
             Program.Run(context);
 
             // Assert: lint fails due to duplicate requirement ID
-            Assert.AreEqual(1, context.ExitCode, "Lint with duplicate IDs should fail");
+            Assert.Equal(1, context.ExitCode);
         }
         finally
         {
@@ -747,17 +745,17 @@ sections:
         }
 
         // Assert: log contains the issue but not banner or summary
-        Assert.IsTrue(File.Exists(logFile), "Log file should exist");
+        Assert.True(File.Exists(logFile), "Log file should exist");
         var logContent = File.ReadAllText(logFile);
-        Assert.Contains("REQ-001", logContent, "Issue about duplicate ID should appear in output");
-        Assert.DoesNotContain("ReqStream version", logContent, "Banner should not appear in lint output");
-        Assert.DoesNotContain("No issues found", logContent, "Summary line should not appear in lint output");
+        Assert.Contains("REQ-001", logContent);
+        Assert.DoesNotContain("ReqStream version", logContent);
+        Assert.DoesNotContain("No issues found", logContent);
     }
 
     /// <summary>
     /// Test Run with enforcement mode and failed tests fails.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithEnforcementAndFailedTests_Fails()
     {
         // Arrange: create requirements file and TRX with a failed test
@@ -800,7 +798,7 @@ sections:
             Program.Run(context);
 
             // Assert: enforcement fails when linked test is failed
-            Assert.AreEqual(1, context.ExitCode);
+            Assert.Equal(1, context.ExitCode);
         }
         finally
         {
@@ -811,7 +809,7 @@ sections:
     /// <summary>
     /// Test Run with lint flag and no requirements files prints an informational message.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithLintAndNoRequirements_PrintsInformationalMessage()
     {
         // Act: run with lint flag but no requirements files
@@ -819,13 +817,13 @@ sections:
         Program.Run(context);
 
         // Assert: completes without error exit code
-        Assert.AreEqual(0, context.ExitCode);
+        Assert.Equal(0, context.ExitCode);
     }
 
     /// <summary>
     /// Test Run with justifications export generates a justifications report file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_WithJustificationsExport_GeneratesJustificationsReport()
     {
         // Arrange: create a test requirements file with justification text and set report output path
@@ -851,8 +849,8 @@ sections:
             Program.Run(context);
 
             // Assert: justifications file was generated with requirement content
-            Assert.AreEqual(0, context.ExitCode);
-            Assert.IsTrue(File.Exists(justificationsFile));
+            Assert.Equal(0, context.ExitCode);
+            Assert.True(File.Exists(justificationsFile));
             var justificationsContent = File.ReadAllText(justificationsFile);
             Assert.Contains("REQ-001", justificationsContent);
         }
