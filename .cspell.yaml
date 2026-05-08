@@ -30,6 +30,7 @@ words:
   - sarifmark
   - sonarmark
   - testname
+  - testresults
   - tracematrix
   - xunit
   - Xunit
@@ -39,6 +40,7 @@ words:
   - Weasy
   - weasyprint
   - yamlfix
+  - yamldotnet
 
 # Exclude common build artifacts, dependencies, and vendored third-party code
 ignorePaths:
