@@ -18,8 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using Microsoft.Extensions.FileSystemGlobbing;
-using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
+using DemaConsulting.ReqStream.Utilities;
 
 namespace DemaConsulting.ReqStream.Cli;
 
@@ -267,7 +266,7 @@ public sealed class Context : IDisposable
                         throw new ArgumentException($"{arg} requires a pattern argument", nameof(args));
                     }
 
-                    requirementsFiles.AddRange(ExpandGlobPattern(args[i++]));
+                    requirementsFiles.AddRange(GlobMatcher.FindMatchingFiles(args[i++]));
                     break;
 
                 case "--tests":
@@ -277,7 +276,7 @@ public sealed class Context : IDisposable
                         throw new ArgumentException($"{arg} requires a pattern argument", nameof(args));
                     }
 
-                    testFiles.AddRange(ExpandGlobPattern(args[i++]));
+                    testFiles.AddRange(GlobMatcher.FindMatchingFiles(args[i++]));
                     break;
 
                 case "--report":
@@ -399,27 +398,6 @@ public sealed class Context : IDisposable
         }
 
         return result;
-    }
-
-    /// <summary>
-    ///     Expands a glob pattern to a list of matching file paths.
-    /// </summary>
-    /// <param name="pattern">The glob pattern.</param>
-    /// <returns>A list of matching file paths.</returns>
-    private static List<string> ExpandGlobPattern(string pattern)
-    {
-        // Create a matcher and add the glob pattern
-        var matcher = new Matcher();
-        matcher.AddInclude(pattern);
-
-        // Get the current directory for matching
-        var currentDirectory = Directory.GetCurrentDirectory();
-
-        // Execute the matcher against the current directory
-        var result = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(currentDirectory)));
-
-        // Return the full paths of matched files
-        return result.Files.Select(f => Path.Combine(currentDirectory, f.Path)).ToList();
     }
 
     /// <summary>

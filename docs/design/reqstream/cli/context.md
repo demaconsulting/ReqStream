@@ -51,7 +51,8 @@ rather than an unhandled exception.
 
 `--filter` values are split on `','` and accumulated into `FilterTags`; multiple `--filter`
 arguments merge into the same set. `--requirements` and `--tests` values are passed to
-`ExpandGlobPattern` and appended to the respective file lists. If `--log` is specified, the named
+`GlobMatcher.FindMatchingFiles` and the resulting absolute paths are appended to the respective
+file lists. If `--log` is specified, the named
 file is opened for writing and assigned to `_logWriter` before the method returns. If the log file
 cannot be opened (for example, due to an invalid path or insufficient permissions), `Create` catches
 the underlying I/O exception, wraps it in an `ArgumentException`, and rethrows it so the caller
@@ -61,15 +62,13 @@ receives a user-actionable error message rather than an unhandled exception.
 (`--report-depth`, `--matrix-depth`, `--justifications-depth`) override this default if
 specified; otherwise each report inherits the value of `Depth`.
 
-##### `ExpandGlobPattern(pattern)`
+##### Glob Resolution
 
-`ExpandGlobPattern` resolves a single pattern (which may contain `*` or `**` wildcards) to a list
-of absolute file paths using `Microsoft.Extensions.FileSystemGlobbing.Matcher` against the current
-working directory.
-
-**Known limitation**: the `Matcher` library silently ignores patterns that are themselves absolute
-paths. Callers that pass absolute paths directly will receive an empty result set. This is an
-accepted limitation of the underlying library; users should use relative paths or glob wildcards.
+`Create` delegates glob pattern resolution to `GlobMatcher.FindMatchingFiles` (in the `Utilities`
+subsystem) for each `--requirements` and `--tests` value. `GlobMatcher` supports both relative
+patterns (resolved against the current working directory) and absolute patterns (resolved from the
+rooted prefix of the pattern). The resolved absolute file paths are appended to `requirementsFiles`
+or `testFiles` respectively.
 
 ##### `WriteLine(message)`
 
@@ -97,3 +96,4 @@ via an early return path.
 | `LoadResult` | Calls `context.WriteError` via `ReportIssues` to report linting issues |
 | `Requirements` | Receives `RequirementsFiles`; does not hold a reference to `Context` |
 | `TraceMatrix` | Receives `TestFiles`; does not hold a reference to `Context` |
+| `GlobMatcher` | Called by `Create` to expand `--requirements` and `--tests` glob patterns to file paths |
