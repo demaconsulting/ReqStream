@@ -37,7 +37,7 @@ The `Modeling` subsystem exposes the following interface to the rest of the tool
 
 | Dependency                         | Direction | Purpose                                                             |
 |------------------------------------|-----------|---------------------------------------------------------------------|
-| `Cli (Context)`                    | Uses      | `LoadResult.ReportIssues` accepts a `Context` to route lint issues to output streams. |
+| `Cli (Context)`                    | Uses      | `LoadResult.ReportIssues` accepts a `Context` to route issues.      |
 | `TraceMatrix`                      | Used by   | Receives the requirement tree to map test results to requirements.  |
 | `Program`                          | Used by   | Calls `Requirements.Load` to load requirements.                     |
 

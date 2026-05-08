@@ -52,7 +52,7 @@ sections:
           - Requirements_Load_BlankChildIdInRequirement_ReportsErrorWithFileLocation
 
       - id: ReqStream-Requirements-Tags
-        title: Requirement shall support an optional list of tags for categorisation.
+        title: Requirement shall support an optional list of tags for categorization.
         justification: |
           Tags enable filtering requirements by category (e.g. "cli", "lint", "reporting"),
           allowing targeted trace matrix exports and focused coverage analysis.

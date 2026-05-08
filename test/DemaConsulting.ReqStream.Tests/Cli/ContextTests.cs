@@ -416,7 +416,7 @@ public sealed class ContextTests : IDisposable
     public void Context_WriteLine_NormalMode_WritesToConsole()
     {
         // Arrange: set up a log file to capture written messages
-        var logPath = Path.Combine(_testDirectory, "writeline_normal.log");
+        var logPath = Path.Combine(_testDirectory, "output-normal.log");
 
         // Act: create context in normal mode with log file, write a message, then dispose
         using (var context = Context.Create(["--log", logPath]))
@@ -437,7 +437,7 @@ public sealed class ContextTests : IDisposable
     public void Context_WriteLine_SilentMode_DoesNotWriteToConsole()
     {
         // Arrange: set up a log file to observe output in silent mode
-        var logPath = Path.Combine(_testDirectory, "writeline_silent.log");
+        var logPath = Path.Combine(_testDirectory, "output-silent.log");
 
         // Act: create context in silent mode with log file, write a message, then dispose
         using (var context = Context.Create(["--silent", "--log", logPath]))
@@ -458,7 +458,7 @@ public sealed class ContextTests : IDisposable
     public void Context_WriteError_NormalMode_WritesToConsole()
     {
         // Arrange: set up a log file to capture error messages
-        var logPath = Path.Combine(_testDirectory, "writeerror_normal.log");
+        var logPath = Path.Combine(_testDirectory, "error-normal.log");
         int exitCode;
 
         // Act: create context in normal mode with log file, write an error, then dispose
@@ -482,7 +482,7 @@ public sealed class ContextTests : IDisposable
     public void Context_WriteError_SilentMode_DoesNotWriteToConsole()
     {
         // Arrange: set up a log file to observe output in silent mode
-        var logPath = Path.Combine(_testDirectory, "writeerror_silent.log");
+        var logPath = Path.Combine(_testDirectory, "error-silent.log");
         int exitCode;
 
         // Act: create context in silent mode with log file, write an error, then dispose
@@ -506,7 +506,7 @@ public sealed class ContextTests : IDisposable
     public void Context_ExitCode_AfterWriteError_ReturnsOne()
     {
         // Arrange: set up a log file to suppress console noise during the test
-        var logPath = Path.Combine(_testDirectory, "exitcode_test.log");
+        var logPath = Path.Combine(_testDirectory, "exit-test.log");
 
         // Act: create context, check initial exit code, call WriteError, check again
         using var context = Context.Create(["--silent", "--log", logPath]);
