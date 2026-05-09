@@ -264,6 +264,12 @@ internal static class Program
             }
         }
 
+        // Report error if matrix was requested but no test files were provided
+        if (context.Matrix != null && traceMatrix == null)
+        {
+            context.WriteError("Error: Cannot generate trace matrix without test results. Use --tests to specify test result files.");
+        }
+
         // Enforce requirements coverage if requested
         if (context.Enforce)
         {

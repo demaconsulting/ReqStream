@@ -846,4 +846,56 @@ sections:
             Directory.SetCurrentDirectory(originalDir);
         }
     }
+
+    /// <summary>
+    /// Test Run with --matrix but no test files reports an error.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithMatrixButNoTestFiles_ReportsError()
+    {
+        // Arrange: create a requirements file but no test result files
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, @"
+sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Test Requirement
+");
+
+        var matrixFile = PathHelpers.SafePathCombine(_testDirectory, "matrix.md");
+        var logFile = PathHelpers.SafePathCombine(_testDirectory, "matrix-no-tests.log");
+
+        var originalDir = Directory.GetCurrentDirectory();
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory);
+
+            // Act: run with requirements and matrix flags but no test files
+            int exitCode;
+            using (var context = Context.Create([
+                "--requirements", "*.yaml",
+                "--matrix", matrixFile,
+                "--silent",
+                "--log", logFile
+            ]))
+            {
+                Program.Run(context);
+                exitCode = context.ExitCode;
+            }
+
+            // Assert: exits with error code and matrix file is not created
+            Assert.Equal(1, exitCode);
+            Assert.False(File.Exists(matrixFile));
+
+            // Assert: error message explains the problem
+            var logContent = File.ReadAllText(logFile);
+            Assert.Contains("Cannot generate trace matrix without test results", logContent);
+            Assert.Contains("--tests", logContent);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+    }
 }
