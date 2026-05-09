@@ -53,7 +53,8 @@ Tests verify that requesting `--matrix` without providing test files produces an
 
 Test methods:
 
-- `Program_Run_WithMatrixButNoTestFiles_ReportsError` — asserts error message and non-zero exit code
+- `Program_Run_WithMatrixButNoTestFiles_ReportsError` — asserts error message and non-zero exit code when `--tests` is omitted
+- `Program_Run_WithMatrixAndUnmatchedTestsPattern_ReportsError` — asserts error message and non-zero exit code when `--tests` pattern matches no files
 
 #### Enforcement Scenario
 

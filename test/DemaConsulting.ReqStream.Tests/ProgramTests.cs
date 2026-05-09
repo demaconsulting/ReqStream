@@ -898,4 +898,57 @@ sections:
             Directory.SetCurrentDirectory(originalDir);
         }
     }
+
+    /// <summary>
+    /// Test Run with --matrix and --tests pattern that matches no files reports an error.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithMatrixAndUnmatchedTestsPattern_ReportsError()
+    {
+        // Arrange: create a requirements file but no test result files matching the pattern
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, @"
+sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Test Requirement
+");
+
+        var matrixFile = PathHelpers.SafePathCombine(_testDirectory, "matrix.md");
+        var logFile = PathHelpers.SafePathCombine(_testDirectory, "matrix-unmatched-tests.log");
+
+        var originalDir = Directory.GetCurrentDirectory();
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory);
+
+            // Act: run with requirements, matrix, and --tests pointing at a pattern that matches nothing
+            int exitCode;
+            using (var context = Context.Create([
+                "--requirements", "*.yaml",
+                "--matrix", matrixFile,
+                "--tests", "nonexistent-*.xml",
+                "--silent",
+                "--log", logFile
+            ]))
+            {
+                Program.Run(context);
+                exitCode = context.ExitCode;
+            }
+
+            // Assert: exits with error code and matrix file is not created
+            Assert.Equal(1, exitCode);
+            Assert.False(File.Exists(matrixFile));
+
+            // Assert: error message explains the problem
+            var logContent = File.ReadAllText(logFile);
+            Assert.Contains("No test result files were provided or matched", logContent);
+            Assert.Contains("--tests", logContent);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+    }
 }

@@ -120,6 +120,7 @@ sections:
               - requirements
             tests:
               - Program_Run_WithMatrixButNoTestFiles_ReportsError
+              - Program_Run_WithMatrixAndUnmatchedTestsPattern_ReportsError
 
           - id: ReqStream-Program-LintNoFiles
             title: >-
