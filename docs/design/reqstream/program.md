@@ -90,7 +90,8 @@ requirement tree. It then conditionally generates the requirements report (if `-
 and the justifications report (if `--justifications` is set). If `--tests` files are provided, a
 `TraceMatrix` is constructed from the requirement tree and the test result files to enable coverage
 analysis. If `--matrix` is set and a `TraceMatrix` was built, the trace matrix report is exported;
-if `--matrix` is set but no test files were provided, the matrix export is silently skipped.
+if `--matrix` is set but no test files were provided, an error is reported via `context.WriteError`
+and no matrix file is written.
 If `--enforce` is active, `EnforceRequirementsCoverage` is called last so that all reports are
 generated even when coverage fails. All export methods respect `context.FilterTags` for tag-filtered
 output.
