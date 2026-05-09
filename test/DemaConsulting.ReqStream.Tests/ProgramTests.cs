@@ -890,7 +890,7 @@ sections:
 
             // Assert: error message explains the problem
             var logContent = File.ReadAllText(logFile);
-            Assert.Contains("Cannot generate trace matrix without test results", logContent);
+            Assert.Contains("No test result files were provided or matched", logContent);
             Assert.Contains("--tests", logContent);
         }
         finally
