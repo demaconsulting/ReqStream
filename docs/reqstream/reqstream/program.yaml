@@ -107,6 +107,20 @@ sections:
             tests:
               - Program_Run_WithLintFlag_OnlyOutputsIssues
 
+          - id: ReqStream-Program-MatrixNoTests
+            title: >-
+              The tool shall report an error and exit with a non-zero code when
+              --matrix is requested but no test files are provided.
+            justification: |
+              Reporting an error when --matrix is requested but no test files are available
+              prevents silent no-op runs that produce no matrix file and no diagnostic,
+              giving users actionable feedback to correct their invocation.
+            tags:
+              - cli
+              - requirements
+            tests:
+              - Program_Run_WithMatrixButNoTestFiles_ReportsError
+
           - id: ReqStream-Program-LintNoFiles
             title: >-
               The tool shall report an informational message and exit when linting is

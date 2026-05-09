@@ -47,6 +47,14 @@ Test methods:
 - `Program_Run_WithTraceMatrixExport_GeneratesMatrix` — asserts trace matrix is generated
 - `Program_Run_WithJustificationsExport_GeneratesJustificationsReport` — asserts justifications report
 
+#### Matrix Without Tests Scenario
+
+Tests verify that requesting `--matrix` without providing test files produces an error.
+
+Test methods:
+
+- `Program_Run_WithMatrixButNoTestFiles_ReportsError` — asserts error message and non-zero exit code
+
 #### Enforcement Scenario
 
 Tests verify that enforcement mode exits with a non-zero code when requirements are unsatisfied.
@@ -77,6 +85,7 @@ Test methods:
 | `ReqStream-Program-Help` | `Program_Run_WithHelpFlag_PrintsHelp` |
 | `ReqStream-Program-Validate` | `Program_Run_WithValidateFlag_RunsValidation`, `Program_Run_WithValidateAndResults_WritesResultsFile` |
 | `ReqStream-Program-Requirements` | `Program_Run_WithNoRequirementsFiles_ShowsMessage`, `Program_Run_WithRequirementsFiles_ProcessesSuccessfully`, `Program_Run_WithRequirementsExport_GeneratesReport`, `Program_Run_WithTraceMatrixExport_GeneratesMatrix`, `Program_Run_WithJustificationsExport_GeneratesJustificationsReport` |
+| `ReqStream-Program-MatrixNoTests` | `Program_Run_WithMatrixButNoTestFiles_ReportsError` |
 | `ReqStream-Program-Enforce` | `Program_Run_WithEnforcementAndFullySatisfiedRequirements_Succeeds`, `Program_Run_WithEnforcementAndUnsatisfiedRequirements_Fails`, `Program_Run_WithEnforcementAndNoTests_Fails`, `Program_Run_WithEnforcementAndFailedTests_Fails` |
 | `ReqStream-Program-Lint` | `Program_Run_WithLintFlag_RunsLinter` |
 | `ReqStream-Program-LintVerbosity` | `Program_Run_WithLintFlag_SuppressesBanner`, `Program_Run_WithLintFlag_OnlyOutputsIssues` |
