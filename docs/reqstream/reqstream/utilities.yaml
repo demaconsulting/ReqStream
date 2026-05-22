@@ -31,6 +31,7 @@ sections:
               - ReqStream-GlobMatcher-Deduplication
               - ReqStream-GlobMatcher-AbsolutePaths
               - ReqStream-GlobMatcher-EmptyResult
+              - ReqStream-GlobMatcher-SortOrder
 
           - id: ReqStream-Utilities-SafePath
             title: >-
@@ -49,6 +50,6 @@ sections:
               - PathHelpers_SafePathCombine_AbsoluteOverridePath_ThrowsArgumentException
               - PathHelpers_SafePathCombine_NullBasePath_ThrowsArgumentNullException
             children:
-              - ReqStream-PathHelpers-SafeCombine
-              - ReqStream-PathHelpers-PathTraversalRejection
-              - ReqStream-PathHelpers-NullGuard
+              - ReqStream-Utilities-PathHelpers-SafeCombine
+              - ReqStream-Utilities-PathHelpers-PathTraversalRejection
+              - ReqStream-Utilities-PathHelpers-NullGuard

@@ -936,4 +936,41 @@ public sealed class IntegrationTests : IDisposable
             output.Contains("cycle") || output.Contains("Cycle") || output.Contains("circular") || output.Contains("Circular"),
             $"Expected lint output to reference the cyclic children graph. Output: {output}");
     }
+
+    /// <summary>
+    /// Integration test verifying that using --enforce without --tests causes the tool to report
+    /// a clear error, exercising the system-level enforce-no-tests error handling behavior.
+    /// </summary>
+    [Fact]
+    public void ReqStream_System_EnforceNoTests_EnforceWithoutTests_ReportsError()
+    {
+        // Arrange: create a minimal requirements file
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: System Requirements
+                requirements:
+                  - id: Integration-System-EnforceNoTests
+                    title: The system shall do something.
+                    tests:
+                      - SomeTest
+            """);
+
+        // Act: run with --enforce but without --tests
+        var exitCode = Runner.RunInDirectory(
+            out var output,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--requirements", "requirements.yaml",
+            "--enforce");
+
+        // Assert: tool exits with a non-zero code
+        Assert.NotEqual(0, exitCode);
+
+        // Assert: output contains an error about missing test files for enforcement
+        Assert.True(
+            output.Contains("test") || output.Contains("Test") || output.Contains("enforce") || output.Contains("Enforce") || output.Contains("error") || output.Contains("Error"),
+            $"Expected error output about missing test files for enforcement. Output: {output}");
+    }
 }

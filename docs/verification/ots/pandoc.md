@@ -42,3 +42,15 @@ valid HTML document. This scenario is tested by `Pandoc_UserGuideHtml`.
 
 **Verification Document HTML**: Verifies that Pandoc converts the verification document Markdown
 collection to a valid HTML document. This scenario is tested by `Pandoc_VerificationHtml`.
+
+### Requirements Coverage
+
+| Requirement | Scenario | Test Method(s) |
+| --- | --- | --- |
+| ReqStream-OTS-Pandoc | Build Notes HTML | `Pandoc_BuildNotesHtml` |
+| ReqStream-OTS-Pandoc | Code Quality HTML | `Pandoc_CodeQualityHtml` |
+| ReqStream-OTS-Pandoc | Review Plan HTML | `Pandoc_ReviewPlanHtml` |
+| ReqStream-OTS-Pandoc | Review Report HTML | `Pandoc_ReviewReportHtml` |
+| ReqStream-OTS-Pandoc | Design Document HTML | `Pandoc_DesignHtml` |
+| ReqStream-OTS-Pandoc | User Guide HTML | `Pandoc_UserGuideHtml` |
+| ReqStream-OTS-Pandoc | Verification Document HTML | `Pandoc_VerificationHtml` |

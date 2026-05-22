@@ -29,6 +29,7 @@ namespace DemaConsulting.ReqStream.Tests.Modeling;
 /// </summary>
 public sealed class ModelingTests : IDisposable
 {
+    /// <summary>Unique temporary directory for this test instance's fixture files.</summary>
     private readonly string _testDirectory;
 
     /// <summary>
@@ -50,6 +51,18 @@ public sealed class ModelingTests : IDisposable
             Directory.Delete(_testDirectory, recursive: true);
         }
         GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Test that calling Requirements.Load with no paths throws ArgumentException.
+    /// </summary>
+    [Fact]
+    public void Modeling_YamlParsing_NoPaths_ThrowsArgumentException()
+    {
+        // Arrange: no setup required; the act itself exercises the boundary condition
+
+        // Act / Assert: empty paths array throws ArgumentException
+        Assert.Throws<ArgumentException>(() => Requirements.Load());
     }
 
     /// <summary>

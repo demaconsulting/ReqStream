@@ -7,7 +7,7 @@ sections:
         sections:
           - title: PathHelpers Requirements
             requirements:
-              - id: ReqStream-PathHelpers-SafeCombine
+              - id: ReqStream-Utilities-PathHelpers-SafeCombine
                 title: >-
                   PathHelpers shall combine a base path and a relative path segment and return the
                   resulting path when it remains within the base directory.
@@ -21,7 +21,7 @@ sections:
                   - PathHelpers_SafePathCombine_ValidRelativePath_ReturnsCombinedPath
                   - PathHelpers_SafePathCombine_ValidSubdirectory_ReturnsCombinedPath
 
-              - id: ReqStream-PathHelpers-PathTraversalRejection
+              - id: ReqStream-Utilities-PathHelpers-PathTraversalRejection
                 title: >-
                   PathHelpers shall throw ArgumentException when the resolved combined path escapes the
                   base directory.
@@ -37,7 +37,7 @@ sections:
                   - PathHelpers_SafePathCombine_DeepDotDotPath_ThrowsArgumentException
                   - PathHelpers_SafePathCombine_AbsoluteOverridePath_ThrowsArgumentException
 
-              - id: ReqStream-PathHelpers-NullGuard
+              - id: ReqStream-Utilities-PathHelpers-NullGuard
                 title: >-
                   PathHelpers shall throw ArgumentNullException when either path argument is null.
                 justification: |

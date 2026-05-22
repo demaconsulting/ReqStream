@@ -18,7 +18,7 @@ YAML parsing or lint validation; those responsibilities belong entirely to `Requ
 
 **Load(paths)**: Static factory method that loads and merges YAML requirement files.
 
-- *Parameters*: `IEnumerable<string> paths` — file paths to load.
+- *Parameters*: `params string[] paths` — file paths to load.
 - *Returns*: `LoadResult` — contains the populated tree (or `null` on error) and lint issues.
 - *Preconditions*: At least one path must be provided (throws `ArgumentException` otherwise).
 - *Postconditions*: All files are processed; the returned `LoadResult` is consistent.
@@ -30,7 +30,8 @@ Delegates to `RequirementsLoader.Load` internally.
 - *Parameters*: `string filePath` — output path; `int depth` — starting heading level;
   `HashSet<string>? filterTags` — optional tag filter.
 - *Returns*: `void`.
-- *Preconditions*: `filePath` must not be null or empty.
+- *Preconditions*: `filePath` must not be null, empty, or whitespace-only; `depth` must be ≥ 1 (throws
+  `ArgumentOutOfRangeException` when `depth < 1`).
 - *Postconditions*: Markdown file written with one heading per section and a table per section's
   requirements.
 
@@ -41,18 +42,23 @@ is non-null, only requirements whose `Tags` list contains at least one matching 
 
 - *Parameters*: Same as `Export`.
 - *Returns*: `void`.
-- *Preconditions*: Same as `Export`.
+- *Preconditions*: `filePath` must not be null, empty, or whitespace-only; `depth` must be ≥ 1 (throws
+  `ArgumentOutOfRangeException` when `depth < 1`).
 - *Postconditions*: Each requirement produces a sub-heading with its ID and bold title;
   justification text is included only when non-null and non-empty.
 
 #### Error Handling
 
 - `Load` throws `ArgumentException` when no paths are provided.
-- `Export` and `ExportJustifications` throw `ArgumentException` when `filePath` is null or empty.
+- `Export` and `ExportJustifications` throw `ArgumentException` when `filePath` is null, empty, or whitespace-only.
+- `Export` and `ExportJustifications` throw `ArgumentOutOfRangeException` when `depth` is less
+  than 1; the CLI enforces `depth >= 1` before calling these methods.
 - Both export methods propagate `IOException` and `UnauthorizedAccessException` from file-write
   operations without wrapping; callers are responsible for handling file-write failures.
 
-#### Dependencies
+#### Interactions
+
+##### Dependencies
 
 - **Section** — `Requirements` extends `Section` and inherits its container properties.
 - **RequirementsLoader** — delegated to by `Requirements.Load` to perform YAML parsing and
@@ -60,7 +66,7 @@ is non-null, only requirements whose `Tags` list contains at least one matching 
 - **LoadResult** — returned by `Requirements.Load`; holds the populated tree and the lint issue
   list.
 
-#### Callers
+##### Callers
 
 - **Program** — calls `Requirements.Load` to build the requirement tree; calls `Export` and
   `ExportJustifications`.
@@ -68,3 +74,10 @@ is non-null, only requirements whose `Tags` list contains at least one matching 
   section tree.
 - **Validation** — exercises `Requirements.Load` with fixture YAML files during self-validation
   tests.
+
+##### Test Dependencies
+
+The unit tests for `Requirements` use `PathHelpers.SafePathCombine` as a test-fixture path
+utility for constructing temporary file paths. This usage is a test-only convenience and is
+explicitly exempt from the production dependency boundary; `Requirements` itself has no
+dependency on `PathHelpers` in production code.

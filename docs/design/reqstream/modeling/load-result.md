@@ -23,15 +23,18 @@ evaluating `Issues.Any(i => i.Severity == LintSeverity.Error)` on each access.
 
 - *Parameters*: `Context context` — the output channel owner.
 - *Returns*: `void`.
-- *Preconditions*: None.
+- *Preconditions*: `context` must not be null; throws `ArgumentNullException` otherwise.
 - *Postconditions*: Warning-level issues sent to `context.WriteLine`; error-level issues sent to
   `context.WriteError`.
 
 This method decouples `LoadResult` from knowledge of how issues are displayed; it delegates all
 formatting and routing decisions to the `Context` unit.
 
-`LoadResult` has an `internal` constructor called only by `RequirementsLoader.Load`. The
-constructor accepts the `Requirements?` tree and the collected `IReadOnlyList<LintIssue>`.
+`LoadResult` has an `internal` constructor called by `RequirementsLoader.Load` and returned
+from the `Requirements.Load` factory method. The `InternalsVisibleTo` assembly attribute also
+allows the test project (`DemaConsulting.ReqStream.Tests`) to construct instances directly for
+unit-test purposes. The constructor accepts the `Requirements?` tree and the collected
+`IReadOnlyList<LintIssue>`.
 
 #### Error Handling
 
@@ -40,12 +43,15 @@ constructor accepts the `Requirements?` tree and the collected `IReadOnlyList<Li
 The caller is responsible for checking `HasErrors` or inspecting `Requirements == null` after the
 call.
 
-#### Dependencies
+#### Interactions
 
-N/A — `LoadResult` is a data container. It holds references to `Requirements` and `LintIssue`
-objects but does not call into other units except `Context` (via `ReportIssues`).
+##### Dependencies
 
-#### Callers
+**Context** — called by `ReportIssues` to route warning-level issues to `context.WriteLine` and
+error-level issues to `context.WriteError`. `LoadResult` holds references to `Requirements` and
+`LintIssue` objects but does not call into them.
+
+##### Callers
 
 - **RequirementsLoader** — constructs `LoadResult` and populates it with the requirements tree
   and issues list.

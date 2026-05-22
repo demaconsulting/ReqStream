@@ -19,7 +19,7 @@ The `Cli` subsystem contains the following software unit:
 - *Role*: Provider (other units consume the returned `Context`).
 - *Contract*: Parses CLI flags; expands glob patterns via `GlobMatcher`; returns a fully
   initialized `Context`. Throws `ArgumentException` for invalid arguments.
-- *Constraints*: Must not perform I/O beyond opening the log file.
+- *Constraints*: Must not write to console output channels (`Console.Out` / `Console.Error`); read-only filesystem access for glob pattern expansion is permitted.
 
 **Context output channels**: `WriteLine` and `WriteError` methods.
 
@@ -48,6 +48,13 @@ internal unit-to-unit collaboration; its design is defined entirely by the `Cont
 
 `Context` implements `IDisposable` so that the log-file `StreamWriter` is closed
 deterministically when `Program.Main`'s `using` block exits.
+
+**Depth inheritance rule**: When `--depth N` is specified on the command line, it sets the
+global default heading depth (`Depth = N`). Each per-report depth property (`ReportDepth`,
+`MatrixDepth`, `JustificationsDepth`) falls back to this default if its corresponding specific
+flag (`--report-depth`, `--matrix-depth`, `--justifications-depth`) is not supplied. In other
+words, omitting a specific depth flag causes that report to use the same depth as `--depth`. If
+neither `--depth` nor a specific depth flag is present, the value defaults to `1`.
 
 The `Cli` subsystem has no dependencies on other tool subsystems. It uses only .NET base
 class library types and `GlobMatcher` from the Utilities subsystem for pattern expansion.

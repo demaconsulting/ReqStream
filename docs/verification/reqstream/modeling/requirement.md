@@ -21,7 +21,7 @@ requirement in the Requirements Coverage table is mapped to at least one passing
 
 **Properties**: Tests verify that requirement properties are parsed correctly from YAML, including
 tests list, tags, justification, and children. This scenario is tested by
-`Requirement_Properties_DefaultValues`,
+`Requirement_Properties_NewInstance_HasDefaultValues`,
 `Requirements_Load_RequirementWithTests_ParsesTestsCorrectly`,
 `Requirements_Load_RequirementWithTags_ParsesTagsCorrectly`,
 `Requirements_Load_RequirementWithJustification_ParsesJustificationCorrectly`, and
@@ -42,11 +42,19 @@ mapping test names, and blank mapping IDs. This scenario is tested by
 `Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation`, and
 `Requirements_Load_TestMappings_AppliesMappingsCorrectly`.
 
+**Circular Reference Detection**: Tests verify that child-reference cycles are detected and
+reported as errors, covering both mutual cycles (A → B → A) and self-references (A → A).
+The loader must halt hierarchy resolution and surface a descriptive error including the cycle
+path so that authors can identify and correct the circular dependency. This scenario is tested by
+`Requirements_Load_CircularRequirements_ReportsCircularReferenceError` and
+`Requirements_Load_SelfReferencingRequirement_ReportsCircularReferenceError`.
+
 #### Requirements Coverage
 
 | Requirement ID | Scenario(s) | Test Method(s) |
 | --- | --- | --- |
 | `ReqStream-Requirements-UniqueIds` | Validation Scenario | `Requirements_Load_DuplicateRequirementId_ReportsError` |
+| `ReqStream-Requirements-UniqueIds` | Validation Scenario | `Requirements_Load_DuplicateRequirementId_ErrorIncludesFileLocation` |
 | `ReqStream-Requirements-UniqueIds` | Validation Scenario | `Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation` |
 | `ReqStream-Requirements-UniqueIds` | Validation Scenario | `Requirements_Load_MultipleFilesWithDuplicateIds_ReportsError` |
 | `ReqStream-Requirements-RequiredTitle` | Validation Scenario | `Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation` |
@@ -60,3 +68,12 @@ mapping test names, and blank mapping IDs. This scenario is tested by
 | `ReqStream-Requirements-TestMappings` | Properties Scenario | `Requirements_Load_TestMappings_AppliesMappingsCorrectly` |
 | `ReqStream-Requirements-TestMappings` | Properties Scenario | `Requirements_Load_BlankTestNameInMapping_ReportsErrorWithFileLocation` |
 | `ReqStream-Requirements-TestMappings` | Properties Scenario | `Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation` |
+| `ReqStream-Requirement-Location` | Validation Scenario | `Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation` |
+| `ReqStream-Requirement-Location` | Validation Scenario | `Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation` |
+| `ReqStream-Requirement-Location` | Validation Scenario | `Requirements_Load_BlankTestNameInRequirement_ReportsErrorWithFileLocation` |
+| `ReqStream-Requirement-Location` | Validation Scenario | `Requirements_Load_BlankTestNameInMapping_ReportsErrorWithFileLocation` |
+| `ReqStream-Requirement-Location` | Validation Scenario | `Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation` |
+| `ReqStream-Requirement-Location` | Validation Scenario | `Requirements_Load_BlankTagName_ReportsErrorWithFileLocation` |
+| `ReqStream-Requirement-Location` | Validation Scenario | `Requirements_Load_BlankChildIdInRequirement_ReportsErrorWithFileLocation` |
+| `ReqStream-Lint-CircularReferences` | Circular Reference Detection Scenario | `Requirements_Load_CircularRequirements_ReportsCircularReferenceError` |
+| `ReqStream-Lint-CircularReferences` | Circular Reference Detection Scenario | `Requirements_Load_SelfReferencingRequirement_ReportsCircularReferenceError` |

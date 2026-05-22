@@ -1,5 +1,11 @@
 ---
 # Requirements unit requirements
+# Note: Some requirement IDs use the historical 'ReqStream-Report-*' prefix that predates the
+# current naming convention (which would use 'ReqStream-Modeling-*' for modeling-layer reporting).
+# Renaming is a breaking change requiring coordinated updates across all artifact trees and is deferred.
+# Note: Requirement IDs in this file use the 'ReqStream-Requirements-*' prefix rather than the
+# standard 'ReqStream-Modeling-Requirements-*' form. This naming predates the Modeling namespace
+# hierarchy and is accepted as a historical deviation to avoid breaking changes to traceability links.
 sections:
   - title: ReqStream Requirements
     sections:
@@ -74,8 +80,6 @@ sections:
                 tests:
                   - Requirements_Load_IdenticalSections_MergesCorrectly
                   - Requirements_Load_MultipleFilesWithSameSections_MergesSections
-                children:
-                  - ReqStream-Section-TitleMerging
 
               - id: ReqStream-Report-MarkdownExport
                 title: The tool shall export requirements to markdown format.

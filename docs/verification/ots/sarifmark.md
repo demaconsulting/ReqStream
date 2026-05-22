@@ -20,3 +20,10 @@ This scenario is tested by `SarifMark_SarifReading`.
 
 **Markdown Report Generation**: Validates that SarifMark can generate a Markdown report from
 parsed SARIF data. This scenario is tested by `SarifMark_MarkdownReportGeneration`.
+
+### Requirements Coverage
+
+| Requirement | Scenario | Test Method(s) |
+| --- | --- | --- |
+| ReqStream-OTS-SarifMark | SARIF Reading | `SarifMark_SarifReading` |
+| ReqStream-OTS-SarifMark | Markdown Report Generation | `SarifMark_MarkdownReportGeneration` |

@@ -67,12 +67,14 @@ public sealed class LoadResult
     ///     error-level issues are sent to <see cref="Context.WriteError"/>.
     /// </summary>
     /// <param name="context">The context to report issues to. Must not be null.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="context"/> is null.</exception>
     /// <remarks>
     ///     This method exists to decouple <see cref="LoadResult"/> from knowledge of how issues
     ///     are displayed, delegating all formatting and routing decisions to <see cref="Context"/>.
     /// </remarks>
     public void ReportIssues(Context context)
     {
+        ArgumentNullException.ThrowIfNull(context);
         foreach (var issue in Issues)
         {
             if (issue.Severity == LintSeverity.Error)

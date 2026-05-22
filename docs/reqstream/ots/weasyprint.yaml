@@ -1,5 +1,8 @@
 ---
 # WeasyPrint OTS requirements
+# Note: Requirement IDs in OTS files use the project-wide ReqStream-OTS-{ToolName} pattern,
+# which is an accepted deviation from the System-Component-Feature naming standard defined
+# in reqstream-usage.md. Renaming would break traceability across all test files.
 sections:
   - title: OTS Software Requirements
     sections:

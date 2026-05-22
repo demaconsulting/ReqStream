@@ -30,7 +30,9 @@ The `Tracing` subsystem contains the following software unit:
 - *Type*: In-process .NET public API.
 - *Role*: Provider.
 - *Contract*: Accepts `filePath`, `depth`, and optional `filterTags`; writes a Markdown report
-  with Summary, Requirements, and Testing sections.
+  with Summary, Requirements, and Testing sections. The `depth` parameter controls the Markdown
+  heading level (valid range 1–6, matching ATX heading levels `#` through `######`); when omitted
+  the default is 1 (top-level `#` headings).
 - *Constraints*: Throws `ArgumentException` for null/empty path.
 
 **TraceMatrix.CalculateSatisfiedRequirements**: Returns satisfied and total requirement counts.
@@ -45,6 +47,25 @@ The `Tracing` subsystem contains the following software unit:
 - *Type*: In-process .NET public API.
 - *Role*: Provider.
 - *Contract*: Returns a list of requirement IDs not covered by passing tests.
+- *Constraints*: Read-only; does not throw.
+
+**TraceMatrix.GetTestResult**: Returns aggregated pass/fail metrics for a named test.
+
+- *Type*: In-process .NET public API.
+- *Role*: Provider.
+- *Contract*: Accepts `testName` (may include a source filter as `"source@testname"`); returns
+  a `TestMetrics` value with aggregated pass and fail counts across all matching executions.
+  Returns `TestMetrics(0, 0)` when the test name is not found — callers do not need to
+  null-check the result.
+- *Constraints*: Read-only; does not throw.
+
+**TraceMatrix.GetAllTestResults**: Returns metrics for all tests referenced in requirements.
+
+- *Type*: In-process .NET public API.
+- *Role*: Provider.
+- *Contract*: Returns an `IReadOnlyDictionary<string, TestMetrics>` mapping each test name
+  (referenced by at least one requirement) to its aggregated `TestMetrics`. Only tests that
+  have been executed (i.e., `Executed > 0`) are included in the returned dictionary.
 - *Constraints*: Read-only; does not throw.
 
 ### Design

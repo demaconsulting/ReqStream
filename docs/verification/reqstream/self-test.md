@@ -1,6 +1,6 @@
 ## SelfTest
 
-### Verification Approach
+### Verification Strategy
 
 The SelfTest subsystem is verified using xUnit integration tests in `SelfTestTests.cs`. Tests
 invoke `Validation.Run` through a silent `Context` and assert on the exit code, results file
@@ -31,7 +31,9 @@ file is written.
 
 **Failure Reporting**: Tests verify that errors are reported and exit code is 1 on failures. This
 scenario is tested by `SelfTest_FailureReporting_WithErrors_SetsExitCode1`, which verifies errors
-produce exit code 1.
+produce exit code 1 via the write-error path, and by
+`SelfTest_FailureReporting_GenuineFailure_SetsExitCode1`, which verifies exit code 1 when genuine
+internal self-validation test failures occur.
 
 ### Requirements Coverage
 
@@ -39,4 +41,5 @@ produce exit code 1.
 | --- | --- | --- |
 | `ReqStream-SelfTest-Qualification` | Qualification Scenario | `SelfTest_Qualification_Run_PassesAllTests` |
 | `ReqStream-SelfTest-ResultsOutput` | Results Output Scenario | `SelfTest_ResultsOutput_TrxResultsPath_WritesTrxFile`, `SelfTest_ResultsOutput_XmlResultsPath_WritesJUnitFile` |
-| `ReqStream-SelfTest-FailureReporting` | Failure Reporting Scenario | `SelfTest_FailureReporting_WithErrors_SetsExitCode1` |
+| `ReqStream-SelfTest-FailureReporting-Error` | Failure Reporting Scenario | `SelfTest_FailureReporting_GenuineFailure_SetsExitCode1`, `SelfTest_FailureReporting_WithErrors_SetsExitCode1` |
+| `ReqStream-SelfTest-FailureReporting-ExitCode` | Failure Reporting Scenario | `SelfTest_FailureReporting_GenuineFailure_SetsExitCode1`, `SelfTest_FailureReporting_WithErrors_SetsExitCode1` |

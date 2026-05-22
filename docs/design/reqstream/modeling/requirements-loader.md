@@ -43,7 +43,7 @@ include detection.
 **Load(paths)**: Initializes shared state, calls `LoadFile` for each path, runs
 `ValidateCycles`, and assembles the `LoadResult`.
 
-- *Parameters*: `IEnumerable<string> paths` — file paths to load.
+- *Parameters*: `string[] paths` — file paths to load.
 - *Returns*: `LoadResult` — contains the tree (or `null` on error) and issues.
 - *Preconditions*: None.
 - *Postconditions*: If any error-level issue was collected, `LoadResult.Requirements` is `null`.
@@ -86,7 +86,9 @@ objects, and processing continues. No exception escapes from `Load` for domain-l
 Lint check categories: file access, YAML syntax, document structure, field types, section rules,
 requirement rules, list entry rules, mapping rules, and graph rules.
 
-#### Dependencies
+#### Interactions
+
+##### Dependencies
 
 - **Section** — creates and merges `Section` objects into the shared requirements tree.
 - **Requirement** — creates `Requirement` objects and populates their fields from YAML nodes.
@@ -96,7 +98,7 @@ requirement rules, list entry rules, mapping rules, and graph rules.
   entries safely.
 - **YamlDotNet** — provides the `RepresentationModel` DOM API used to parse YAML text.
 
-#### Callers
+##### Callers
 
 - **Requirements** — delegates YAML parsing and validation to `RequirementsLoader.Load` from
   its own `Load` factory.

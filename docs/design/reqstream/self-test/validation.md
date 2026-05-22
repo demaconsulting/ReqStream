@@ -44,8 +44,10 @@ tests sequentially, and prints a multi-line summary. The six tests:
 
 - *Parameters*: `Context context`; `List<TestResult> testResults`.
 - *Returns*: `void`.
-- *Preconditions*: `context.ResultsFile` is set.
-- *Postconditions*: File written in TRX (`.trx`) or JUnit (`.xml`) format.
+- *Preconditions*: None — if `context.ResultsFile` is null the method returns immediately without
+  error.
+- *Postconditions*: File written in TRX (`.trx`) or JUnit (`.xml`) format when `context.ResultsFile`
+  is non-null.
 
 Dispatches based on file extension: `.trx` uses TRX serializer, `.xml` uses JUnit serializer,
 any other extension reports an error via `context.WriteError`.
@@ -62,11 +64,14 @@ The following conditions are handled without throwing:
 - **Unsupported results file extension** — `context.WriteError` with descriptive message.
 - **Results file write failure** — `context.WriteError` with exception message; execution
   continues.
+- `ArgumentNullException` — thrown by `Run` when `context` is `null`.
 
 The only exception that can escape `Run` is an unexpected runtime error, which propagates to
 `Program.Run`.
 
-#### Dependencies
+#### Interactions
+
+##### Dependencies
 
 - **DemaConsulting.TestResults** — provides `TestResults`, `TestResult`, `TestOutcome` model
   types.
@@ -78,7 +83,7 @@ The only exception that can escape `Run` is an unexpected runtime error, which p
 - **Requirements** — `Requirements.Load` is called with fixture YAML files.
 - **TraceMatrix** — constructed with fixture test-result files.
 
-#### Callers
+##### Callers
 
 - **Program** — calls `Validation.Run(context)` when `--validate` is present on the command
   line.

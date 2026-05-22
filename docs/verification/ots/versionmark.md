@@ -20,3 +20,10 @@ configured tools. This scenario is tested by `VersionMark_CapturesVersions`.
 
 **Markdown Report Generation**: Validates that VersionMark can generate a Markdown report from
 captured version metadata. This scenario is tested by `VersionMark_GeneratesMarkdownReport`.
+
+### Requirements Coverage
+
+| Requirement | Scenario | Test Method(s) |
+| --- | --- | --- |
+| ReqStream-OTS-VersionMark | Version Capture | `VersionMark_CapturesVersions` |
+| ReqStream-OTS-VersionMark | Markdown Report Generation | `VersionMark_GeneratesMarkdownReport` |

@@ -39,4 +39,6 @@ absolute path overrides are rejected. This scenario is tested by
 
 | Requirement ID | Test Method(s) |
 | --- | --- |
-| (security hardening — no explicit requirement) | All `PathHelpers_SafePathCombine_*` methods |
+| `ReqStream-Utilities-PathHelpers-SafeCombine` | `PathHelpers_SafePathCombine_ValidRelativePath_ReturnsCombinedPath`, `PathHelpers_SafePathCombine_ValidSubdirectory_ReturnsCombinedPath` |
+| `ReqStream-Utilities-PathHelpers-PathTraversalRejection` | `PathHelpers_SafePathCombine_DotDotPath_ThrowsArgumentException`, `PathHelpers_SafePathCombine_DeepDotDotPath_ThrowsArgumentException`, `PathHelpers_SafePathCombine_AbsoluteOverridePath_ThrowsArgumentException` |
+| `ReqStream-Utilities-PathHelpers-NullGuard` | `PathHelpers_SafePathCombine_NullBasePath_ThrowsArgumentNullException`, `PathHelpers_SafePathCombine_NullRelativePath_ThrowsArgumentNullException` |

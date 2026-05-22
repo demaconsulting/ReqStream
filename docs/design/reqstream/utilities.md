@@ -32,19 +32,23 @@ base directory.
 - *Type*: In-process .NET internal API (static method).
 - *Role*: Provider (Modeling subsystem consumes this).
 - *Contract*: Accepts `basePath` and `relativePath`; returns the combined path. Throws
-  `ArgumentException` if the combined path escapes the base (path traversal attempt).
+  `ArgumentException` if the combined path escapes the base (path traversal attempt). Throws
+  `ArgumentNullException` if `basePath` or `relativePath` is null.
 - *Constraints*: Never permits traversal outside `basePath`.
 
 ### Design
 
-The `Utilities` subsystem contains two independent units, `GlobMatcher` and `PathHelpers`, which
-have no dependency on each other. Both are declared `internal static`; they expose no instances
+The `Utilities` subsystem contains two units, `GlobMatcher` and `PathHelpers`, with a
+one-directional dependency: `GlobMatcher` depends on `PathHelpers`, but `PathHelpers` has no
+dependency on `GlobMatcher`. Both are declared `internal static`; they expose no instances
 and are accessible only within the assembly.
 
 `GlobMatcher` is used by `Context.Create` to expand `--requirements` and `--tests` glob patterns
-into resolved file path lists. `PathHelpers.SafePathCombine` is used by `RequirementsLoader` to
-combine `includes` directory paths with relative include paths before recursing into included
-files. Neither unit calls the other.
+into resolved file path lists. Within `FindMatchingFiles`, `GlobMatcher` calls
+`PathHelpers.SafePathCombine` to construct safe absolute file paths for each matched result.
+`PathHelpers.SafePathCombine` is also used by `RequirementsLoader` to combine `includes`
+directory paths with relative include paths before recursing into included files.
+`PathHelpers` itself does not call `GlobMatcher`.
 
 The subsystem uses only .NET base class library types and
 `Microsoft.Extensions.FileSystemGlobbing`. The `Cli`, `Modeling`, and `SelfTest` subsystems are

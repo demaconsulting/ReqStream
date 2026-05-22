@@ -40,3 +40,11 @@ matching. The integration follows these steps:
 `GlobMatcher` is designed to be non-throwing. Patterns that reference non-existent directories
 are skipped; the `Matcher` returns empty results rather than throwing. Only `GlobMatcher` uses
 this package; no other ReqStream unit depends on it directly.
+
+### Version Constraints
+
+`Microsoft.Extensions.FileSystemGlobbing` requires a minimum of .NET 8.0, which aligns with
+ReqStream's minimum target framework. The API surface used (`Matcher`, `DirectoryInfoWrapper`,
+`PatternMatchingResult`, `FilePatternMatch`) has been stable since .NET Core 1.0 extensions and
+is not expected to change. Version numbers are managed centrally in the project file and SBOM per
+the OTS Dependencies Design policy.

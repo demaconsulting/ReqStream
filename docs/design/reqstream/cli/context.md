@@ -110,12 +110,14 @@ it.
 
 All other `Context` methods (`WriteLine`, `WriteError`, `Dispose`) do not throw.
 
-#### Dependencies
+#### Interactions
+
+##### Dependencies
 
 - **GlobMatcher** — called by `Create` to expand `--requirements` and `--tests` glob patterns
   into absolute file path lists.
 
-#### Callers
+##### Callers
 
 - **Program** — creates `Context` via `Create`; calls `WriteLine` and `WriteError`; reads
   `ExitCode`.

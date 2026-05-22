@@ -43,3 +43,11 @@ steps:
 converts it to a `LintIssue` with `LintSeverity.Error`, including the file path and line/column
 from the exception's `Start` property. No other ReqStream unit depends on `YamlDotNet` directly;
 all YAML parsing is encapsulated within `RequirementsLoader`.
+
+### Version Constraints
+
+Only the `YamlDotNet.RepresentationModel` namespace is used; the `YamlDotNet.Serialization`
+namespace is not consumed. Any version of `YamlDotNet` that exposes `YamlStream`, `YamlDocument`,
+`YamlMappingNode`, `YamlSequenceNode`, `YamlScalarNode`, and `YamlException` with the API surface
+described above is compatible. Version numbers are managed centrally in the project file and SBOM
+per the OTS Dependencies Design policy.

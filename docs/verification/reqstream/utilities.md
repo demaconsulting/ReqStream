@@ -1,10 +1,16 @@
 ## Utilities
 
-### Verification Approach
+### Verification Strategy
 
 The Utilities subsystem is verified using xUnit unit tests. Each unit within the subsystem
 has its own test class that exercises the public methods with various input combinations,
 including edge cases and boundary conditions.
+
+Unit tests serve as the sole compliance evidence for the subsystem-level requirements because
+no separate subsystem integration tests exist. The subsystem contains only two units —
+`GlobMatcher` and `PathHelpers` — which have no dependency on each other and are individually
+fully verified by their respective unit test classes. Together these unit tests fully satisfy
+both subsystem requirements.
 
 ### Test Environment
 
@@ -36,9 +42,15 @@ verifies returned paths are rooted;
 `GlobMatcher_SplitAbsolutePattern_WildcardAtTopLevel_SplitsAtRoot`, which verifies a wildcard at
 the top level splits at the root;
 `GlobMatcher_SplitAbsolutePattern_LiteralPath_SplitsAtLastSeparator`, which verifies a literal
-path splits at the last separator; and
+path splits at the last separator;
 `GlobMatcher_SplitAbsolutePattern_DoubleStarWildcard_SplitsBeforeWildcard`, which verifies `**`
-splits before the wildcard.
+splits before the wildcard;
+`GlobMatcher_FindMatchingFiles_MultiplePatterns_DeduplicatesResults`, which verifies that a file
+matched by more than one pattern appears only once in the result;
+`GlobMatcher_FindMatchingFiles_MultipleMatches_ReturnsSortedResults`, which verifies that results
+are returned in lexicographic ascending order regardless of file-system enumeration order; and
+`GlobMatcher_FindMatchingFiles_MultiplePatterns_CombinesFromDifferentSources`, which verifies that
+patterns rooted in different directories are all combined into a single result list.
 
 **PathHelpers**: Tests verify that `PathHelpers.SafePathCombine` correctly combines paths and
 rejects path-traversal attempts. This scenario is tested by
@@ -60,5 +72,24 @@ which verifies a null relative path is rejected.
 
 | Requirement ID | Test Method(s) |
 | --- | --- |
-| `ReqStream-Command-RequirementsGlobPatterns` | `GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles`, `GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles`, `GlobMatcher_FindMatchingFiles_AbsolutePatternWithDoubleWildcard_MatchesFilesInSubdirectories` |
-| `ReqStream-Command-TestGlobPatterns` | `GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles`, `GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles`, `GlobMatcher_FindMatchingFiles_AbsolutePatternWithDoubleWildcard_MatchesFilesInSubdirectories` |
+| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles` |
+| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles` |
+| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_FindMatchingFiles_AbsolutePatternWithDoubleWildcard_MatchesFilesInSubdirectories` |
+| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_FindMatchingFiles_AbsoluteLiteralPath_MatchesSingleFile` |
+| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_SplitAbsolutePattern_WildcardAtTopLevel_SplitsAtRoot` |
+| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_SplitAbsolutePattern_LiteralPath_SplitsAtLastSeparator` |
+| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_SplitAbsolutePattern_DoubleStarWildcard_SplitsBeforeWildcard` |
+| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_FindMatchingFiles_MultiplePatterns_DeduplicatesResults` |
+| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_FindMatchingFiles_MultiplePatterns_CombinesFromDifferentSources` |
+| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_FindMatchingFiles_ReturnsAbsolutePaths` |
+| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty` |
+| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_FindMatchingFiles_MultipleMatches_ReturnsSortedResults` |
+| `ReqStream-GlobMatcher-NullPatterns` | `GlobMatcher_FindMatchingFiles_NullPatterns_ThrowsArgumentNullException` |
+| `ReqStream-GlobMatcher-NullElement` | `GlobMatcher_FindMatchingFiles_NullElementInPatterns_SkipsElement` |
+| `ReqStream-Utilities-SafePath` | `PathHelpers_SafePathCombine_ValidRelativePath_ReturnsCombinedPath` |
+| `ReqStream-Utilities-SafePath` | `PathHelpers_SafePathCombine_ValidSubdirectory_ReturnsCombinedPath` |
+| `ReqStream-Utilities-SafePath` | `PathHelpers_SafePathCombine_DotDotPath_ThrowsArgumentException` |
+| `ReqStream-Utilities-SafePath` | `PathHelpers_SafePathCombine_DeepDotDotPath_ThrowsArgumentException` |
+| `ReqStream-Utilities-SafePath` | `PathHelpers_SafePathCombine_AbsoluteOverridePath_ThrowsArgumentException` |
+| `ReqStream-Utilities-SafePath` | `PathHelpers_SafePathCombine_NullBasePath_ThrowsArgumentNullException` |
+| `ReqStream-Utilities-SafePath` | `PathHelpers_SafePathCombine_NullRelativePath_ThrowsArgumentNullException` |

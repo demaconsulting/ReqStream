@@ -126,7 +126,8 @@ sections:
             children:
               - ReqStream-Program-Validate
               - ReqStream-SelfTest-Qualification
-              - ReqStream-SelfTest-FailureReporting
+              - ReqStream-SelfTest-FailureReporting-Error
+              - ReqStream-SelfTest-FailureReporting-ExitCode
 
           - id: ReqStream-System-ValidateResultsOutput
             title: >-
@@ -283,7 +284,6 @@ sections:
               responsibility while still producing one coherent requirement tree.
             tags: [system]
             tests:
-              - ReqStream_System_FileIncludes_RequirementsWithIncludes_LoadsAllRequirements
               - ReqStream_System_SectionMerging_TwoFilesWithSameSection_ProducesSingleMergedSection
             children:
               - ReqStream-Requirements-SectionMerging
@@ -314,6 +314,9 @@ sections:
               Satisfaction of all children constitutes complete evidence for this
               system-level requirement.
             tags: [system]
+            tests:
+              - ReqStream_System_TestFileErrorHandling_MissingTestFile_ReportsFatalError
+              - ReqStream_System_TestFileErrorHandling_MalformedTestFile_ReportsFatalError
             children:
               - ReqStream-Tracing-MissingFile
               - ReqStream-Tracing-MalformedFile
@@ -329,8 +332,24 @@ sections:
               Satisfaction of all children constitutes complete evidence for this
               system-level requirement.
             tags: [system]
+            tests:
+              - ReqStream_System_MatrixErrorHandling_MatrixWithoutTests_ReportsError
             children:
               - ReqStream-Program-MatrixNoTests
+
+          - id: ReqStream-System-EnforceNoTests
+            title: >-
+              The system shall report an error when enforcement is requested but no test result
+              files are provided.
+            justification: |
+              Enforcement without test results is a configuration error analogous to
+              requesting a trace matrix without test results. The user should be informed
+              explicitly rather than silently succeeding or failing.
+            tags: [system]
+            tests:
+              - ReqStream_System_EnforceNoTests_EnforceWithoutTests_ReportsError
+            children:
+              - ReqStream-Program-Enforce
 
           - id: ReqStream-System-CyclicChildDetection
             title: >-
@@ -344,5 +363,7 @@ sections:
               Satisfaction of all children constitutes complete evidence for this
               system-level requirement.
             tags: [system]
+            tests:
+              - ReqStream_System_CyclicChildDetection_CyclicChildRequirements_ReportsError
             children:
               - ReqStream-Lint-CircularReferences

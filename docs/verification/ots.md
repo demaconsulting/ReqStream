@@ -29,14 +29,14 @@ The following table lists all OTS items and their primary evidence type.
 
 | OTS Item | Primary Evidence Type |
 | --- | --- |
-| BuildMark | CI pipeline step evidence |
-| FileAssert | Self-validation |
+| BuildMark | Self-validation report and CI integration evidence |
+| FileAssert | Self-validation and CI acceptance test |
 | xUnit | Integration test evidence |
 | Pandoc | CI pipeline step evidence combined with FileAssert document validation |
-| ReviewMark | CI pipeline step evidence |
+| ReviewMark | Self-validation report |
 | SarifMark | CI pipeline step evidence |
 | SonarMark | CI pipeline step evidence |
-| VersionMark | CI pipeline step evidence |
+| VersionMark | Self-validation report and CI integration evidence |
 | WeasyPrint | CI pipeline step evidence combined with FileAssert document validation |
 | YamlDotNet | Integration test evidence |
 | Microsoft.Extensions.FileSystemGlobbing | Integration test evidence |

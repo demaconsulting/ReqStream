@@ -47,12 +47,14 @@ namespace DemaConsulting.ReqStream.Modeling;
 public class Requirement
 {
     /// <summary>
-    ///     Gets or sets the unique identifier for this requirement.
+    ///     Uniquely identifies this requirement across all loaded files, enabling traceability,
+    ///     deduplication, and child reference resolution.
     /// </summary>
     public string Id { get; set; } = string.Empty;
 
     /// <summary>
-    ///     Gets or sets the title or description of this requirement.
+    ///     Human-readable description surfaced in reports so stakeholders can understand
+    ///     requirements without consulting source YAML.
     /// </summary>
     public string Title { get; set; } = string.Empty;
 

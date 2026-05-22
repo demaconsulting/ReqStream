@@ -39,12 +39,14 @@ N/A — `LintIssue` and `LintSeverity` are simple value types with no executable
 objects are created only by `RequirementsLoader`; no validation or error detection occurs within
 these types themselves.
 
-#### Dependencies
+#### Interactions
+
+##### Dependencies
 
 N/A — `LintIssue` and `LintSeverity` are simple value types with no outbound dependencies on
 other units, OTS items, or shared packages.
 
-#### Callers
+##### Callers
 
 - **RequirementsLoader** — creates `LintIssue` objects for every structural problem found during
   YAML validation.

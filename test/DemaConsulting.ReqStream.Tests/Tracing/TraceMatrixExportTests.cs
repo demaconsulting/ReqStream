@@ -32,8 +32,10 @@ namespace DemaConsulting.ReqStream.Tests.Tracing;
 /// </summary>
 public sealed class TraceMatrixExportTests : IDisposable
 {
+    /// <summary>Delimiter string used to split export output lines for assertion.</summary>
     private static readonly string[] SplitDelimiter = ["| Test_Credentials |"];
 
+    /// <summary>Unique temporary directory for this test instance's fixture files.</summary>
     private readonly string _testDirectory;
 
     /// <summary>

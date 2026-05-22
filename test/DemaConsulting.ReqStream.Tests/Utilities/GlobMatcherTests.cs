@@ -27,6 +27,7 @@ namespace DemaConsulting.ReqStream.Tests.Utilities;
 /// </summary>
 public sealed class GlobMatcherTests : IDisposable
 {
+    /// <summary>Unique temporary directory for this test instance's fixture files.</summary>
     private readonly string _testDirectory;
 
     /// <summary>
@@ -268,6 +269,46 @@ public sealed class GlobMatcherTests : IDisposable
     }
 
     /// <summary>
+    ///     Validates that results are returned in lexicographic ascending order.
+    /// </summary>
+    [Fact]
+    public void GlobMatcher_FindMatchingFiles_MultipleMatches_ReturnsSortedResults()
+    {
+        // Arrange: create files whose names would be unsorted if added in creation order
+        var fileB = PathHelpers.SafePathCombine(_testDirectory, "b_file.yaml");
+        var fileA = PathHelpers.SafePathCombine(_testDirectory, "a_file.yaml");
+        var fileC = PathHelpers.SafePathCombine(_testDirectory, "c_file.yaml");
+        File.WriteAllText(fileB, "test");
+        File.WriteAllText(fileA, "test");
+        File.WriteAllText(fileC, "test");
+
+        // Act: find files using an absolute glob pattern
+        var pattern = PathHelpers.SafePathCombine(_testDirectory, "*.yaml");
+        var files = GlobMatcher.FindMatchingFiles([pattern]);
+
+        // Assert: files are returned in lexicographic ascending order (a before b before c)
+        Assert.Equal(3, files.Count);
+        Assert.Equal(fileA, files[0]);
+        Assert.Equal(fileB, files[1]);
+        Assert.Equal(fileC, files[2]);
+    }
+
+    /// <summary>
+    ///     Validates that an empty patterns collection returns an empty result without throwing.
+    /// </summary>
+    [Fact]
+    public void GlobMatcher_FindMatchingFiles_EmptyPatterns_ReturnsEmpty()
+    {
+        // Arrange: no patterns supplied
+
+        // Act: find files with an empty patterns list
+        var files = GlobMatcher.FindMatchingFiles([]);
+
+        // Assert: result is empty
+        Assert.Empty(files);
+    }
+
+    /// <summary>
     /// Test that multiple patterns from different directories are combined into one result.
     /// </summary>
     [Fact]
@@ -292,5 +333,35 @@ public sealed class GlobMatcherTests : IDisposable
         Assert.Equal(2, files.Count);
         Assert.Single(files, f => f.EndsWith("req1.yaml"));
         Assert.Single(files, f => f.EndsWith("req2.yaml"));
+    }
+
+    /// <summary>
+    ///     Verifies that passing null as the patterns argument throws ArgumentNullException.
+    /// </summary>
+    [Fact]
+    public void GlobMatcher_FindMatchingFiles_NullPatterns_ThrowsArgumentNullException()
+    {
+        // Act and Assert: null patterns must throw ArgumentNullException immediately
+        Assert.Throws<ArgumentNullException>(() => GlobMatcher.FindMatchingFiles(null!));
+    }
+
+    /// <summary>
+    ///     Verifies that a null element within the patterns collection is silently skipped
+    ///     and does not prevent the non-null patterns from being processed.
+    /// </summary>
+    [Fact]
+    public void GlobMatcher_FindMatchingFiles_NullElementInPatterns_SkipsElement()
+    {
+        // Arrange: create a test file matched by the non-null pattern
+        var file = PathHelpers.SafePathCombine(_testDirectory, "skip_null.yaml");
+        File.WriteAllText(file, "test");
+        var pattern = PathHelpers.SafePathCombine(_testDirectory, "*.yaml");
+
+        // Act: collection contains a null element alongside a valid pattern
+        var files = GlobMatcher.FindMatchingFiles([null!, pattern]);
+
+        // Assert: the null element is skipped; the valid pattern still matches
+        Assert.Single(files);
+        Assert.Single(files, f => f.EndsWith("skip_null.yaml"));
     }
 }

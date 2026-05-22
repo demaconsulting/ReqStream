@@ -25,9 +25,11 @@ namespace DemaConsulting.ReqStream.Modeling;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         <b>Why mutable class rather than record:</b> YamlDotNet deserialization requires
-///         settable properties; record immutability would prevent the loader from building
-///         objects incrementally during DOM traversal.
+///         <b>YamlDotNet deserialization — two mechanisms:</b>
+///         <see cref="Title"/> has a public setter and is populated directly by YamlDotNet
+///         during DOM traversal. <see cref="Requirements"/> and <see cref="Sections"/> have
+///         no setter; YamlDotNet populates them by calling <c>.Add()</c> on the
+///         pre-initialized empty lists, so no setter is required for collection properties.
 ///     </para>
 ///     <para>
 ///         <b>Why merging logic is excluded:</b> Section is a pure data container. All merging
@@ -53,10 +55,18 @@ public class Section
     /// <summary>
     ///     Gets the list of requirements in this section.
     /// </summary>
+    /// <remarks>
+    ///     Pre-initialized to an empty list. YamlDotNet populates this collection during
+    ///     deserialization by calling <c>.Add()</c> on the list; no setter is required.
+    /// </remarks>
     public List<Requirement> Requirements { get; } = [];
 
     /// <summary>
     ///     Gets the list of child sections.
     /// </summary>
+    /// <remarks>
+    ///     Pre-initialized to an empty list. YamlDotNet populates this collection during
+    ///     deserialization by calling <c>.Add()</c> on the list; no setter is required.
+    /// </remarks>
     public List<Section> Sections { get; } = [];
 }

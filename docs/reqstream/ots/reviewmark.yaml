@@ -1,18 +1,32 @@
 ---
 # ReviewMark OTS requirements
+# Note: Requirement IDs in OTS files use the project-wide ReqStream-OTS-{ToolName} pattern,
+# which is an accepted deviation from the System-Component-Feature naming standard defined
+# in reqstream-usage.md. Renaming would break traceability across all test files.
 sections:
   - title: OTS Software Requirements
     sections:
       - title: ReviewMark
         requirements:
-          - id: ReqStream-OTS-ReviewMark
-            title: ReviewMark shall generate a review plan and review report from the review configuration.
+          - id: ReqStream-OTS-ReviewMark-Plan
+            title: ReviewMark shall generate review plans.
             justification: |
               DemaConsulting.ReviewMark reads the .reviewmark.yaml configuration and the review
-              evidence store to produce a review plan and review report documenting file review
-              coverage and currency. It runs in the same CI pipeline that produces the TRX test
-              results, so a successful pipeline run is evidence that ReviewMark executed without error.
+              evidence store to produce a review plan documenting file review coverage and
+              currency. ReviewMark is qualified via its built-in --validate command, which runs
+              internal self-tests and writes results to a TRX file consumed by ReqStream as
+              traceability evidence.
             tags: [ots]
             tests:
               - ReviewMark_ReviewPlanGeneration
+          - id: ReqStream-OTS-ReviewMark-Report
+            title: ReviewMark shall generate review reports.
+            justification: |
+              DemaConsulting.ReviewMark reads the .reviewmark.yaml configuration and the review
+              evidence store to produce a review report documenting file review coverage and
+              currency. ReviewMark is qualified via its built-in --validate command, which runs
+              internal self-tests and writes results to a TRX file consumed by ReqStream as
+              traceability evidence.
+            tags: [ots]
+            tests:
               - ReviewMark_ReviewReportGeneration

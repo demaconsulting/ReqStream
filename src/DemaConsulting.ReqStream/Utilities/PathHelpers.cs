@@ -30,9 +30,24 @@ internal static class PathHelpers
     /// <summary>
     ///     Safely combines two paths, ensuring the resolved combined path stays within the base directory.
     /// </summary>
-    /// <param name="basePath">The base path.</param>
-    /// <param name="relativePath">The relative path to combine.</param>
-    /// <returns>The combined path.</returns>
+    /// <remarks>
+    ///     This method exists to prevent path-traversal attacks on user-supplied include paths: a
+    ///     crafted relative component such as <c>../../etc/passwd</c> or an absolute override could
+    ///     otherwise cause the tool to read files outside the intended directory tree.
+    ///
+    ///     The algorithm validates the combined path against the base directory using fully resolved
+    ///     absolute forms, but deliberately returns the non-resolved <c>Path.Combine</c> result so
+    ///     that the caller's relative or working-directory style is preserved for downstream display
+    ///     and further path operations.
+    ///
+    ///     Stateless; safe for concurrent use.
+    /// </remarks>
+    /// <param name="basePath">The base directory path. Must not be <see langword="null"/>.</param>
+    /// <param name="relativePath">The relative path segment to combine. Must not be <see langword="null"/>.</param>
+    /// <returns>
+    ///     The combined path in non-resolved form (equivalent to <c>Path.Combine(basePath, relativePath)</c>),
+    ///     guaranteed to resolve within <paramref name="basePath"/>.
+    /// </returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="basePath"/> or <paramref name="relativePath"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentException">
     ///     Thrown when the resolved combined path escapes the base directory, or when a supplied path is invalid.

@@ -2,7 +2,10 @@
 
 This chapter covers the design integration of Off-The-Shelf (OTS) software packages used by
 ReqStream. Each OTS item is accessed through a single dedicated wrapper or utility class within
-the system, ensuring minimal coupling and straightforward replacement.
+the system, ensuring minimal coupling and straightforward replacement. CI pipeline tools
+(BuildMark, FileAssert, xUnit, Pandoc, ReviewMark, SarifMark, SonarMark, VersionMark,
+WeasyPrint) are excluded from integration design documentation because they are not accessed
+through source code APIs; their integration is through the CI configuration files.
 
 ## Selection Criteria
 

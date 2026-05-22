@@ -33,6 +33,7 @@ namespace DemaConsulting.ReqStream.Tests.Tracing;
 /// </summary>
 public sealed class TracingTests : IDisposable
 {
+    /// <summary>Absolute path to the per-test temporary directory created in the constructor and deleted in Dispose.</summary>
     private readonly string _testDirectory;
 
     /// <summary>

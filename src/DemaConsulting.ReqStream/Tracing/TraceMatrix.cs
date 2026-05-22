@@ -58,6 +58,28 @@ public record TestMetrics(int Passes, int Fails)
 /// <summary>
 ///     Represents a single test execution from a specific test result file.
 /// </summary>
+/// <remarks>
+///     <para>
+///         <see cref="TestExecution"/> is an immutable record because each instance represents a
+///         single captured observation from a parsed test result file; the data must not change once
+///         created so that aggregation across multiple files remains deterministic and thread-safe
+///         without synchronization.
+///     </para>
+///     <para>
+///         <see cref="FileBaseName"/> is stored as a plain <see cref="string"/> (rather than a
+///         normalized or lower-cased form) so that the original casing is preserved for display
+///         purposes. Case-insensitive substring matching is applied at the point of comparison in
+///         <see cref="TraceMatrix.GetTestResult"/> using
+///         <see cref="string.Contains(string, StringComparison)"/> with
+///         <see cref="StringComparison.OrdinalIgnoreCase"/>, keeping the invariant simple and
+///         letting the record remain a pure data carrier.
+///     </para>
+///     <para>
+///         Invariants: <see cref="FileBaseName"/> and <see cref="Name"/> are non-null non-empty
+///         strings set at construction; <see cref="Metrics"/> is a non-null <see cref="TestMetrics"/>
+///         instance.
+///     </para>
+/// </remarks>
 /// <param name="FileBaseName">The base name of the test file (without extension).</param>
 /// <param name="Name">The test name.</param>
 /// <param name="Metrics">The test metrics (passes and fails).</param>
@@ -67,6 +89,23 @@ public record TestExecution(string FileBaseName, string Name, TestMetrics Metric
 ///     Represents a traceability matrix that maps test results to requirements.
 ///     Supports TRX and JUnit test result formats.
 /// </summary>
+/// <remarks>
+///     <para>
+///         <see cref="TraceMatrix"/> follows a construction-then-read two-phase lifecycle.
+///         The constructor is the only mutating phase: it parses every supplied test result file
+///         and populates <c>_testExecutions</c>. Once the constructor returns, the instance is
+///         effectively frozen — all public query methods (<see cref="GetTestResult"/>,
+///         <see cref="GetAllTestResults"/>, <see cref="CalculateSatisfiedRequirements(System.Collections.Generic.HashSet{string}?)"/>,
+///         <see cref="GetUnsatisfiedRequirements"/>, and <see cref="Export"/>) are read-only and
+///         do not modify any state.
+///     </para>
+///     <para>
+///         Thread-safety contract: concurrent calls to any combination of the read-only query
+///         methods after construction are safe without additional synchronization. The constructor
+///         itself is not thread-safe; callers must ensure construction completes on a single thread
+///         before sharing the instance across threads.
+///     </para>
+/// </remarks>
 public class TraceMatrix
 {
     /// <summary>
@@ -140,7 +179,13 @@ public class TraceMatrix
     /// <summary>
     ///     Gets all test metrics for tests referenced in requirements.
     /// </summary>
-    /// <returns>A read-only dictionary of test names to their metrics.</returns>
+    /// <returns>
+    ///     A read-only dictionary mapping test names to their aggregated <see cref="TestMetrics"/>.
+    ///     Only tests that are directly referenced by at least one requirement in the
+    ///     <see cref="Requirements"/> tree are included. Tests referenced by requirements but
+    ///     with <see cref="TestMetrics.Executed"/> equal to zero (i.e., not present in any loaded
+    ///     test-result file) are excluded.
+    /// </returns>
     public IReadOnlyDictionary<string, TestMetrics> GetAllTestResults()
     {
         // Build dictionary of all test results from required tests in the requirements
@@ -231,9 +276,14 @@ public class TraceMatrix
     ///     </para>
     /// </remarks>
     /// <param name="filePath">The path to the output Markdown file.</param>
-    /// <param name="depth">The starting depth for Markdown headers (default: 1).</param>
+    /// <param name="depth">
+    ///     The starting depth for Markdown headers (default: 1). Must be at least 1; a value
+    ///     less than 1 produces malformed Markdown headers.
+    /// </param>
     /// <param name="filterTags">Optional set of tags to filter requirements. If provided, only requirements with matching tags are included.</param>
     /// <exception cref="ArgumentException">Thrown when filePath is null or empty.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="depth"/> is less than 1.</exception>
+    /// <exception cref="System.IO.IOException">Thrown when the output file cannot be written.</exception>
     public void Export(string filePath, int depth = 1, HashSet<string>? filterTags = null)
     {
         // Validate file path
@@ -241,6 +291,9 @@ public class TraceMatrix
         {
             throw new ArgumentException("File path cannot be null or empty", nameof(filePath));
         }
+
+        // Validate depth - a depth less than 1 would produce invalid Markdown headers
+        ArgumentOutOfRangeException.ThrowIfLessThan(depth, 1);
 
         // Create a string builder to build the markdown content
         using var writer = new StringWriter();
@@ -408,6 +461,11 @@ public class TraceMatrix
     /// <summary>
     ///     Collects all tests from a requirement and its children recursively.
     /// </summary>
+    /// <remarks>
+    ///     This method recurses through the descendant requirement tree without a cycle guard
+    ///     because <c>ValidateCycles</c> has already confirmed the requirement graph is acyclic
+    ///     before this method is called. Adding a visited-set guard would be redundant overhead.
+    /// </remarks>
     /// <param name="requirement">The requirement to collect tests from.</param>
     /// <param name="rootSection">The root section for looking up child requirements.</param>
     /// <param name="allTests">The set to add tests to.</param>

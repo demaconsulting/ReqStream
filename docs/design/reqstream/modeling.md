@@ -73,5 +73,48 @@ For export paths, `Requirements.Export` and `Requirements.ExportJustifications` 
 `Section` tree recursively, emitting Markdown at the caller-specified heading depth. Neither
 method calls back into `RequirementsLoader`; they read only the already-populated tree.
 
-All lint issues carry `LintSeverity.Error`. Any single error causes `LoadResult` to return
-`null` for `Requirements`.
+> **Test dependency note**: The test fixture for the Modeling subsystem
+> (`ModelingTests.cs`) uses `Utilities.PathHelpers.SafePathCombine` to construct temporary
+> file paths in a safe, cross-platform manner. Access is enabled by the
+> `[assembly: InternalsVisibleTo("DemaConsulting.ReqStream.Tests")]` attribute declared in the
+> main assembly. This dependency on `Utilities.PathHelpers` is confined to tests and does not
+> affect the production `Modeling` subsystem boundary.
+
+Lint issues may carry either `LintSeverity.Warning` (non-fatal; reported but loading continues)
+or `LintSeverity.Error` (fatal; `LoadResult.Requirements` is `null` when at least one error-level
+issue is present).
+
+The table below maps each specific structural defect to its assigned severity. All defects
+currently detected by `RequirementsLoader` use `Error` severity; no conditions currently produce
+`Warning` severity (the severity level exists to accommodate future non-fatal checks).
+
+| Lint Condition | Severity |
+| --- | --- |
+| Invalid file path (path resolution failure) | `Error` |
+| Circular include detected | `Error` |
+| File not found | `Error` |
+| Failed to read file (I/O error) | `Error` |
+| Malformed YAML (parse exception) | `Error` |
+| Document root is not a mapping | `Error` |
+| Unknown field at document root | `Error` |
+| Section is not a mapping node | `Error` |
+| Section missing required field `title` | `Error` |
+| Section `title` is blank | `Error` |
+| Unknown field in section | `Error` |
+| Requirement is not a mapping node | `Error` |
+| Requirement missing required field `id` | `Error` |
+| Requirement `id` is blank | `Error` |
+| Duplicate requirement ID | `Error` |
+| Requirement missing required field `title` | `Error` |
+| Requirement `title` is blank | `Error` |
+| Unknown field in requirement | `Error` |
+| Invalid `includes` path | `Error` |
+| Non-scalar entry in `includes`, `tests`, `children`, or `tags` sequence | `Error` |
+| Blank entry in `includes`, `tests`, `children`, or `tags` sequence | `Error` |
+| Field expected to be a sequence but is not | `Error` |
+| Mapping missing required field `id` | `Error` |
+| Mapping `id` is blank | `Error` |
+| Unknown field in mapping | `Error` |
+| Non-scalar test entry in mapping | `Error` |
+| Requirement references unknown child ID | `Error` |
+| Circular requirement child reference | `Error` |

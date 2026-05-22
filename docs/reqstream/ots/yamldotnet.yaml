@@ -1,17 +1,23 @@
 ---
 # YamlDotNet OTS requirements
+# Note: Requirement IDs in OTS files use the project-wide ReqStream-OTS-{ToolName} pattern,
+# which is an accepted deviation from the System-Component-Feature naming standard defined
+# in reqstream-usage.md. Renaming would break traceability across all test files.
 sections:
   - title: OTS Software Requirements
     sections:
       - title: YamlDotNet
         requirements:
           - id: ReqStream-OTS-YamlDotNet
-            title: YamlDotNet shall parse YAML requirements files into a structured data model and report parse errors with
-              file location information.
+            title: YamlDotNet shall provide YAML parsing with file-location error reporting.
             justification: |
               YamlDotNet is the YAML parsing library used to deserialize requirements files.
               It must correctly parse well-formed YAML and report deserialization errors with
               location information for malformed files.
+              YAML parsing and error-location reporting are treated as a single requirement because
+              accurate error locations are an inherent quality property of the parsing operation —
+              a parser that succeeds but provides no location information does not satisfy the
+              integration need.
             tags: [ots]
             tests:
               - Requirements_Load_ValidFile_ReturnsRequirementsAndNoIssues

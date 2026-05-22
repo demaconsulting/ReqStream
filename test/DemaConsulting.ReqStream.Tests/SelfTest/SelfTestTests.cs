@@ -1,4 +1,4 @@
-// Copyright (c) 2026 DEMA Consulting
+// Copyright (c) 2025 DEMA Consulting
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,6 @@
 
 using DemaConsulting.ReqStream.Cli;
 using DemaConsulting.ReqStream.SelfTest;
-using DemaConsulting.ReqStream.Utilities;
 
 namespace DemaConsulting.ReqStream.Tests.SelfTest;
 
@@ -30,6 +29,7 @@ namespace DemaConsulting.ReqStream.Tests.SelfTest;
 /// </summary>
 public sealed class SelfTestTests : IDisposable
 {
+    /// <summary>Absolute path to the isolated temporary directory created for this test class instance.</summary>
     private readonly string _testDirectory;
 
     /// <summary>
@@ -37,7 +37,7 @@ public sealed class SelfTestTests : IDisposable
     /// </summary>
     public SelfTestTests()
     {
-        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_self_test_{Guid.NewGuid()}");
+        _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_self_test_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testDirectory);
     }
 
@@ -76,7 +76,7 @@ public sealed class SelfTestTests : IDisposable
     public void SelfTest_ResultsOutput_TrxResultsPath_WritesTrxFile()
     {
         // Arrange: define path for the TRX results output file
-        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "validation-results.trx");
+        var resultsFile = Path.Combine(_testDirectory, "validation-results.trx");
         using var context = Context.Create(["--silent", "--results", resultsFile]);
 
         // Act: run self-validation
@@ -96,7 +96,7 @@ public sealed class SelfTestTests : IDisposable
     public void SelfTest_ResultsOutput_XmlResultsPath_WritesJUnitFile()
     {
         // Arrange: define path for the JUnit XML results output file
-        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "validation-results.xml");
+        var resultsFile = Path.Combine(_testDirectory, "validation-results.xml");
         using var context = Context.Create(["--silent", "--results", resultsFile]);
 
         // Act: run self-validation
@@ -116,8 +116,8 @@ public sealed class SelfTestTests : IDisposable
     public void SelfTest_FailureReporting_WithErrors_SetsExitCode1()
     {
         // Arrange: create a results file path with an unsupported extension to trigger an error
-        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "validation-results.invalid");
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "failure-test.log");
+        var resultsFile = Path.Combine(_testDirectory, "validation-results.invalid");
+        var logFile = Path.Combine(_testDirectory, "failure-test.log");
 
         int exitCode;
         using (var context = Context.Create(["--silent", "--log", logFile, "--results", resultsFile]))
@@ -131,5 +131,47 @@ public sealed class SelfTestTests : IDisposable
         Assert.Equal(1, exitCode);
         var logContent = File.ReadAllText(logFile);
         Assert.Contains("Error:", logContent);
+    }
+
+    /// <summary>
+    /// Test that self-validation sets exit code 1 when genuine internal test failures occur
+    /// (i.e., when one or more of the six self-validation tests themselves fail, not only when
+    /// a results-file write fails).
+    /// </summary>
+    [Fact]
+    public void SelfTest_FailureReporting_GenuineFailure_SetsExitCode1()
+    {
+        // Arrange: create a file at a path that will be used as the temp directory base so that
+        // TemporaryDirectory construction inside Validation fails with an I/O exception, causing
+        // all six internal test methods to be recorded as Failed.
+        var fakeTempBase = Path.Combine(_testDirectory, "fake-temp");
+        File.WriteAllText(fakeTempBase, string.Empty);
+
+        var savedTmp = Environment.GetEnvironmentVariable("TMP");
+        var savedTemp = Environment.GetEnvironmentVariable("TEMP");
+        var savedTmpDir = Environment.GetEnvironmentVariable("TMPDIR");
+        Environment.SetEnvironmentVariable("TMP", fakeTempBase);
+        Environment.SetEnvironmentVariable("TEMP", fakeTempBase);
+        Environment.SetEnvironmentVariable("TMPDIR", fakeTempBase);
+
+        int exitCode;
+        try
+        {
+            // Act: run self-validation — all six internal tests fail because TemporaryDirectory
+            // cannot create a subdirectory under a path that is a file, not a directory.
+            using var context = Context.Create(["--silent"]);
+            Validation.Run(context);
+            exitCode = context.ExitCode;
+        }
+        finally
+        {
+            // Restore original temp directory environment variables regardless of outcome
+            Environment.SetEnvironmentVariable("TMP", savedTmp);
+            Environment.SetEnvironmentVariable("TEMP", savedTemp);
+            Environment.SetEnvironmentVariable("TMPDIR", savedTmpDir);
+        }
+
+        // Assert: exit code is 1 because genuine internal self-validation test failures occurred
+        Assert.Equal(1, exitCode);
     }
 }

@@ -31,3 +31,11 @@ self-validation. This scenario is tested by `FileAssert_HelpDisplay`.
 **Document Validation Acceptance**: Validates that FileAssert successfully validates a real HTML
 document, confirming file existence, structural validity, and content assertions operate correctly
 end-to-end. This scenario is tested by `Pandoc_DesignHtml`.
+
+### Requirements Coverage
+
+| Requirement | Scenario | Test Method(s) |
+| --- | --- | --- |
+| ReqStream-OTS-FileAssert | Version Display | `FileAssert_VersionDisplay` |
+| ReqStream-OTS-FileAssert | Help Display | `FileAssert_HelpDisplay` |
+| ReqStream-OTS-FileAssert | Document Validation Acceptance | `Pandoc_DesignHtml` |

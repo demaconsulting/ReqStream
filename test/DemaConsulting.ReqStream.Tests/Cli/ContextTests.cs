@@ -410,10 +410,10 @@ public sealed class ContextTests : IDisposable
     }
 
     /// <summary>
-    /// Test WriteLine writes to console.
+    /// Test WriteLine writes to the log file.
     /// </summary>
     [Fact]
-    public void Context_WriteLine_NormalMode_WritesToConsole()
+    public void Context_WriteLine_NormalMode_WritesToLogFile()
     {
         // Arrange: set up a log file to capture written messages
         var logPath = PathHelpers.SafePathCombine(_testDirectory, "output-normal.log");
@@ -473,6 +473,32 @@ public sealed class ContextTests : IDisposable
         var logContent = File.ReadAllText(logPath);
         Assert.Contains("Error message", logContent);
         Assert.Equal(1, exitCode);
+    }
+
+    /// <summary>
+    /// Test WriteError in normal mode routes the message to stderr (Console.Error).
+    /// </summary>
+    [Fact]
+    public void Context_WriteError_NormalMode_WritesToStderr()
+    {
+        // Arrange: redirect Console.Error to a StringWriter so the output can be inspected
+        var originalError = Console.Error;
+        var errorWriter = new StringWriter();
+        Console.SetError(errorWriter);
+        try
+        {
+            // Act: create context in normal mode and write an error message
+            using var context = Context.Create([]);
+            context.WriteError("stderr message");
+
+            // Assert: the error message was written to the captured stderr stream
+            Assert.Contains("stderr message", errorWriter.ToString());
+        }
+        finally
+        {
+            // Restore original Console.Error to avoid affecting other tests
+            Console.SetError(originalError);
+        }
     }
 
     /// <summary>

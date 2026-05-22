@@ -7,16 +7,35 @@ sections:
         sections:
           - title: Section Requirements
             requirements:
-              - id: ReqStream-Section-Container
-                title: >-
-                  Section shall hold a title, a list of requirements, and a list of child sections.
+              - id: ReqStream-Section-Title
+                title: Section shall hold a title identifying the section.
                 justification: |
-                  The Section data structure is the fundamental organizational unit in the requirements
-                  tree. Holding a title, requirements, and child sections enables hierarchical grouping
-                  of requirements for both display and navigation purposes.
+                  The title is the primary identity of a section: it is displayed in generated reports
+                  and used as the merge key by RequirementsLoader to locate existing sections when
+                  loading requirements from multiple YAML files.
                 tags: [requirements]
                 tests:
                   - Section_Load_SimpleRequirement_ParsesCorrectly
+                  - Section_Load_NestedSections_ParsesHierarchyCorrectly
+
+              - id: ReqStream-Section-RequirementsList
+                title: Section shall hold a list of requirements.
+                justification: |
+                  Requirements are the content payload of a section. Holding them in a list enables
+                  enumeration for reporting, tracing, and linting without imposing an ordering
+                  constraint on consumers.
+                tags: [requirements]
+                tests:
+                  - Section_Load_SimpleRequirement_ParsesCorrectly
+
+              - id: ReqStream-Section-ChildSections
+                title: Section shall hold a list of child sections.
+                justification: |
+                  Child sections enable the hierarchical tree structure required for grouping
+                  requirements by system components, features, or concerns. Holding children in a
+                  list allows RequirementsLoader to traverse and merge the full requirements tree.
+                tags: [requirements]
+                tests:
                   - Section_Load_NestedSections_ParsesHierarchyCorrectly
 
               - id: ReqStream-Section-Nesting

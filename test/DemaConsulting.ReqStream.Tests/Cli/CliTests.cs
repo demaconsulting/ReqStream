@@ -28,6 +28,7 @@ namespace DemaConsulting.ReqStream.Tests.Cli;
 /// </summary>
 public sealed class CliTests : IDisposable
 {
+    /// <summary>Unique temporary directory for this test instance's fixture files.</summary>
     private readonly string _testDirectory;
 
     /// <summary>

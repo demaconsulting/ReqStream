@@ -33,8 +33,8 @@ The algorithm:
 5. Otherwise return the combined path.
 
 The method never permits traversal outside `basePath`. The CodeQL `cs/path-combine` rule is
-suppressed specifically for `PathHelpers.cs` because this is the one location where the raw
-`Path.Combine` call is validated and therefore safe to use.
+suppressed via the repository-level CodeQL configuration in `.github/codeql-config.yml` because
+this is the one location where the raw `Path.Combine` call is validated and therefore safe to use.
 
 #### Error Handling
 
@@ -42,14 +42,22 @@ suppressed specifically for `PathHelpers.cs` because this is the one location wh
 - **`ArgumentException`** — thrown when the resolved combined path escapes `basePath` (path
   traversal attempt detected), or when either argument contains invalid path characters.
 
-No other exceptions are thrown; valid inputs always return a combined path string.
+- **`NotSupportedException`** — propagated from `Path.Combine` or `Path.GetFullPath` when a
+  supplied path contains an unsupported format (e.g. a path with an unrecognised prefix on
+  Windows). This exception originates in the .NET runtime; `SafePathCombine` does not throw it
+  explicitly.
+- **`PathTooLongException`** — propagated from `Path.Combine` or `Path.GetFullPath` when the
+  combined or resolved path exceeds the system-defined maximum path length. This exception
+  originates in the .NET runtime; `SafePathCombine` does not throw it explicitly.
 
-#### Dependencies
+#### Interactions
+
+##### Dependencies
 
 N/A — `PathHelpers` depends only on .NET base class library path APIs (`System.IO.Path`). It
 has no dependencies on other ReqStream units, OTS packages, or shared packages.
 
-#### Callers
+##### Callers
 
 - **RequirementsLoader** — calls `PathHelpers.SafePathCombine` to combine include-file directory
   paths with relative `includes` entries before recursing.

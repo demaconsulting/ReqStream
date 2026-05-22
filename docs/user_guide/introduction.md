@@ -24,6 +24,8 @@ ReqStream offers the following capabilities:
 - **Justifications** — document the rationale behind each requirement
 - **File Includes** — modularize requirements across multiple YAML files for better maintainability
 - **Circular Include Detection** — automatically detects and reports circular include references
+- **Cyclic Requirement Detection** — detects and reports cyclic references in the child-requirement graph before
+  analysis begins
 - **Linting** — inspect requirements files for structural issues and reference errors, reporting all issues in
   one pass
 - **Validation** — run a built-in self-test suite to qualify the tool in its deployment environment
@@ -32,6 +34,10 @@ ReqStream offers the following capabilities:
   `--matrix-depth`, and `--justifications-depth` flags
 - **Export Capabilities** — generate Markdown reports for requirements, justifications, and test trace matrices
 - **Continuous Compliance** — automatically generate compliance evidence on every CI run
+- **Error Handling: Missing Test Files** — exits with a fatal error when a test result file is missing or cannot
+  be parsed
+- **Error Handling: Matrix Without Tests** — exits with an error when `--matrix` is requested but no test result
+  files are provided
 
 ## Scope
 
@@ -1308,7 +1314,7 @@ A: Avoid circular includes (A includes B, B includes A). ReqStream will detect t
 
 **Q: What happens if I have duplicate requirement IDs?**
 
-A: ReqStream will detect duplicate IDs and report an error during validation.
+A: ReqStream will detect duplicate IDs and report an error during linting.
 
 ## Test Mapping Questions
 

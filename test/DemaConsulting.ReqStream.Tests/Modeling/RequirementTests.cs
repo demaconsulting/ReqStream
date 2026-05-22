@@ -56,7 +56,7 @@ public sealed class RequirementTests : IDisposable
     /// Test that a default Requirement instance has the expected default property values.
     /// </summary>
     [Fact]
-    public void Requirement_Properties_DefaultValues()
+    public void Requirement_Properties_NewInstance_HasDefaultValues()
     {
         // Arrange / Act:
         var requirement = new Requirement();
@@ -461,10 +461,10 @@ mappings:
     }
 
     /// <summary>
-    ///     Test that circular requirements (A -> B -> A) throw an exception at read time.
+    ///     Test that circular requirements (A → B → A) are reported as a lint error with the cycle path.
     /// </summary>
     [Fact]
-    public void Requirements_Load_CircularRequirements_ThrowsInvalidOperationException()
+    public void Requirements_Load_CircularRequirements_ReportsCircularReferenceError()
     {
         // Arrange: create a YAML file with circular child references
         var yamlContent = @"---

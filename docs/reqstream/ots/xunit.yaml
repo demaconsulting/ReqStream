@@ -1,16 +1,20 @@
 ---
 # xUnit OTS requirements
+# Note: Requirement IDs in OTS files use the project-wide ReqStream-OTS-{ToolName} pattern,
+# which is an accepted deviation from the System-Component-Feature naming standard defined
+# in reqstream-usage.md. Renaming would break traceability across all test files.
 sections:
   - title: OTS Software Requirements
     sections:
       - title: xUnit
         requirements:
-          - id: ReqStream-OTS-XUnit
-            title: xUnit shall execute unit tests and report results.
+          - id: ReqStream-OTS-XUnit-Execute
+            title: xUnit shall discover and execute unit tests.
             justification: |
               xUnit (xunit.v3 and xunit.runner.visualstudio) is the unit-testing framework used
-              by the project. It discovers and runs all test methods. Passing tests confirm the
-              framework is functioning correctly.
+              by the project. It must discover all test methods and execute them correctly.
+              Passing unit and integration tests confirm the discovery and execution functionality
+              is operating as expected.
             tags: [ots]
             tests:
               - Context_Create_NoArguments_ReturnsDefaultContext
@@ -19,5 +23,14 @@ sections:
               - Section_Load_SimpleRequirement_ParsesCorrectly
               - Requirement_Properties_DefaultValues
               - TraceMatrix_Constructor_WithNoFiles_CreatesEmptyMatrix
+          - id: ReqStream-OTS-XUnit-Report
+            title: xUnit shall report test results.
+            justification: |
+              xUnit (xunit.v3 and xunit.runner.visualstudio) must produce test result output
+              that can be consumed by the CI pipeline and ReqStream. Passing full-program
+              execution tests confirm that the reporting and output mechanism is operating
+              correctly.
+            tags: [ots]
+            tests:
               - Program_Run_WithVersionFlag_PrintsVersion
               - Validation_Run_WithSilentContext_CompletesSuccessfully

@@ -39,8 +39,11 @@ flowchart TD
 ```
 
 The collaboration model is strictly hierarchical: `Program` is the only unit that calls into
-multiple subsystems; subsystems do not call other subsystems directly. The `Context` object is
-the single shared state carrier passed from `Program` to the units that need to produce output.
+multiple subsystems; subsystems do not call other subsystems directly. The one intentional
+exception is the `SelfTest/Validation` unit, which calls `Program.Run` to re-invoke the tool
+pipeline as part of self-testing; this is the only feedback cycle in the architecture. The
+`Context` object is the single shared state carrier passed from `Program` to the units that need
+to produce output.
 
 | Item | Type | Responsibility |
 | ---- | ---- | -------------- |
@@ -85,7 +88,8 @@ the single shared state carrier passed from `Program` to the units that need to 
 
 - *Type*: Console stream.
 - *Role*: Provider.
-- *Contract*: Error messages; suppressed when `--silent` is active; triggers exit code `1`.
+- *Contract*: Error messages; written by `Context.WriteError`, which also sets the process exit
+  code to `1`; suppressed when `--silent` is active.
 - *Constraints*: None.
 
 **YAML requirements files**: Input files conforming to the ReqStream requirements schema.
@@ -179,14 +183,21 @@ flowchart LR
    in `--requirements` and `--tests` arguments.
 2. **Requirements loading** — `Requirements.Load(context.RequirementsFiles)` reads and merges all
    YAML requirements files into a single requirement tree, following `includes` recursively.
+   Sections are merged by matching their full title hierarchy path: when two loaded files define
+   sections with identical title paths, their child requirements are combined into a single section
+   node.
 3. **Report generation** — if `--report` is set, the requirements report is exported. If
    `--justifications` is set, the justifications report is exported.
 4. **Test result loading** — if `--tests` is set, a `TraceMatrix` is constructed from the test
    result files and the requirement tree.
 5. **Trace matrix export** — if `--matrix` is set and a `TraceMatrix` was constructed, the trace
-   matrix report is exported.
+   matrix report is exported. If `--matrix` is set but no `--tests` were provided (so no
+   `TraceMatrix` was constructed), an error is reported via `Context.WriteError` and the tool exits
+   with a non-zero exit code.
 6. **Enforcement** — if `--enforce` is set and a `TraceMatrix` was constructed,
-   `EnforceRequirementsCoverage` verifies all requirements are covered by passing tests.
+   `EnforceRequirementsCoverage` verifies all requirements are covered by passing tests. If
+   `--enforce` is set but no `--tests` were provided (so no `TraceMatrix` was constructed), the
+   tool reports an error via `Context.WriteError` and exits with a non-zero exit code.
 7. **Tag filtering** — if `--filter` is set, `Context.FilterTags` restricts which requirements
    appear in reports and enforcement. Filtering is applied transparently at each operation rather
    than as a separate pipeline stage.

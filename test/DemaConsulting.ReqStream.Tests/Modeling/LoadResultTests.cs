@@ -30,6 +30,7 @@ namespace DemaConsulting.ReqStream.Tests.Modeling;
 /// </summary>
 public sealed class LoadResultTests : IDisposable
 {
+    /// <summary>Unique temporary directory for this test instance's fixture files.</summary>
     private readonly string _testDirectory;
 
     /// <summary>
@@ -156,8 +157,11 @@ sections:
         // Arrange: create a load result with no issues
         var result = new LoadResult(new Requirements(), []);
 
+        // Act: evaluate HasErrors
+        var hasErrors = result.HasErrors;
+
         // Assert: HasErrors is false when there are no issues
-        Assert.False(result.HasErrors);
+        Assert.False(hasErrors);
     }
 
     /// <summary>
@@ -171,8 +175,11 @@ sections:
             new Requirements(),
             [new LintIssue("file.yaml", LintSeverity.Warning, "A warning")]);
 
+        // Act: evaluate HasErrors
+        var hasErrors = result.HasErrors;
+
         // Assert: HasErrors is false and Requirements is not null for warnings-only results
-        Assert.False(result.HasErrors);
+        Assert.False(hasErrors);
         Assert.NotNull(result.Requirements);
     }
 
@@ -187,8 +194,11 @@ sections:
             null,
             [new LintIssue("file.yaml", LintSeverity.Error, "An error")]);
 
+        // Act: evaluate HasErrors
+        var hasErrors = result.HasErrors;
+
         // Assert: HasErrors is true and Requirements is null for error results
-        Assert.True(result.HasErrors);
+        Assert.True(hasErrors);
         Assert.Null(result.Requirements);
     }
 }

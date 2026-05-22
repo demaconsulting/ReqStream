@@ -62,13 +62,28 @@ merges multiple filter arguments. This scenario is tested by
 **Output Channel**: Tests verify that output and error output are correctly routed in silent and
 normal modes, and that WriteError sets the exit code to 1. This scenario is tested by
 `Context_WriteLine_SilentMode_WritesToLogFile`, `Context_WriteError_SilentMode_WritesToLogFile`,
-`Context_WriteError_NormalMode_WritesToLogFile`, and `Context_ExitCode_AfterWriteError_ReturnsOne`.
+`Context_WriteError_NormalMode_WritesToLogFile`, `Context_WriteError_NormalMode_WritesToStderr`,
+and `Context_ExitCode_AfterWriteError_ReturnsOne`.
 
 **Log File**: Tests verify that output is written to the log file when `--log` is provided,
 that silent mode writes only to the log file, that the log file is closed on disposal, and that
 an invalid log path throws an exception. This scenario is tested by
 `Context_Create_WithLogFile_WritesToLogFile`, `Context_Create_WithLogFileAndSilent_WritesToLogOnly`,
 `Context_Dispose_WithLogFile_ClosesLogFile`, and `Context_Create_InvalidLogPath_ThrowsException`.
+
+**Additional Defensive Tests**: The following eight tests provide supplementary error-path and
+robustness coverage beyond the stated requirements. They guard against misconfiguration edge
+cases and verify that malformed or incomplete argument lists are rejected with clear exceptions.
+These tests are not directly mapped to a single requirement but strengthen overall defensive
+coverage:
+`Context_Create_MissingRequirementsPattern_ThrowsException`,
+`Context_Create_MissingTestsPattern_ThrowsException`,
+`Context_Create_MissingReportDepth_ThrowsException`,
+`Context_Create_MissingMatrixDepth_ThrowsException`,
+`Context_Create_InvalidReportDepth_ThrowsException`,
+`Context_Create_InvalidMatrixDepth_ThrowsException`,
+`Context_Create_MissingResultFilename_ThrowsException`, and
+`Context_WriteLine_NormalMode_WritesToLogFile`.
 
 #### Requirements Coverage
 
@@ -82,6 +97,7 @@ an invalid log path throws an exception. This scenario is tested by
 | `ReqStream-Command-Silent` | CLI Parsing Scenario, Output Channel Scenario | `Context_WriteLine_SilentMode_WritesToLogFile` |
 | `ReqStream-Command-Silent` | CLI Parsing Scenario, Output Channel Scenario | `Context_WriteError_SilentMode_WritesToLogFile` |
 | `ReqStream-Command-ErrorOutput` | Output Channel Scenario | `Context_WriteError_NormalMode_WritesToLogFile` |
+| `ReqStream-Command-ErrorOutput` | Output Channel Scenario | `Context_WriteError_NormalMode_WritesToStderr` |
 | `ReqStream-Command-UnknownArgs` | CLI Parsing Scenario | `Context_Create_UnsupportedArgument_ThrowsException` |
 | `ReqStream-Command-MissingLogValue` | CLI Parsing Scenario | `Context_Create_MissingLogFilename_ThrowsException` |
 | `ReqStream-Command-MissingResultsValue` | CLI Parsing Scenario, Results and Report Flags Scenario | `Context_Create_MissingResultsFilename_ThrowsException` |

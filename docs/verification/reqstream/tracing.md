@@ -1,6 +1,6 @@
 ## Tracing
 
-### Verification Approach
+### Verification Strategy
 
 The Tracing subsystem is verified using xUnit integration tests in `TracingTests.cs`. Tests
 create temporary YAML requirements files and TRX/JUnit test result files, construct a

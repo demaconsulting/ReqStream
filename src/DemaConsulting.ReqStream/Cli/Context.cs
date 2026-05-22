@@ -23,8 +23,22 @@ using DemaConsulting.ReqStream.Utilities;
 namespace DemaConsulting.ReqStream.Cli;
 
 /// <summary>
-///     Context class that handles command-line arguments and program output.
+///     Single authorized I/O owner and sole entry point for CLI option parsing.
 /// </summary>
+/// <remarks>
+///     <c>Context</c> centralizes all console and log file output so that the rest of the
+///     application never calls <see cref="Console"/> directly — it is the only class permitted
+///     to perform I/O on behalf of the tool. It implements <see cref="IDisposable"/> to provide
+///     deterministic lifecycle management of the underlying log file stream opened by
+///     <c>--log</c>. CLI option parsing is performed exclusively by the <see cref="Create"/>
+///     factory method; direct construction via the private constructor is intentionally
+///     prohibited to enforce a single, validated entry point.
+///     <para>
+///         This class is not thread-safe; it is intended for single-threaded use from the main
+///         application thread. <c>_hasErrors</c> and <c>_logWriter</c> are mutated without
+///         synchronization.
+///     </para>
+/// </remarks>
 public sealed class Context : IDisposable
 {
     /// <summary>
@@ -38,37 +52,53 @@ public sealed class Context : IDisposable
     private bool _hasErrors;
 
     /// <summary>
-    ///     Gets a value indicating whether the version flag was specified.
+    ///     Gets a value indicating whether the version flag (<c>--version</c> or <c>-v</c>) was
+    ///     specified. Consumed by Program to print the tool version string and exit immediately.
     /// </summary>
     public bool Version { get; private init; }
 
     /// <summary>
-    ///     Gets a value indicating whether the help flag was specified.
+    ///     Gets a value indicating whether the help flag (<c>--help</c>, <c>-h</c>, or <c>-?</c>)
+    ///     was specified. Consumed by Program to print usage information and exit immediately.
     /// </summary>
     public bool Help { get; private init; }
 
     /// <summary>
-    ///     Gets a value indicating whether the silent flag was specified.
+    ///     Gets a value indicating whether the silent flag (<c>--silent</c>) was specified.
+    ///     When <see langword="true"/>, <see cref="WriteLine"/> and <see cref="WriteError"/>
+    ///     suppress all console output while still writing to the log file when one is open.
     /// </summary>
     public bool Silent { get; private init; }
 
     /// <summary>
-    ///     Gets a value indicating whether the validate flag was specified.
+    ///     Gets a value indicating whether the validate flag (<c>--validate</c>) was specified.
+    ///     Consumed by Program to activate self-validation mode, which runs the tool's own
+    ///     requirements through ReqStream and emits a test result file.
     /// </summary>
     public bool Validate { get; private init; }
 
     /// <summary>
     ///     Gets a value indicating whether the lint flag was specified.
     /// </summary>
+    /// <remarks>
+    ///     Consumed by <c>Program</c> to activate requirements linting mode, which checks
+    ///     all loaded requirement files for structural issues and reports them before exiting.
+    /// </remarks>
     public bool Lint { get; private init; }
 
     /// <summary>
     ///     Gets the validation results output file path.
     /// </summary>
+    /// <remarks>
+    ///     Consumed by <c>Validation</c> to determine the output path for the self-validation
+    ///     TRX results file written when <c>--validate</c> is active.
+    /// </remarks>
     public string? ResultsFile { get; private init; }
 
     /// <summary>
-    ///     Gets a value indicating whether the enforce flag was specified.
+    ///     Gets a value indicating whether the enforce flag (<c>--enforce</c>) was specified.
+    ///     Consumed by Program to activate requirements enforcement mode, causing the tool to
+    ///     exit with a non-zero code when any requirement lacks test coverage.
     /// </summary>
     public bool Enforce { get; private init; }
 

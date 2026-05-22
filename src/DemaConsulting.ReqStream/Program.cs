@@ -1,4 +1,4 @@
-// Copyright (c) 2026 DEMA Consulting
+// Copyright (c) 2025 DEMA Consulting
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -59,6 +59,7 @@ internal static class Program
     /// </summary>
     /// <param name="args">Command line arguments.</param>
     /// <returns>Exit code.</returns>
+    /// <exception cref="Exception">Thrown when an unexpected error occurs that is not an <see cref="ArgumentException"/> or <see cref="InvalidOperationException"/>.</exception>
     private static int Main(string[] args)
     {
         try
@@ -103,6 +104,9 @@ internal static class Program
     ///     after this method returns signals that an error was reported during execution.
     /// </remarks>
     /// <param name="context">The context containing command line arguments and program state.</param>
+    /// <exception cref="System.IO.IOException">Propagates from <see cref="Modeling.Requirements.Load"/> or file export methods if file I/O fails.</exception>
+    /// <exception cref="System.Xml.XmlException">Propagates from <see cref="Modeling.Requirements.Load"/> if a requirements file contains malformed XML.</exception>
+    /// <exception cref="System.Exception">Any exception not caught internally by <see cref="Modeling.Requirements.Load"/>, <see cref="SelfTest.Validation.Run"/>, <see cref="Tracing.TraceMatrix"/> construction, or file export methods will propagate to <see cref="Main"/> where it is handled by the unexpected-exception catch block.</exception>
     public static void Run(Context context)
     {
         // Priority 1: Version query
@@ -161,7 +165,7 @@ internal static class Program
     private static void PrintBanner(Context context)
     {
         context.WriteLine($"ReqStream version {Version}");
-        context.WriteLine("Copyright (c) 2026 DEMA Consulting");
+        context.WriteLine("Copyright (c) 2025 DEMA Consulting");
         context.WriteLine("");
     }
 
@@ -268,6 +272,7 @@ internal static class Program
         if (context.Matrix != null && traceMatrix == null)
         {
             context.WriteError("Error: No test result files were provided or matched. Ensure the --tests pattern matches at least one file.");
+            return;
         }
 
         // Enforce requirements coverage if requested
@@ -287,15 +292,18 @@ internal static class Program
     /// <param name="traceMatrix">The trace matrix containing test results, or null if no tests were provided.</param>
     private static void EnforceRequirementsCoverage(Context context, TraceMatrix? traceMatrix)
     {
+        // Phase 1: Guard — enforcement requires a trace matrix; report error if none was constructed
         if (traceMatrix == null)
         {
             context.WriteError("Error: Cannot enforce requirements without test results. Use --tests to specify test result files.");
             return;
         }
 
+        // Phase 2: Coverage calculation — determine how many requirements are satisfied
         var (satisfied, total) = traceMatrix.CalculateSatisfiedRequirements(context.FilterTags);
         if (satisfied < total)
         {
+            // Phase 3: Unsatisfied requirement enumeration — report each failing requirement
             var unsatisfied = traceMatrix.GetUnsatisfiedRequirements(context.FilterTags);
             context.WriteError($"Error: Only {satisfied} of {total} requirements are satisfied with tests.");
             context.WriteError("Unsatisfied requirements:");

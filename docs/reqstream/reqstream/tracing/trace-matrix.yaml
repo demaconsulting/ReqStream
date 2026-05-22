@@ -1,5 +1,8 @@
 ---
 # TraceMatrix unit requirements
+# Note: Requirement IDs use historical prefixes ('ReqStream-Test-*' and 'ReqStream-Report-*') that
+# predate the current naming convention (which would use 'ReqStream-Tracing-*'). Renaming is a
+# breaking change requiring coordinated updates across all artifact trees and is deferred.
 sections:
   - title: ReqStream Requirements
     sections:

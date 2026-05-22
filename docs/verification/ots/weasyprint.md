@@ -42,3 +42,15 @@ This scenario is tested by `WeasyPrint_UserGuidePdf`.
 
 **Verification Document PDF**: Verifies that WeasyPrint converts the verification document HTML to
 a valid PDF. This scenario is tested by `WeasyPrint_VerificationPdf`.
+
+### Requirements Coverage
+
+| Requirement | Scenario | Test Method(s) |
+| --- | --- | --- |
+| ReqStream-OTS-WeasyPrint | Build Notes PDF | `WeasyPrint_BuildNotesPdf` |
+| ReqStream-OTS-WeasyPrint | Code Quality PDF | `WeasyPrint_CodeQualityPdf` |
+| ReqStream-OTS-WeasyPrint | Review Plan PDF | `WeasyPrint_ReviewPlanPdf` |
+| ReqStream-OTS-WeasyPrint | Review Report PDF | `WeasyPrint_ReviewReportPdf` |
+| ReqStream-OTS-WeasyPrint | Design Document PDF | `WeasyPrint_DesignPdf` |
+| ReqStream-OTS-WeasyPrint | User Guide PDF | `WeasyPrint_UserGuidePdf` |
+| ReqStream-OTS-WeasyPrint | Verification Document PDF | `WeasyPrint_VerificationPdf` |

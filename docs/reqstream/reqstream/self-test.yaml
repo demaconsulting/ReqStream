@@ -41,12 +41,23 @@ sections:
               - ReqStream-Validation-WriteFailure-ReportsError
               - ReqStream-Validation-WriteFailure-Continues
 
-          - id: ReqStream-SelfTest-FailureReporting
-            title: The tool shall report an error and set exit code 1 when self-validation encounters failures.
+          - id: ReqStream-SelfTest-FailureReporting-Error
+            title: The tool shall report an error when self-validation encounters failures.
             justification: |
-              Automated test pipelines and CI/CD systems rely on non-zero exit codes to detect
-              tool failures. Reporting each error via WriteError and exiting with code 1 ensures
-              that failures are surfaced to the pipeline and not silently ignored.
+              Reporting each self-validation failure via WriteError ensures that failures are
+              surfaced to the user and to log files, and are not silently ignored.
             tags: [self-test]
             tests:
+              - SelfTest_FailureReporting_GenuineFailure_SetsExitCode1
+              - SelfTest_FailureReporting_WithErrors_SetsExitCode1
+
+          - id: ReqStream-SelfTest-FailureReporting-ExitCode
+            title: The tool shall set exit code 1 when self-validation encounters failures.
+            justification: |
+              Automated test pipelines and CI/CD systems rely on non-zero exit codes to detect
+              tool failures. Exiting with code 1 when self-validation encounters failures ensures
+              that they are surfaced to the pipeline and not silently ignored.
+            tags: [self-test]
+            tests:
+              - SelfTest_FailureReporting_GenuineFailure_SetsExitCode1
               - SelfTest_FailureReporting_WithErrors_SetsExitCode1

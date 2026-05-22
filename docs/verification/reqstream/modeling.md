@@ -1,6 +1,6 @@
 ## Modeling
 
-### Verification Approach
+### Verification Strategy
 
 The Modeling subsystem is verified using xUnit integration tests in `ModelingTests.cs`. Tests
 create temporary YAML requirements files, invoke `Requirements.Load`, and assert on the
@@ -21,12 +21,14 @@ every requirement in the Requirements Coverage is mapped to at least one passing
 
 ### Test Scenarios
 
-**YAML Parsing**: Tests verify that valid YAML files load correctly and that duplicate IDs are
-detected. This scenario is tested by `Modeling_YamlParsing_ValidFile_LoadsRequirements`, which
-verifies a valid file loads requirements;
-`Modeling_YamlParsing_ValidFile_ReturnsNoLintIssues`, which verifies a valid file returns no lint
-issues; and `Modeling_YamlParsing_DuplicateIds_DetectsLintError`, which verifies duplicate IDs
-produce an error lint issue.
+**YAML Parsing**: Tests verify that valid YAML files load correctly, that duplicate IDs are
+detected, and that providing no file paths raises an `ArgumentException`. This scenario is tested
+by `Modeling_YamlParsing_ValidFile_LoadsRequirements`, which verifies a valid file loads
+requirements; `Modeling_YamlParsing_ValidFile_ReturnsNoLintIssues`, which verifies a valid file
+returns no lint issues; `Modeling_YamlParsing_DuplicateIds_DetectsLintError`, which verifies
+duplicate IDs produce an error lint issue; and
+`Modeling_YamlParsing_NoPaths_ThrowsArgumentException`, which verifies an empty paths array
+throws `ArgumentException`.
 
 **Export**: Tests verify that requirements and justifications are exported to Markdown files. This
 scenario is tested by `Modeling_Export_Requirements_GeneratesMarkdownFile`, which verifies
@@ -44,7 +46,7 @@ reported at once.
 
 | Requirement ID | Scenario(s) | Test Method(s) |
 | --- | --- | --- |
-| `ReqStream-Modeling-YamlParsing` | YAML Parsing Scenario | `Modeling_YamlParsing_ValidFile_LoadsRequirements`, `Modeling_YamlParsing_ValidFile_ReturnsNoLintIssues`, `Modeling_YamlParsing_DuplicateIds_DetectsLintError` |
+| `ReqStream-Modeling-YamlParsing` | YAML Parsing Scenario | `Modeling_YamlParsing_ValidFile_LoadsRequirements`, `Modeling_YamlParsing_ValidFile_ReturnsNoLintIssues`, `Modeling_YamlParsing_DuplicateIds_DetectsLintError`, `Modeling_YamlParsing_NoPaths_ThrowsArgumentException` |
 | `ReqStream-Modeling-Export` | Export Scenario | `Modeling_Export_Requirements_GeneratesMarkdownFile`, `Modeling_Export_Justifications_GeneratesMarkdownFile` |
 | `ReqStream-Modeling-MultiFileLoading` | YAML Parsing Scenario | `Modeling_YamlParsing_ValidFile_LoadsRequirements`, `Modeling_MultiFileLoading_WithIncludes_LoadsRequirementsFromAllFiles` |
 | `ReqStream-Modeling-Linting` | Linting Scenario | `Modeling_YamlParsing_DuplicateIds_DetectsLintError`, `Modeling_Linting_MalformedYaml_DetectsError`, `Modeling_Linting_ValidFile_ReturnsNoIssues` |

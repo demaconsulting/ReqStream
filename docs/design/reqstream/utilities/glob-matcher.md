@@ -21,9 +21,15 @@ is allocated locally within `FindMatchingFiles` calls and is not shared between 
 
 - *Parameters*: `IEnumerable<string> patterns` — glob patterns to resolve.
 - *Returns*: `List<string>` — sorted, deduplicated absolute paths.
-- *Preconditions*: None (empty or null patterns produce empty results).
+- *Preconditions*: `patterns` must not be null; `ArgumentNullException` is thrown if null.
+  Individual null elements within the collection are skipped silently. An empty collection
+  produces an empty result.
 - *Postconditions*: Duplicates are removed using a `HashSet<string>` with the appropriate
-  file-system comparer. Results are sorted using the same comparer.
+  file-system comparer: on Windows, `StringComparer.OrdinalIgnoreCase` is used (case-insensitive,
+  matching NTFS semantics); on non-Windows systems, `StringComparer.Ordinal` is used
+  (case-sensitive, matching ext4/APFS default semantics). Platform detection uses
+  `OperatingSystem.IsWindows()`. Results are sorted using the same comparer so that sort order
+  is also consistent with the file system's case rules.
 
 For each pattern, the method checks `Path.IsPathRooted(pattern)`:
 
@@ -54,16 +60,19 @@ before wildcard, empty root) are handled with fallback logic.
 - Non-matching patterns return an empty result; no exception is raised.
 - Patterns that reference non-existent directories are skipped silently.
 - `SplitAbsolutePattern` does not throw; it handles edge cases using fallback logic.
+- `FindMatchingFiles` throws `ArgumentNullException` if `patterns` itself is null.
 
 The caller (`Context.Create`) is responsible for deciding whether zero matching files is an
 error condition.
 
-#### Dependencies
+#### Interactions
+
+##### Dependencies
 
 - **Microsoft.Extensions.FileSystemGlobbing** — provides the `Matcher` class used to evaluate
   glob patterns against the file system.
 
-#### Callers
+##### Callers
 
 - **Context** — `Context.Create` calls `GlobMatcher.FindMatchingFiles` to resolve
   `--requirements` and `--tests` patterns.

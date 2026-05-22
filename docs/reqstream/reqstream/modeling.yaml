@@ -24,12 +24,15 @@ sections:
               - Modeling_YamlParsing_ValidFile_LoadsRequirements
               - Modeling_YamlParsing_ValidFile_ReturnsNoLintIssues
               - Modeling_YamlParsing_DuplicateIds_DetectsLintError
+              - Modeling_YamlParsing_NoPaths_ThrowsArgumentException
             children:
               - ReqStream-Requirements-YamlProcessing
               - ReqStream-Requirements-Includes
               - ReqStream-Requirements-SectionMerging
               - ReqStream-Requirements-Hierarchy
-              - ReqStream-Section-Container
+              - ReqStream-Section-Title
+              - ReqStream-Section-RequirementsList
+              - ReqStream-Section-ChildSections
               - ReqStream-Section-Nesting
               - ReqStream-Requirements-Tags
               - ReqStream-Requirements-BlankTagName
@@ -109,12 +112,14 @@ sections:
               - ReqStream-Lint-NonScalarListEntries
               - ReqStream-Lint-CircularReferences
               - ReqStream-Lint-UnknownChildReference
+              # Note: these are same-file requirements grouped as children for traceability
               - ReqStream-Modeling-LintingValidation
               - ReqStream-Modeling-LintingReporting
               - ReqStream-LoadResult-ReportIssues
               - ReqStream-Lint-InvalidFilePath
               - ReqStream-Lint-FileNotFound
               - ReqStream-Lint-IoReadFailure
+              - ReqStream-Lint-CircularFileIncludes
               - ReqStream-Lint-NonMappingRoot
               - ReqStream-Lint-SeverityString
               - ReqStream-LoadResult-HasErrors
@@ -122,9 +127,11 @@ sections:
           - id: ReqStream-Modeling-LintingValidation
             title: The Modeling subsystem shall validate requirements file structure.
             justification: |
-              Structural validation during loading catches malformed YAML, missing mandatory fields,
-              unknown fields, duplicate IDs, and other problems early, allowing users to fix all
-              problems before running reports or tracing.
+              This requirement covers the structural validation phase of linting: loaded requirements
+              are checked for integrity issues including missing mandatory fields (id, title),
+              unknown fields, duplicate IDs, and invalid cross-references. Validation runs as a
+              distinct phase before reporting begins, so that reporting can operate on a
+              structurally consistent set of issues.
             tags: [modeling, lint]
             tests:
               - Modeling_Linting_MalformedYaml_DetectsError

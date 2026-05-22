@@ -2,10 +2,10 @@
 
 ### Required Functionality
 
-YamlDotNet (`ReqStream-OTS-YamlDotNet`) shall parse YAML requirements files into a structured
-data model. YamlDotNet is the YAML parsing library used to deserialize requirements files,
+YamlDotNet (`ReqStream-OTS-YamlDotNet`) shall provide YAML parsing with file-location error
+reporting. YamlDotNet is the YAML parsing library used to deserialize requirements files,
 converting YAML text into .NET objects that the Modeling subsystem uses for requirements
-management.
+management, and reporting deserialization errors with location information for malformed files.
 
 ### Verification Approach
 
@@ -33,3 +33,13 @@ correctly from YAML. This scenario is tested by `Section_Load_SimpleRequirement_
 **Complex Structure Parsing**: Verifies that a complex multi-section, multi-requirement YAML
 structure is parsed correctly. This scenario is tested by
 `Requirements_Load_ComplexStructure_ParsesCorrectly`.
+
+### Requirements Coverage
+
+| Requirement | Scenario | Test Method(s) |
+| --- | --- | --- |
+| ReqStream-OTS-YamlDotNet | Well-Formed YAML Parsing | `Requirements_Load_ValidFile_ReturnsRequirementsAndNoIssues` |
+| ReqStream-OTS-YamlDotNet | YAML Error Reporting with Location | `Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation` |
+| ReqStream-OTS-YamlDotNet | Malformed YAML Handling | `Requirements_Load_MalformedYaml_ReturnsNullAndIssues` |
+| ReqStream-OTS-YamlDotNet | Simple Requirement Parsing | `Section_Load_SimpleRequirement_ParsesCorrectly` |
+| ReqStream-OTS-YamlDotNet | Complex Structure Parsing | `Requirements_Load_ComplexStructure_ParsesCorrectly` |

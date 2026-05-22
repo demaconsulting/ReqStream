@@ -80,6 +80,7 @@ public sealed class ProgramTests : IDisposable
         // Assert: log file contains version output (read after context disposal to ensure flush)
         var outputText = File.ReadAllText(logFile).Trim();
         Assert.False(string.IsNullOrWhiteSpace(outputText));
+        Assert.Contains(Program.Version, outputText);
         Assert.DoesNotContain("Copyright", outputText);
         Assert.DoesNotContain("Usage", outputText);
     }
@@ -208,29 +209,6 @@ public sealed class ProgramTests : IDisposable
         // Assert: log confirms results were written
         var logContent = File.ReadAllText(logFile);
         Assert.Contains($"Results written to {resultsFile}", logContent);
-    }
-
-    /// <summary>
-    /// Test Run with no requirements files prints an informational message.
-    /// </summary>
-    [Fact]
-    public void Program_Run_WithNoFiles_PrintsMessage()
-    {
-        // Arrange: create log file path to capture output
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "no-files.log");
-
-        // Act: run program with no arguments, capturing output to log file
-        using (var context = Context.Create(["--log", logFile]))
-        {
-            Program.Run(context);
-
-            // Assert: exit code is 0
-            Assert.Equal(0, context.ExitCode);
-        }
-
-        // Assert: message includes "No requirements files specified"
-        var outputText = File.ReadAllText(logFile);
-        Assert.Contains("No requirements files specified", outputText);
     }
 
     /// <summary>

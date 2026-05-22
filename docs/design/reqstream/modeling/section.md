@@ -11,12 +11,15 @@ the root of the tree.
 #### Data Model
 
 **`Title`**: `string` — used to identify and merge sections across files. YAML key: `title`.
-Default: `""`.
+Default: `""`. YamlDotNet deserializes this property via its public setter (`{ get; set; }`).
 
 **`Requirements`**: `List<Requirement>` — requirements directly in this section. YAML key:
-`requirements`. Default: `[]`.
+`requirements`. Default: `[]` (pre-initialized empty list). YamlDotNet populates this
+collection by calling `.Add()` on the pre-initialized list; no setter is required.
 
-**`Sections`**: `List<Section>` — child sections. YAML key: `sections`. Default: `[]`.
+**`Sections`**: `List<Section>` — child sections. YAML key: `sections`. Default: `[]`
+(pre-initialized empty list). YamlDotNet populates this collection by calling `.Add()` on
+the pre-initialized list; no setter is required.
 
 When `RequirementsLoader` encounters a section whose `Title` matches an existing section under
 the same parent, it reuses the existing `Section` object rather than creating a new one. This
@@ -34,12 +37,14 @@ N/A — `Section` is a data container with no methods. All merging logic resides
 N/A — `Section` contains no executable logic; all validation errors are produced by
 `RequirementsLoader`.
 
-#### Dependencies
+#### Interactions
+
+##### Dependencies
 
 N/A — `Section` is a data container with no dependencies on other units, OTS items, or shared
 packages beyond the `Requirement` objects it holds in its list.
 
-#### Callers
+##### Callers
 
 - **RequirementsLoader** — creates `Section` objects and merges them into the shared
   requirements tree.

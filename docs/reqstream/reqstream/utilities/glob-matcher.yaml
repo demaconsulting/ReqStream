@@ -22,15 +22,13 @@ sections:
 
               - id: ReqStream-GlobMatcher-AbsolutePatterns
                 title: >-
-                  GlobMatcher shall match files using absolute patterns, splitting each pattern at the
-                  last directory separator before the first wildcard character to obtain the root
-                  directory and the relative sub-pattern.
+                  GlobMatcher shall support absolute glob patterns, returning all files whose absolute
+                  paths satisfy the pattern.
                 justification: |
                   Absolute pattern support allows callers to supply fully-qualified paths with wildcards
                   (e.g. "/output/**/*.trx") without requiring the caller to manipulate the current
-                  working directory. Splitting at the last separator before the first wildcard character
-                  correctly integrates with Microsoft.Extensions.FileSystemGlobbing, which requires a
-                  root directory and a relative pattern as separate inputs.
+                  working directory. This integrates with Microsoft.Extensions.FileSystemGlobbing, which
+                  requires a root directory and a relative pattern as separate inputs.
                 tags: [utilities]
                 tests:
                   - GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles
@@ -77,3 +75,40 @@ sections:
                 tags: [utilities]
                 tests:
                   - GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty
+
+              - id: ReqStream-GlobMatcher-SortOrder
+                title: >-
+                  GlobMatcher shall return matching files in lexicographic ascending order.
+                justification: |
+                  Returning results in a deterministic lexicographic order ensures that callers
+                  process files in a predictable sequence regardless of file-system enumeration
+                  order, which can vary across operating systems and file-system implementations.
+                  Deterministic ordering also makes test assertions and compliance reports
+                  reproducible across environments.
+                tags: [utilities]
+                tests:
+                  - GlobMatcher_FindMatchingFiles_MultipleMatches_ReturnsSortedResults
+
+              - id: ReqStream-GlobMatcher-NullPatterns
+                title: >-
+                  GlobMatcher shall throw ArgumentNullException when the patterns argument is null.
+                justification: |
+                  Failing fast with ArgumentNullException for a null patterns argument follows .NET
+                  design guidelines and ensures callers receive a clear, actionable error rather
+                  than a NullReferenceException deep inside the implementation. This makes the API
+                  contract explicit and prevents silent misuse.
+                tags: [utilities]
+                tests:
+                  - GlobMatcher_FindMatchingFiles_NullPatterns_ThrowsArgumentNullException
+
+              - id: ReqStream-GlobMatcher-NullElement
+                title: >-
+                  GlobMatcher shall silently skip null elements within the patterns collection.
+                justification: |
+                  Skipping null elements allows callers that build pattern collections dynamically
+                  to include optional or conditionally-populated entries without having to filter
+                  nulls themselves. This reduces boilerplate at call sites and avoids defensive
+                  null-filtering code scattered across the codebase.
+                tags: [utilities]
+                tests:
+                  - GlobMatcher_FindMatchingFiles_NullElementInPatterns_SkipsElement

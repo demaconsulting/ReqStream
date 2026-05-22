@@ -34,9 +34,22 @@ analysis methods.
 **TraceMatrix(requirements, testResultFiles)**: Constructor that stores the `Requirements` tree
 and calls `ProcessTestResultFile` for each path to populate `_testExecutions`.
 
-- *Parameters*: `Requirements requirements`; `IEnumerable<string> testResultFiles`.
+- *Parameters*: `Requirements requirements`; `params string[] testResultFiles` — using `params`
+  allows callers to pass zero or more file paths directly without constructing a collection,
+  improving usability at call sites.
 - *Preconditions*: `requirements` is a validated, acyclic tree.
 - *Postconditions*: `_testExecutions` is fully populated and read-only after construction.
+
+**GetAllTestResults()**: Returns a filtered dictionary of test metrics for all tests referenced
+by requirements in the `Requirements` tree that have been executed at least once.
+
+- *Parameters*: None.
+- *Returns*: `IReadOnlyDictionary<string, TestMetrics>` — keys are test names (plain or
+  `filepart@testname` form) as they appear in requirements; values are aggregated
+  `TestMetrics`. Only tests with `Executed > 0` are included; tests referenced in
+  requirements but absent from all loaded TRX/JUnit files are silently omitted.
+- *Preconditions*: None.
+- *Postconditions*: None (read-only).
 
 **GetTestResult(testName)**: Returns aggregated `TestMetrics` for a named test.
 
@@ -66,10 +79,19 @@ case-insensitively against each `TestExecution.FileBaseName` for source-specific
 **Export(filePath, depth, filterTags)**: Writes the trace matrix to a Markdown file with three
 sections: Summary, Requirements, and Testing.
 
-- *Parameters*: `string filePath`; `int depth`; `HashSet<string>? filterTags`.
+- *Parameters*: `string filePath`; `int depth` (minimum value: 1); `HashSet<string>? filterTags`.
 - *Returns*: `void`.
-- *Preconditions*: `filePath` must not be null or empty.
+- *Preconditions*: `filePath` must not be null or empty; `depth` must be at least 1.
 - *Postconditions*: Markdown file written.
+- *Note — Summary vs. Requirements asymmetry*: The **Summary** section counts satisfied
+  requirements by calling `CalculateSatisfiedRequirements`, which delegates to
+  `IsRequirementSatisfied`. That method recurses through the full descendant subtree via
+  `CollectAllTests` to include tests from child requirements. The **Requirements** table rows,
+  by contrast, show only *direct* test counts for each requirement (tests listed directly on
+  that requirement, not its descendants). Reviewers must be aware of this asymmetry when
+  interpreting a compliance verdict: a requirement can show zero direct tests in the table yet
+  still be counted as satisfied in the Summary if its child requirements provide the necessary
+  test evidence.
 
 **CollectAllTests(requirement, rootSection, allTests)**: Returns the union of all test names for
 a requirement and its entire descendant subtree. Recurses without a cycle guard because
@@ -89,7 +111,9 @@ All query methods are read-only and do not throw for missing test names or empty
 throws `ArgumentException` for null/empty path and propagates `IOException` from file-write
 operations.
 
-#### Dependencies
+#### Interactions
+
+##### Dependencies
 
 - **Requirements** — provides the validated requirement tree iterated during analysis.
 - **DemaConsulting.TestResults** — provides `TestResults`, `TestResult`, and `TestOutcome` model
@@ -97,7 +121,7 @@ operations.
 - **DemaConsulting.TestResults.IO.Serializer** — auto-detects and deserializes TRX and JUnit XML
   test result files.
 
-#### Callers
+##### Callers
 
 - **Program** — constructs `TraceMatrix` and calls `CalculateSatisfiedRequirements`,
   `GetUnsatisfiedRequirements`, and `Export`.

@@ -66,7 +66,8 @@ public class Requirements : Section
     /// <param name="filePath">The path to the output Markdown file.</param>
     /// <param name="depth">The starting depth for Markdown headers (default: 1).</param>
     /// <param name="filterTags">Optional set of tags to filter requirements. If provided, only requirements with matching tags are exported.</param>
-    /// <exception cref="ArgumentException">Thrown when filePath is null or empty.</exception>
+    /// <exception cref="ArgumentException">Thrown when filePath is null, empty, or whitespace-only.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when depth is less than 1.</exception>
     /// <remarks>
     ///     <b>File-write side effect:</b> Overwrites any existing file at <paramref name="filePath"/>.
     ///     Any <see cref="IOException"/> or <see cref="UnauthorizedAccessException"/> from the
@@ -79,6 +80,12 @@ public class Requirements : Section
         if (string.IsNullOrWhiteSpace(filePath))
         {
             throw new ArgumentException("File path cannot be null or empty", nameof(filePath));
+        }
+
+        // Validate depth
+        if (depth < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(depth), depth, "Depth must be at least 1");
         }
 
         // Create a string builder to build the markdown content
@@ -97,6 +104,11 @@ public class Requirements : Section
     /// <summary>
     ///     Exports a section to the markdown writer.
     /// </summary>
+    /// <remarks>
+    ///     Extracted as a recursive entry point so <see cref="Export"/> remains non-recursive
+    ///     while the tree walk handles depth tracking. Each recursive call increments
+    ///     <paramref name="depth"/> by one, producing progressively deeper ATX headings.
+    /// </remarks>
     /// <param name="writer">The text writer to write to.</param>
     /// <param name="section">The section to export.</param>
     /// <param name="depth">The current depth for Markdown headers.</param>
@@ -146,7 +158,8 @@ public class Requirements : Section
     /// <param name="filePath">The path to the output file.</param>
     /// <param name="depth">The starting depth for Markdown headers (default is 1).</param>
     /// <param name="filterTags">Optional set of tags to filter requirements. If provided, only requirements with matching tags are exported.</param>
-    /// <exception cref="ArgumentException">Thrown when the file path is null or empty.</exception>
+    /// <exception cref="ArgumentException">Thrown when the file path is null, empty, or whitespace-only.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when depth is less than 1.</exception>
     /// <remarks>
     ///     <b>File-write side effect:</b> Overwrites any existing file at <paramref name="filePath"/>.
     ///     Any <see cref="IOException"/> or <see cref="UnauthorizedAccessException"/> from the
@@ -159,6 +172,12 @@ public class Requirements : Section
         if (string.IsNullOrWhiteSpace(filePath))
         {
             throw new ArgumentException("File path cannot be null or empty", nameof(filePath));
+        }
+
+        // Validate depth
+        if (depth < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(depth), depth, "Depth must be at least 1");
         }
 
         // Create a string builder to build the markdown content
@@ -177,6 +196,12 @@ public class Requirements : Section
     /// <summary>
     ///     Exports a section's justifications to the markdown writer.
     /// </summary>
+    /// <remarks>
+    ///     Extracted to mirror the structure of <see cref="ExportSection"/>, keeping
+    ///     justification export parallel to standard report export. Applying the same
+    ///     recursive depth-tracking pattern ensures both export paths remain structurally
+    ///     consistent and independently maintainable.
+    /// </remarks>
     /// <param name="writer">The text writer to write to.</param>
     /// <param name="section">The section to export.</param>
     /// <param name="depth">The current depth for Markdown headers.</param>
@@ -227,6 +252,12 @@ public class Requirements : Section
     /// <summary>
     ///     Filters requirements based on tags.
     /// </summary>
+    /// <remarks>
+    ///     Extracted to encapsulate the tag-filter predicate so both <see cref="ExportSection"/>
+    ///     and <see cref="ExportJustificationsSection"/> apply identical filtering logic without
+    ///     duplication. A single definition ensures that both export paths diverge only in how
+    ///     they render matched requirements, not in how they select them.
+    /// </remarks>
     /// <param name="requirements">The list of requirements to filter.</param>
     /// <param name="filterTags">The set of filter tags. If null or empty, all requirements are returned.</param>
     /// <returns>A filtered list of requirements.</returns>
@@ -245,6 +276,12 @@ public class Requirements : Section
     /// <summary>
     ///     Checks if a section has any filtered content (requirements or child sections with content).
     /// </summary>
+    /// <remarks>
+    ///     Extracted to allow the filter-presence check to recurse through child sections without
+    ///     duplicating the predicate. Both <see cref="ExportSection"/> and
+    ///     <see cref="ExportJustificationsSection"/> call this method to decide whether an
+    ///     otherwise-empty section heading should be suppressed.
+    /// </remarks>
     /// <param name="section">The section to check.</param>
     /// <param name="filterTags">The set of filter tags.</param>
     /// <returns>True if the section has filtered content, false otherwise.</returns>

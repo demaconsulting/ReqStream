@@ -1,5 +1,8 @@
 ---
 # Context unit requirements
+# Note: Requirement IDs use the historical 'ReqStream-Command-*' prefix that predates the current
+# naming convention (which would use 'ReqStream-Cli-*'). Renaming is a breaking change requiring
+# coordinated updates across all artifact trees and is deferred.
 sections:
   - title: ReqStream Requirements
     sections:
@@ -46,8 +49,8 @@ sections:
                 tags: [cli]
                 tests:
                   - Context_Create_SilentFlag_SetsSilentProperty
-                  - Context_WriteLine_SilentMode_DoesNotWriteToConsole
-                  - Context_WriteError_SilentMode_DoesNotWriteToConsole
+                  - Context_WriteLine_SilentMode_WritesToLogFile
+                  - Context_WriteError_SilentMode_WritesToLogFile
 
               - id: ReqStream-Command-ErrorOutput
                 title: The tool shall write error messages to stderr.
@@ -56,7 +59,8 @@ sections:
                   without polluting stdout, which consumers may pipe or redirect for data capture.
                 tags: [cli]
                 tests:
-                  - Context_WriteError_NormalMode_WritesToConsole
+                  - Context_WriteError_NormalMode_WritesToLogFile
+                  - Context_WriteError_NormalMode_WritesToStderr
 
               - id: ReqStream-Command-UnknownArgs
                 title: The tool shall reject unknown command-line arguments with a descriptive error.

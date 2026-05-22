@@ -38,7 +38,7 @@ sections:
                   is skipped on Windows platforms.
                 tags: [lint]
                 tests:
-                  - RequirementsLoader_Load_WithIoReadFailure_ReportsError
+                  - ubuntu@RequirementsLoader_Load_WithIoReadFailure_ReportsError
 
               - id: ReqStream-Lint-CircularFileIncludes
                 title: >-
@@ -98,6 +98,8 @@ sections:
                 justification: |
                   The title field is mandatory for all sections. Missing it prevents the section from being
                   correctly identified in reports and trace matrices.
+                  A blank value is treated equivalently to an absent field because both conditions indicate
+                  the required content is missing; distinguishing them provides no value to the tool user.
                 tags: [lint]
                 tests:
                   - RequirementsLoader_Load_WithSectionMissingTitle_ReportsError
@@ -118,6 +120,8 @@ sections:
                 justification: |
                   The id field is mandatory for all requirements. Missing or blank values cause downstream
                   processing failures, duplicate-ID detection gaps, and produce incomplete reports.
+                  A blank value is treated equivalently to an absent field because both conditions indicate
+                  the required content is missing; distinguishing them provides no value to the tool user.
                 tags: [lint]
                 tests:
                   - RequirementsLoader_Load_WithRequirementMissingId_ReportsError
@@ -128,6 +132,8 @@ sections:
                 justification: |
                   The title field is mandatory for all requirements. Missing or blank values produce incomplete
                   reports and prevent the requirement from being correctly identified in trace matrices.
+                  A blank value is treated equivalently to an absent field because both conditions indicate
+                  the required content is missing; distinguishing them provides no value to the tool user.
                 tags: [lint]
                 tests:
                   - RequirementsLoader_Load_WithRequirementMissingTitle_ReportsError
@@ -194,6 +200,8 @@ sections:
                 justification: |
                   The id field is mandatory for all test mappings. Missing or blank values prevent the mapping
                   from being associated with a requirement and cause downstream processing failures.
+                  A blank value is treated equivalently to an absent field because both conditions indicate
+                  the required content is missing; distinguishing them provides no value to the tool user.
                 tags: [lint]
                 tests:
                   - RequirementsLoader_Load_WithMappingMissingId_ReportsError
@@ -204,6 +212,9 @@ sections:
                 justification: |
                   Blank test names cannot be matched against test result files and would silently break
                   coverage calculations.
+                  A blank test name in a requirement and a blank test name in a mapping represent the same
+                  class of defect — unusable test references — and are detected and reported identically;
+                  distinguishing between the two sources provides no value to the tool user.
                 tags: [lint]
                 tests:
                   - RequirementsLoader_Load_WithBlankTestName_ReportsError
@@ -225,6 +236,9 @@ sections:
                   List fields such as tests, children, tags, and includes must contain scalar string values.
                   Non-scalar entries (e.g. nested mappings) would be silently ignored without this check,
                   leading to missing coverage or include entries.
+                  All list field types (tests, children, tags, includes, and mapping tests) represent the
+                  same class of defect — an unusable non-scalar list entry — and are detected and reported
+                  identically; distinguishing between the source list provides no value to the tool user.
                 tags: [lint]
                 tests:
                   - RequirementsLoader_Load_WithNonScalarTestEntry_ReportsError

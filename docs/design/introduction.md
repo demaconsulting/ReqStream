@@ -85,13 +85,17 @@ src/DemaConsulting.ReqStream/
     └── Validation.cs           — self-validation test runner
 
 test/DemaConsulting.ReqStream.Tests/
+├── AssemblyInfo.cs             — test assembly configuration
+├── IntegrationTests.cs         — system-level integration tests
+├── Runner.cs                   — test runner infrastructure
 ├── CliTests.cs                 — CLI subsystem integration tests
 ├── Modeling/
 │   └── ModelingTests.cs        — Modeling subsystem integration tests
 ├── Tracing/
 │   └── TracingTests.cs         — Tracing subsystem integration tests
 └── Utilities/
-    └── UtilitiesTests.cs       — Utilities subsystem integration tests
+    ├── GlobMatcherTests.cs         — GlobMatcher unit tests
+    └── PathHelpersTests.cs         — PathHelpers unit tests
 ```
 
 ## Companion Artifact Structure
@@ -114,4 +118,4 @@ Review-sets: defined in `.reviewmark.yaml`
 
 ## References
 
-- [ReqStream releases](https://github.com/demaconsulting/ReqStream/releases)
+- [REF-1] ReqStream Releases, DEMA Consulting, <https://github.com/demaconsulting/ReqStream/releases>

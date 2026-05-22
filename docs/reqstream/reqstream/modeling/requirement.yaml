@@ -84,3 +84,20 @@ sections:
                   - Requirements_Load_TestMappings_AppliesMappingsCorrectly
                   - Requirements_Load_BlankTestNameInMapping_ReportsErrorWithFileLocation
                   - Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation
+
+              - id: ReqStream-Requirement-Location
+                title: Requirement definitions shall carry a source file location, and validation errors shall include file-location
+                  information.
+                justification: |
+                  Carrying a source file location on each requirement enables precise error reporting
+                  that directs authors to the exact file where an invalid value was declared,
+                  reducing the time needed to diagnose and correct lint issues in large requirement sets.
+                tags: [requirements]
+                tests:
+                  - Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation
+                  - Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation
+                  - Requirements_Load_BlankTestNameInRequirement_ReportsErrorWithFileLocation
+                  - Requirements_Load_BlankTestNameInMapping_ReportsErrorWithFileLocation
+                  - Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation
+                  - Requirements_Load_BlankTagName_ReportsErrorWithFileLocation
+                  - Requirements_Load_BlankChildIdInRequirement_ReportsErrorWithFileLocation

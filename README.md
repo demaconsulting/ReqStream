@@ -19,6 +19,7 @@ providing validation, linting, traceability, and test-mapping capabilities.
 - 📝 **YAML Format** - Manage requirements in human-readable YAML format
 - 🔗 **Hierarchical Structure** - Organize requirements with sections, subsections, and file includes
 - 🧪 **Test Mapping** - Link requirements to test cases for traceability, including source-specific matching
+- 🚦 **Enforcement Mode** - Fail CI/CD builds when any requirement lacks passing test evidence
 - 🔍 **Linting** - Validate requirements YAML structure and references, reporting all issues in one pass
 - 🏷️ **Tag Filtering** - Categorize and filter requirements using tags
 - 📤 **Export Capabilities** - Generate markdown reports for requirements, trace matrices, and justifications

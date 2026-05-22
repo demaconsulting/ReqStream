@@ -40,12 +40,14 @@ N/A — `Requirement` contains no executable logic and performs no validation. A
 checking (blank `Id`, blank `Title`, duplicate `Id`, non-scalar list entries) is performed by
 `RequirementsLoader` during YAML DOM traversal. `Requirement` itself never throws.
 
-#### Dependencies
+#### Interactions
+
+##### Dependencies
 
 N/A — `Requirement` is a data-transfer object with no dependencies on other units, OTS items,
 or shared packages. It contains only built-in .NET collection types.
 
-#### Callers
+##### Callers
 
 - **RequirementsLoader** — creates `Requirement` objects and populates their fields during YAML
   DOM traversal.

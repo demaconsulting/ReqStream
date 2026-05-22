@@ -14,13 +14,55 @@ The `SelfTest` subsystem contains the following software unit:
 
 ### Interfaces
 
+**Provided Interface**:
+
 **Validation.Run**: Runs all self-validation tests, prints a summary, and writes results.
 
 - *Type*: In-process .NET internal API (static method).
 - *Role*: Provider (called by `Program.Run` when `--validate` is present).
 - *Contract*: Accepts a `Context`; executes six validation tests sequentially; prints a summary.
   If `context.ResultsFile` is set, writes results to that file in TRX or JUnit format.
+  Throws `ArgumentNullException` when `context` is null (backed by `ReqStream-Validation-NullContext`).
+  If the results file extension is unsupported, the error is reported via `context.WriteError`
+  and execution continues to the summary rather than aborting. If the results file write fails,
+  the write error is similarly reported via `context.WriteError` and execution continues to
+  the summary.
 - *Constraints*: Must not be called concurrently (mutates the process working directory).
+
+**Consumed Interfaces**:
+
+**Program.Run**: Invoked by all six internal validation test methods to exercise the full tool
+dispatch pipeline end-to-end.
+
+- *Type*: In-process .NET internal API (static method).
+- *Role*: Consumer (each of the six test methods creates a `Context` and passes it to
+  `Program.Run`).
+- *Contract*: Accepts a `Context`; dispatches to the appropriate processing path; reports
+  results and errors via the context. Exit code 0 on success, non-zero on failure.
+
+**Context.Create**: Invoked within each test method to construct a silent `Context` for that
+test's `Program.Run` invocation.
+
+- *Type*: In-process .NET internal API (static factory method), `Cli` subsystem.
+- *Role*: Consumer.
+- *Contract*: Accepts a string array of command-line arguments; returns a configured
+  `Context` scoped to that invocation.
+
+**PathHelpers.SafePathCombine**: Invoked during test fixture setup to construct absolute file
+paths safely, and by `WriteResultsFile` when building the output file path.
+
+- *Type*: In-process .NET internal API (static method), `Utilities` subsystem.
+- *Role*: Consumer.
+- *Contract*: Accepts a base path and a relative segment; returns the combined path; throws
+  `ArgumentException` if the combined path would escape the base directory.
+
+**TrxSerializer.Serialize / JUnitSerializer.Serialize**: Invoked by `WriteResultsFile` to
+serialise the `TestResults` collection into TRX or JUnit XML format.
+
+- *Type*: OTS API, `DemaConsulting.TestResults.IO` package.
+- *Role*: Consumer.
+- *Contract*: Accepts a `TestResults` collection; returns a serialised string in the
+  respective format.
 
 ### Design
 
@@ -37,6 +79,13 @@ test-runner pattern:
 The six tests exercise: requirements processing, trace matrix construction, report export,
 tag filtering, enforcement mode, and lint detection. Each runs in a dedicated temporary
 directory for isolation.
+
+Each test method invokes `Program.Run` via a locally created `Context` to drive the tool's
+full dispatch pipeline. `Context.Create` (from the `Cli` subsystem) constructs the context for
+each `Program.Run` call. `PathHelpers.SafePathCombine` (from the `Utilities` subsystem) builds
+all fixture file paths within the test methods and within `WriteResultsFile`. The
+`WriteResultsFile` helper calls `TrxSerializer.Serialize` or `JUnitSerializer.Serialize`
+(from the OTS `DemaConsulting.TestResults.IO` package) to produce the results output.
 
 The two nested helper classes, `TemporaryDirectory` and `DirectorySwitch`, are used exclusively
 within the test methods and have no visibility outside `Validation`. Each test uses both classes

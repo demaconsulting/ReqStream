@@ -23,6 +23,19 @@ sections:
             tests:
               - Program_Run_WithHelpFlag_PrintsHelp
 
+          - id: ReqStream-Program-Banner
+            title: >-
+              The tool shall display its name and version on startup for non-lint invocations.
+            justification: |
+              Displaying the tool name and version on startup provides a visible record of which
+              version was used in each run, supporting compliance traceability and troubleshooting.
+              The banner is suppressed during lint runs so that build pipelines and editors that
+              parse lint output receive only actionable issue lines.
+            tags: [cli]
+            tests:
+              - Program_Run_WithHelpFlag_PrintsHelp
+              - Program_Run_WithLintFlag_SuppressesBanner
+
           - id: ReqStream-Program-Validate
             title: The tool shall run self-validation when the validate flag is provided.
             justification: |
@@ -67,6 +80,7 @@ sections:
             tags: [cli, requirements]
             tests:
               - Program_Run_WithLintFlag_RunsLinter
+              - Program_Run_WithLintFlag_OnlyOutputsIssues
 
           - id: ReqStream-Program-LintNoBanner
             title: The tool shall suppress the application banner when the lint flag is provided.

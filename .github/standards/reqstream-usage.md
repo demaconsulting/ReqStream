@@ -56,6 +56,9 @@ sections:
         tests:                            # ReqStream matches these by method name in test results
           - TestMethodName
           - windows@PlatformSpecificTest  # Only test runs on Windows count as evidence
+        tags: [example, category]         # Extension field: silently accepted by ReqStream,
+                                          # used for local categorization (e.g. ots, shared).
+                                          # No effect on report generation or validation.
 ```
 
 # Local System/Subsystem/Unit Requirements

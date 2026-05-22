@@ -25,3 +25,12 @@ scenario is tested by `SonarMark_HotSpotsRetrieval`.
 
 **Markdown Report Generation**: Validates that SonarMark can generate a Markdown report from
 SonarCloud quality data. This scenario is tested by `SonarMark_MarkdownReportGeneration`.
+
+### Requirements Coverage
+
+| Requirement | Scenario | Test Method(s) |
+| --- | --- | --- |
+| ReqStream-OTS-SonarMark | Quality Gate Retrieval | `SonarMark_QualityGateRetrieval` |
+| ReqStream-OTS-SonarMark | Issues Retrieval | `SonarMark_IssuesRetrieval` |
+| ReqStream-OTS-SonarMark | Hotspots Retrieval | `SonarMark_HotSpotsRetrieval` |
+| ReqStream-OTS-SonarMark | Markdown Report Generation | `SonarMark_MarkdownReportGeneration` |

@@ -32,6 +32,7 @@ namespace DemaConsulting.ReqStream.Tests.Tracing;
 /// </summary>
 public sealed class TraceMatrixReadTests : IDisposable
 {
+    /// <summary>Unique temporary directory for this test instance's fixture files.</summary>
     private readonly string _testDirectory;
 
     /// <summary>

@@ -45,3 +45,10 @@ evidence from diverse CI environments without format-specific parsing logic.
 `FileNotFoundException` is thrown with the file path. If parsing fails,
 `InvalidOperationException` is thrown with the file path and original exception as the inner
 exception. `TraceMatrix` and `Validation` are the only units that use this package directly.
+
+### Version Constraints
+
+The TRX schema version consumed is the standard MSTest V2 TRX format; the JUnit XML schema is
+the de-facto format used by most CI systems. Both are auto-detected by `Serializer.Deserialize`
+based on root element names. Version numbers are managed centrally in the project file and SBOM
+per the OTS Dependencies Design policy.

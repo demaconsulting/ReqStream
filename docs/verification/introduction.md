@@ -82,4 +82,4 @@ Review-sets for all items are defined in `.reviewmark.yaml` at the repository ro
 
 ## References
 
-- [ReqStream releases](https://github.com/demaconsulting/ReqStream/releases)
+- [REF-1] ReqStream Releases, DEMA Consulting, <https://github.com/demaconsulting/ReqStream/releases>
