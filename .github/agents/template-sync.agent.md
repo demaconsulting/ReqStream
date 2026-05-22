@@ -35,6 +35,11 @@ For each group intersecting the requested scope, call a sub-agent with:
     for the file types in the group scope
   - Project-specific names substitute for placeholders at matching path depth
     (e.g. `SystemName` → `{SystemName}`, `system-name` → `{system-name}`)
+  - For files within `{system-name}/` subtrees in `docs/design/`, `docs/verification/`,
+    and `docs/reqstream/`: consult `docs/design/introduction.md` to determine whether
+    each item is a subsystem or unit, then select the appropriate template
+    (`subsystem-name.*` or `unit-name.*`) regardless of the item's folder depth —
+    do not infer item type from path depth alone
   - If a template counterpart cannot be fetched, skip the file and report it
 - **goal**:
   - Based on the given mode:

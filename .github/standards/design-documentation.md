@@ -56,6 +56,9 @@ write "N/A - {justification}" rather than removing any section:
 # Subsystem Design (MANDATORY)
 
 Place `{subsystem-name}.md` in the **parent** folder; create `{subsystem-name}/` for children.
+**Important**: A file at `{system-name}/{name}.md` may be either a subsystem or a unit. Always
+determine the correct classification from `docs/design/introduction.md` — folder depth does not
+determine classification.
 All sections mandatory; write "N/A - {justification}" rather than removing any section:
 
 - **Overview**: responsibility, boundaries, contained units
@@ -64,8 +67,11 @@ All sections mandatory; write "N/A - {justification}" rather than removing any s
 
 # Unit Design (MANDATORY)
 
-Place `{unit-name}.md` in the **parent** folder. All sections mandatory;
-write "N/A - {justification}" rather than removing any section:
+Place `{unit-name}.md` in the **parent** folder.
+**Important**: A file at `{system-name}/{name}.md` may be either a subsystem or a unit. Always
+determine the correct classification from `docs/design/introduction.md` — folder depth does not
+determine classification.
+All sections mandatory; write "N/A - {justification}" rather than removing any section:
 
 - **Purpose**: single responsibility
 - **Data Model**: fields, properties, types, invariants (IEC 62304 §5.4.2)
