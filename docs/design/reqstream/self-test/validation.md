@@ -1,6 +1,6 @@
 ### Validation Unit Design
 
-#### Overview
+#### Purpose
 
 `Validation` is the self-validation test runner for ReqStream. Its purpose is to execute a suite
 of end-to-end tests that verify the tool's own behavior and to produce structured test-result
@@ -9,7 +9,15 @@ tool's own requirements — enabling a self-hosting compliance workflow.
 
 All tests run in temporary directories to avoid side effects and are isolated from one another.
 
-#### Methods
+#### Data Model
+
+N/A — `Validation` is a static class with no instance state. All shared state within a
+validation run is allocated locally within `Run` and the individual test methods; no fields
+are retained between invocations. The two nested helper classes `TemporaryDirectory` and
+`DirectorySwitch` carry local instance state (directory paths and a saved working directory)
+but are scoped to individual test method calls.
+
+#### Key Methods
 
 ##### `Run(context)`
 
@@ -60,6 +68,26 @@ outcome `Passed` or `Failed`.
 The serializer is called with the assembled `TestResults` object, returning a serialized string.
 The string is then written to the resolved output path via `File.WriteAllText`.
 
+#### Error Handling
+
+`Validation.Run` does not throw for test failures; each failing test is recorded as a
+`TestResult` with outcome `Failed` and reported via `context.WriteError`. The method runs all
+tests regardless of individual failures, so the final summary always reflects the complete
+picture.
+
+The following conditions are handled without throwing:
+
+- **Test failure** — `context.WriteError` is called for each failing test; `context.ExitCode`
+  becomes `1` after the call returns.
+- **Unsupported results file extension** — `context.WriteError` is called with a descriptive
+  message; no results file is written.
+- **Results file write failure** — `context.WriteError` is called with the exception message;
+  execution continues normally.
+
+The only exception that can escape `Run` is an unexpected error from within a test method
+(for example, a .NET runtime failure). Such exceptions propagate to `Program.Run`, which
+re-throws them after writing to `Console.Error`.
+
 #### Supporting Types
 
 ##### `TemporaryDirectory` (nested helper class)
@@ -81,18 +109,14 @@ Each test uses both classes together: `TemporaryDirectory` owns the directory li
 guarantees that each test starts with a clean file system state and that no test artifacts persist
 after the test completes, regardless of whether the test passes or fails.
 
-#### Dependencies
+#### Interactions
 
-| Library / Type | Role |
+| Unit / Library | Role |
 | -------------- | ---- |
-| `DemaConsulting.TestResults` | `TestResults`, `TestResult`, `TestOutcome` model types |
-| `DemaConsulting.TestResults.IO.Serializer` | TRX and JUnit file serialization |
-
-#### Interactions with Other Units
-
-| Unit | Nature of interaction |
-| ---- | --------------------- |
-| `Context` | Reads `ResultsFile`, `Silent`; calls `WriteLine` for headers and summary |
-| `Program` | Reads `Program.Version`; `Run` exercises `Program.Run` or individual workflow methods |
-| `Requirements` | Tests exercise `Requirements.Load` with fixture YAML files |
-| `TraceMatrix` | Tests exercise `TraceMatrix` construction with fixture test-result files |
+| `DemaConsulting.TestResults` | Used by `Validation`; provides `TestResults`, `TestResult`, `TestOutcome` model types |
+| `DemaConsulting.TestResults.IO.Serializer` | Used by `Validation`; provides TRX and JUnit file serialization |
+| `Context` | Used by `Validation`; output channel for header lines, test summaries, and errors; provides `ResultsFile` and `Silent` |
+| `Program` | Used by `Validation`; `Program.Version` is read for the header block; `Program.Run` is exercised by individual test methods |
+| `Requirements` | Used by `Validation`; `Requirements.Load` is called with fixture YAML files to verify loading behavior |
+| `TraceMatrix` | Used by `Validation`; `TraceMatrix` is constructed with fixture test-result files to verify tracing behavior |
+| `Program` (caller) | Calls `Validation.Run(context)` when `--validate` is present on the command line |

@@ -16,6 +16,18 @@ creates a temporary working directory, writes fixture YAML requirements files an
 result files, invokes the tool, and asserts on the exit code, console output, and generated
 report files as appropriate.
 
+## Acceptance Criteria
+
+A system-level test scenario passes when the xUnit test method completes without an uncaught
+exception and all assertions succeed. For scenarios that exercise success paths, the tool must
+exit with code 0; for scenarios that exercise failure paths, the tool must exit with a non-zero
+code. Console output and generated file content must match expected patterns where asserted.
+
+The system verification as a whole is complete when every scenario in this chapter passes on all
+three supported platforms (Windows, Linux, macOS) and all three supported .NET runtimes (.NET 8,
+.NET 9, .NET 10), and the Requirements Coverage table shows every system requirement mapped to at
+least one passing test method.
+
 ## System Test Scenarios
 
 ### Version Display Scenario
@@ -102,14 +114,17 @@ Verifies that the tool filters requirements output by tags when the `--filter` f
 
 Test method: `ReqStream_System_TagFilter_Flag_FiltersRequirements`
 
-### Output Routing Scenario
+### Log File Output Scenario
 
-Verifies that the tool supports log file output and console output suppression.
+Verifies that the tool routes all output to the specified log file when `--log` is provided.
 
-Test methods:
+Test method: `ReqStream_System_OutputControl_LogFlag_WritesOutputToFile`
 
-- `ReqStream_System_OutputControl_LogFlag_WritesOutputToFile`
-- `ReqStream_System_OutputControl_SilentFlag_SuppressesConsoleOutput`
+### Silent Mode Scenario
+
+Verifies that the tool suppresses console output when `--silent` is provided.
+
+Test method: `ReqStream_System_OutputControl_SilentFlag_SuppressesConsoleOutput`
 
 ### Report Depth Scenario
 
@@ -122,6 +137,45 @@ Test method: `ReqStream_System_ReportDepth_DepthFlag_GeneratesReportWithCorrectH
 Verifies that the tool loads requirements from multiple YAML files via file includes.
 
 Test method: `ReqStream_System_FileIncludes_RequirementsWithIncludes_LoadsAllRequirements`
+
+### Section Merging Scenario
+
+Verifies that sections with the same title in different included files are automatically
+merged into a single section in the output.
+
+Test method: `ReqStream_System_SectionMerging_TwoFilesWithSameSection_ProducesSingleMergedSection`
+
+### Circular Include Detection Scenario
+
+Verifies that the tool detects circular include references (where file A includes file B
+and file B includes file A) and reports an error, exiting with a non-zero code.
+
+Test method: `ReqStream_System_CircularIncludeDetection_CircularInclude_ReportsError`
+
+### Test File Error Handling Scenario
+
+Verifies that the tool reports a fatal error and exits with a non-zero code when a test result
+file path is specified but the file is missing, or when the file cannot be parsed.
+
+Test methods:
+
+- `ReqStream_System_TestFileErrorHandling_MissingTestFile_ReportsFatalError`
+- `ReqStream_System_TestFileErrorHandling_MalformedTestFile_ReportsFatalError`
+
+### Matrix Error Handling Scenario
+
+Verifies that the tool reports an error and exits with a non-zero code when `--matrix` is
+requested but no `--tests` files are provided.
+
+Test method: `ReqStream_System_MatrixErrorHandling_MatrixWithoutTests_ReportsError`
+
+### Cyclic Child Detection Scenario
+
+Verifies that the tool detects cyclic references in the child-requirement graph (where
+requirement A lists B as a child and B lists A as a child) and reports an error. This is
+distinct from circular include detection (which detects cycles in `includes` file references).
+
+Test method: `ReqStream_System_CyclicChildDetection_CyclicChildRequirements_ReportsError`
 
 ## Platform Test Scenarios
 
@@ -169,10 +223,16 @@ Test methods: `dotnet10.x@ReqStream_VersionDisplay`, `dotnet10.x@ReqStream_HelpD
 | `ReqStream-System-TraceMatrix` | `ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces` |
 | `ReqStream-System-Justifications` | `ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces` |
 | `ReqStream-System-TagFilter` | `ReqStream_System_TagFilter_Flag_FiltersRequirements` |
-| `ReqStream-System-OutputRouting` | `ReqStream_System_OutputControl_LogFlag_WritesOutputToFile`, `ReqStream_System_OutputControl_SilentFlag_SuppressesConsoleOutput` |
+| `ReqStream-System-LogFileOutput` | `ReqStream_System_OutputControl_LogFlag_WritesOutputToFile` |
+| `ReqStream-System-SilentMode` | `ReqStream_System_OutputControl_SilentFlag_SuppressesConsoleOutput` |
 | `ReqStream-System-ReportDepth` | `ReqStream_System_ReportDepth_DepthFlag_GeneratesReportWithCorrectHeadingLevel` |
 | `ReqStream-System-CrossPlatform` | Satisfied by children: `ReqStream-Platform-Windows`, `ReqStream-Platform-Linux`, `ReqStream-Platform-MacOS`, `ReqStream-Platform-Net8`, `ReqStream-Platform-Net9`, `ReqStream-Platform-Net10` |
 | `ReqStream-System-FileIncludes` | `ReqStream_System_FileIncludes_RequirementsWithIncludes_LoadsAllRequirements` |
+| `ReqStream-System-SectionMerging` | `ReqStream_System_SectionMerging_TwoFilesWithSameSection_ProducesSingleMergedSection` |
+| `ReqStream-System-CircularIncludeDetection` | `ReqStream_System_CircularIncludeDetection_CircularInclude_ReportsError` |
+| `ReqStream-System-TestFileErrorHandling` | `ReqStream_System_TestFileErrorHandling_MissingTestFile_ReportsFatalError`, `ReqStream_System_TestFileErrorHandling_MalformedTestFile_ReportsFatalError` |
+| `ReqStream-System-MatrixErrorHandling` | `ReqStream_System_MatrixErrorHandling_MatrixWithoutTests_ReportsError` |
+| `ReqStream-System-CyclicChildDetection` | `ReqStream_System_CyclicChildDetection_CyclicChildRequirements_ReportsError` |
 | `ReqStream-Platform-Windows` | `windows@ReqStream_VersionDisplay`, `windows@ReqStream_HelpDisplay` |
 | `ReqStream-Platform-Linux` | `ubuntu@ReqStream_VersionDisplay`, `ubuntu@ReqStream_HelpDisplay` |
 | `ReqStream-Platform-MacOS` | `macos@ReqStream_VersionDisplay`, `macos@ReqStream_HelpDisplay` |

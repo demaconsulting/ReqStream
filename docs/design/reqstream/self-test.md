@@ -1,21 +1,17 @@
 ## SelfTest Subsystem Design
 
-The `SelfTest` subsystem provides the self-validation framework for ReqStream.
-It runs a built-in suite of tests to demonstrate the tool is functioning correctly in the
-deployment environment.
-
 ### Overview
 
-The `SelfTest` subsystem is invoked when the user passes `--validate` on the command line.
-It exercises the tool's own capabilities and reports a pass/fail summary. It can also write
-test results to a file in TRX or JUnit XML format for integration with CI/CD pipelines.
-
-### Units
+The `SelfTest` subsystem provides the self-validation framework for ReqStream. It is invoked
+when the user passes `--validate` on the command line and exercises the tool's own capabilities
+end-to-end, reporting a pass/fail summary. It can also write test results to a file in TRX or
+JUnit XML format for integration with CI/CD pipelines, enabling the tool to produce compliance
+evidence about its own correctness.
 
 The `SelfTest` subsystem contains the following software unit:
 
-| Unit         | File                     | Responsibility                                     |
-|--------------|--------------------------|----------------------------------------------------|
+| Unit | File | Responsibility |
+| ---- | ---- | -------------- |
 | `Validation` | `SelfTest/Validation.cs` | Orchestrating and executing self-validation tests. |
 
 ### Interfaces
@@ -26,12 +22,31 @@ The `SelfTest` subsystem exposes the following interface to the rest of the tool
 |------------------|-----------------------------------------------------------------------|
 | `Validation.Run` | Runs all self-validation tests, prints a summary, and writes results. |
 
+### Design
+
+The `SelfTest` subsystem contains a single unit, `Validation`. Its internal design follows a
+test-runner pattern:
+
+1. `Validation.Run` prints a header block and then executes each of the six test methods
+   sequentially. Each test method creates a `TemporaryDirectory` and a `DirectorySwitch`,
+   writes fixture files, invokes tool methods, and returns a `TestResult` with outcome
+   `Passed` or `Failed`.
+2. After all tests complete, `Run` prints a summary and optionally writes results to a file
+   via `WriteResultsFile`.
+
+The two nested helper classes, `TemporaryDirectory` and `DirectorySwitch`, are used exclusively
+within the test methods and have no visibility outside `Validation`.
+
+> **Thread-safety constraint**: each test method uses `DirectorySwitch`, which mutates the
+> process-wide current working directory. `Validation.Run` must not be called concurrently;
+> see the Validation unit design documentation for details.
+
 ### Interactions
 
-| Dependency | Direction | Purpose                                                      |
-|------------|-----------|--------------------------------------------------------------|
-| `Context`  | Uses      | Output channel for header lines, test summaries, and errors. |
-| `Program`  | Uses      | `Program.Run` is called internally to exercise the tool.     |
+| Unit | Relationship | Description |
+| ---- | ------------ | ----------- |
+| `Context` | Uses | Output channel for header lines, test summaries, and errors. |
+| `Program` | Uses | `Program.Run` is called internally to exercise the tool. |
 
 ### Error Handling
 

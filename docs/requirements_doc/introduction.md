@@ -28,5 +28,6 @@ Throughout this document:
 
 ## References
 
-- ReqStream User Guide: Provides detailed usage instructions and examples
-- ReqStream Repository: <https://github.com/demaconsulting/ReqStream>
+- [ReqStream releases](https://github.com/demaconsulting/ReqStream/releases) — compiled documentation
+  including the ReqStream User Guide
+- ReqStream repository: <https://github.com/demaconsulting/ReqStream>

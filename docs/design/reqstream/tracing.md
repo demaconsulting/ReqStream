@@ -1,22 +1,19 @@
 ## Tracing Subsystem Design
 
-The `Tracing` subsystem provides test result loading and requirement-to-test traceability
-for ReqStream. It maps test execution evidence to requirements and supports enforcement of
-full test coverage.
-
 ### Overview
 
-The `Tracing` subsystem reads test result files in TRX or JUnit XML format, correlates
-each test result with the requirements that reference it, and produces a trace matrix report
-or coverage enforcement decision.
-
-### Units
+The `Tracing` subsystem provides test result loading and requirement-to-test traceability
+for ReqStream. It reads test result files in TRX or JUnit XML format, correlates each test
+result with the requirements that reference it, and produces a trace matrix report or coverage
+enforcement decision. Its boundaries begin where the `Modeling` subsystem ends: it receives an
+already-validated `Requirements` tree and test-result file paths, and produces coverage analysis
+and Markdown report output.
 
 The `Tracing` subsystem contains the following software unit:
 
-| Unit          | File                    | Responsibility                                                       |
-|---------------|-------------------------|----------------------------------------------------------------------|
-| `TraceMatrix` | `Tracing/TraceMatrix.cs`| Test result loading, requirement mapping, and coverage enforcement.  |
+| Unit | File | Responsibility |
+| ---- | ---- | -------------- |
+| `TraceMatrix` | `Tracing/TraceMatrix.cs` | Test result loading, requirement mapping, and coverage enforcement. |
 
 ### Interfaces
 
@@ -31,13 +28,28 @@ The `Tracing` subsystem exposes the following interface to the rest of the tool:
 | `TraceMatrix.GetTestResult` | Returns pass/fail counts for a named test across results. |
 | `TraceMatrix.GetAllTestResults` | Returns pass/fail `TestMetrics` for all tests referenced in requirements. |
 
+### Design
+
+The `Tracing` subsystem contains a single unit, `TraceMatrix`. Its internal design is a
+two-phase construction-then-query pattern:
+
+1. **Construction phase** — the `TraceMatrix` constructor calls `ProcessTestResultFile` for each
+   path in `testResultFiles`. Each call deserializes the file and accumulates `TestExecution`
+   records into `_testExecutions`. After construction, the lookup structures are fully populated
+   and read-only.
+2. **Query phase** — `Program` calls `GetTestResult`, `GetAllTestResults`,
+   `CalculateSatisfiedRequirements`, `GetUnsatisfiedRequirements`, and `Export` in any order.
+   All query methods are read-only; they do not modify `_testExecutions` or `_requirements`.
+
+The subsystem has no internal unit-to-unit collaboration beyond this single unit.
+
 ### Interactions
 
-| Dependency     | Direction | Purpose                                                                |
-|----------------|-----------|------------------------------------------------------------------------|
-| `Context`      | Uses      | Receives test file paths from `Context.TestFiles`.                     |
-| `Requirements` | Uses      | Receives the requirement tree to map tests to requirements.            |
-| `Program`      | Used by   | Constructs `TraceMatrix` and calls enforcement/export methods.         |
+| Unit | Relationship | Description |
+| ---- | ------------ | ----------- |
+| `Context` | Uses | Receives test file paths from `Context.TestFiles`. |
+| `Requirements` | Uses | Receives the requirement tree to map tests to requirements. |
+| `Program` | Used by | Constructs `TraceMatrix` and calls enforcement/export methods. |
 
 ### Error Handling
 

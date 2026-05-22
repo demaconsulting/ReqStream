@@ -48,7 +48,6 @@ public sealed class ContextTests : IDisposable
         {
             Directory.Delete(_testDirectory, recursive: true);
         }
-        GC.SuppressFinalize(this);
     }
 
     /// <summary>
@@ -432,10 +431,10 @@ public sealed class ContextTests : IDisposable
     }
 
     /// <summary>
-    /// Test WriteLine in silent mode doesn't write to console.
+    /// Test WriteLine in silent mode still writes to the log file.
     /// </summary>
     [Fact]
-    public void Context_WriteLine_SilentMode_DoesNotWriteToConsole()
+    public void Context_WriteLine_SilentMode_WritesToLogFile()
     {
         // Arrange: set up a log file to observe output in silent mode
         var logPath = PathHelpers.SafePathCombine(_testDirectory, "output-silent.log");
@@ -453,10 +452,10 @@ public sealed class ContextTests : IDisposable
     }
 
     /// <summary>
-    /// Test WriteError writes to console.
+    /// Test WriteError in normal mode writes to the log file.
     /// </summary>
     [Fact]
-    public void Context_WriteError_NormalMode_WritesToConsole()
+    public void Context_WriteError_NormalMode_WritesToLogFile()
     {
         // Arrange: set up a log file to capture error messages
         var logPath = PathHelpers.SafePathCombine(_testDirectory, "error-normal.log");
@@ -477,10 +476,10 @@ public sealed class ContextTests : IDisposable
     }
 
     /// <summary>
-    /// Test WriteError in silent mode doesn't write to console.
+    /// Test WriteError in silent mode still writes to the log file.
     /// </summary>
     [Fact]
-    public void Context_WriteError_SilentMode_DoesNotWriteToConsole()
+    public void Context_WriteError_SilentMode_WritesToLogFile()
     {
         // Arrange: set up a log file to observe output in silent mode
         var logPath = PathHelpers.SafePathCombine(_testDirectory, "error-silent.log");

@@ -22,4 +22,5 @@ Test evidence names (test methods written to the TRX file by `dotnet sarifmark -
 
 | Requirement ID | Test Method(s) |
 | --- | --- |
-| `ReqStream-OTS-SarifMark` | `SarifMark_SarifReading`, `SarifMark_MarkdownReportGeneration` |
+| `ReqStream-OTS-SarifMark` | `SarifMark_SarifReading` |
+| `ReqStream-OTS-SarifMark` | `SarifMark_MarkdownReportGeneration` |

@@ -6,6 +6,18 @@ The GlobMatcher unit is verified using xUnit unit tests in `GlobMatcherTests.cs`
 temporary directories with known file contents and assert that `FindMatchingFiles` and
 `SplitAbsolutePattern` return the correct results for both relative and absolute patterns.
 
+#### Test Environment
+
+The GlobMatcher unit tests require no setup beyond the standard xUnit test runner and .NET runtime.
+Tests create temporary directories with known file structures on disk and delete them on test
+completion.
+
+#### Acceptance Criteria
+
+The GlobMatcher unit verification is complete when all xUnit tests in `GlobMatcherTests.cs` pass
+without uncaught exceptions and all assertions succeed. The unit is considered verified when every
+requirement in the Coverage Summary is mapped to at least one passing test method.
+
 #### Test Scenarios
 
 ##### Relative Pattern Scenario

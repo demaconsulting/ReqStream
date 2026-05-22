@@ -18,6 +18,7 @@ This document covers the detailed design of the following software items, spanni
 - **Program** — entry point and execution orchestrator (`Program.cs`)
 - **Context** — command-line argument parser and I/O owner (`Cli/Context.cs`)
 - **GlobMatcher** — glob-pattern file matching utility (`Utilities/GlobMatcher.cs`)
+- **PathHelpers** — safe path combination with traversal protection (`Utilities/PathHelpers.cs`)
 - **Validation** — self-validation test runner (`SelfTest/Validation.cs`)
 - **LintIssue and LoadResult** — lint severity classification, issue data model, and load-result
   encapsulation (`Modeling/LintIssue.cs`, `Modeling/LoadResult.cs`)
@@ -55,8 +56,13 @@ ReqStream (System)
 │   └── Section (Unit)
 ├── Tracing (Subsystem)
 │   └── TraceMatrix (Unit)
-└── SelfTest (Subsystem)
-    └── Validation (Unit)
+├── SelfTest (Subsystem)
+│   └── Validation (Unit)
+├── OTS Items
+│   ├── YamlDotNet
+│   └── Microsoft.Extensions.FileSystemGlobbing
+└── Shared Packages
+    └── DemaConsulting.TestResults
 ```
 
 Each unit is described in detail in its own chapter within this document.
@@ -70,6 +76,13 @@ breakdown above:
 docs/design/
 ├── introduction.md                         — document introduction and architecture overview
 ├── reqstream.md                            — system integration design
+├── ots.md                                  — OTS items design overview
+├── ots/
+│   ├── yamldotnet.md                       — YamlDotNet integration design
+│   └── microsoft-extensions-file-system-globbing.md — Microsoft.Extensions.FileSystemGlobbing design
+├── shared.md                               — shared packages design overview
+├── shared/
+│   └── dema-consulting-test-results.md     — DemaConsulting.TestResults integration design
 └── reqstream/
     ├── program.md                          — Program unit design
     ├── cli.md                              — Cli subsystem design
@@ -156,7 +169,25 @@ For example, the `Requirements` unit maps to:
 | Source | `src/DemaConsulting.ReqStream/Modeling/Requirements.cs` |
 | Tests | `test/DemaConsulting.ReqStream.Tests/Modeling/ModelingTests.cs` |
 
+For OTS software items, the artifact structure uses a flatter layout (no source code or tests):
+
+| Artifact | Path |
+| -------- | ---- |
+| Requirements | `docs/reqstream/ots/{ots-name}.yaml` |
+| Design | `docs/design/ots/{ots-name}.md` |
+| Verification | `docs/verification/ots/{ots-name}.md` |
+
+For shared packages, the artifact structure is similar to OTS:
+
+| Artifact | Path |
+| -------- | ---- |
+| Requirements | `docs/reqstream/shared/{shared-name}.yaml` (where applicable) |
+| Design | `docs/design/shared/{shared-name}.md` |
+| Verification | `docs/verification/shared/{shared-name}.md` |
+
 ## References
 
-- ReqStream System Requirements document
-- ReqStream Requirements Root document
+- ReqStream System Requirements document —
+  [ReqStream releases](https://github.com/demaconsulting/ReqStream/releases)
+- ReqStream Requirements Root document —
+  [ReqStream releases](https://github.com/demaconsulting/ReqStream/releases)

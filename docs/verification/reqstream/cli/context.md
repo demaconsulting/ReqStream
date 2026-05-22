@@ -1,11 +1,23 @@
 ### Context Unit Verification
 
-#### Verification Strategy
+#### Verification Approach
 
 The Context unit is verified using xUnit unit tests in `ContextTests.cs`. Tests create `Context`
 instances with specific command-line argument arrays and assert the resulting property values,
 file system effects, and exception behavior. Temporary directories are created for tests
 requiring file system access.
+
+#### Test Environment
+
+The Context unit tests require no setup beyond the standard xUnit test runner and .NET runtime.
+Temporary directories are created by tests that exercise log file or output routing behavior and
+are deleted on test completion.
+
+#### Acceptance Criteria
+
+The Context unit verification is complete when all xUnit tests in `ContextTests.cs` pass without
+uncaught exceptions and all assertions succeed. The unit is considered verified when every
+requirement in the Coverage Summary is mapped to at least one passing test method.
 
 #### Test Scenarios
 
@@ -75,9 +87,9 @@ Test methods:
 
 Test methods:
 
-- `Context_WriteLine_SilentMode_DoesNotWriteToConsole` — silent suppresses stdout
-- `Context_WriteError_SilentMode_DoesNotWriteToConsole` — silent suppresses stderr
-- `Context_WriteError_NormalMode_WritesToConsole` — normal mode writes to stderr
+- `Context_WriteLine_SilentMode_WritesToLogFile` — silent mode still writes to log file
+- `Context_WriteError_SilentMode_WritesToLogFile` — silent mode still writes error to log file
+- `Context_WriteError_NormalMode_WritesToLogFile` — normal mode writes error to log file
 - `Context_ExitCode_AfterWriteError_ReturnsOne` — exit code is 1 after error
 
 ##### Log File Scenario
@@ -89,32 +101,32 @@ Test methods:
 - `Context_Dispose_WithLogFile_ClosesLogFile` — dispose closes log file
 - `Context_Create_InvalidLogPath_ThrowsException` — invalid log path throws
 
-#### Coverage Summary
+#### Requirements Coverage
 
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-Command-Cli` | `Context_Create_NoArguments_ReturnsDefaultContext`, `Context_Create_MultipleArguments_ParsesAllCorrectly` |
-| `ReqStream-Command-Version` | `Context_Create_VersionFlag_SetsVersionProperty` |
-| `ReqStream-Command-Help` | `Context_Create_HelpFlags_SetsHelpProperty` |
-| `ReqStream-Command-Silent` | `Context_Create_SilentFlag_SetsSilentProperty`, `Context_WriteLine_SilentMode_DoesNotWriteToConsole`, `Context_WriteError_SilentMode_DoesNotWriteToConsole` |
-| `ReqStream-Command-ErrorOutput` | `Context_WriteError_NormalMode_WritesToConsole` |
-| `ReqStream-Command-UnknownArgs` | `Context_Create_UnsupportedArgument_ThrowsException` |
-| `ReqStream-Command-MissingLogValue` | `Context_Create_MissingLogFilename_ThrowsException` |
-| `ReqStream-Command-MissingResultsValue` | `Context_Create_MissingResultsFilename_ThrowsException` |
-| `ReqStream-Command-MissingFilterValue` | `Context_Create_FilterArgumentMissingValue_ThrowsException` |
-| `ReqStream-Command-RequirementsGlobPatterns` | `Context_Create_WithRequirementsPattern_ExpandsGlobPattern` |
-| `ReqStream-Command-TestGlobPatterns` | `Context_Create_WithTestsPattern_ExpandsGlobPattern` |
-| `ReqStream-Command-Validate` | `Context_Create_ValidateFlag_SetsValidateProperty` |
-| `ReqStream-Command-Enforce` | `Context_Create_EnforceFlag_SetsEnforceProperty` |
-| `ReqStream-Command-ExitCode` | `Context_ExitCode_AfterWriteError_ReturnsOne` |
-| `ReqStream-Command-ReportDepth` | `Context_Create_ReportDepth_SetsReportDepthProperty` |
-| `ReqStream-Command-MatrixDepth` | `Context_Create_MatrixDepth_SetsMatrixDepthProperty` |
-| `ReqStream-Command-Depth` | `Context_Create_Depth_SetsAllDepths`, `Context_Create_SpecificDepthOverridesDefaultDepth`, `Context_Create_MissingDepth_ThrowsException`, `Context_Create_InvalidDepth_ThrowsException` |
-| `ReqStream-Command-TagFilter` | `Context_Create_FilterArgument_ParsesTagsCorrectly`, `Context_Create_FilterArgumentWithSpaces_TrimsAndParsesTagsCorrectly`, `Context_Create_FilterSingleTag_ParsesCorrectly`, `Context_Create_MultipleFilterArguments_MergesIntoSingleSet` |
-| `ReqStream-Command-Lint` | `Context_Create_LintFlag_SetsLintProperty` |
-| `ReqStream-Command-Results` | `Context_Create_ResultsFlag_SetsResultsFileProperty`, `Context_Create_ResultFlag_SetsResultsFileProperty`, `Context_Create_MissingResultsFilename_ThrowsException` |
-| `ReqStream-Command-Report` | `Context_Create_ReportFile_SetsReportProperty`, `Context_Create_MissingReportFilename_ThrowsException` |
-| `ReqStream-Command-Matrix` | `Context_Create_MatrixFile_SetsMatrixProperty`, `Context_Create_MissingMatrixFilename_ThrowsException` |
-| `ReqStream-Command-Justifications` | `Context_Create_JustificationsFile_SetsJustificationsFileProperty`, `Context_Create_MissingJustificationsFilename_ThrowsException` |
-| `ReqStream-Command-JustificationsDepth` | `Context_Create_JustificationsDepth_SetsJustificationsDepthProperty`, `Context_Create_MissingJustificationsDepth_ThrowsException`, `Context_Create_InvalidJustificationsDepth_ThrowsException` |
-| `ReqStream-Command-LogFileOutput` | `Context_Create_WithLogFile_WritesToLogFile`, `Context_Create_WithLogFileAndSilent_WritesToLogOnly`, `Context_Dispose_WithLogFile_ClosesLogFile`, `Context_Create_InvalidLogPath_ThrowsException` |
+| Requirement ID | Scenario(s) | Test Method(s) |
+| --- | --- | --- |
+| `ReqStream-Command-Cli` | CLI Parsing Scenario | `Context_Create_NoArguments_ReturnsDefaultContext`, `Context_Create_MultipleArguments_ParsesAllCorrectly` |
+| `ReqStream-Command-Version` | CLI Parsing Scenario | `Context_Create_VersionFlag_SetsVersionProperty` |
+| `ReqStream-Command-Help` | CLI Parsing Scenario | `Context_Create_HelpFlags_SetsHelpProperty` |
+| `ReqStream-Command-Silent` | CLI Parsing Scenario, Output Channel Scenario | `Context_Create_SilentFlag_SetsSilentProperty`, `Context_WriteLine_SilentMode_WritesToLogFile`, `Context_WriteError_SilentMode_WritesToLogFile` |
+| `ReqStream-Command-ErrorOutput` | Output Channel Scenario | `Context_WriteError_NormalMode_WritesToLogFile` |
+| `ReqStream-Command-UnknownArgs` | CLI Parsing Scenario | `Context_Create_UnsupportedArgument_ThrowsException` |
+| `ReqStream-Command-MissingLogValue` | CLI Parsing Scenario | `Context_Create_MissingLogFilename_ThrowsException` |
+| `ReqStream-Command-MissingResultsValue` | CLI Parsing Scenario, Results and Report Flags Scenario | `Context_Create_MissingResultsFilename_ThrowsException` |
+| `ReqStream-Command-MissingFilterValue` | CLI Parsing Scenario, Tag Filter Scenario | `Context_Create_FilterArgumentMissingValue_ThrowsException` |
+| `ReqStream-Command-RequirementsGlobPatterns` | Requirements and Tests Pattern Scenario | `Context_Create_WithRequirementsPattern_ExpandsGlobPattern` |
+| `ReqStream-Command-TestGlobPatterns` | Requirements and Tests Pattern Scenario | `Context_Create_WithTestsPattern_ExpandsGlobPattern` |
+| `ReqStream-Command-Validate` | CLI Parsing Scenario | `Context_Create_ValidateFlag_SetsValidateProperty` |
+| `ReqStream-Command-Enforce` | CLI Parsing Scenario | `Context_Create_EnforceFlag_SetsEnforceProperty` |
+| `ReqStream-Command-ExitCode` | Output Channel Scenario | `Context_ExitCode_AfterWriteError_ReturnsOne` |
+| `ReqStream-Command-ReportDepth` | Depth Flags Scenario | `Context_Create_ReportDepth_SetsReportDepthProperty` |
+| `ReqStream-Command-MatrixDepth` | Depth Flags Scenario | `Context_Create_MatrixDepth_SetsMatrixDepthProperty` |
+| `ReqStream-Command-Depth` | Depth Flags Scenario | `Context_Create_Depth_SetsAllDepths`, `Context_Create_SpecificDepthOverridesDefaultDepth`, `Context_Create_MissingDepth_ThrowsException`, `Context_Create_InvalidDepth_ThrowsException` |
+| `ReqStream-Command-TagFilter` | Tag Filter Scenario | `Context_Create_FilterArgument_ParsesTagsCorrectly`, `Context_Create_FilterArgumentWithSpaces_TrimsAndParsesTagsCorrectly`, `Context_Create_FilterSingleTag_ParsesCorrectly`, `Context_Create_MultipleFilterArguments_MergesIntoSingleSet` |
+| `ReqStream-Command-Lint` | CLI Parsing Scenario | `Context_Create_LintFlag_SetsLintProperty` |
+| `ReqStream-Command-Results` | Results and Report Flags Scenario | `Context_Create_ResultsFlag_SetsResultsFileProperty`, `Context_Create_ResultFlag_SetsResultsFileProperty`, `Context_Create_MissingResultsFilename_ThrowsException` |
+| `ReqStream-Command-Report` | Results and Report Flags Scenario | `Context_Create_ReportFile_SetsReportProperty`, `Context_Create_MissingReportFilename_ThrowsException` |
+| `ReqStream-Command-Matrix` | Results and Report Flags Scenario | `Context_Create_MatrixFile_SetsMatrixProperty`, `Context_Create_MissingMatrixFilename_ThrowsException` |
+| `ReqStream-Command-Justifications` | Results and Report Flags Scenario | `Context_Create_JustificationsFile_SetsJustificationsFileProperty`, `Context_Create_MissingJustificationsFilename_ThrowsException` |
+| `ReqStream-Command-JustificationsDepth` | Depth Flags Scenario | `Context_Create_JustificationsDepth_SetsJustificationsDepthProperty`, `Context_Create_MissingJustificationsDepth_ThrowsException`, `Context_Create_InvalidJustificationsDepth_ThrowsException` |
+| `ReqStream-Command-LogFileOutput` | Log File Scenario | `Context_Create_WithLogFile_WritesToLogFile`, `Context_Create_WithLogFileAndSilent_WritesToLogOnly`, `Context_Dispose_WithLogFile_ClosesLogFile`, `Context_Create_InvalidLogPath_ThrowsException` |

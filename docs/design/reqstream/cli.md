@@ -1,23 +1,17 @@
 ## Cli Subsystem Design
 
-The `Cli` subsystem provides the command-line interface for ReqStream.
-It is responsible for accepting user input from the command line and routing output to
-the console and an optional log file.
-
 ### Overview
 
-The `Cli` subsystem acts as the primary boundary between the user's shell invocation and
-the tool's internal logic. It owns argument parsing, output formatting, and error tracking.
-All other subsystems receive a `Context` object from the `Cli` subsystem to read parsed
-flags and write output.
-
-### Units
+The `Cli` subsystem provides the command-line interface for ReqStream. It acts as the primary
+boundary between the user's shell invocation and the tool's internal logic, owning argument
+parsing, output formatting, and error tracking. All other subsystems receive a `Context` object
+from the `Cli` subsystem to read parsed flags and write output.
 
 The `Cli` subsystem contains the following software unit:
 
-| Unit                          | File             | Responsibility                                                |
-|-------------------------------|------------------|---------------------------------------------------------------|
-| `Context`                     | `Cli/Context.cs` | Argument parsing, output channels, and exit code.             |
+| Unit | File | Responsibility |
+| ---- | ---- | -------------- |
+| `Context` | `Cli/Context.cs` | Argument parsing, output channels, and exit code. |
 
 ### Interfaces
 
@@ -46,6 +40,17 @@ The `Cli` subsystem exposes the following interface to the rest of the tool:
   appends it to the log file if logging is enabled, and sets the error exit code.
 - **`Context.ExitCode`** — Returns 0 for success or 1 when errors have been reported.
 - **`Context.Dispose`** — Closes the log file writer and releases resources.
+
+### Design
+
+The `Cli` subsystem contains a single unit, `Context`, which is constructed by `Program.Main`
+via the static factory method `Context.Create(args)`. After construction, `Program` holds the
+`Context` and passes it to all subsystems that need to produce output. The subsystem has no
+internal unit-to-unit collaboration; its design is defined entirely by the `Context` unit.
+
+`Context` implements `IDisposable` so that the log-file `StreamWriter` is closed
+deterministically when `Program.Main`'s `using` block exits. This is the only resource
+lifecycle concern in the subsystem.
 
 ### Interactions
 

@@ -1,16 +1,13 @@
 ## Modeling Subsystem Design
 
-The `Modeling` subsystem provides the data model and YAML parsing for ReqStream requirements
-documents. It is responsible for reading, validating, and structuring requirement data for use
-by the tracing, reporting, and enforcement subsystems.
-
 ### Overview
 
-The `Modeling` subsystem handles all YAML file parsing and requirement data structures. It
-reads one or more requirement YAML files (including those referenced via `includes`), merges
-them into a unified requirement tree, and exposes that tree to the rest of the tool.
-
-### Units
+The `Modeling` subsystem provides the data model and YAML parsing for ReqStream requirements
+documents. It handles all YAML file parsing and requirement data structures, reading one or more
+requirement YAML files (including those referenced via `includes`), merging them into a unified
+requirement tree, and exposing that tree to the rest of the tool. Its boundaries extend from raw
+YAML file I/O through to the populated in-memory requirement tree; it has no knowledge of test
+results, tracing, or report file formats.
 
 The `Modeling` subsystem contains the following software units:
 
@@ -33,13 +30,32 @@ The `Modeling` subsystem exposes the following interface to the rest of the tool
 | `Requirements.ExportJustifications` | Exports justifications to Markdown. Supports `depth` and `filterTags`. |
 | `LoadResult.ReportIssues` | Reports lint issues discovered during loading via the context. |
 
+### Design
+
+The `Modeling` subsystem units collaborate in a directed chain during a `Requirements.Load` call:
+
+1. `Requirements.Load` delegates immediately to `RequirementsLoader.Load`, passing the file
+   paths.
+2. `RequirementsLoader` creates `Section`, `Requirement`, and `LintIssue` objects as it walks
+   the YAML DOM. It writes into the shared `Requirements` tree directly (title-based section
+   merging across files).
+3. After all files are processed, `RequirementsLoader` runs `ValidateCycles` to detect circular
+   child references. Any issues are appended to the `LintIssue` list.
+4. `RequirementsLoader.Load` assembles and returns a `LoadResult` containing the (possibly null)
+   `Requirements` tree and the complete `LintIssue` list.
+5. `Requirements.Load` returns the `LoadResult` to the caller (`Program`).
+
+For export paths, `Requirements.Export` and `Requirements.ExportJustifications` walk the
+`Section` tree recursively, emitting Markdown at the caller-specified heading depth. Neither
+method calls back into `RequirementsLoader`; they read only the already-populated tree.
+
 ### Interactions
 
-| Dependency                         | Direction | Purpose                                                             |
-|------------------------------------|-----------|---------------------------------------------------------------------|
-| `Cli (Context)`                    | Uses      | `LoadResult.ReportIssues` accepts a `Context` to route issues.      |
-| `TraceMatrix`                      | Used by   | Receives the requirement tree to map test results to requirements.  |
-| `Program`                          | Used by   | Calls `Requirements.Load` to load requirements.                     |
+| Unit | Relationship | Description |
+| ---- | ------------ | ----------- |
+| `Cli (Context)` | Uses | `LoadResult.ReportIssues` accepts a `Context` to route issues. |
+| `TraceMatrix` | Used by | Receives the requirement tree to map test results to requirements. |
+| `Program` | Used by | Calls `Requirements.Load` to load requirements. |
 
 ### Operation
 

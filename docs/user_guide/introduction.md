@@ -1,5 +1,8 @@
 # Introduction
 
+This guide describes how to install, configure, and use ReqStream, a .NET command-line tool for managing
+software requirements in YAML format.
+
 ## Purpose
 
 This document serves as the comprehensive user guide for ReqStream, a .NET command-line tool for managing software
@@ -33,9 +36,11 @@ to be treated as code, stored in source control, and integrated into CI/CD pipel
 - **Source-Specific Test Matching** - Restrict coverage evidence to named result files using `filepart@testname` syntax
 - **Justifications** - Document the rationale behind each requirement for better understanding
 - **File Includes** - Modularize requirements across multiple YAML files for better maintainability
+- **Circular Include Detection** - Automatically detects and reports circular include references to prevent infinite loading loops
 - **Linting** - Inspect requirements files for structural issues and reference errors, reporting all problems in one pass
 - **Validation** - Run a built-in self-test suite to qualify the tool in its deployment environment
 - **Tag Filtering** - Categorize and filter requirements using tags for focused reporting and enforcement
+- **Configurable Report Depth** - Control Markdown heading levels in exported reports via `--depth`, `--report-depth`, `--matrix-depth`, and `--justifications-depth` flags
 - **Export Capabilities** - Generate markdown reports for requirements, justifications, and test trace matrices
 - **Continuous Compliance** - Automatically generate compliance evidence on every CI run, following the
   [Continuous Compliance][continuous-compliance] methodology
@@ -253,7 +258,7 @@ mappings:
 The separate `mappings` section is useful when test mappings are maintained by a different team or in a different
 file from the requirements.
 
-## Test Source Linking
+## Source-Specific Test Matching
 
 When testing requirements across multiple platforms or configurations, use test source linking to distinguish tests
 from different sources. This is particularly useful for matrix testing scenarios.
@@ -524,7 +529,7 @@ ReqStream supports the following command-line options:
 | ------ | ----------- |
 | `-v`, `--version` | Display version information |
 | `-?`, `-h`, `--help` | Display help message |
-| `--silent` | Suppress console output (useful in CI/CD) |
+| `--silent` | Suppress all console output (both stdout and stderr are suppressed; useful in CI/CD) |
 | `--validate` | Run self-validation and display test results |
 | `--results <file>` | Write validation test results to a file (TRX or JUnit format, use .trx or .xml extension) |
 | `--lint` | Lint requirements files for structural issues |
@@ -658,6 +663,7 @@ only actionable issue lines appear in the output.
 | Blank test name | A test name in a `tests` list is empty or whitespace |
 | Blank tag name | A tag name in a `tags` list is empty or whitespace |
 | Duplicate requirement ID | Two requirements share the same `id` (within or across files) |
+| Circular include reference | A YAML include directive creates a circular dependency |
 
 ### Requirements Processing
 

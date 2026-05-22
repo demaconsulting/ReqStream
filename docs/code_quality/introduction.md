@@ -33,3 +33,7 @@ This document is intended for:
 - Quality assurance teams reviewing code quality
 - Project stakeholders evaluating project health
 - Contributors understanding quality standards
+
+## References
+
+- [ReqStream releases](https://github.com/demaconsulting/ReqStream/releases)

@@ -9,7 +9,7 @@ globs: ["requirements.yaml", "docs/reqstream/**/*.yaml"]
 Read these standards first before applying this standard:
 
 - **`requirements-principles.md`** - Requirements principles and unidirectionality
-- **`software-items.md`** - Software categorization (System/Subsystem/Unit/OTS)
+- **`software-items.md`** - Software categorization (System/Subsystem/Unit/OTS/Shared Package)
 
 # Requirements Organization
 
@@ -29,13 +29,16 @@ docs/reqstream/
 │   │   ├── {child-subsystem}/       # Child subsystem folder
 │   │   └── {unit-name}.yaml         # Unit requirements
 │   └── {unit-name}.yaml             # System-level unit requirements
-└── ots/                             # OTS items appear as a distinct section in reports
-    └── {ots-name}.yaml              # Requirements for OTS components
+├── ots/                             # OTS items appear as a distinct section in reports
+│   └── {ots-name}.yaml              # Requirements for OTS components
+└── shared/                          # Shared Packages appear as a distinct section in reports
+    └── {package-name}.yaml          # Requirements for Shared Package dependencies
 ```
 
-In-house items have matching relative paths across `docs/reqstream/`, `docs/design/`, and
-`docs/verification/`. OTS items appear only in `docs/reqstream/ots/` and
-`docs/verification/ots/` - they have no design documentation.
+Local items have matching relative paths across `docs/reqstream/`, `docs/design/`, and
+`docs/verification/`. OTS items appear in `docs/reqstream/ots/`, `docs/design/ots/`, and
+`docs/verification/ots/`. Shared Packages appear in `docs/reqstream/shared/`,
+`docs/design/shared/`, and `docs/verification/shared/`.
 
 # Requirements File Format
 
@@ -58,7 +61,7 @@ sections:
 # OTS Software Requirements
 
 Use nested sections in `docs/reqstream/ots/` because ReqStream renders the `ots/`
-subtree as a distinct section in generated reports, separate from in-house
+subtree as a distinct section in generated reports, separate from local
 system requirements:
 
 ```yaml
@@ -71,6 +74,23 @@ sections:
             title: System.Text.Json shall be able to read JSON files.
             tests:
               - JsonReaderTests.TestReadValidJson
+```
+
+# Shared Package Requirements
+
+Use nested sections in `docs/reqstream/shared/` - ReqStream renders the `shared/`
+subtree as a distinct section in reports, separate from local and OTS requirements:
+
+```yaml
+sections:
+  - title: Shared Package Requirements
+    sections:
+      - title: MyOrg.SharedLibrary
+        requirements:
+          - id: SharedLibrary-Core-ParseConfig
+            title: MyOrg.SharedLibrary shall parse configuration files.
+            tests:
+              - SharedLibraryIntegrationTests.TestParseValidConfig
 ```
 
 # Semantic IDs (MANDATORY)
@@ -132,5 +152,6 @@ Before submitting requirements, verify:
 - [ ] Files organized under `docs/reqstream/` following the folder structure pattern above
 - [ ] All documentation folders use kebab-case names matching source code structure
 - [ ] OTS requirements placed in `ots/` subfolder
+- [ ] Shared Package requirements placed in `shared/` subfolder
 - [ ] Valid YAML syntax passes yamllint validation
 - [ ] Test result formats compatible (TRX, JUnit XML)

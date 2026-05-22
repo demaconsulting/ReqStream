@@ -25,8 +25,15 @@ using DemaConsulting.ReqStream.Utilities;
 namespace DemaConsulting.ReqStream.Tests;
 
 /// <summary>
+/// Collection definition to disable parallel execution for ProgramTests.
+/// </summary>
+[CollectionDefinition("Sequential", DisableParallelization = true)]
+public sealed class SequentialCollectionDefinition;
+
+/// <summary>
 /// Unit tests for the Program class Run method.
 /// </summary>
+[Collection("Sequential")]
 public sealed class ProgramTests : IDisposable
 {
     private readonly string _testDirectory;

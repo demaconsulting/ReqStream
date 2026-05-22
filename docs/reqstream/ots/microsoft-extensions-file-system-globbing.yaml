@@ -1,0 +1,23 @@
+---
+# Microsoft.Extensions.FileSystemGlobbing OTS Software Requirements
+#
+# Requirements for the Microsoft.Extensions.FileSystemGlobbing glob pattern matching library.
+
+sections:
+  - title: OTS Software Requirements
+    sections:
+      - title: Microsoft.Extensions.FileSystemGlobbing Requirements
+        requirements:
+          - id: ReqStream-OTS-FileSystemGlobbing
+            title: >-
+              Microsoft.Extensions.FileSystemGlobbing shall match file paths against glob
+              patterns, returning all matching absolute file paths.
+            justification: |
+              GlobMatcher uses FileSystemGlobbing to expand --requirements and --tests
+              command-line patterns into resolved file path lists. It must correctly match
+              relative and absolute glob patterns on all supported platforms.
+            tags: [ots]
+            tests:
+              - GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles
+              - GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles
+              - GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty

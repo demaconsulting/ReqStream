@@ -22,4 +22,5 @@ Test evidence names (test methods written to the TRX file by `dotnet reviewmark 
 
 | Requirement ID | Test Method(s) |
 | --- | --- |
-| `ReqStream-OTS-ReviewMark` | `ReviewMark_ReviewPlanGeneration`, `ReviewMark_ReviewReportGeneration` |
+| `ReqStream-OTS-ReviewMark` | `ReviewMark_ReviewPlanGeneration` |
+| `ReqStream-OTS-ReviewMark` | `ReviewMark_ReviewReportGeneration` |

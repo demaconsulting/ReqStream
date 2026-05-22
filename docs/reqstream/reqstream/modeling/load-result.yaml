@@ -9,7 +9,7 @@
 sections:
   - title: LoadResult Unit Requirements
     requirements:
-      - id: ReqStream-Requirements-UnifiedLoad
+      - id: ReqStream-LoadResult-UnifiedLoad
         title: >-
           LoadResult shall encapsulate a requirements tree and lint issues in a single result,
           returning both together regardless of whether loading succeeds.

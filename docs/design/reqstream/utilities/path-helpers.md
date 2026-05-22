@@ -1,6 +1,6 @@
 ### PathHelpers Unit Design
 
-#### Overview
+#### Purpose
 
 `PathHelpers` is a static utility class that provides safe path combination guarded against
 path-traversal attacks. It wraps `Path.Combine` with a validation step that ensures the
@@ -10,7 +10,12 @@ or glob results) could escape to unintended locations.
 
 `PathHelpers` has no mutable state; all methods are `internal static`.
 
-#### Methods
+#### Data Model
+
+N/A — `PathHelpers` is a static class declared `internal static`. It has no mutable instance
+or class-level state; all state is local to individual `SafePathCombine` calls.
+
+#### Key Methods
 
 ##### `SafePathCombine(basePath, relativePath)`
 
@@ -28,6 +33,14 @@ The algorithm is:
 The method never permits traversal outside `basePath`. It throws `ArgumentNullException` for
 null inputs and `ArgumentException` for path-traversal attempts or invalid path formats.
 
+#### Error Handling
+
+- **`ArgumentNullException`** — thrown when `basePath` or `relativePath` is `null`.
+- **`ArgumentException`** — thrown when the resolved combined path escapes `basePath` (path
+  traversal attempt detected), or when either argument contains invalid path characters.
+
+No other exceptions are thrown; valid inputs always return a combined path string.
+
 #### Security Rationale
 
 `Path.Combine` on its own accepts relative components such as `../../etc/passwd` and absolute
@@ -36,3 +49,15 @@ and calling `Path.GetRelativePath`, `SafePathCombine` detects any escape attempt
 platform separator style or case-sensitivity. The CodeQL `cs/path-combine` rule is suppressed
 specifically for `PathHelpers.cs` because this is the one location where the raw `Path.Combine`
 call is validated and therefore safe to use.
+
+#### Dependencies
+
+N/A — `PathHelpers` depends only on .NET base class library path APIs (`System.IO.Path`,
+`System.IO.Directory`). It has no dependencies on other ReqStream units, OTS packages, or
+shared packages.
+
+#### Callers
+
+| Unit | Nature of interaction |
+| ---- | --------------------- |
+| `RequirementsLoader` | Calls `PathHelpers.SafePathCombine` to combine include-file directory paths with relative `includes` entries before recursing |

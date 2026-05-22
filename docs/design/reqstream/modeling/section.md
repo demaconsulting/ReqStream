@@ -1,6 +1,6 @@
 ### Section Unit Design
 
-#### Overview
+#### Purpose
 
 `Section` is the container node in the requirements tree. It groups a set of `Requirement`
 objects under a common title and optionally nests child `Section` objects to represent
@@ -10,7 +10,9 @@ validation logic resides in `RequirementsLoader`.
 `Requirements` extends `Section` to serve as the root of the tree, inheriting its container
 properties without adding additional state.
 
-#### Properties
+#### Data Model
+
+##### Properties
 
 | Property | Type | YAML key | Default | Notes |
 | -------- | ---- | -------- | ------- | ----- |
@@ -26,16 +28,26 @@ same-title merge strategy is the design decision that enables modular requiremen
 multiple YAML files can contribute requirements to the same logical section without requiring a
 single monolithic file.
 
+#### Key Methods
+
+N/A — `Section` is a data container with no methods. All merging logic resides in
+`RequirementsLoader`; all traversal and export logic resides in `Requirements.Export` and
+`TraceMatrix`.
+
 #### Error Handling
 
 Section contains no executable logic; all validation errors are produced by `RequirementsLoader`.
 
-#### Interactions with Other Units
+#### Interactions
+
+**Dependencies**: N/A — `Section` is a data container with no dependencies on other units, OTS items, or shared
+packages beyond the `Requirement` objects it holds in its list.
+
+**Callers**:
 
 | Unit | Nature of interaction |
 | ---- | --------------------- |
-| `RequirementsLoader` | Creates and merges `Section` objects during YAML DOM traversal |
-| `Requirement` | Held in the `Requirements` list |
-| `Requirements` | Extends `Section`; acts as the tree root |
-| `TraceMatrix` | Recursively visits sections to collect requirements |
-| `Requirements.Export` | Recursively visits sections to generate Markdown headings and tables |
+| `RequirementsLoader` | Creates `Section` objects and merges them into the shared requirements tree |
+| `Requirements` | Extends `Section` to serve as the tree root; inherits container properties |
+| `TraceMatrix` | Recursively visits `Sections` children to collect all requirements for analysis |
+| `Requirements.Export` | Recursively visits `Sections` children to generate Markdown headings and tables |

@@ -14,4 +14,6 @@ includes:
   - docs/reqstream/ots/weasyprint.yaml
   - docs/reqstream/ots/fileassert.yaml
   - docs/reqstream/ots/yamldotnet.yaml
-  - docs/reqstream/ots/testresults.yaml
+  - docs/reqstream/ots/microsoft-extensions-file-system-globbing.yaml
+  # Shared package requirements
+  - docs/reqstream/shared/dema-consulting-test-results.yaml

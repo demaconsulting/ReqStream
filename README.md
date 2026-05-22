@@ -25,6 +25,7 @@ validate and manage requirement documents in a structured and maintainable way.
 - 🧪 **Test Mapping** - Link requirements to test cases for traceability
 - 🎯 **Source-Specific Test Matching** - Restrict coverage evidence to named result files using `filepart@testname` syntax
 - 📦 **File Includes** - Modularize requirements across multiple YAML files
+- 🔄 **Circular Include Detection** - Automatically detects and reports circular include references in YAML files
 - ✅ **Validation** - Run a built-in self-test suite to qualify the tool in its deployment environment
 - 🔍 **Linting** - Validate requirements YAML structure and references, reporting all issues in one pass
 - 🏷️ **Tag Filtering** - Categorize and filter requirements using tags
@@ -483,35 +484,16 @@ reqstream --requirements "**/*.yaml" --justifications justifications.md --depth 
 This adjusts the header levels in the output, useful when embedding the reports in larger documentation
 structures.
 
-## Development
+## Building
 
-### Requirements
-
-- .NET SDK 8.0, 9.0, or 10.0
-- C# 12
-
-### Architecture
-
-For a comprehensive guide to the architecture and internal workings of ReqStream, see the
-[Architecture Documentation][architecture].
-
-### Building
-
-```bash
-dotnet build
+```pwsh
+pwsh ./build.ps1
 ```
 
-### Testing
+## User Guide
 
-```bash
-dotnet test
-```
-
-### Packaging
-
-```bash
-dotnet pack
-```
+The ReqStream User Guide is available on the
+[ReqStream releases page](https://github.com/demaconsulting/ReqStream/releases).
 
 ## Contributing
 
@@ -571,7 +553,6 @@ For information about reporting security vulnerabilities, please see our [Securi
 [nuget-shield]: https://img.shields.io/nuget/v/DemaConsulting.ReqStream
 [nuget-url]: https://www.nuget.org/packages/DemaConsulting.ReqStream
 [license]: https://github.com/demaconsulting/ReqStream/blob/main/LICENSE
-[architecture]: https://github.com/demaconsulting/ReqStream/blob/main/docs/design/introduction.md
 [contributing]: https://github.com/demaconsulting/ReqStream/blob/main/CONTRIBUTING.md
 [code-of-conduct]: https://github.com/demaconsulting/ReqStream/blob/main/CODE_OF_CONDUCT.md
 [security]: https://github.com/demaconsulting/ReqStream/blob/main/SECURITY.md

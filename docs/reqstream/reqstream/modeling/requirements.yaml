@@ -19,7 +19,6 @@ sections:
             tags:
               - requirements
             tests:
-              - Section_Load_SimpleRequirement_ParsesCorrectly
               - Requirements_Load_ComplexStructure_ParsesCorrectly
 
           - id: ReqStream-Requirements-Validation
@@ -30,11 +29,7 @@ sections:
             tags:
               - requirements
             tests:
-              - Section_Load_BlankSectionTitle_ReportsErrorWithFileLocation
-              - Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation
-              - Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation
-              - Requirements_Load_DuplicateRequirementId_ReportsError
-              - Requirements_Load_DuplicateRequirementId_ErrorIncludesFileLocation
+              - Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation
 
           - id: ReqStream-Requirements-YamlErrorReporting
             title: The tool shall report YAML deserialization errors with the filename and location.
@@ -54,7 +49,6 @@ sections:
             tags:
               - requirements
             tests:
-              - Section_Load_NestedSections_ParsesHierarchyCorrectly
               - Requirements_Export_NestedSections_CreatesHierarchy
 
           - id: ReqStream-Requirements-Includes
@@ -67,6 +61,18 @@ sections:
             tests:
               - Requirements_Load_WithIncludes_MergesFilesCorrectly
               - Requirements_Load_MultipleFiles_MergesAllFiles
+              - Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop
+
+          - id: ReqStream-Requirements-CircularInclude
+            title: >-
+              The tool shall detect and report circular include references in requirements files.
+            justification: |
+              Circular file include references (where file A includes B and B includes A) would
+              cause infinite loading loops. Detecting and reporting them prevents hangs and
+              provides users with a clear error message identifying the problematic file.
+            tags:
+              - requirements
+            tests:
               - Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop
 
           - id: ReqStream-Requirements-SectionMerging

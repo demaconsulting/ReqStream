@@ -109,6 +109,8 @@ sections:
               - cli
             tests:
               - Context_Create_WithRequirementsPattern_ExpandsGlobPattern
+            children:
+              - ReqStream-Utilities-GlobMatching
 
           - id: ReqStream-Command-TestGlobPatterns
             title: The tool shall support glob patterns for test result files.
@@ -119,6 +121,8 @@ sections:
               - cli
             tests:
               - Context_Create_WithTestsPattern_ExpandsGlobPattern
+            children:
+              - ReqStream-Utilities-GlobMatching
 
           - id: ReqStream-Command-Validate
             title: The tool shall accept a validate flag to trigger self-validation mode.

@@ -1,13 +1,13 @@
 ## Program Unit Design
 
-### Overview
+### Purpose
 
 `Program` is the entry point of the ReqStream executable. It owns the top-level execution flow,
 dispatches to the appropriate subsystem based on the parsed command-line options, and establishes the
 error-handling boundary for the entire process. All meaningful work is delegated to `Context`,
 `Validation`, `Requirements`, and `TraceMatrix`; `Program` itself contains no domain logic.
 
-### Properties
+### Data Model
 
 #### `Version`
 
@@ -18,8 +18,8 @@ Resolution order:
 
 | Priority | Source | API |
 | -------- | ------ | --- |
-| 1 | `AssemblyInformationalVersionAttribute` | `Assembly.GetExecutingAssembly()` |
-| 2 | `AssemblyName.Version` | `Assembly.GetExecutingAssembly().GetName().Version` |
+| 1 | `AssemblyInformationalVersionAttribute` | `typeof(Program).Assembly` |
+| 2 | `AssemblyName.Version` | `typeof(Program).Assembly.GetName().Version` |
 | 3 | Fallback literal | `"Unknown"` |
 
 The informational version (set by the build system) is preferred because it carries pre-release
@@ -27,7 +27,7 @@ labels and build metadata. If the attribute is absent or empty the numeric `Asse
 string is used. If neither is available the string `"Unknown"` is returned so that the property
 never throws and never returns `null`.
 
-### Methods
+### Key Methods
 
 #### `Main(args)`
 
@@ -109,11 +109,33 @@ requirement IDs and reports each one via `context.WriteError`.
 This method never throws; all failure signalling goes through `context.WriteError`, which sets the
 internal error flag and eventually produces a non-zero exit code.
 
-### Interactions with Other Units
+### Error Handling
 
-| Unit | Nature of interaction |
-| ---- | --------------------- |
-| `Context` | Created in `Main`; passed to all subsystems; owns output and exit code |
-| `Validation` | Called by `Run` when `--validate` is present |
-| `Requirements` | Constructed in `ProcessRequirements`; provides the requirement tree; also used for linting |
-| `TraceMatrix` | Constructed in `ProcessRequirements` when test files are present |
+`Program` handles errors at two levels:
+
+**Process-boundary level** (`Main`): `ArgumentException` and `InvalidOperationException` are
+caught and their messages written to `Console.Error`; the method returns exit code `1`. Any
+other exception is re-thrown so that the operating system or process supervisor captures the
+full stack trace.
+
+**Domain-error level** (`Run`, `ProcessRequirements`, `EnforceRequirementsCoverage`): errors
+detected during requirements loading, trace matrix construction, or coverage enforcement are
+reported via `context.WriteError` rather than thrown. This ensures all reports are generated
+before an error exit code is returned, and that the error message is human-readable rather than
+a raw exception message.
+
+No method in `Program` swallows exceptions silently; every error path either propagates the
+exception or routes a message through `context.WriteError`.
+
+### Interactions
+
+| Unit | Purpose |
+| ---- | ------- |
+| `Context` | Created in `Main`; provides parsed CLI options, output channels, and exit code |
+| `Validation` | Called by `Run` when `--validate` is set to execute the self-validation suite |
+| `Requirements` | Loaded in `ProcessRequirements` to build the requirement tree; also loaded for linting |
+| `TraceMatrix` | Constructed in `ProcessRequirements` when `--tests` files are provided |
+
+`Program.Main` is the process entry point and is not called by any other unit in the normal
+execution path. `Validation` invokes `Program.Run` internally when exercising the full pipeline
+during self-validation tests.

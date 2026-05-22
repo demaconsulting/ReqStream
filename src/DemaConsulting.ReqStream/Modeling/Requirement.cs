@@ -23,6 +23,27 @@ namespace DemaConsulting.ReqStream.Modeling;
 /// <summary>
 ///     Represents a single requirement with its metadata.
 /// </summary>
+/// <remarks>
+///     <para>
+///         <b>Why mutable DTO:</b> YAML deserialization via <see cref="RequirementsLoader"/>
+///         requires mutable properties; <c>RequirementsLoader</c> builds objects incrementally
+///         during DOM traversal, setting fields as they are encountered in the YAML node tree.
+///     </para>
+///     <para>
+///         <b>Validation delegation:</b> All validation (blank <c>Id</c>, blank <c>Title</c>,
+///         duplicate <c>Id</c>, non-scalar list entries) is delegated entirely to
+///         <see cref="RequirementsLoader"/>. <c>Requirement</c> itself never throws.
+///     </para>
+///     <para>
+///         <b>Thread safety:</b> Not thread-safe. No concurrent access is expected; loading is
+///         single-threaded and completes before the model is consumed by callers.
+///     </para>
+///     <para>
+///         <b>List initialization:</b> All list properties (<see cref="Tests"/>,
+///         <see cref="Children"/>, <see cref="Tags"/>) are always initialized to empty
+///         <see cref="List{T}"/> instances; callers can iterate without null checks.
+///     </para>
+/// </remarks>
 public class Requirement
 {
     /// <summary>
@@ -42,16 +63,19 @@ public class Requirement
 
     /// <summary>
     ///     Gets the list of test identifiers associated with this requirement.
+    ///     Always initialized; never <c>null</c>.
     /// </summary>
     public List<string> Tests { get; } = [];
 
     /// <summary>
     ///     Gets the list of child requirement identifiers.
+    ///     Always initialized; never <c>null</c>.
     /// </summary>
     public List<string> Children { get; } = [];
 
     /// <summary>
     ///     Gets the list of tags associated with this requirement.
+    ///     Always initialized; never <c>null</c>.
     /// </summary>
     public List<string> Tags { get; } = [];
 

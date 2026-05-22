@@ -14,6 +14,10 @@ Perform software development tasks by determining and applying appropriate stand
 2. **Read relevant standards** using the selection matrix in AGENTS.md
 3. **Pre-flight verification** before making any changes:
    - List files that will be created, modified, or deleted
+   - For each file to be **created**, check whether a counterpart exists in the
+     template (URL in the `# Reference Template` section of `AGENTS.md`).
+     If one exists, fetch it as the starting point; adjust placeholder names and heading
+     depth to match the target path before writing the file
    - For each modified file, identify which companion artifacts need updating
      (requirements, design docs, tests, review-sets)
    - Include companion artifact updates in the work plan

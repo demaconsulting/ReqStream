@@ -22,4 +22,5 @@ Test evidence names (test methods written to the TRX file by `dotnet versionmark
 
 | Requirement ID | Test Method(s) |
 | --- | --- |
-| `ReqStream-OTS-VersionMark` | `VersionMark_CapturesVersions`, `VersionMark_GeneratesMarkdownReport` |
+| `ReqStream-OTS-VersionMark` | `VersionMark_CapturesVersions` |
+| `ReqStream-OTS-VersionMark` | `VersionMark_GeneratesMarkdownReport` |

@@ -9,6 +9,87 @@ each describe one component in isolation, this chapter focuses on the end-to-end
 coordination points between units, and the integrated scenarios that the units collectively
 enable.
 
+## Architecture
+
+The ReqStream system is a single executable (.NET tool package) organized into the following
+software items:
+
+| Item | Type | Responsibility |
+| ---- | ---- | -------------- |
+| `Program` | Unit | Entry point and top-level dispatch orchestrator |
+| `Cli` | Subsystem | Command-line argument parsing and I/O ownership |
+| `Context` | Unit | Argument parser, output channels, and exit code |
+| `Utilities` | Subsystem | Shared low-level file-system helpers |
+| `GlobMatcher` | Unit | Glob pattern expansion to file paths |
+| `PathHelpers` | Unit | Path combination with traversal protection |
+| `Modeling` | Subsystem | YAML requirements data model and parsing |
+| `LintIssue` | Unit | Lint issue severity and data model |
+| `LoadResult` | Unit | Combined load outcome (tree and issues) |
+| `Requirement` | Unit | Single requirement data-transfer object |
+| `Requirements` | Unit | Requirements tree root and export entry point |
+| `RequirementsLoader` | Unit | YAML deserializer and lint validator |
+| `Section` | Unit | Named requirements group and tree node |
+| `Tracing` | Subsystem | Test result loading and requirement traceability |
+| `TraceMatrix` | Unit | Test result loader, mapper, and coverage enforcer |
+| `SelfTest` | Subsystem | Built-in self-validation framework |
+| `Validation` | Unit | Self-validation test runner |
+
+The collaboration model is strictly hierarchical: `Program` is the only unit that calls into
+multiple subsystems; subsystems do not call other subsystems directly. The `Context` object is
+the single shared state carrier passed from `Program` to the units that need to produce output.
+See the subsystem and unit design chapters for individual collaboration details.
+
+## External Interfaces
+
+| Interface | Direction | Format | Constraints |
+| --------- | --------- | ------ | ----------- |
+| Command-line arguments | Input | Space-separated flag/value pairs | Defined flag set only; unknown flags cause `ArgumentException` |
+| Standard output (stdout) | Output | Plain text lines via `Context.WriteLine` | Suppressed when `--silent` is active |
+| Standard error (stderr) | Output | Plain text error lines via `Context.WriteError` | Suppressed when `--silent` is active; triggers exit code `1` |
+| YAML requirements files | Input | YAML mapping nodes per the ReqStream requirements schema | Validated by `RequirementsLoader`; parse errors returned as `LintIssue` objects |
+| Test result files | Input | TRX (MSTest) or JUnit XML | Auto-detected by `DemaConsulting.TestResults.IO.Serializer`; fatal error reported if a file is missing or cannot be parsed |
+| Requirements report file | Output | Markdown | Path from `--report`; written by `Requirements.Export` |
+| Justifications report file | Output | Markdown | Path from `--justifications`; written by `Requirements.ExportJustifications` |
+| Trace matrix report file | Output | Markdown | Path from `--matrix`; written by `TraceMatrix.Export` |
+| Log file | Output | Plain text (same as stdout) | Path from `--log`; written by Context log writer; optional |
+| Validation results file | Output | TRX or JUnit XML | Path from `--results`; written by `Validation.WriteResultsFile` |
+| Process exit code | Output | Integer (0 or 1) | `0` = success; `1` = any error reported via `Context.WriteError` |
+
+## Dependencies
+
+The ReqStream system depends on the following external software items. Detailed integration and
+usage design for each is in the OTS and Shared Package design chapters.
+
+| Item | Type | Purpose |
+| ---- | ---- | ------- |
+| `YamlDotNet` | OTS | YAML parsing via the RepresentationModel DOM API in `RequirementsLoader` |
+| `Microsoft.Extensions.FileSystemGlobbing` | OTS | Glob pattern matching used by `GlobMatcher.FindMatchingFiles` |
+| `DemaConsulting.TestResults` | Shared Package | Test result deserialization (TRX, JUnit) in `TraceMatrix` and `Validation` |
+
+## Risk Control Measures
+
+The following segregation measures are implemented to satisfy IEC 62304 §5.3.3 software system
+design requirements:
+
+- **Error isolation at process boundary** — `Program.Main` catches `ArgumentException` and
+  `InvalidOperationException`, preventing unhandled exceptions from reaching the operating system
+  in normal error conditions. Unexpected exceptions are re-thrown to preserve the full stack trace
+  for diagnosis.
+- **No shared mutable state across subsystems** — each subsystem receives only the data it needs.
+  `Context` is the sole shared state carrier; subsystem units do not hold direct references to
+  each other.
+- **Output channel separation** — normal output uses `Context.WriteLine` (stdout); errors use
+  `Context.WriteError` (stderr). The two channels are never mixed, enabling downstream tooling
+  to detect failures by reading stderr or the exit code without parsing stdout.
+- **Path traversal prevention** — `PathHelpers.SafePathCombine` validates all relative path
+  combinations against the base directory before use, preventing `includes` directives in YAML
+  files from escaping the file-system boundary.
+- **Include loop guard** — `RequirementsLoader` tracks visited file paths in a `HashSet`,
+  preventing infinite recursion on circular `includes` graphs.
+- **Acyclic child-requirement graph** — `RequirementsLoader.ValidateCycles` confirms the
+  child-requirement graph is acyclic before downstream analysis; `TraceMatrix.CollectAllTests`
+  can therefore recurse without a cycle guard. This satisfies `ReqStream-System-CyclicChildDetection`.
+
 ## System Data Flow
 
 The following table shows the direction of data between units during a standard requirements
@@ -31,6 +112,10 @@ processing invocation:
 The following sequence describes the full pipeline executed during a normal (non-version, non-help,
 non-validate, non-lint) invocation:
 
+> **Note**: `--version` prints the version string and exits immediately, before any pipeline steps.
+> `--help` prints usage information and exits immediately. Both flags take precedence over all other
+> flags and no file system access occurs.
+
 1. **Argument parsing** — `Context.Create(args)` parses all CLI flags and expands any glob
    patterns in `--requirements` and `--tests` arguments.
 2. **Requirements loading** — `Requirements.Load(context.RequirementsFiles)` reads and merges all
@@ -42,7 +127,9 @@ non-validate, non-lint) invocation:
    test result file (TRX or JUnit), applies source-specific matching rules, and maps each test
    result to the requirements that reference it.
 5. **Trace matrix export** — if `--matrix` is set and a `TraceMatrix` was constructed, the trace
-   matrix report is exported.
+   matrix report is exported. If `--matrix` is set but no `TraceMatrix` was constructed (i.e., no
+   `--tests` files were provided), an error is reported: "No test files provided. Cannot generate
+   trace matrix."
 6. **Enforcement** — if `--enforce` is set and a `TraceMatrix` was constructed,
    `EnforceRequirementsCoverage` compares the satisfied-requirement count against the total count.
    Any unsatisfied requirement causes an error to be written to `context`, which results in a
@@ -121,7 +208,6 @@ processing invocation, tracing them from origin to the process exit code:
 
 | Source | Data | Destination |
 | ------ | ---- | ----------- |
-| CLI arguments | Parsed flags and file paths | `Context` |
 | YAML files | Requirements content | `Requirements.Load` |
 | Test result files | Test execution records | `TraceMatrix` |
 | `Context` | Expanded file lists and flags | `Requirements.Load` |
@@ -130,6 +216,8 @@ processing invocation, tracing them from origin to the process exit code:
 | `Requirements.Load` + `result.ReportIssues` | Lint warnings/errors | `context.WriteError` → `Context.ExitCode` |
 | `TraceMatrix` | Coverage analysis | Markdown reports |
 | `Program.EnforceRequirementsCoverage` | Unsatisfied requirements | `context.WriteError` → `Context.ExitCode` |
+| `Program.ProcessRequirements` | Error when `--matrix` requested without `--tests` | `context.WriteError` → `Context.ExitCode` |
+| `TraceMatrix` constructor | Fatal error when a test result file is missing or cannot be parsed | `context.WriteError` → `Context.ExitCode` |
 
 ## Platform Support
 
@@ -139,6 +227,23 @@ ship as portable NuGet packages and no platform-specific APIs are used anywhere 
 the resulting binaries run without modification on Windows, Linux, and macOS. The GitHub Actions
 CI matrix executes the full test suite on all three operating systems and all three .NET versions
 on every build, providing continuous evidence that the platform requirements are satisfied.
+
+## Design Constraints
+
+The following constraints govern the design of the ReqStream system:
+
+- **Platform portability** — no platform-specific APIs are used. All runtime dependencies ship as
+  portable NuGet packages. The tool must function identically on Windows, Linux, and macOS.
+- **Multi-framework targeting** — the project targets `net8.0`, `net9.0`, and `net10.0`.
+  All language and library features used must be available on all three target frameworks.
+- **Nullable reference types enabled** — the compiler is configured with `<Nullable>enable</Nullable>`.
+  All APIs must handle null inputs explicitly; no null-reference exceptions are permitted at runtime.
+- **Zero compiler warnings** — the project uses `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>`.
+  All code must compile without warnings on all three target frameworks.
+- **No interactive prompts** — ReqStream is designed for CI/CD use. The tool must never block
+  waiting for user input; all required information must be supplied on the command line.
+- **Stateless between invocations** — the tool holds no persistent state between runs. Each
+  invocation is independent and idempotent given the same inputs and file system state.
 
 ## Design Decisions
 

@@ -14,14 +14,18 @@
 
 $ErrorActionPreference = 'Stop'
 
+Write-Host "Restoring dependencies..."
+dotnet restore
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
 Write-Host "Building project..."
-dotnet build --configuration Release
+dotnet build --no-restore --configuration Release
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 # [PROJECT-SPECIFIC] Add additional build steps here.
 
 Write-Host "Running unit tests..."
-dotnet test --configuration Release
+dotnet test --no-build --configuration Release --logger trx --results-directory artifacts/tests
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 # [PROJECT-SPECIFIC] Add additional test or post-build steps here.

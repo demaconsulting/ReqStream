@@ -1,6 +1,6 @@
 ### Context Unit Design
 
-#### Overview
+#### Purpose
 
 `Context` is the command-line argument parser and I/O owner for ReqStream. It is the single
 authoritative source for all runtime options and is the only unit permitted to write to the console
@@ -10,12 +10,14 @@ sole concerns are parsing arguments and surfacing results to the caller.
 `Context` implements `IDisposable` so that the log-file `StreamWriter` is closed deterministically
 when the enclosing `using` block in `Program.Main` exits.
 
-#### Private State
+#### Data Model
+
+##### Private State
 
 - **`_logWriter`** (`StreamWriter?`, `--log`) — Open writer for the optional log file; `null` when no log file was requested.
 - **`_hasErrors`** (`bool`) — Accumulates error state; initially `false`; set to `true` by `WriteError`.
 
-#### Properties
+##### Properties
 
 | Property | Type | CLI flag | Notes |
 | -------- | ---- | -------- | ----- |
@@ -38,7 +40,7 @@ when the enclosing `using` block in `Program.Main` exits.
 | `JustificationsDepth` | `int` | `--justifications-depth` | Justifications report heading depth; defaults to `Depth` |
 | `ExitCode` | `int` | — | Computed: `_hasErrors ? 1 : 0` |
 
-#### Methods
+#### Key Methods
 
 ##### `Create(args)`
 
@@ -53,7 +55,7 @@ rather than an unhandled exception.
 arguments merge into the same set. `--requirements` and `--tests` values are passed to
 `GlobMatcher.FindMatchingFiles` and the resulting absolute paths are appended to the respective
 file lists. If `--log` is specified, the named
-file is opened for writing and assigned to `_logWriter` before the method returns. If the log file
+file is opened for writing with `AutoFlush = true` and assigned to `_logWriter` before the method returns. The `AutoFlush = true` setting ensures that all output is flushed to disk immediately on each write, preventing log truncation if the process exits unexpectedly before `Dispose` is called. If the log file
 cannot be opened (for example, due to an invalid path or insufficient permissions), `Create` catches
 the underlying I/O exception, wraps it in an `ArgumentException`, and rethrows it so the caller
 receives a user-actionable error message rather than an unhandled exception.
@@ -88,13 +90,29 @@ log file is open.
 ensures the log file is not truncated and file handles are not leaked even when the process exits
 via an early return path.
 
-#### Interactions with Other Units
+#### Error Handling
+
+`Context.Create` throws `ArgumentNullException` when `args` is `null`.
+
+`Context.Create` throws `ArgumentException` under the following conditions:
+
+- **Unknown argument** — An unrecognized flag is present in `args`.
+- **Missing argument value** — A flag that requires a value is the last argument (no value follows).
+- **Invalid depth value** — A `--depth`, `--report-depth`, `--matrix-depth`,
+  or `--justifications-depth` value is not a positive integer.
+- **Log file open failure** — The file path provided to `--log` cannot be opened for writing.
+
+All other `Context` methods (`WriteLine`, `WriteError`, `Dispose`) do not throw; they handle
+internal failure cases silently (for example, `Dispose` sets `_logWriter` to `null` after
+closing it, preventing double-disposal errors).
+
+#### Interactions
 
 | Unit | Nature of interaction |
 | ---- | --------------------- |
+| `GlobMatcher` | Called by `Create` to expand `--requirements` and `--tests` glob patterns into absolute file path lists |
 | `Program` | Creates `Context` via `Create`; calls `WriteLine` and `WriteError`; reads `ExitCode` |
-| `Validation` | Calls `context.WriteLine`, `context.WriteError`, reads `ResultsFile`, `Silent` |
-| `LoadResult` | Calls `context.WriteError` via `ReportIssues` to report linting issues |
-| `Requirements` | Receives `RequirementsFiles`; does not hold a reference to `Context` |
-| `TraceMatrix` | Receives `TestFiles`; does not hold a reference to `Context` |
-| `GlobMatcher` | Called by `Create` to expand `--requirements` and `--tests` glob patterns to file paths |
+| `Validation` | Calls `context.WriteLine`, `context.WriteError`; reads `ResultsFile` and `Silent` |
+| `LoadResult` | Calls `context.WriteError` via `ReportIssues` to route lint issues |
+| `Requirements` | Receives `RequirementsFiles` from context; does not hold a reference to `Context` |
+| `TraceMatrix` | Receives `TestFiles` from context; does not hold a reference to `Context` |

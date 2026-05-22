@@ -1,0 +1,28 @@
+---
+# DemaConsulting.TestResults Shared Package Requirements
+#
+# Requirements for the DemaConsulting.TestResults test result reading library.
+
+sections:
+  - title: Shared Package Requirements
+    sections:
+      - title: DemaConsulting.TestResults Requirements
+        requirements:
+          - id: ReqStream-Shared-TestResults-Trx
+            title: DemaConsulting.TestResults shall read TRX test result files.
+            justification: |
+              DemaConsulting.TestResults is the library used to read test result files in TRX
+              (MSTest) and JUnit XML formats. It must correctly parse test execution records
+              so that ReqStream can map test results to requirements for coverage analysis.
+            tags: [shared]
+            tests:
+              - TraceMatrix_Constructor_WithTrxFile_ParsesCorrectly
+          - id: ReqStream-Shared-TestResults-JUnit
+            title: DemaConsulting.TestResults shall read JUnit XML test result files.
+            justification: |
+              DemaConsulting.TestResults is the library used to read test result files in TRX
+              (MSTest) and JUnit XML formats. It must correctly parse test execution records
+              so that ReqStream can map test results to requirements for coverage analysis.
+            tags: [shared]
+            tests:
+              - TraceMatrix_Constructor_WithJUnitFile_ParsesCorrectly

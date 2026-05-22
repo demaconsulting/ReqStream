@@ -1,13 +1,15 @@
 ### TraceMatrix Unit Design
 
-#### Overview
+#### Purpose
 
 `TraceMatrix` maps test execution results to requirements and calculates requirement-coverage
 metrics. It consumes an already-validated `Requirements` tree and a list of test-result file paths,
 then provides lookup and satisfaction-analysis methods used by `Program` to generate reports and
 enforce coverage.
 
-#### Supporting Value Types
+#### Data Model
+
+##### Supporting Value Types
 
 ##### `TestMetrics`
 
@@ -35,7 +37,7 @@ result file.
 | `Name` | `string` | Test name as it appears in the result file |
 | `Metrics` | `TestMetrics` | Aggregated pass/fail counts for this test in this file |
 
-#### Private State
+##### Private State
 
 | Field | Type | Purpose |
 | ----- | ---- | ------- |
@@ -59,7 +61,7 @@ construction, `_testExecutions` contains every unique test name seen, each mappe
 in an `InvalidOperationException` that includes `filePath` — this ensures the caller can identify
 the offending file without inspecting nested exception detail.
 
-#### Methods
+#### Key Methods
 
 ##### `GetTestResult(testName)`
 
@@ -155,6 +157,22 @@ while the Summary reflects full-subtree satisfaction.
   not appear in the Testing table. Defaults to `null`.
 - `rootSection`: `_requirements` is used internally as the root to iterate the requirement tree.
 
+#### Error Handling
+
+`TraceMatrix` reports errors at the constructor boundary and propagates them to `Program`:
+
+- **`FileNotFoundException`** — thrown by `ProcessTestResultFile` when a path in
+  `testResultFiles` does not exist. The exception message includes the offending file path.
+- **`InvalidOperationException`** — thrown by `ProcessTestResultFile` when a file cannot be
+  parsed (malformed TRX or JUnit XML). The message includes the offending file path; the
+  original parse exception is available as the inner exception.
+
+All query methods (`GetTestResult`, `GetAllTestResults`, `CalculateSatisfiedRequirements`,
+`GetUnsatisfiedRequirements`, `Export`) are read-only and do not throw for missing test names
+or empty requirement trees; they return empty collections or zero counts in those cases.
+`Export` throws `ArgumentException` when `filePath` is null or empty, and propagates
+`IOException` or `UnauthorizedAccessException` from file-write operations without wrapping.
+
 #### Test Name Format Summary
 
 | Format | Example | Matching rule |
@@ -162,8 +180,12 @@ while the Summary reflects full-subtree satisfaction.
 | Plain | `TestFeature_Valid_Passes` | Aggregates across all result files |
 | Source-specific | `ubuntu@TestFeature_Valid_Passes` | Restricted to files whose base name contains `ubuntu` |
 
-#### Interactions with Other Units
+#### Interactions
 
-- **`Program`** — Constructs `TraceMatrix`; calls `CalculateSatisfiedRequirements`, `GetUnsatisfiedRequirements`, and `Export`.
-- **`Requirements`** — Provides the requirement tree; iterated during analysis.
-- **`Validation`** — Exercises `TraceMatrix` with fixture test-result files in validation tests.
+| Unit | Role |
+| ---- | ---- |
+| `Requirements` | Used by `TraceMatrix`; provides the validated requirement tree iterated during construction and analysis |
+| `DemaConsulting.TestResults` | Used by `TraceMatrix`; provides `TestResults`, `TestResult`, and `TestOutcome` model types used for deserialization |
+| `DemaConsulting.TestResults.IO.Serializer` | Used by `TraceMatrix`; auto-detects and deserializes TRX and JUnit XML test result files |
+| `Program` | Calls `TraceMatrix`; constructs `TraceMatrix` and calls `CalculateSatisfiedRequirements`, `GetUnsatisfiedRequirements`, and `Export` |
+| `Validation` | Calls `TraceMatrix`; exercises `TraceMatrix` construction with fixture test-result files in self-validation tests |

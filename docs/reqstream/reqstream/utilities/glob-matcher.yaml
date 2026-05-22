@@ -1,0 +1,86 @@
+---
+# GlobMatcher Unit Requirements
+#
+# PURPOSE:
+# - Define requirements for the GlobMatcher unit (GlobMatcher.cs)
+# - GlobMatcher resolves glob patterns to lists of matching absolute file paths
+# - Unit requirements describe the pattern-matching, path resolution, and result-set behavior
+
+sections:
+  - title: GlobMatcher Unit Requirements
+    requirements:
+      - id: ReqStream-GlobMatcher-RelativePatterns
+        title: >-
+          GlobMatcher shall match files using relative patterns resolved against the current
+          working directory.
+        justification: |
+          Resolving relative patterns against the current working directory follows the standard
+          convention for command-line tools, allowing users to specify patterns such as
+          "docs/**/*.yaml" without supplying an absolute base path. This enables concise
+          invocations in CI/CD pipeline scripts.
+        tags:
+          - utilities
+        tests:
+          - GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles
+
+      - id: ReqStream-GlobMatcher-AbsolutePatterns
+        title: >-
+          GlobMatcher shall match files using absolute patterns, splitting each pattern at the
+          last directory separator before the first wildcard character to obtain the root
+          directory and the relative sub-pattern.
+        justification: |
+          Absolute pattern support allows callers to supply fully-qualified paths with wildcards
+          (e.g. "/output/**/*.trx") without requiring the caller to manipulate the current
+          working directory. Splitting at the last separator before the first wildcard character
+          correctly integrates with Microsoft.Extensions.FileSystemGlobbing, which requires a
+          root directory and a relative pattern as separate inputs.
+        tags:
+          - utilities
+        tests:
+          - GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles
+          - GlobMatcher_FindMatchingFiles_AbsolutePatternWithDoubleWildcard_MatchesFilesInSubdirectories
+          - GlobMatcher_FindMatchingFiles_AbsoluteLiteralPath_MatchesSingleFile
+          - GlobMatcher_SplitAbsolutePattern_WildcardAtTopLevel_SplitsAtRoot
+          - GlobMatcher_SplitAbsolutePattern_LiteralPath_SplitsAtLastSeparator
+          - GlobMatcher_SplitAbsolutePattern_DoubleStarWildcard_SplitsBeforeWildcard
+
+      - id: ReqStream-GlobMatcher-Deduplication
+        title: >-
+          GlobMatcher shall deduplicate results so that each matching file path appears at most
+          once, regardless of how many patterns matched it.
+        justification: |
+          Deduplication prevents a file matched by multiple overlapping patterns from being
+          processed more than once, which would cause duplicate requirements loading or
+          duplicate test result counting and incorrect coverage calculations.
+        tags:
+          - utilities
+        tests:
+          - GlobMatcher_FindMatchingFiles_MultiplePatterns_DeduplicatesResults
+          - GlobMatcher_FindMatchingFiles_MultiplePatterns_CombinesFromDifferentSources
+
+      - id: ReqStream-GlobMatcher-AbsolutePaths
+        title: >-
+          GlobMatcher shall return absolute file paths regardless of whether the input pattern
+          is relative or absolute.
+        justification: |
+          Returning absolute paths allows callers to open files without further path resolution,
+          eliminating a class of working-directory-dependent path-handling errors in callers
+          such as Context and RequirementsLoader.
+        tags:
+          - utilities
+        tests:
+          - GlobMatcher_FindMatchingFiles_ReturnsAbsolutePaths
+
+      - id: ReqStream-GlobMatcher-EmptyResult
+        title: >-
+          GlobMatcher shall return an empty list when no files match the supplied patterns,
+          without raising an exception.
+        justification: |
+          Returning an empty list rather than throwing when no files match leaves the caller
+          responsible for deciding whether zero results is an error condition, which is
+          context-dependent. This avoids forced exception handling in callers that accept
+          optional or conditional file lists.
+        tags:
+          - utilities
+        tests:
+          - GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty

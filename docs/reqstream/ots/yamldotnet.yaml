@@ -9,7 +9,8 @@ sections:
       - title: YamlDotNet Requirements
         requirements:
           - id: ReqStream-OTS-YamlDotNet
-            title: YamlDotNet shall parse YAML requirements files into a structured data model.
+            title: YamlDotNet shall parse YAML requirements files into a structured data model and report parse errors with
+              file location information.
             justification: |
               YamlDotNet is the YAML parsing library used to deserialize requirements files.
               It must correctly parse well-formed YAML and report deserialization errors with

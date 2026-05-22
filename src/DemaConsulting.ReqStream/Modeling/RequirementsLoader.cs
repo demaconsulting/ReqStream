@@ -28,6 +28,11 @@ namespace DemaConsulting.ReqStream.Modeling;
 ///     Loads requirements from YAML files using a single DOM tree walk that simultaneously
 ///     builds the requirements model and collects lint issues.
 /// </summary>
+/// <remarks>
+///     Internal static class that is the sole reader of YAML from disk for requirements data.
+///     Isolated behind <see cref="Requirements.Load"/>. Not thread-safe; designed for
+///     single-threaded, single-pass loading.
+/// </remarks>
 internal static class RequirementsLoader
 {
     /// <summary>
@@ -65,6 +70,13 @@ internal static class RequirementsLoader
     ///     describing all issues found.
     /// </returns>
     /// <exception cref="ArgumentException">Thrown when no paths are provided.</exception>
+    /// <remarks>
+    ///     Initializes all shared state for one load session (requirements tree, seenIds,
+    ///     allRequirements, visitedFiles, activeFiles). Delegates file loading to
+    ///     <see cref="LoadFile"/> and cycle detection to <see cref="ValidateCycles"/>.
+    ///     Returns null <see cref="Requirements"/> when any error-level issue is found,
+    ///     allowing callers to detect failure without exception handling.
+    /// </remarks>
     internal static LoadResult Load(string[] paths)
     {
         if (paths == null || paths.Length == 0)
@@ -84,10 +96,13 @@ internal static class RequirementsLoader
         // visitedFiles prevents re-processing the same file via include loops
         var visitedFiles = new HashSet<string>(StringComparer.Ordinal);
 
+        // activeFiles tracks the current include call stack to detect circular includes
+        var activeFiles = new HashSet<string>(StringComparer.Ordinal);
+
         // Walk each file, building the model and collecting issues
         foreach (var path in paths)
         {
-            LoadFile(requirements, issues, path, seenIds, allRequirements, visitedFiles);
+            LoadFile(requirements, issues, path, seenIds, allRequirements, visitedFiles, activeFiles);
         }
 
         // Validate cycle-free requirement references on a best-effort basis, even if other errors exist
@@ -111,13 +126,21 @@ internal static class RequirementsLoader
     /// <param name="seenIds">Dictionary of requirement IDs already seen and the file they came from.</param>
     /// <param name="allRequirements">Dictionary of all built requirement objects, keyed by ID.</param>
     /// <param name="visitedFiles">Set of fully-resolved file paths already processed.</param>
+    /// <param name="activeFiles">Set of fully-resolved file paths in the current include call stack.</param>
+    /// <remarks>
+    ///     Handles file-not-found and I/O errors by recording them as <see cref="LintIssue"/> objects
+    ///     and returning — never throws for domain errors. Uses <c>activeFiles</c> to detect circular
+    ///     file includes before following include directives. Uses <c>visitedFiles</c> to skip files
+    ///     already processed (handles diamond-include patterns without re-processing).
+    /// </remarks>
     private static void LoadFile(
         Requirements requirements,
         List<LintIssue> issues,
         string path,
         Dictionary<string, string> seenIds,
         Dictionary<string, Requirement> allRequirements,
-        HashSet<string> visitedFiles)
+        HashSet<string> visitedFiles,
+        HashSet<string> activeFiles)
     {
         // Resolve to full path to detect duplicate includes
         string fullPath;
@@ -131,7 +154,14 @@ internal static class RequirementsLoader
             return;
         }
 
-        // Skip already-visited files (prevents infinite loops on cyclic includes)
+        // Detect circular includes: if this file is already in the active call stack, report it
+        if (activeFiles.Contains(fullPath))
+        {
+            issues.Add(new LintIssue(path, LintSeverity.Error, $"Circular include detected: '{path}' is already being loaded"));
+            return;
+        }
+
+        // Skip already-visited files (prevents re-processing the same file when included multiple times)
         if (!visitedFiles.Add(fullPath))
         {
             return;
@@ -197,6 +227,9 @@ internal static class RequirementsLoader
         // Walk the document, building model objects and collecting issues
         LoadDocument(requirements, issues, path, root, seenIds, allRequirements);
 
+        // Track this file as active during recursive include processing
+        activeFiles.Add(fullPath);
+
         // Follow include directives recursively
         var baseDirectory = Path.GetDirectoryName(fullPath) ?? string.Empty;
         var includes = GetValidatedStringList(
@@ -217,8 +250,11 @@ internal static class RequirementsLoader
                 continue;
             }
 
-            LoadFile(requirements, issues, includePath, seenIds, allRequirements, visitedFiles);
+            LoadFile(requirements, issues, includePath, seenIds, allRequirements, visitedFiles, activeFiles);
         }
+
+        // Remove from active set after this file's includes are fully processed
+        activeFiles.Remove(fullPath);
     }
 
     /// <summary>
@@ -681,6 +717,11 @@ internal static class RequirementsLoader
     /// </summary>
     /// <param name="allRequirements">All built requirements, keyed by ID.</param>
     /// <param name="issues">The list to add lint issues to.</param>
+    /// <remarks>
+    ///     Called once after all files are loaded. Skipped entirely when no requirements were
+    ///     loaded. Uses a three-set DFS (visiting/currentPath/visited) that is safe to call
+    ///     multiple times from the outer loop.
+    /// </remarks>
     private static void ValidateCycles(
         Dictionary<string, Requirement> allRequirements,
         List<LintIssue> issues)
@@ -704,6 +745,12 @@ internal static class RequirementsLoader
     /// <param name="visiting">IDs currently on the active DFS stack.</param>
     /// <param name="currentPath">Ordered list of IDs on the active DFS path (for cycle reporting).</param>
     /// <param name="visited">IDs already fully processed.</param>
+    /// <remarks>
+    ///     Standard DFS cycle-detection algorithm. A hit in <c>visiting</c> indicates a back-edge
+    ///     (cycle). The <c>currentPath</c> list reconstructs the human-readable cycle path for the
+    ///     error message. After processing all children, the ID moves from <c>visiting</c> to
+    ///     <c>visited</c> to prevent redundant traversal.
+    /// </remarks>
     private static void ValidateCyclesFrom(
         string reqId,
         Dictionary<string, Requirement> allRequirements,

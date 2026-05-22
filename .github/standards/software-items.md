@@ -11,12 +11,14 @@ requirements management approach, testing strategy, and review scope.
 
 # Software Item Categories
 
-Categorize all software into five primary groups:
+Categorize all software into six primary groups:
 
 - **Software Package**: Distributable unit delivered to end users or dependent
   systems, containing one software system with all its components. All software
-  systems are delivered as a software package. When consumed by another system,
-  our software package is treated as an OTS Software Item by that system.
+  systems are delivered as a software package. When consumed by a system outside
+  the producing program, our software package is treated as an OTS Software Item
+  by that system. When consumed by another repository within the same program,
+  it is treated as a Shared Package.
 - **Software System**: Complete deliverable product including all components
   and external interfaces, contained within a software package
 - **Software Subsystem**: Major architectural component with well-defined
@@ -24,7 +26,11 @@ Categorize all software into five primary groups:
 - **Software Unit**: Individual class, function, or tightly coupled set of
   functions that can be tested in isolation
 - **OTS Software Item**: Third-party component (library, framework, tool, or
-  published software package) providing functionality not developed in-house
+  published software package) providing functionality not developed within the program
+- **Shared Package**: A software package produced by a different repository within
+  the same program, consumed as a dependency. Referenced by its advertised features
+  rather than internal design; traceability to program-level requirements runs
+  through the top-level project.
 
 **Naming**: When names collide in hierarchy, add descriptive suffix to higher-level entity:
 
@@ -75,20 +81,38 @@ Choose the appropriate category based on scope and testability:
 
 ## OTS Software Item
 
-- External dependency not developed in-house - typically a third-party published
+- External dependency from outside the program - typically a third-party published
   software package (NuGet, npm, etc.), hosted service, or tool
-- Our own published software package becomes an OTS item to any system that
-  consumes it
+- A package produced by an unrelated program (inside or outside the organization)
+  is treated as OTS by any consuming system
 - Tested through integration tests proving required functionality works
 - Examples: System.Text.Json, Entity Framework, third-party APIs
-- **Artifact locations** (OTS items have no design documentation):
+- **Artifact locations** (OTS items have no internal design documentation):
   - Requirements: `docs/reqstream/ots/{ots-name}.yaml`
+  - Design: `docs/design/ots/{ots-name}.md` (integration/usage design - how the local system uses this item)
   - Verification: `docs/verification/ots/{ots-name}.md`
   - These folders sit parallel to system folders (not inside any system folder)
 - System design documentation records which OTS items each system depends on
 - **OTS test project**: If no other verification evidence is available (e.g., vendor test results,
-  published compliance reports), a dedicated test project (`OtsSoftwareTests` / `ots_software_tests`,
-  cased per language) holds OTS integration tests - one test file per OTS item requiring tests.
+  published compliance reports), a dedicated test project holds OTS integration tests - one test
+  file per OTS item requiring tests. OTS items are repo-level (not per-system), so the project
+  uses a fixed repo-level name: `test/OtsSoftwareTests/` (C#) or `test/ots_software_tests/`
+  (Python/other) — never prefixed with a system or project name.
+
+## Shared Package
+
+- A software package produced by a different repository within the same program
+- The consuming repository references advertised features, not internal design or source
+- Traceability to program-level requirements runs through the top-level project,
+  not directly between repositories
+- Verified through any appropriate approach in the consuming repository - most commonly
+  downstream integration tests that transitively prove the advertised features are functional
+- **Artifact locations** (no internal design documentation in the consuming repository):
+  - Requirements: `docs/reqstream/shared/{package-name}.yaml`
+  - Design: `docs/design/shared/{package-name}.md` (integration/usage design - which features are consumed and how)
+  - Verification: `docs/verification/shared/{package-name}.md`
+  - These folders sit parallel to system and OTS folders
+- System design documentation records which Shared Packages each system depends on
 
 # Software Item Artifact Model
 
@@ -97,7 +121,8 @@ unit - because reviewing any one artifact in isolation cannot determine whether
 the item is correct, well-designed, and proven to work:
 
 - **Requirements** - WHAT the item must do (drives all other artifacts; applies to all item types)
-- **Design** - HOW the item satisfies its requirements (in-house items only: system, subsystem, unit)
+- **Design** - HOW the item satisfies its requirements (full design for local items: system,
+  subsystem, unit; integration/usage design for OTS and Shared Package)
 - **Verification Design** - HOW the requirements will be tested (applies to all item types)
-- **Source code** - The implementation of the design (in-house units only)
+- **Source code** - The implementation of the design (local units only; not applicable to OTS or Shared Package)
 - **Tests** - PROOF the item does WHAT it is required to do (applies to all item types)

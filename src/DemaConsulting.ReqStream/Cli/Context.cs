@@ -140,7 +140,27 @@ public sealed class Context : IDisposable
     /// </summary>
     /// <param name="args">Command-line arguments.</param>
     /// <returns>A new Context instance.</returns>
-    /// <exception cref="ArgumentException">Thrown when arguments are invalid.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="args"/> is null.</exception>
+    /// <exception cref="ArgumentException">
+    ///     Thrown under any of the following conditions:
+    ///     <list type="bullet">
+    ///       <item><description>
+    ///         <b>Unknown argument</b> — an unrecognized flag is present in <paramref name="args"/>.
+    ///       </description></item>
+    ///       <item><description>
+    ///         <b>Missing argument value</b> — a flag that requires a value (e.g. <c>--log</c>,
+    ///         <c>--depth</c>) is the last element in <paramref name="args"/> with no value following it.
+    ///       </description></item>
+    ///       <item><description>
+    ///         <b>Invalid depth value</b> — a <c>--depth</c>, <c>--report-depth</c>,
+    ///         <c>--matrix-depth</c>, or <c>--justifications-depth</c> value is not a positive integer.
+    ///       </description></item>
+    ///       <item><description>
+    ///         <b>Log file open failure</b> — the path supplied to <c>--log</c> cannot be opened
+    ///         for writing (e.g. invalid path, missing parent directory, or insufficient permissions).
+    ///       </description></item>
+    ///     </list>
+    /// </exception>
     public static Context Create(string[] args)
     {
         // Validate input
@@ -404,6 +424,10 @@ public sealed class Context : IDisposable
     ///     Writes a line of output to the console and log file (if logging is enabled).
     /// </summary>
     /// <param name="message">The message to write.</param>
+    /// <remarks>
+    ///     Console output is suppressed when <see cref="Silent"/> is <see langword="true"/>;
+    ///     log file output is always written when a log file is open.
+    /// </remarks>
     public void WriteLine(string message)
     {
         // Write to console unless silent mode is enabled
@@ -420,6 +444,10 @@ public sealed class Context : IDisposable
     ///     Writes an error message to the error console and log file (if logging is enabled).
     /// </summary>
     /// <param name="message">The error message to write.</param>
+    /// <remarks>
+    ///     Sets the internal error flag, causing <see cref="ExitCode"/> to return 1 for the
+    ///     lifetime of this context.
+    /// </remarks>
     public void WriteError(string message)
     {
         // Mark that we have encountered errors
@@ -447,6 +475,10 @@ public sealed class Context : IDisposable
     /// <summary>
     ///     Disposes resources used by the Context.
     /// </summary>
+    /// <remarks>
+    ///     Calling <see cref="Dispose"/> more than once is safe; subsequent calls are no-ops
+    ///     (idempotent).
+    /// </remarks>
     public void Dispose()
     {
         // Close and dispose the log file writer if it exists

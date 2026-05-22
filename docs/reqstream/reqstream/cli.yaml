@@ -17,6 +17,7 @@ sections:
         justification: |
           A CLI interface enables automation in CI/CD pipelines and allows integration with scripts
           and build processes. This is essential for the tool's primary use case.
+        tags: [cli]
         tests:
           - Cli_Interface_VersionFlag_SetsVersionProperty
           - Cli_Interface_HelpFlag_SetsHelpProperty
@@ -46,6 +47,7 @@ sections:
         justification: |
           Centralized output routing ensures consistent formatting and allows output to be
           suppressed or redirected to a log file as needed.
+        tags: [cli]
         tests:
           - Cli_Output_SilentFlag_SetsSilentProperty
           - Cli_Output_LogFlag_WritesOutputToLogFile
@@ -58,6 +60,7 @@ sections:
         justification: |
           Error messages must be written to stderr so they remain visible to the user
           without polluting stdout, which consumers may pipe or redirect for data capture.
+        tags: [cli]
         tests:
           - Cli_Output_WriteError_WritesToErrorChannel
         children:
@@ -68,6 +71,7 @@ sections:
         justification: |
           A non-zero exit code allows callers to detect failure conditions by inspecting the
           process exit code, enabling correct CI/CD pipeline behavior without parsing output.
+        tags: [cli]
         tests:
           - Cli_Output_WriteError_SetsExitCodeToOne
         children:
@@ -78,6 +82,7 @@ sections:
         justification: |
           Providing clear feedback when a required argument value is omitted prevents silent
           misconfiguration and helps users quickly identify and correct command-line errors.
+        tags: [cli]
         tests:
           - Cli_Interface_MissingArgumentValue_ThrowsArgumentException
         children:
@@ -90,6 +95,7 @@ sections:
         justification: |
           The depth argument must be a valid integer; rejecting non-integer values prevents
           downstream formatting errors and gives users actionable feedback.
+        tags: [cli]
         tests:
           - Cli_Interface_InvalidDepthValue_ThrowsArgumentException
 
@@ -98,6 +104,7 @@ sections:
         justification: |
           Detecting an inaccessible log file path at startup prevents silent loss of log output
           and gives users a clear error message before any processing begins.
+        tags: [cli]
         tests:
           - Cli_Interface_LogFileOpenFailure_ThrowsArgumentException
 
@@ -109,5 +116,6 @@ sections:
           Providing a single --depth option that sets the default for all per-report depth
           options reduces repetition in common invocations and simplifies pipeline configuration
           while still allowing individual overrides.
+        tags: [cli]
         tests:
           - Cli_Interface_DepthFlag_SetsDefaultForAllReportDepths

@@ -23,11 +23,31 @@ namespace DemaConsulting.ReqStream.Modeling;
 /// <summary>
 ///     Represents a section containing requirements and/or child sections.
 /// </summary>
+/// <remarks>
+///     <para>
+///         <b>Why mutable class rather than record:</b> YamlDotNet deserialization requires
+///         settable properties; record immutability would prevent the loader from building
+///         objects incrementally during DOM traversal.
+///     </para>
+///     <para>
+///         <b>Why merging logic is excluded:</b> Section is a pure data container. All merging
+///         logic resides in <see cref="RequirementsLoader"/> to maintain a clean separation of
+///         concerns; merging is a loader responsibility, not a data-model responsibility.
+///     </para>
+///     <para>
+///         <b>Thread safety:</b> Not thread-safe. No concurrent access is expected; loading is
+///         single-threaded and completes before the model is consumed by callers.
+///     </para>
+/// </remarks>
 public class Section
 {
     /// <summary>
     ///     Gets or sets the title of this section.
     /// </summary>
+    /// <remarks>
+    ///     Serves as the merge identity key used by <see cref="RequirementsLoader"/> to locate
+    ///     existing sections when merging content from multiple YAML files.
+    /// </remarks>
     public string Title { get; set; } = string.Empty;
 
     /// <summary>

@@ -172,12 +172,11 @@ includes:
         // Act: load file A (which includes file B, which includes file A)
         var result = Requirements.Load(pathA);
 
-        // Assert: loading completes without infinite loop and both sections are present
-        Assert.False(result.HasErrors);
-        var requirements = result.Requirements;
-
-        Assert.NotNull(requirements);
-        Assert.Equal(2, requirements.Sections.Count);
+        // Assert: loading completes without infinite loop, circular include is reported as error,
+        //         and Requirements is null (errors prevent returning a partial result)
+        Assert.True(result.HasErrors);
+        Assert.Contains(result.Issues, i => i.Description.Contains("Circular include"));
+        Assert.Null(result.Requirements);
     }
 
     /// <summary>

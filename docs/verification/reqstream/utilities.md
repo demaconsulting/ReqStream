@@ -6,6 +6,19 @@ The Utilities subsystem is verified using xUnit unit tests. Each unit within the
 has its own test class that exercises the public methods with various input combinations,
 including edge cases and boundary conditions.
 
+### Test Environment
+
+The Utilities subsystem tests require no setup beyond the standard xUnit test runner and .NET
+runtime. Tests that exercise file matching create temporary directories with known file contents,
+which are deleted on test completion.
+
+### Acceptance Criteria
+
+The Utilities subsystem verification is complete when all xUnit unit tests for `GlobMatcher` and
+`PathHelpers` pass without uncaught exceptions and all assertions succeed. The subsystem is
+considered verified when every requirement in the Coverage Summary is mapped to at least one
+passing test method.
+
 ### Test Scenarios
 
 #### GlobMatcher Scenario

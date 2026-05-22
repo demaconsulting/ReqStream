@@ -9,6 +9,18 @@ and Markdown report generation. No dependencies are mocked; isolation is achieve
 all required YAML requirement files and test result files in a per-test temporary directory
 that is deleted on disposal.
 
+### Test Environment
+
+The Tracing subsystem tests require no setup beyond the standard xUnit test runner and .NET
+runtime. Each test creates temporary YAML requirements files and TRX or JUnit XML test result
+files in a per-test temporary directory that is deleted on disposal.
+
+### Acceptance Criteria
+
+The Tracing subsystem verification is complete when all xUnit tests in `TracingTests.cs` pass
+without uncaught exceptions and all assertions succeed. The subsystem is considered verified when
+every requirement in the Requirements Coverage table is mapped to at least one passing test method.
+
 ### Test Scenarios
 
 #### Test Results Loading Scenario
@@ -46,13 +58,13 @@ Test methods:
 
 - `Tracing_Reporting_SimpleMatrix_CreatesMarkdownFile` — Markdown report generated
 
-### Coverage Summary
+### Requirements Coverage
 
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-Tracing-TestResults` | `Tracing_TestResults_TrxFile_LoadsTestResults`, `Tracing_TestResults_JUnitFile_LoadsTestResults` |
-| `ReqStream-Tracing-Mapping` | `Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied` |
-| `ReqStream-Tracing-Coverage` | `Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied`, `Tracing_Coverage_WithMissingTests_RequirementIsUnsatisfied` |
-| `ReqStream-Tracing-MissingFile` | `Tracing_FileLoading_NonExistentFile_ThrowsFileNotFoundException` |
-| `ReqStream-Tracing-MalformedFile` | `Tracing_FileLoading_MalformedFile_ThrowsInvalidOperationException` |
-| `ReqStream-Tracing-Reporting` | `Tracing_Reporting_SimpleMatrix_CreatesMarkdownFile` |
+| Requirement ID | Scenario(s) | Test Method(s) |
+| --- | --- | --- |
+| `ReqStream-Tracing-TestResults` | Test Results Loading Scenario | `Tracing_TestResults_TrxFile_LoadsTestResults`, `Tracing_TestResults_JUnitFile_LoadsTestResults` |
+| `ReqStream-Tracing-Mapping` | Coverage Scenario | `Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied` |
+| `ReqStream-Tracing-Coverage` | Coverage Scenario | `Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied`, `Tracing_Coverage_WithMissingTests_RequirementIsUnsatisfied` |
+| `ReqStream-Tracing-MissingFile` | Error Handling Scenario | `Tracing_FileLoading_NonExistentFile_ThrowsFileNotFoundException` |
+| `ReqStream-Tracing-MalformedFile` | Error Handling Scenario | `Tracing_FileLoading_MalformedFile_ThrowsInvalidOperationException` |
+| `ReqStream-Tracing-Reporting` | Reporting Scenario | `Tracing_Reporting_SimpleMatrix_CreatesMarkdownFile` |

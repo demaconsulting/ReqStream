@@ -27,6 +27,19 @@ namespace DemaConsulting.ReqStream.Tracing;
 /// <summary>
 ///     Represents test metrics for a single test execution.
 /// </summary>
+/// <remarks>
+///     <para>
+///         <see cref="TestMetrics"/> is an immutable record because metrics are computed once
+///         from a test result file and never modified afterwards; immutability prevents accidental
+///         mutation during aggregation and makes the type safe to share across threads without
+///         synchronization.
+///     </para>
+///     <para>
+///         The default instance <c>TestMetrics(0, 0)</c> is the intentional safe-return value for
+///         tests that have no recorded executions. Callers receive a valid, non-null object regardless
+///         of whether the test name was found, eliminating null-checks at every call site.
+///     </para>
+/// </remarks>
 /// <param name="Passes">Number of passes in the file matching the test name.</param>
 /// <param name="Fails">Number of fails in the file matching the test name.</param>
 public record TestMetrics(int Passes, int Fails)
@@ -73,6 +86,9 @@ public class TraceMatrix
     /// <param name="testResultFiles">Paths to test result files (TRX or JUnit format).</param>
     /// <exception cref="ArgumentNullException">Thrown when requirements is null.</exception>
     /// <exception cref="FileNotFoundException">Thrown when a test result file does not exist.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when a test result file cannot be parsed
+    /// (malformed TRX or JUnit XML). The message includes the file path; the inner exception contains
+    /// the parse failure.</exception>
     public TraceMatrix(Requirements requirements, params string[] testResultFiles)
     {
         ArgumentNullException.ThrowIfNull(requirements);
@@ -89,6 +105,22 @@ public class TraceMatrix
     /// <summary>
     ///     Gets the test metrics for a specific test name.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         When <paramref name="testName"/> contains a <c>'@'</c> separator (not at position 0 or
+    ///         end), source-specific filtering is applied: the part before <c>'@'</c> is matched
+    ///         case-insensitively using <see cref="string.Contains(string, StringComparison)"/> against
+    ///         each <see cref="TestExecution.FileBaseName"/>. <c>Contains</c> is used rather than exact
+    ///         equality so that a partial qualifier such as <c>ubuntu</c> matches a file named
+    ///         <c>ubuntu-results</c> without requiring the caller to know the full file name.
+    ///     </para>
+    ///     <para>
+    ///         When the test name is not found, the method returns <c>TestMetrics(0, 0)</c>. This
+    ///         safe-return contract means callers never need to null-check the result; a 0/0 metric
+    ///         correctly propagates as "not executed" through <see cref="TestMetrics.AllPassed"/> and
+    ///         <see cref="IsRequirementSatisfied"/>.
+    ///     </para>
+    /// </remarks>
     /// <param name="testName">The name of the test (may include source filter as "source@testname").</param>
     /// <returns>The TestMetrics for the test (returns 0/0 if the test was not found).</returns>
     public TestMetrics GetTestResult(string testName)
@@ -180,6 +212,24 @@ public class TraceMatrix
     /// <summary>
     ///     Exports the trace matrix to a Markdown file.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The output is structured in three sections written in order by
+    ///         <c>ExportSummary</c>, <c>ExportRequirements</c>, and <c>ExportTesting</c>.
+    ///         The three-section structure separates the summary sentence (a quick pass/fail signal),
+    ///         the per-requirement detail table (direct-test counts for auditors), and the per-test
+    ///         detail table (traceability links for engineers) so that each audience can locate the
+    ///         information they need without reading the entire document.
+    ///     </para>
+    ///     <para>
+    ///         There is a deliberate asymmetry between the Summary and Requirements sections: the
+    ///         Requirements table shows only <em>direct</em> tests listed on each requirement, while
+    ///         the Summary satisfied-count is computed by <see cref="CalculateSatisfiedRequirements(HashSet{string})"/>
+    ///         using <see cref="IsRequirementSatisfied"/>, which recurses through the entire descendant
+    ///         subtree. This gives the Summary an accurate compliance verdict while keeping the
+    ///         Requirements table rows concise.
+    ///     </para>
+    /// </remarks>
     /// <param name="filePath">The path to the output Markdown file.</param>
     /// <param name="depth">The starting depth for Markdown headers (default: 1).</param>
     /// <param name="filterTags">Optional set of tags to filter requirements. If provided, only requirements with matching tags are included.</param>
@@ -328,6 +378,13 @@ public class TraceMatrix
     ///     A requirement is satisfied if analyzing its tests and all child-requirement tests
     ///     recursively shows at least one test, and all tests have passed.
     /// </summary>
+    /// <remarks>
+    ///     A requirement with no tests returns <see langword="false"/>. This is a deliberate
+    ///     design decision: every requirement must be traceable to at least one passing test,
+    ///     so a requirement that has never been linked to a test is treated as not satisfied
+    ///     rather than vacuously satisfied. This ensures that untested requirements are always
+    ///     surfaced as coverage gaps during enforcement.
+    /// </remarks>
     /// <param name="requirement">The requirement to check.</param>
     /// <param name="rootSection">The root section for looking up child requirements.</param>
     /// <returns>True if the requirement is satisfied, false otherwise.</returns>
@@ -606,8 +663,19 @@ public class TraceMatrix
     /// <summary>
     ///     Processes a test result file and updates test execution counts.
     /// </summary>
+    /// <remarks>
+    ///     When the underlying <see cref="DemaConsulting.TestResults.IO.Serializer.Deserialize"/> call
+    ///     throws, the exception is caught and re-thrown as an
+    ///     <see cref="InvalidOperationException"/> that includes <paramref name="filePath"/> in its
+    ///     message. This wrapping ensures that the caller (the constructor) can identify the offending
+    ///     file by message text alone, without needing to inspect nested exception detail. The original
+    ///     parse exception is preserved as the inner exception for diagnostics.
+    /// </remarks>
     /// <param name="filePath">Path to the test result file.</param>
     /// <exception cref="FileNotFoundException">Thrown when the file does not exist.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the file cannot be parsed (malformed
+    /// TRX or JUnit XML). The message includes the file path; the inner exception contains the parse
+    /// failure.</exception>
     private void ProcessTestResultFile(string filePath)
     {
         // Verify file exists

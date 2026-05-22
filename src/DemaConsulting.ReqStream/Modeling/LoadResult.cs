@@ -54,6 +54,11 @@ public sealed class LoadResult
     /// <summary>
     ///     Gets a value indicating whether any error-level lint issues were found during loading.
     /// </summary>
+    /// <remarks>
+    ///     This property is computed on each access (not cached); callers that need the value
+    ///     multiple times should store it locally. The class is effectively immutable after
+    ///     construction, so the result is stable for the lifetime of the instance.
+    /// </remarks>
     public bool HasErrors => Issues.Any(i => i.Severity == LintSeverity.Error);
 
     /// <summary>
@@ -61,7 +66,11 @@ public sealed class LoadResult
     ///     Warning-level issues are sent to <see cref="Context.WriteLine"/>;
     ///     error-level issues are sent to <see cref="Context.WriteError"/>.
     /// </summary>
-    /// <param name="context">The context to report issues to.</param>
+    /// <param name="context">The context to report issues to. Must not be null.</param>
+    /// <remarks>
+    ///     This method exists to decouple <see cref="LoadResult"/> from knowledge of how issues
+    ///     are displayed, delegating all formatting and routing decisions to <see cref="Context"/>.
+    /// </remarks>
     public void ReportIssues(Context context)
     {
         foreach (var issue in Issues)

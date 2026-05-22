@@ -1,10 +1,22 @@
 ### Validation Unit Verification
 
-#### Verification Strategy
+#### Verification Approach
 
 The Validation unit is verified using xUnit unit tests in `ValidationTests.cs`. Tests invoke
 `Validation.Run` with `Context` instances configured for specific scenarios and assert on exit
 codes, log file content, and result file content.
+
+#### Test Environment
+
+The Validation unit tests require no setup beyond the standard xUnit test runner and .NET runtime.
+Tests that verify results file output create temporary files on disk, which are deleted on test
+completion.
+
+#### Acceptance Criteria
+
+The Validation unit verification is complete when all xUnit tests in `ValidationTests.cs` pass
+without uncaught exceptions and all assertions succeed. The unit is considered verified when every
+requirement in the Requirements Coverage is mapped to at least one passing test method.
 
 #### Test Scenarios
 
@@ -29,12 +41,12 @@ Test methods:
 - `Validation_Run_WithUnwritableResultsFile_Continues` — write failure → summary still produced
 - `Validation_Run_WithInvalidResultsExtension_ReportsError` — unsupported extension → exit code 1
 
-#### Coverage Summary
+#### Requirements Coverage
 
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-Validation-SelfValidation` | `Validation_Run_WithSilentContext_CompletesSuccessfully`, `Validation_Run_WithTrxResultsFile_WritesTrxFile`, `Validation_Run_WithXmlResultsFile_WritesXmlFile` |
-| `ReqStream-Validation-NullContext` | `Validation_Run_WithNullContext_ThrowsArgumentNullException` |
-| `ReqStream-Validation-UnsupportedResultsFormat` | `Validation_Run_WithInvalidResultsExtension_ReportsError` |
-| `ReqStream-Validation-WriteFailure-ReportsError` | `Validation_Run_WithUnwritableResultsFile_ReportsError` |
-| `ReqStream-Validation-WriteFailure-Continues` | `Validation_Run_WithUnwritableResultsFile_Continues` |
+| Requirement ID | Scenario(s) | Test Method(s) |
+| --- | --- | --- |
+| `ReqStream-Validation-SelfValidation` | Self-Validation Scenario | `Validation_Run_WithSilentContext_CompletesSuccessfully`, `Validation_Run_WithTrxResultsFile_WritesTrxFile`, `Validation_Run_WithXmlResultsFile_WritesXmlFile` |
+| `ReqStream-Validation-NullContext` | Self-Validation Scenario | `Validation_Run_WithNullContext_ThrowsArgumentNullException` |
+| `ReqStream-Validation-UnsupportedResultsFormat` | Error and Continuation Scenario | `Validation_Run_WithInvalidResultsExtension_ReportsError` |
+| `ReqStream-Validation-WriteFailure-ReportsError` | Error and Continuation Scenario | `Validation_Run_WithUnwritableResultsFile_ReportsError` |
+| `ReqStream-Validation-WriteFailure-Continues` | Error and Continuation Scenario | `Validation_Run_WithUnwritableResultsFile_Continues` |

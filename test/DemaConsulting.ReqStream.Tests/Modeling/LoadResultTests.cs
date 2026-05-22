@@ -148,6 +148,19 @@ sections:
     }
 
     /// <summary>
+    /// Test that HasErrors is false when Issues is an empty collection.
+    /// </summary>
+    [Fact]
+    public void LoadResult_HasErrors_NoIssues_ReturnsFalse()
+    {
+        // Arrange: create a load result with no issues
+        var result = new LoadResult(new Requirements(), []);
+
+        // Assert: HasErrors is false when there are no issues
+        Assert.False(result.HasErrors);
+    }
+
+    /// <summary>
     /// Test that HasErrors is false when there are only warnings.
     /// </summary>
     [Fact]

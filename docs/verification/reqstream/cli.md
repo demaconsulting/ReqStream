@@ -9,6 +9,18 @@ file system state. The tests operate at the subsystem boundary — validating th
 between argument parsing (`Context`) and the I/O routing it provides — without mocking any
 internal components.
 
+### Test Environment
+
+The Cli subsystem tests require no setup beyond the standard xUnit test runner and .NET runtime.
+Temporary directories are created by tests that require file system access (e.g. log file tests)
+and are deleted on test completion.
+
+### Acceptance Criteria
+
+The Cli subsystem verification is complete when all xUnit tests in `CliTests.cs` pass without
+uncaught exceptions and all assertions succeed. The subsystem is considered verified when every
+requirement in the Coverage Summary is mapped to at least one passing test method.
+
 ### Test Scenarios
 
 #### Interface Scenario
@@ -36,15 +48,15 @@ Test methods:
 - `Cli_Output_WriteError_WritesToErrorChannel` — WriteError writes to stderr
 - `Cli_Output_WriteError_SetsExitCodeToOne` — WriteError sets ExitCode to 1
 
-### Coverage Summary
+### Requirements Coverage
 
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-Cli-Interface` | `Cli_Interface_VersionFlag_SetsVersionProperty`, `Cli_Interface_HelpFlag_SetsHelpProperty`, `Cli_Interface_UnknownArgument_ThrowsArgumentException` |
-| `ReqStream-Cli-Output` | `Cli_Output_SilentFlag_SetsSilentProperty`, `Cli_Output_LogFlag_WritesOutputToLogFile` |
-| `ReqStream-Cli-StderrRouting` | `Cli_Output_WriteError_WritesToErrorChannel` |
-| `ReqStream-Cli-ExitCodeSignaling` | `Cli_Output_WriteError_SetsExitCodeToOne` |
-| `ReqStream-Cli-MissingArgumentValue` | `Cli_Interface_MissingArgumentValue_ThrowsArgumentException` |
-| `ReqStream-Cli-InvalidDepthValue` | `Cli_Interface_InvalidDepthValue_ThrowsArgumentException` |
-| `ReqStream-Cli-LogFileOpenFailure` | `Cli_Interface_LogFileOpenFailure_ThrowsArgumentException` |
-| `ReqStream-Cli-DepthInheritance` | `Cli_Interface_DepthFlag_SetsDefaultForAllReportDepths` |
+| Requirement ID | Scenario(s) | Test Method(s) |
+| --- | --- | --- |
+| `ReqStream-Cli-Interface` | Interface Scenario | `Cli_Interface_VersionFlag_SetsVersionProperty`, `Cli_Interface_HelpFlag_SetsHelpProperty`, `Cli_Interface_UnknownArgument_ThrowsArgumentException` |
+| `ReqStream-Cli-Output` | Output Scenario | `Cli_Output_SilentFlag_SetsSilentProperty`, `Cli_Output_LogFlag_WritesOutputToLogFile` |
+| `ReqStream-Cli-StderrRouting` | Output Scenario | `Cli_Output_WriteError_WritesToErrorChannel` |
+| `ReqStream-Cli-ExitCodeSignaling` | Output Scenario | `Cli_Output_WriteError_SetsExitCodeToOne` |
+| `ReqStream-Cli-MissingArgumentValue` | Interface Scenario | `Cli_Interface_MissingArgumentValue_ThrowsArgumentException` |
+| `ReqStream-Cli-InvalidDepthValue` | Interface Scenario | `Cli_Interface_InvalidDepthValue_ThrowsArgumentException` |
+| `ReqStream-Cli-LogFileOpenFailure` | Interface Scenario | `Cli_Interface_LogFileOpenFailure_ThrowsArgumentException` |
+| `ReqStream-Cli-DepthInheritance` | Interface Scenario | `Cli_Interface_DepthFlag_SetsDefaultForAllReportDepths` |

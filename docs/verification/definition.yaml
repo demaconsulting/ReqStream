@@ -3,10 +3,12 @@ resource-path:
   - docs/verification
   - docs/verification/reqstream
   - docs/verification/reqstream/cli
+  - docs/verification/reqstream/utilities
   - docs/verification/reqstream/modeling
   - docs/verification/reqstream/tracing
   - docs/verification/reqstream/self-test
   - docs/verification/ots
+  - docs/verification/shared
   - docs/template
 
 input-files:
@@ -16,6 +18,9 @@ input-files:
   - docs/verification/reqstream/program.md
   - docs/verification/reqstream/cli.md
   - docs/verification/reqstream/cli/context.md
+  - docs/verification/reqstream/utilities.md
+  - docs/verification/reqstream/utilities/glob-matcher.md
+  - docs/verification/reqstream/utilities/path-helpers.md
   - docs/verification/reqstream/modeling.md
   - docs/verification/reqstream/modeling/lint-issue.md
   - docs/verification/reqstream/modeling/load-result.md
@@ -28,6 +33,8 @@ input-files:
   - docs/verification/reqstream/self-test.md
   - docs/verification/reqstream/self-test/validation.md
   - docs/verification/ots.md
+  - docs/verification/shared.md
+  - docs/verification/shared/dema-consulting-test-results.md
   - docs/verification/ots/buildmark.md
   - docs/verification/ots/fileassert.md
   - docs/verification/ots/xunit.md
@@ -38,7 +45,7 @@ input-files:
   - docs/verification/ots/versionmark.md
   - docs/verification/ots/weasyprint.md
   - docs/verification/ots/yamldotnet.md
-  - docs/verification/ots/testresults.md
+  - docs/verification/ots/microsoft-extensions-file-system-globbing.md
 template: template.html
 table-of-contents: true
 number-sections: true

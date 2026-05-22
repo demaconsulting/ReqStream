@@ -6,6 +6,18 @@ The SelfTest subsystem is verified using xUnit integration tests in `SelfTestTes
 invoke `Validation.Run` through a silent `Context` and assert on the exit code, results file
 content, and error reporting behavior.
 
+### Test Environment
+
+The SelfTest subsystem tests require no setup beyond the standard xUnit test runner and .NET
+runtime. Tests that verify results file output create temporary files on disk, which are deleted
+on test completion.
+
+### Acceptance Criteria
+
+The SelfTest subsystem verification is complete when all xUnit tests in `SelfTestTests.cs` pass
+without uncaught exceptions and all assertions succeed. The subsystem is considered verified when
+every requirement in the Requirements Coverage table is mapped to at least one passing test method.
+
 ### Test Scenarios
 
 #### Qualification Scenario
@@ -33,10 +45,10 @@ Test methods:
 
 - `SelfTest_FailureReporting_WithErrors_SetsExitCode1` — errors → exit code 1
 
-### Coverage Summary
+### Requirements Coverage
 
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-SelfTest-Qualification` | `SelfTest_Qualification_Run_PassesAllTests` |
-| `ReqStream-SelfTest-ResultsOutput` | `SelfTest_ResultsOutput_TrxResultsPath_WritesTrxFile`, `SelfTest_ResultsOutput_XmlResultsPath_WritesJUnitFile` |
-| `ReqStream-SelfTest-FailureReporting` | `SelfTest_FailureReporting_WithErrors_SetsExitCode1` |
+| Requirement ID | Scenario(s) | Test Method(s) |
+| --- | --- | --- |
+| `ReqStream-SelfTest-Qualification` | Qualification Scenario | `SelfTest_Qualification_Run_PassesAllTests` |
+| `ReqStream-SelfTest-ResultsOutput` | Results Output Scenario | `SelfTest_ResultsOutput_TrxResultsPath_WritesTrxFile`, `SelfTest_ResultsOutput_XmlResultsPath_WritesJUnitFile` |
+| `ReqStream-SelfTest-FailureReporting` | Failure Reporting Scenario | `SelfTest_FailureReporting_WithErrors_SetsExitCode1` |

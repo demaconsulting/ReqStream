@@ -37,11 +37,27 @@ sections:
         justification: |
           I/O failures (e.g. permission denied, disk error) prevent the file from being read.
           Reporting the error with the file path and failure reason allows users to diagnose
-          access permission or storage problems.
+          access permission or storage problems. On Windows, permission-based file locking is
+          not reliably reproducible via filesystem permissions; the test for this requirement
+          is skipped on Windows platforms.
         tags:
           - lint
         tests:
           - RequirementsLoader_Load_WithIoReadFailure_ReportsError
+
+      - id: ReqStream-Lint-CircularFileIncludes
+        title: >-
+          The requirements loader shall detect and report circular file includes,
+          preventing infinite loading loops.
+        justification: |
+          Circular file include references (where file A includes B and B includes A)
+          would cause infinite loading loops. The loader uses an active-files call
+          stack to detect when a file is included while it is already being processed,
+          reports an error, and halts processing of that branch.
+        tags:
+          - lint
+        tests:
+          - RequirementsLoader_Load_WithCircularFileInclude_ReportsError
 
       - id: ReqStream-Lint-NonMappingRoot
         title: The requirements loader shall report an error when the requirements document root is not a mapping node.

@@ -951,4 +951,41 @@ mappings:
         Assert.Contains("NONEXISTENT", errors);
         Assert.Contains("unknown child", errors);
     }
+
+    /// <summary>
+    /// Test that a circular file include (file A includes file B which includes file A) is reported as an error.
+    /// </summary>
+    [Fact]
+    public void RequirementsLoader_Load_WithCircularFileInclude_ReportsError()
+    {
+        // Arrange: create two files that include each other
+        var fileA = PathHelpers.SafePathCombine(_testDirectory, "file-a.yaml");
+        var fileB = PathHelpers.SafePathCombine(_testDirectory, "file-b.yaml");
+
+        File.WriteAllText(fileA, @"includes:
+  - file-b.yaml
+sections:
+  - title: Section A
+    requirements:
+      - id: REQ-A
+        title: Requirement A
+");
+
+        File.WriteAllText(fileB, @"includes:
+  - file-a.yaml
+sections:
+  - title: Section B
+    requirements:
+      - id: REQ-B
+        title: Requirement B
+");
+
+        // Act: load the root file which will trigger the circular include
+        var (exitCode, errors) = RunLint(fileA);
+
+        // Assert: exit code is 1 and error mentions circular include
+        Assert.Equal(1, exitCode);
+        Assert.Contains("error", errors);
+        Assert.Contains("Circular include", errors);
+    }
 }

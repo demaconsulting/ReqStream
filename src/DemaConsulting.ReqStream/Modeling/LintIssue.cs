@@ -73,6 +73,11 @@ public sealed class LintIssue
     ///     Returns the issue formatted as "location: severity: description".
     /// </summary>
     /// <returns>A formatted string representing the issue.</returns>
+    /// <remarks>
+    ///     The <c>"location: severity: description"</c> format was chosen for compatibility with
+    ///     editors and CI tools that parse diagnostic location and severity tokens from tool output,
+    ///     allowing them to navigate directly to the source of the issue.
+    /// </remarks>
     public override string ToString()
     {
         var severityText = Severity == LintSeverity.Error ? "error" : "warning";

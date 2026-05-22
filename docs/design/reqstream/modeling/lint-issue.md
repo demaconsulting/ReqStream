@@ -1,6 +1,6 @@
 ### LintIssue Unit Design
 
-#### Overview
+#### Purpose
 
 `LintIssue` and its companion enum `LintSeverity` represent a single structural issue discovered
 during requirements loading or linting. They are simple value types with no dependencies on other
@@ -30,7 +30,9 @@ where the issue occurred, how severe it is, and what the problem is.
 | `Description` | `string` | A human-readable description of the issue |
 | `ToString()` | `string` | Returns the issue formatted as `"location: severity: description"` |
 
-#### Formatting
+#### Key Methods
+
+##### `ToString()`
 
 `ToString()` returns the issue in the standard diagnostic format:
 
@@ -48,9 +50,18 @@ The `LintSeverity` enum values map to the following lowercase strings in `ToStri
 This format is recognized by editors and CI tools that can parse file locations and navigate to
 the line containing the issue.
 
-#### Interactions with Other Units
+#### Error Handling
+
+N/A — `LintIssue` and `LintSeverity` are simple value types with no executable logic.
+`LintIssue` objects are created only by `RequirementsLoader`; no validation or error detection
+occurs within these types themselves.
+
+#### Interactions
+
+N/A — `LintIssue` and `LintSeverity` are simple value types with no outbound dependencies on
+other units, OTS items, or shared packages.
 
 | Unit | Nature of interaction |
 | ---- | --------------------- |
-| `LoadResult` | Holds a list of `LintIssue` objects; routes them to context output |
-| `RequirementsLoader` | Creates `LintIssue` objects during YAML validation |
+| `RequirementsLoader` | Creates `LintIssue` objects for every structural problem found during YAML validation |
+| `LoadResult` | Holds a list of `LintIssue` objects and routes them to the `Context` output channels |

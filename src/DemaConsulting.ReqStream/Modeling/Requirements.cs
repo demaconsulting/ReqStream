@@ -23,11 +23,25 @@ namespace DemaConsulting.ReqStream.Modeling;
 /// <summary>
 ///     Represents the complete requirements document tree.
 /// </summary>
+/// <remarks>
+///     <para>
+///         <b>Why extends Section:</b> <c>Requirements</c> is the root of the requirements
+///         section tree. Inheriting from <see cref="Section"/> reuses the container tree
+///         (title, requirements list, child sections) without duplication. The root node is
+///         identical in structure to any other section node; only its role is different.
+///     </para>
+///     <para>
+///         <b>Public API surface:</b> <c>Requirements</c> is the Modeling subsystem's public
+///         API entry point. It exposes <see cref="Load"/>, <see cref="Export"/>, and
+///         <see cref="ExportJustifications"/> to callers while hiding
+///         <see cref="RequirementsLoader"/> entirely.
+///     </para>
+/// </remarks>
 public class Requirements : Section
 {
     /// <summary>
-    ///     Loads one or more requirements YAML files using a single YAML DOM tree walk that
-    ///     simultaneously builds the requirements model and collects lint issues.
+    ///     Provides the single public entry point for loading YAML requirements files,
+    ///     insulating callers from the loader and lint pipeline.
     /// </summary>
     /// <param name="paths">One or more paths to YAML files to load.</param>
     /// <returns>
@@ -35,6 +49,12 @@ public class Requirements : Section
     ///     when error-level issues are present) and all lint issues found during loading.
     /// </returns>
     /// <exception cref="ArgumentException">Thrown when no paths are provided.</exception>
+    /// <remarks>
+    ///     Delegates to <see cref="RequirementsLoader.Load"/> which performs a single YAML DOM
+    ///     tree walk that simultaneously builds the requirements model and collects lint issues.
+    ///     Returns <c>null</c> requirements when any error-level issue is found, allowing callers
+    ///     to detect failure without exception handling.
+    /// </remarks>
     public static LoadResult Load(params string[] paths)
     {
         return RequirementsLoader.Load(paths);
@@ -47,6 +67,12 @@ public class Requirements : Section
     /// <param name="depth">The starting depth for Markdown headers (default: 1).</param>
     /// <param name="filterTags">Optional set of tags to filter requirements. If provided, only requirements with matching tags are exported.</param>
     /// <exception cref="ArgumentException">Thrown when filePath is null or empty.</exception>
+    /// <remarks>
+    ///     <b>File-write side effect:</b> Overwrites any existing file at <paramref name="filePath"/>.
+    ///     Any <see cref="IOException"/> or <see cref="UnauthorizedAccessException"/> from the
+    ///     underlying file-write operations propagates to the caller (<c>Program</c>) without
+    ///     wrapping; this method does not catch or suppress I/O exceptions.
+    /// </remarks>
     public void Export(string filePath, int depth = 1, HashSet<string>? filterTags = null)
     {
         // Validate file path
@@ -121,6 +147,12 @@ public class Requirements : Section
     /// <param name="depth">The starting depth for Markdown headers (default is 1).</param>
     /// <param name="filterTags">Optional set of tags to filter requirements. If provided, only requirements with matching tags are exported.</param>
     /// <exception cref="ArgumentException">Thrown when the file path is null or empty.</exception>
+    /// <remarks>
+    ///     <b>File-write side effect:</b> Overwrites any existing file at <paramref name="filePath"/>.
+    ///     Any <see cref="IOException"/> or <see cref="UnauthorizedAccessException"/> from the
+    ///     underlying file-write operations propagates to the caller (<c>Program</c>) without
+    ///     wrapping; this method does not catch or suppress I/O exceptions.
+    /// </remarks>
     public void ExportJustifications(string filePath, int depth = 1, HashSet<string>? filterTags = null)
     {
         // Validate file path

@@ -1,11 +1,11 @@
 ## DemaConsulting.TestResults Verification
 
-### Required Functionality
+### Package Functionality
 
-DemaConsulting.TestResults (`ReqStream-OTS-TestResults`) shall read TRX and JUnit XML test
-result files. DemaConsulting.TestResults is the library used to read test result files,
-parsing test execution records so that ReqStream can map test results to requirements for
-coverage analysis.
+DemaConsulting.TestResults (`ReqStream-Shared-TestResults-Trx`, `ReqStream-Shared-TestResults-JUnit`)
+shall read TRX and JUnit XML test result files. DemaConsulting.TestResults is the library used to
+read test result files, parsing test execution records so that ReqStream can map test results to
+requirements for coverage analysis.
 
 ### Verification Approach
 
@@ -21,4 +21,5 @@ methods are linked as evidence:
 
 | Requirement ID | Test Method(s) |
 | --- | --- |
-| `ReqStream-OTS-TestResults` | `TraceMatrix_Constructor_WithTrxFile_ParsesCorrectly`, `TraceMatrix_Constructor_WithJUnitFile_ParsesCorrectly` |
+| `ReqStream-Shared-TestResults-Trx` | `TraceMatrix_Constructor_WithTrxFile_ParsesCorrectly` |
+| `ReqStream-Shared-TestResults-JUnit` | `TraceMatrix_Constructor_WithJUnitFile_ParsesCorrectly` |

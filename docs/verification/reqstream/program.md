@@ -1,11 +1,23 @@
 ## Program Unit Verification
 
-### Verification Strategy
+### Verification Approach
 
 The Program unit is verified using xUnit unit tests in `ProgramTests.cs`. Tests call the
 `Program.Run` static method directly; console output is captured by redirecting `Console.Out`
 to a `StringWriter` before creating the `Context`. Temporary directories and fixture YAML
 requirements files are created on disk where processing requires real files.
+
+### Test Environment
+
+The Program unit tests require no setup beyond the standard xUnit test runner and .NET runtime.
+Temporary directories are created on disk by tests that invoke `Program.Run` with requirements
+files or test result files, and are deleted on test completion.
+
+### Acceptance Criteria
+
+The Program unit verification is complete when all xUnit tests in `ProgramTests.cs` pass without
+uncaught exceptions and all assertions succeed. The unit is considered verified when every
+requirement in the Coverage Summary is mapped to at least one passing test method.
 
 ### Test Scenarios
 
@@ -79,7 +91,7 @@ Test methods:
 - `Program_Run_WithLintFlag_OnlyOutputsIssues` — asserts only issues are output
 - `Program_Run_WithLintAndNoRequirements_PrintsInformationalMessage` — informational message
 
-### Coverage Summary
+### Requirements Coverage
 
 | Requirement ID | Test Method(s) |
 | --- | --- |
@@ -87,9 +99,10 @@ Test methods:
 | `ReqStream-Program-Help` | `Program_Run_WithHelpFlag_PrintsHelp` |
 | `ReqStream-Program-Validate` | `Program_Run_WithValidateFlag_RunsValidation`, `Program_Run_WithValidateAndResults_WritesResultsFile` |
 | `ReqStream-Program-Requirements` | `Program_Run_WithNoRequirementsFiles_ShowsMessage`, `Program_Run_WithRequirementsFiles_ProcessesSuccessfully`, `Program_Run_WithRequirementsExport_GeneratesReport`, `Program_Run_WithTraceMatrixExport_GeneratesMatrix`, `Program_Run_WithJustificationsExport_GeneratesJustificationsReport` |
-| `ReqStream-Program-MatrixNoTests` | `Program_Run_WithMatrixButNoTestFiles_ReportsError` |
+| `ReqStream-Program-MatrixNoTests` | `Program_Run_WithMatrixButNoTestFiles_ReportsError`, `Program_Run_WithMatrixAndUnmatchedTestsPattern_ReportsError` |
 | `ReqStream-Program-Enforce` | `Program_Run_WithEnforcementAndFullySatisfiedRequirements_Succeeds`, `Program_Run_WithEnforcementAndUnsatisfiedRequirements_Fails`, `Program_Run_WithEnforcementAndNoTests_Fails`, `Program_Run_WithEnforcementAndFailedTests_Fails` |
 | `ReqStream-Program-Lint` | `Program_Run_WithLintFlag_RunsLinter` |
-| `ReqStream-Program-LintVerbosity` | `Program_Run_WithLintFlag_SuppressesBanner`, `Program_Run_WithLintFlag_OnlyOutputsIssues` |
+| `ReqStream-Program-LintNoBanner` | `Program_Run_WithLintFlag_SuppressesBanner` |
+| `ReqStream-Program-LintVerbosity` | `Program_Run_WithLintFlag_RunsLinter`, `Program_Run_WithLintFlag_SuppressesBanner` |
 | `ReqStream-Program-LintFailure` | `Program_Run_WithLintFlag_OnlyOutputsIssues` |
 | `ReqStream-Program-LintNoFiles` | `Program_Run_WithLintAndNoRequirements_PrintsInformationalMessage` |

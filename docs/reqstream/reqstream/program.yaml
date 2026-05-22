@@ -93,7 +93,8 @@ sections:
             tags:
               - cli
             tests:
-              - Program_Run_WithLintFlag_OnlyOutputsIssues
+              - Program_Run_WithLintFlag_RunsLinter
+              - Program_Run_WithLintFlag_SuppressesBanner
 
           - id: ReqStream-Program-LintFailure
             title: The tool shall exit with a non-zero exit code when linting detects any issues.

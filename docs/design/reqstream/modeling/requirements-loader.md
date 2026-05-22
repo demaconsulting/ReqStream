@@ -1,6 +1,6 @@
 ### RequirementsLoader Unit Design
 
-#### Overview
+#### Purpose
 
 `RequirementsLoader` is the YAML deserializer and structural lint validator for requirements
 files. It walks the YAML DOM, merges sections into the shared `Requirements` tree, validates
@@ -9,7 +9,9 @@ unit that reads from the file system for requirements data and the only unit wit
 the YAML DOM representation. `RequirementsLoader` is declared `internal static`; it has no
 instances and is inaccessible outside the assembly.
 
-#### YAML DOM Traversal
+#### Data Model
+
+##### YAML DOM Traversal
 
 YAML is parsed using `YamlDotNet`'s `RepresentationModel` (DOM) API. `RequirementsLoader` reads
 the raw YAML text into a `YamlStream`, then walks the resulting node tree directly:
@@ -26,7 +28,7 @@ structural level (`KnownDocumentFields`, `KnownSectionFields`, `KnownRequirement
 classes; each DOM node is consumed directly and converted to the long-lived `Requirement`,
 `Section`, and `Requirements` objects during the walk.
 
-#### Shared State
+##### Shared State
 
 `RequirementsLoader.Load` allocates and shares the following state across all files loaded in
 one call:
@@ -37,9 +39,10 @@ one call:
 | `seenIds` | `Dictionary<string, string>` | Maps requirement ID to first-seen location for duplicate detection |
 | `allRequirements` | `Dictionary<string, Requirement>` | Maps ID to `Requirement` object for cycle detection |
 | `visitedFiles` | `HashSet<string>` | Fully-resolved paths of already-processed files (include-loop guard) |
+| `activeFiles` | `HashSet<string>` | Tracks the current include call stack (fully-resolved paths of files currently being processed) to detect circular file includes during recursive loading |
 | `issues` | `List<LintIssue>` | All issues collected during the load |
 
-#### Methods
+#### Key Methods
 
 ##### `Load(paths)`
 
@@ -59,6 +62,11 @@ Four design points govern its behavior:
 - **Deduplication**: `path` is normalized to an absolute path and checked against `visitedFiles`
   before any work is done. If already present, the method returns immediately. This prevents
   infinite loops when files include each other directly or transitively.
+- **Circular include detection**: before following any include directives, `LoadFile` adds the
+  current file's full path to `activeFiles`. Before loading any included file, it checks whether
+  that file's path is already in `activeFiles`; if so, it reports a circular-include error and
+  returns without recursing further. After all includes for a file are processed, the file is
+  removed from `activeFiles`.
 - **YAML parsing**: the file text is parsed into a `YamlStream` using `YamlDotNet`'s
   `RepresentationModel` DOM API. A `YamlScalarNode` at the document root whose `Value` is
   `null` or empty (produced by a `---`-only YAML file or a blank document) is silently accepted
@@ -125,12 +133,35 @@ Error-level:
 | Test name | Blank entry in `tests` list | `Test name cannot be blank` |
 | Mapping ID | Blank | `Mapping 'id' cannot be blank` |
 
-#### Interactions with Other Units
+#### Error Handling
+
+`RequirementsLoader` reports all detected structural issues as `LintIssue` objects with
+`LintSeverity.Error`. It does not throw for domain errors; instead it records each problem and
+continues processing to collect as many issues as possible in a single run.
+
+Both `IOException` and `YamlDotNet.Core.YamlException` are caught within `LoadFile`, converted
+to `LintIssue` objects with `LintSeverity.Error`, and processing continues with the remaining
+files. Neither exception type propagates beyond `LoadFile`. No exception escapes from `Load` for
+domain-level problems.
+
+Any `LintIssue` with `LintSeverity.Error` causes `LoadResult.Requirements` to be `null`, which
+is the caller's signal that loading failed.
+
+#### Interactions
+
+**Dependencies**:
+
+| Unit | Purpose |
+| ---- | ------- |
+| `Section` | Creates and merges `Section` objects into the shared requirements tree during DOM traversal |
+| `Requirement` | Creates `Requirement` objects and populates their fields from YAML scalar and sequence nodes |
+| `LintIssue` | Creates `LintIssue` objects for every structural problem detected during loading |
+| `LoadResult` | Assembled by `Load` from the populated requirements tree and the collected issues list |
+| `PathHelpers` | Called to combine include-file directory paths with relative `includes` entries safely |
+| `YamlDotNet` | Provides the `RepresentationModel` DOM API used to parse YAML text into node trees |
+
+**Callers**:
 
 | Unit | Nature of interaction |
 | ---- | --------------------- |
-| `Requirements` | Called via `Requirements.Load`; provides the shared `Requirements` tree |
-| `Section` | Creates and merges `Section` objects during DOM traversal |
-| `Requirement` | Creates `Requirement` objects and populates their fields |
-| `LintIssue` | Creates `LintIssue` objects for every structural problem found |
-| `LoadResult` | Assembled by `Load` from the requirements tree and collected issues |
+| `Requirements` | Delegates YAML parsing and validation to `RequirementsLoader.Load` from its own `Load` factory |

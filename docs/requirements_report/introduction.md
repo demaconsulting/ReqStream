@@ -25,3 +25,8 @@ This document is intended for:
 - Quality assurance teams validating requirements coverage
 - Project stakeholders reviewing test coverage
 - Auditors verifying requirements traceability
+
+## References
+
+- ReqStream System Requirements
+- ReqStream Verification Report

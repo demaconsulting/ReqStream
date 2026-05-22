@@ -1,10 +1,22 @@
 ### RequirementsLoader Unit Verification
 
-#### Verification Strategy
+#### Verification Approach
 
 The RequirementsLoader unit is verified using xUnit unit tests in `RequirementsLoaderTests.cs`.
 Tests create YAML requirements files with specific structural conditions (unknown fields, missing
 fields, duplicate IDs, circular references, etc.) and assert on the lint issues reported.
+
+#### Test Environment
+
+The RequirementsLoader unit tests require no setup beyond the standard xUnit test runner and .NET
+runtime. Temporary YAML requirements files are created on disk and deleted on test completion.
+
+#### Acceptance Criteria
+
+The RequirementsLoader unit verification is complete when all xUnit tests in
+`RequirementsLoaderTests.cs` pass without uncaught exceptions and all assertions succeed. The unit
+is considered verified when every requirement in the Requirements Coverage table is mapped to at least one
+passing test method.
 
 #### Test Scenarios
 
@@ -19,6 +31,7 @@ Test methods:
 - `RequirementsLoader_Load_WithIoReadFailure_ReportsError` — I/O failure → error
 - `RequirementsLoader_Load_WithNonMappingRoot_ReportsError` — non-mapping root → error
 - `RequirementsLoader_Load_WithMalformedYaml_ReportsError` — malformed YAML → error
+- `RequirementsLoader_Load_WithCircularFileInclude_ReportsError` — circular file include → error
 
 ##### Document Structure Scenario
 
@@ -75,30 +88,31 @@ Test methods:
 - `RequirementsLoader_Load_WithNonScalarMappingTestEntry_ReportsError` — non-scalar mapping test
 - `RequirementsLoader_Load_WithNonScalarIncludeEntry_ReportsError` — non-scalar include entry
 
-#### Coverage Summary
+#### Requirements Coverage
 
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-Lint-InvalidFilePath` | `RequirementsLoader_Load_WithInvalidFilePath_ReportsError` |
-| `ReqStream-Lint-FileNotFound` | `RequirementsLoader_Load_WithMissingFile_ReportsError` |
-| `ReqStream-Lint-IoReadFailure` | `RequirementsLoader_Load_WithIoReadFailure_ReportsError` |
-| `ReqStream-Lint-NonMappingRoot` | `RequirementsLoader_Load_WithNonMappingRoot_ReportsError` |
-| `ReqStream-Lint-MalformedYaml` | `RequirementsLoader_Load_WithMalformedYaml_ReportsError` |
-| `ReqStream-Lint-UnknownDocumentField` | `RequirementsLoader_Load_WithUnknownDocumentField_ReportsError` |
-| `ReqStream-Lint-UnknownSectionField` | `RequirementsLoader_Load_WithUnknownSectionField_ReportsError` |
-| `ReqStream-Lint-MissingSectionTitle` | `RequirementsLoader_Load_WithSectionMissingTitle_ReportsError`, `RequirementsLoader_Load_WithBlankSectionTitle_ReportsError` |
-| `ReqStream-Lint-UnknownRequirementField` | `RequirementsLoader_Load_WithUnknownRequirementField_ReportsError`, `RequirementsLoader_Load_WithNestedSectionIssues_ReportsError` |
-| `ReqStream-Lint-MissingRequirementId` | `RequirementsLoader_Load_WithRequirementMissingId_ReportsError`, `RequirementsLoader_Load_WithBlankRequirementId_ReportsError` |
-| `ReqStream-Lint-MissingRequirementTitle` | `RequirementsLoader_Load_WithRequirementMissingTitle_ReportsError`, `RequirementsLoader_Load_WithBlankRequirementTitle_ReportsError` |
-| `ReqStream-Lint-DuplicateIds` | `RequirementsLoader_Load_WithDuplicateIds_ReportsError`, `RequirementsLoader_Load_WithDuplicateIdsAcrossFiles_ReportsError` |
-| `ReqStream-Lint-MultipleIssues` | `RequirementsLoader_Load_WithMultipleIssues_ReportsAllIssues` |
-| `ReqStream-Lint-FollowsIncludes` | `RequirementsLoader_Load_WithIncludes_LintsIncludedFiles` |
-| `ReqStream-Lint-NoIssuesMessage` | `RequirementsLoader_Load_WithValidFile_ReportsNoIssues`, `RequirementsLoader_Load_WithEmptyFile_ReportsNoIssues` |
-| `ReqStream-Lint-ErrorFormat` | `RequirementsLoader_Load_ErrorFormat_IncludesFileAndLocation` |
-| `ReqStream-Lint-UnknownMappingField` | `RequirementsLoader_Load_WithUnknownMappingField_ReportsError` |
-| `ReqStream-Lint-MissingMappingId` | `RequirementsLoader_Load_WithMappingMissingId_ReportsError`, `RequirementsLoader_Load_WithBlankMappingId_ReportsError` |
-| `ReqStream-Lint-BlankTestName` | `RequirementsLoader_Load_WithBlankTestName_ReportsError`, `RequirementsLoader_Load_WithBlankMappingTestName_ReportsError` |
-| `ReqStream-Lint-BlankTagName` | `RequirementsLoader_Load_WithBlankTagName_ReportsError` |
-| `ReqStream-Lint-NonScalarListEntries` | `RequirementsLoader_Load_WithNonScalarTestEntry_ReportsError`, `RequirementsLoader_Load_WithNonScalarChildEntry_ReportsError`, `RequirementsLoader_Load_WithNonScalarTagEntry_ReportsError`, `RequirementsLoader_Load_WithNonScalarMappingTestEntry_ReportsError`, `RequirementsLoader_Load_WithNonScalarIncludeEntry_ReportsError` |
-| `ReqStream-Lint-CircularReferences` | `RequirementsLoader_Load_WithMultipleCycles_ReportsAllCycles` |
-| `ReqStream-Lint-UnknownChildReference` | `RequirementsLoader_Load_WithUnknownChildReference_ReportsError` |
+| Requirement ID | Scenario(s) | Test Method(s) |
+| --- | --- | --- |
+| `ReqStream-Lint-InvalidFilePath` | File Loading Scenario | `RequirementsLoader_Load_WithInvalidFilePath_ReportsError` |
+| `ReqStream-Lint-FileNotFound` | File Loading Scenario | `RequirementsLoader_Load_WithMissingFile_ReportsError` |
+| `ReqStream-Lint-IoReadFailure` | File Loading Scenario | `RequirementsLoader_Load_WithIoReadFailure_ReportsError` |
+| `ReqStream-Lint-NonMappingRoot` | File Loading Scenario | `RequirementsLoader_Load_WithNonMappingRoot_ReportsError` |
+| `ReqStream-Lint-MalformedYaml` | File Loading Scenario | `RequirementsLoader_Load_WithMalformedYaml_ReportsError` |
+| `ReqStream-Lint-UnknownDocumentField` | Document Structure Scenario | `RequirementsLoader_Load_WithUnknownDocumentField_ReportsError` |
+| `ReqStream-Lint-UnknownSectionField` | Document Structure Scenario | `RequirementsLoader_Load_WithUnknownSectionField_ReportsError` |
+| `ReqStream-Lint-MissingSectionTitle` | Document Structure Scenario | `RequirementsLoader_Load_WithSectionMissingTitle_ReportsError`, `RequirementsLoader_Load_WithBlankSectionTitle_ReportsError` |
+| `ReqStream-Lint-UnknownRequirementField` | Requirement Structure Scenario | `RequirementsLoader_Load_WithUnknownRequirementField_ReportsError`, `RequirementsLoader_Load_WithNestedSectionIssues_ReportsError` |
+| `ReqStream-Lint-MissingRequirementId` | Requirement Structure Scenario | `RequirementsLoader_Load_WithRequirementMissingId_ReportsError`, `RequirementsLoader_Load_WithBlankRequirementId_ReportsError` |
+| `ReqStream-Lint-MissingRequirementTitle` | Requirement Structure Scenario | `RequirementsLoader_Load_WithRequirementMissingTitle_ReportsError`, `RequirementsLoader_Load_WithBlankRequirementTitle_ReportsError` |
+| `ReqStream-Lint-DuplicateIds` | Duplicate and Reference Scenario | `RequirementsLoader_Load_WithDuplicateIds_ReportsError`, `RequirementsLoader_Load_WithDuplicateIdsAcrossFiles_ReportsError` |
+| `ReqStream-Lint-MultipleIssues` | Validation and Reporting Scenario | `RequirementsLoader_Load_WithMultipleIssues_ReportsAllIssues` |
+| `ReqStream-Lint-FollowsIncludes` | Validation and Reporting Scenario | `RequirementsLoader_Load_WithIncludes_LintsIncludedFiles` |
+| `ReqStream-Lint-NoIssuesMessage` | Validation and Reporting Scenario | `RequirementsLoader_Load_WithValidFile_ReportsNoIssues`, `RequirementsLoader_Load_WithEmptyFile_ReportsNoIssues` |
+| `ReqStream-Lint-ErrorFormat` | Validation and Reporting Scenario | `RequirementsLoader_Load_ErrorFormat_IncludesFileAndLocation` |
+| `ReqStream-Lint-UnknownMappingField` | Mapping and List Scenario | `RequirementsLoader_Load_WithUnknownMappingField_ReportsError` |
+| `ReqStream-Lint-MissingMappingId` | Mapping and List Scenario | `RequirementsLoader_Load_WithMappingMissingId_ReportsError`, `RequirementsLoader_Load_WithBlankMappingId_ReportsError` |
+| `ReqStream-Lint-BlankTestName` | Mapping and List Scenario | `RequirementsLoader_Load_WithBlankTestName_ReportsError`, `RequirementsLoader_Load_WithBlankMappingTestName_ReportsError` |
+| `ReqStream-Lint-BlankTagName` | Mapping and List Scenario | `RequirementsLoader_Load_WithBlankTagName_ReportsError` |
+| `ReqStream-Lint-NonScalarListEntries` | Mapping and List Scenario | `RequirementsLoader_Load_WithNonScalarTestEntry_ReportsError`, `RequirementsLoader_Load_WithNonScalarChildEntry_ReportsError`, `RequirementsLoader_Load_WithNonScalarTagEntry_ReportsError`, `RequirementsLoader_Load_WithNonScalarMappingTestEntry_ReportsError`, `RequirementsLoader_Load_WithNonScalarIncludeEntry_ReportsError` |
+| `ReqStream-Lint-CircularReferences` | Duplicate and Reference Scenario | `RequirementsLoader_Load_WithMultipleCycles_ReportsAllCycles` |
+| `ReqStream-Lint-UnknownChildReference` | Duplicate and Reference Scenario | `RequirementsLoader_Load_WithUnknownChildReference_ReportsError` |
+| `ReqStream-Lint-CircularFileIncludes` | File Loading Scenario | `RequirementsLoader_Load_WithCircularFileInclude_ReportsError` |

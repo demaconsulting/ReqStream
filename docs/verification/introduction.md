@@ -27,6 +27,9 @@ This document covers verification of the following software units:
   - **Requirements** unit — parsed requirements document with section tree (`Modeling/Requirements.cs`)
   - **RequirementsLoader** unit — YAML deserializer and lint validator (`Modeling/RequirementsLoader.cs`)
   - **Section** unit — named group of requirements within a document (`Modeling/Section.cs`)
+- **Utilities** subsystem:
+  - **GlobMatcher** unit — glob pattern file matching (`Utilities/GlobMatcher.cs`)
+  - **PathHelpers** unit — safe path combination with traversal protection (`Utilities/PathHelpers.cs`)
 - **Tracing** subsystem:
   - **TraceMatrix** unit — test result loader and requirement-coverage analyzer (`Tracing/TraceMatrix.cs`)
 - **SelfTest** subsystem:
@@ -44,6 +47,10 @@ The following eleven OTS items are also verified:
 - **VersionMark** — version tracking tool
 - **WeasyPrint** — HTML to PDF converter
 - **YamlDotNet** — YAML parsing library
+- **Microsoft.Extensions.FileSystemGlobbing** — glob pattern matching library
+
+The following shared package is also verified:
+
 - **DemaConsulting.TestResults** — test result file reader
 
 The following topics are out of scope:
@@ -52,7 +59,7 @@ The following topics are out of scope:
 - Build pipeline configuration
 - Deployment and packaging
 
-## Companion Artifacts
+## Companion Artifact Structure
 
 In-house software items have parallel artifacts organized as follows:
 
@@ -62,10 +69,17 @@ In-house software items have parallel artifacts organized as follows:
 - **Source**: `src/DemaConsulting.ReqStream/.../{Item}.cs` (PascalCase)
 - **Tests**: `test/DemaConsulting.ReqStream.Tests/.../{Item}Tests.cs` (PascalCase)
 
-OTS software items have no design documentation. Their artifacts are:
+OTS software items have integration/usage design documentation for items consumed as libraries. Their artifacts are:
 
 - **Requirements**: `docs/reqstream/ots/{ots-name}.yaml`
+- **Design**: `docs/design/ots/{ots-name}.md` (library OTS items only)
 - **Verification**: `docs/verification/ots/{ots-name}.md`
+
+Shared packages have parallel artifacts organized as follows:
+
+- **Requirements**: `docs/reqstream/shared/{package-name}.yaml`
+- **Design**: `docs/design/shared/{package-name}.md`
+- **Verification**: `docs/verification/shared/{package-name}.md`
 
 Review-sets for all items are defined in `.reviewmark.yaml` at the repository root.
 

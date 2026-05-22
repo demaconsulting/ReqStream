@@ -1,6 +1,6 @@
 ### GlobMatcher Unit Design
 
-#### Overview
+#### Purpose
 
 `GlobMatcher` is a static utility class that resolves glob patterns to lists of absolute
 file paths. It wraps `Microsoft.Extensions.FileSystemGlobbing.Matcher` and adds support for
@@ -10,7 +10,13 @@ patterns in either form without special-casing.
 
 `GlobMatcher` has no mutable state; all methods are `internal static`.
 
-#### Methods
+#### Data Model
+
+N/A — `GlobMatcher` is a static class declared `internal static`. It has no mutable instance
+or class-level state; all state is allocated locally within `FindMatchingFiles` calls and is
+not shared between invocations.
+
+#### Key Methods
 
 ##### `FindMatchingFiles(patterns)`
 
@@ -54,8 +60,26 @@ tuple. The algorithm is:
      `C:\*.yaml`), the path root with its trailing separator is used instead, so that
      `DirectoryInfo` receives a valid drive-root path.
 
-#### Interactions with Other Units
+#### Error Handling
 
-| Unit        | Nature of interaction                                                                    |
-| ----------- | ---------------------------------------------------------------------------------------- |
-| `Context`   | Calls `GlobMatcher.FindMatchingFiles` to expand `--requirements` and `--tests` patterns  |
+`GlobMatcher` is designed to be non-throwing for all normal use cases:
+
+- Non-matching patterns return an empty result; no exception is raised.
+- Patterns that reference non-existent directories are skipped silently; no exception is raised.
+- `SplitAbsolutePattern` does not throw; it handles edge cases (no wildcard, no separator before
+  wildcard, empty root) using the fallback logic described in its algorithm.
+
+The caller (`Context.Create`) is responsible for deciding whether zero matching files is an
+error condition.
+
+#### Dependencies
+
+| Unit | Purpose |
+| ---- | ------- |
+| `Microsoft.Extensions.FileSystemGlobbing` | Provides the `Matcher` class used to evaluate glob patterns against the file system |
+
+#### Callers
+
+| Unit | Nature of interaction |
+| ---- | --------------------- |
+| `Context` | `Context.Create` calls `GlobMatcher.FindMatchingFiles` to resolve `--requirements` and `--tests` patterns |

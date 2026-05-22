@@ -16,6 +16,11 @@ PDF file exists, has a non-trivial size, contains at least one page, and include
 document content in the rendered text. Passing FileAssert assertions confirm WeasyPrint
 executed correctly and produced meaningful output.
 
+Note: `WeasyPrint_RequirementsPdf` and `WeasyPrint_TraceMatrixPdf` are excluded from OTS
+evidence because they depend on ReqStream output (the requirements PDF and trace matrix PDF
+are generated from ReqStream output). These tests cannot serve as pre-ReqStream qualification
+evidence; they exercise ReqStream functionality rather than WeasyPrint independently.
+
 Test evidence names:
 
 - `WeasyPrint_BuildNotesPdf` — build-notes PDF document validated

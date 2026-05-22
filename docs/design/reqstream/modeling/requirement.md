@@ -1,12 +1,14 @@
 ### Requirement Unit Design
 
-#### Overview
+#### Purpose
 
 `Requirement` is the domain model for a single requirement entry. It is a simple mutable
 data-transfer object with no business logic; its fields are populated by `RequirementsLoader`
 during YAML DOM traversal and consumed by `Requirements`, `TraceMatrix`, and the export methods.
 
-#### Properties
+#### Data Model
+
+##### Properties
 
 | Property | Type | YAML key | Notes |
 | -------- | ---- | -------- | ----- |
@@ -30,11 +32,27 @@ during YAML DOM traversal and consumed by `Requirements`, `TraceMatrix`, and the
 to empty `List<string>` instances. `Justification` defaults to `null`. `Location` defaults to
 `null`. No property is left uninitialized; callers can safely iterate lists without null checks.
 
-#### Interactions with Other Units
+#### Key Methods
+
+N/A — `Requirement` is a data-transfer object. It has no methods; all population logic resides
+in `RequirementsLoader` and all consumption logic resides in the caller units.
+
+#### Error Handling
+
+N/A — `Requirement` contains no executable logic and performs no validation. All constraint
+checking (blank `Id`, blank `Title`, duplicate `Id`, non-scalar list entries) is performed by
+`RequirementsLoader` during YAML DOM traversal. `Requirement` itself never throws.
+
+#### Interactions
+
+**Dependencies**: N/A — `Requirement` is a data-transfer object with no dependencies on other units, OTS items,
+or shared packages. It contains only built-in .NET collection types.
+
+**Callers**:
 
 | Unit | Nature of interaction |
 | ---- | --------------------- |
-| `RequirementsLoader` | Creates and populates `Requirement` objects during YAML DOM traversal |
+| `RequirementsLoader` | Creates `Requirement` objects and populates their fields during YAML DOM traversal |
 | `Section` | Holds `Requirement` objects in its `Requirements` list |
-| `TraceMatrix` | Reads `Tests` and `Children` to compute coverage |
+| `TraceMatrix` | Reads `Tests`, `Children`, and `Tags` to compute coverage and apply tag filtering |
 | `Requirements` | Exports `Requirement` fields to Markdown via `Export` and `ExportJustifications` |

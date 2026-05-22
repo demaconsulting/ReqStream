@@ -653,4 +653,287 @@ public sealed class IntegrationTests : IDisposable
         var reportContent = File.ReadAllText(reportFile);
         Assert.Contains("### Depth Test Section", reportContent);
     }
+
+    /// <summary>
+    /// Integration test verifying that circular include references are detected and reported
+    /// as errors, exercising the system-level circular include detection behavior.
+    /// </summary>
+    [Fact]
+    public void ReqStream_System_CircularIncludeDetection_CircularInclude_ReportsError()
+    {
+        // Arrange: create two files that include each other (circular)
+        var fileA = PathHelpers.SafePathCombine(_testDirectory, "a.yaml");
+        var fileB = PathHelpers.SafePathCombine(_testDirectory, "b.yaml");
+        File.WriteAllText(fileA, """
+            includes:
+              - b.yaml
+            sections:
+              - title: A Requirements
+                requirements:
+                  - id: Circular-A-Req
+                    title: Requirement A.
+                    tests:
+                      - TestA
+            """);
+        File.WriteAllText(fileB, """
+            includes:
+              - a.yaml
+            sections:
+              - title: B Requirements
+                requirements:
+                  - id: Circular-B-Req
+                    title: Requirement B.
+                    tests:
+                      - TestB
+            """);
+
+        // Act: run lint with the circular-include root file
+        var exitCode = Runner.RunInDirectory(
+            out var output,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--lint",
+            "--requirements", "a.yaml");
+
+        // Assert: lint exits with a non-zero code because a circular include was detected
+        Assert.NotEqual(0, exitCode);
+
+        // Assert: lint reported a circular-include error
+        Assert.True(
+            output.Contains("circular") || output.Contains("Circular") || output.Contains("cycle") || output.Contains("already"),
+            $"Expected lint output to reference the circular include issue. Output: {output}");
+    }
+
+    /// <summary>
+    /// Integration test verifying that sections with the same title in different included
+    /// files are automatically merged into a single section, exercising the system-level
+    /// section merging behavior.
+    /// </summary>
+    [Fact]
+    public void ReqStream_System_SectionMerging_TwoFilesWithSameSection_ProducesSingleMergedSection()
+    {
+        // Arrange: create two child files both contributing to the same section title
+        var childFileA = PathHelpers.SafePathCombine(_testDirectory, "child-a.yaml");
+        File.WriteAllText(childFileA, """
+            sections:
+              - title: Shared Section
+                requirements:
+                  - id: Merge-A-Req
+                    title: Requirement from file A.
+                    tests:
+                      - MergeTestA
+            """);
+
+        var childFileB = PathHelpers.SafePathCombine(_testDirectory, "child-b.yaml");
+        File.WriteAllText(childFileB, """
+            sections:
+              - title: Shared Section
+                requirements:
+                  - id: Merge-B-Req
+                    title: Requirement from file B.
+                    tests:
+                      - MergeTestB
+            """);
+
+        // Arrange: create root file that includes both children
+        var rootFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(rootFile, """
+            includes:
+              - child-a.yaml
+              - child-b.yaml
+            """);
+
+        var reportFile = PathHelpers.SafePathCombine(_testDirectory, "report.md");
+
+        // Act: generate a report from the merged requirements
+        var exitCode = Runner.RunInDirectory(
+            out _,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--requirements", "requirements.yaml",
+            "--report", reportFile);
+
+        // Assert: tool exited successfully
+        Assert.Equal(0, exitCode);
+
+        // Assert: report was generated
+        Assert.True(File.Exists(reportFile), "Report file should have been generated.");
+
+        // Assert: report contains requirements from both files under the merged section
+        var reportContent = File.ReadAllText(reportFile);
+        Assert.Contains("Merge-A-Req", reportContent);
+        Assert.Contains("Merge-B-Req", reportContent);
+
+        // Assert: the section title appears only once (sections were merged, not duplicated)
+        var sectionOccurrences = System.Text.RegularExpressions.Regex.Matches(
+            reportContent, @"Shared Section").Count;
+        Assert.Equal(1, sectionOccurrences);
+    }
+
+    /// <summary>
+    /// Integration test verifying that the tool reports a fatal error when a specified test
+    /// result file is missing, exercising the system-level test file error handling behavior.
+    /// </summary>
+    [Fact]
+    public void ReqStream_System_TestFileErrorHandling_MissingTestFile_ReportsFatalError()
+    {
+        // Arrange: create a minimal requirements file
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: System Requirements
+                requirements:
+                  - id: Integration-System-MissingTestFile
+                    title: The system shall do something.
+                    tests:
+                      - SomeTest
+            """);
+
+        // Act: run with a non-existent test file path
+        var exitCode = Runner.RunInDirectory(
+            out var output,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--requirements", "requirements.yaml",
+            "--tests", "nonexistent.trx",
+            "--enforce");
+
+        // Assert: tool exits with a non-zero code due to the missing file
+        Assert.NotEqual(0, exitCode);
+
+        // Assert: output contains an error referencing the missing file
+        Assert.True(
+            output.Contains("nonexistent.trx") || output.Contains("not found") || output.Contains("error") || output.Contains("Error"),
+            $"Expected error output referencing the missing test file. Output: {output}");
+    }
+
+    /// <summary>
+    /// Integration test verifying that the tool reports a fatal error when a test result file
+    /// cannot be parsed, exercising the system-level test file error handling behavior.
+    /// </summary>
+    [Fact]
+    public void ReqStream_System_TestFileErrorHandling_MalformedTestFile_ReportsFatalError()
+    {
+        // Arrange: create a minimal requirements file
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: System Requirements
+                requirements:
+                  - id: Integration-System-MalformedTestFile
+                    title: The system shall do something.
+                    tests:
+                      - SomeTest
+            """);
+
+        // Arrange: create a malformed test result file (not valid TRX or JUnit XML)
+        var malformedFile = PathHelpers.SafePathCombine(_testDirectory, "malformed.trx");
+        File.WriteAllText(malformedFile, "this is not valid XML or TRX content <<<");
+
+        // Act: run with the malformed test file path
+        var exitCode = Runner.RunInDirectory(
+            out var output,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--requirements", "requirements.yaml",
+            "--tests", "malformed.trx",
+            "--enforce");
+
+        // Assert: tool exits with a non-zero code due to the malformed file
+        Assert.NotEqual(0, exitCode);
+
+        // Assert: output contains an error referencing the malformed file
+        Assert.True(
+            output.Contains("malformed.trx") || output.Contains("error") || output.Contains("Error") || output.Contains("parse"),
+            $"Expected error output referencing the malformed test file. Output: {output}");
+    }
+
+    /// <summary>
+    /// Integration test verifying that requesting --matrix without providing any --tests files
+    /// reports an error, exercising the system-level matrix error handling behavior.
+    /// </summary>
+    [Fact]
+    public void ReqStream_System_MatrixErrorHandling_MatrixWithoutTests_ReportsError()
+    {
+        // Arrange: create a minimal requirements file
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: System Requirements
+                requirements:
+                  - id: Integration-System-MatrixNoTests
+                    title: The system shall do something.
+                    tests:
+                      - SomeTest
+            """);
+
+        var matrixFile = PathHelpers.SafePathCombine(_testDirectory, "matrix.md");
+
+        // Act: run with --matrix but without --tests
+        var exitCode = Runner.RunInDirectory(
+            out var output,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--requirements", "requirements.yaml",
+            "--matrix", matrixFile);
+
+        // Assert: tool exits with a non-zero code
+        Assert.NotEqual(0, exitCode);
+
+        // Assert: output contains an error about missing test files
+        Assert.True(
+            output.Contains("test") || output.Contains("Test") || output.Contains("matrix") || output.Contains("Matrix") || output.Contains("error") || output.Contains("Error"),
+            $"Expected error output about missing test files for matrix generation. Output: {output}");
+    }
+
+    /// <summary>
+    /// Integration test verifying that cyclic references in the child-requirement graph are
+    /// detected and reported as errors. This tests children-graph cycles (requirement A has
+    /// B as child, B has A as child), which is distinct from circular include detection.
+    /// </summary>
+    [Fact]
+    public void ReqStream_System_CyclicChildDetection_CyclicChildRequirements_ReportsError()
+    {
+        // Arrange: create a requirements file with a cyclic children graph
+        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        File.WriteAllText(reqFile, """
+            sections:
+              - title: System Requirements
+                requirements:
+                  - id: Cyclic-Req-A
+                    title: Requirement A references B as child.
+                    tests:
+                      - TestA
+                    children:
+                      - Cyclic-Req-B
+                  - id: Cyclic-Req-B
+                    title: Requirement B references A as child (creating a cycle).
+                    tests:
+                      - TestB
+                    children:
+                      - Cyclic-Req-A
+            """);
+
+        // Act: run lint with the cyclic requirements file
+        var exitCode = Runner.RunInDirectory(
+            out var output,
+            _testDirectory,
+            "dotnet",
+            _dllPath,
+            "--lint",
+            "--requirements", "requirements.yaml");
+
+        // Assert: lint exits with a non-zero code because a cycle was detected
+        Assert.NotEqual(0, exitCode);
+
+        // Assert: output contains an error referencing the cycle
+        Assert.True(
+            output.Contains("cycle") || output.Contains("Cycle") || output.Contains("circular") || output.Contains("Circular"),
+            $"Expected lint output to reference the cyclic children graph. Output: {output}");
+    }
 }

@@ -20,3 +20,4 @@ sections:
             tests:
               - FileAssert_VersionDisplay
               - FileAssert_HelpDisplay
+              - Pandoc_DesignHtml

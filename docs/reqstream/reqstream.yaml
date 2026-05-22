@@ -1,6 +1,7 @@
 ---
 includes:
   - reqstream/cli.yaml
+  - reqstream/utilities.yaml
   - reqstream/modeling.yaml
   - reqstream/tracing.yaml
   - reqstream/self-test.yaml
@@ -19,6 +20,7 @@ sections:
             justification: |
               Providing the version at the system entry point ensures users and tooling can
               confirm which release is deployed without running the full pipeline.
+            tags: [system]
             tests:
               - ReqStream_System_CliInterface_VersionFlag_PrintsVersion
             children:
@@ -31,11 +33,11 @@ sections:
             justification: |
               Providing built-in help at the system entry point enables users to discover
               available flags and options without consulting external documentation.
+            tags: [system]
             tests:
               - ReqStream_System_CliInterface_HelpFlag_PrintsHelp
             children:
               - ReqStream-Cli-Interface
-              - ReqStream-Cli-MissingArgumentValue
               - ReqStream-Program-Help
 
           - id: ReqStream-System-FullPipeline
@@ -47,15 +49,18 @@ sections:
               enforcement in a single invocation is the primary CI/CD use case. This system-level
               requirement verifies that all subsystems — Modeling, Tracing, and Program —
               work correctly when integrated together.
+            tags: [system]
             tests:
               - ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces
             children:
               - ReqStream-Program-Requirements
               - ReqStream-Modeling-YamlParsing
               - ReqStream-Tracing-TestResults
+              - ReqStream-Tracing-Mapping
               - ReqStream-Modeling-Export
               - ReqStream-Tracing-Reporting
               - ReqStream-Tracing-Coverage
+              - ReqStream-Cli-MissingArgumentValue
 
           - id: ReqStream-System-SourceFilter
             title: >-
@@ -65,6 +70,7 @@ sections:
               When running tests across multiple platforms or configurations, each producing
               separate test result files, source-specific matching ensures that platform-specific
               requirements are satisfied only by test evidence from the appropriate source files.
+            tags: [system]
             tests:
               - ReqStream_SourceFilter_NamedSourceInRequirement_MatchesTestsBySourceFile
             children:
@@ -79,6 +85,7 @@ sections:
               that the CI/CD pipeline fails if any requirement is not covered by passing tests.
               This validates both the positive case (all requirements satisfied, exit code 0) and
               the negative case (unsatisfied requirement, non-zero exit code).
+            tags: [system]
             tests:
               - ReqStream_EnforcementMode_RequirementLacksTestEvidence_FailsWithNonZeroExitCode
             children:
@@ -93,6 +100,7 @@ sections:
               Linting enables CI/CD pipelines to catch malformed YAML, missing mandatory fields,
               unknown fields, duplicate IDs, and other structural problems early, before they cause
               silent failures in downstream processing.
+            tags: [system]
             tests:
               - ReqStream_System_Lint_Flag_ReportsLintIssues
               - ReqStream_System_Lint_ValidRequirementsFile_ExitsSilentlyWithZero
@@ -111,6 +119,7 @@ sections:
               In regulated environments, tool qualification evidence is required to demonstrate that
               the tool functions correctly in its deployment environment. The self-test suite
               exercises core behaviors and produces a pass/fail summary.
+            tags: [system]
             tests:
               - ReqStream_System_Validate_Flag_RunsSelfValidation
             children:
@@ -125,6 +134,7 @@ sections:
             justification: |
               Results file output enables CI/CD pipeline integration and requirements traceability
               tool consumption.
+            tags: [system]
             tests:
               - ReqStream_System_ValidateResultsOutput_ResultsFlag_WritesResultsFile
             children:
@@ -137,6 +147,7 @@ sections:
             justification: |
               Markdown report generation from requirements data enables documentation to be produced
               automatically from requirements files, reducing manual effort and ensuring consistency.
+            tags: [system]
             tests:
               - ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces
             children:
@@ -149,6 +160,7 @@ sections:
             justification: |
               Trace matrix export provides visibility into test coverage and requirement
               satisfaction, essential for quality assurance and compliance reporting.
+            tags: [system]
             tests:
               - ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces
             children:
@@ -161,6 +173,7 @@ sections:
             justification: |
               Justification export enables stakeholders to understand the rationale behind
               requirements, supporting design reviews, audits, and compliance activities.
+            tags: [system]
             tests:
               - ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces
             children:
@@ -172,6 +185,7 @@ sections:
             justification: |
               Tag-based filtering enables selective export of requirement subsets for focused
               reports, security audits, compliance documentation, and targeted reviews.
+            tags: [system]
             tests:
               - ReqStream_System_TagFilter_Flag_FiltersRequirements
             children:
@@ -179,22 +193,33 @@ sections:
               - ReqStream-Tracing-Reporting
               - ReqStream-Modeling-Export
 
-          - id: ReqStream-System-OutputRouting
+          - id: ReqStream-System-LogFileOutput
             title: >-
-              The system shall support configurable output routing, including log file output
-              and console output suppression, via command-line flags.
+              The system shall write all output to a log file when the log flag is provided.
             justification: |
-              Directing output to a log file and suppressing console output enables quiet operation
-              in automated CI/CD pipelines. These behaviors are user-visible system features
-              requiring traceability through the Cli subsystem.
+              Directing output to a log file enables quiet operation in automated CI/CD pipelines
+              and provides a persistent record of tool output for post-run analysis.
+            tags: [system]
             tests:
               - ReqStream_System_OutputControl_LogFlag_WritesOutputToFile
+              - ReqStream_System_OutputControl_LogFlag_WithoutSilent_WritesOutputToFileAndConsole
+            children:
+              - ReqStream-Cli-Output
+              - ReqStream-Cli-LogFileOpenFailure
+
+          - id: ReqStream-System-SilentMode
+            title: >-
+              The system shall suppress console output when the silent flag is provided.
+            justification: |
+              Suppressing console output enables clean integration in CI/CD pipelines where only
+              the exit code matters and console output would pollute the build log.
+            tags: [system]
+            tests:
               - ReqStream_System_OutputControl_SilentFlag_SuppressesConsoleOutput
             children:
               - ReqStream-Cli-Output
               - ReqStream-Cli-StderrRouting
               - ReqStream-Cli-ExitCodeSignaling
-              - ReqStream-Cli-LogFileOpenFailure
 
           - id: ReqStream-System-ReportDepth
             title: >-
@@ -204,6 +229,7 @@ sections:
               enabling integration with external document workflows that require specific
               heading hierarchies. A single --depth flag sets the default for all report types,
               with per-report overrides available for fine-grained control.
+            tags: [system]
             tests:
               - ReqStream_System_ReportDepth_DepthFlag_GeneratesReportWithCorrectHeadingLevel
             children:
@@ -221,6 +247,7 @@ sections:
               test references from the CI matrix job, scoped to the specific platform or runtime
               it represents. Satisfaction of all children constitutes complete evidence for this
               system-level requirement.
+            tags: [system]
             children:
               # Each child carries source-filtered test references from the CI matrix job,
               # providing platform- and runtime-specific evidence. Satisfaction of all
@@ -240,10 +267,12 @@ sections:
               File includes allow requirements to be split across multiple YAML files organized
               by component, team, or release, while still producing a single unified requirements
               tree. This is essential for scalable requirements management in large repositories.
+            tags: [system]
             tests:
               - ReqStream_System_FileIncludes_RequirementsWithIncludes_LoadsAllRequirements
             children:
               - ReqStream-Requirements-Includes
+              - ReqStream-Modeling-MultiFileLoading
 
           - id: ReqStream-System-SectionMerging
             title: >-
@@ -254,8 +283,10 @@ sections:
               explicit namespace or import declaration. Multiple files can contribute to the same
               logical section, allowing requirements to be organized by feature, component, or
               responsibility while still producing one coherent requirement tree.
+            tags: [system]
             tests:
               - ReqStream_System_FileIncludes_RequirementsWithIncludes_LoadsAllRequirements
+              - ReqStream_System_SectionMerging_TwoFilesWithSameSection_ProducesSingleMergedSection
             children:
               - ReqStream-Requirements-SectionMerging
               - ReqStream-Section-TitleMerging
@@ -268,5 +299,52 @@ sections:
               Circular includes (A includes B, B includes A) would cause infinite loading loops.
               Detecting and reporting them prevents hangs and provides users with a clear error
               message identifying the problematic file.
+            tags: [system]
+            tests:
+              - ReqStream_System_CircularIncludeDetection_CircularInclude_ReportsError
+            children:
+              - ReqStream-Requirements-CircularInclude
+
+          - id: ReqStream-System-TestFileErrorHandling
+            title: >-
+              The system shall report a fatal error when a test result file is missing or
+              cannot be parsed.
+            justification: |
+              Missing or malformed test result files indicate a misconfiguration or broken
+              CI pipeline step. Reporting a clear fatal error prevents silent data loss and
+              allows users to diagnose the problem quickly.
+              Satisfaction of all children constitutes complete evidence for this
+              system-level requirement.
+            tags: [system]
+            children:
+              - ReqStream-Tracing-MissingFile
+              - ReqStream-Tracing-MalformedFile
+
+          - id: ReqStream-System-MatrixErrorHandling
+            title: >-
+              The system shall report an error when a trace matrix is requested but no test
+              result files are provided.
+            justification: |
+              Requesting a matrix without providing test files is a user configuration error.
+              Reporting a clear error prevents silent failures and guides users to provide the
+              required test result files.
+              Satisfaction of all children constitutes complete evidence for this
+              system-level requirement.
+            tags: [system]
+            children:
+              - ReqStream-Program-MatrixNoTests
+
+          - id: ReqStream-System-CyclicChildDetection
+            title: >-
+              The system shall detect and report cyclic references in the child-requirement
+              graph before any downstream analysis.
+            justification: |
+              Cyclic requirement hierarchies would cause infinite recursion in trace matrix
+              generation. Detecting and reporting all cycles before any analysis begins ensures
+              downstream processing is safe. This corresponds to the ValidateCycles measure
+              described in the Risk Control Measures section of the design document.
+              Satisfaction of all children constitutes complete evidence for this
+              system-level requirement.
+            tags: [system]
             children:
               - ReqStream-Lint-CircularReferences
