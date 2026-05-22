@@ -5,55 +5,56 @@ software requirements in YAML format.
 
 ## Purpose
 
-This document serves as the comprehensive user guide for ReqStream, a .NET command-line tool for managing software
-requirements. It provides complete instructions for installing, configuring, and using ReqStream to manage
-requirements in a structured, version-controllable manner.
+ReqStream enables software development teams to manage requirements as YAML files stored alongside source code in
+version control. It provides validation, linting, traceability, and test-mapping capabilities, enabling teams to
+generate compliance evidence automatically on every CI run as part of the
+[Continuous Compliance][continuous-compliance] methodology by DEMA Consulting.
+
+ReqStream offers the following capabilities:
+
+- **YAML Format** — manage requirements in human-readable YAML format that integrates with source control and
+  code review workflows
+- **Command-Line Interface** — automate requirement management with CLI tools for use in build systems and
+  CI/CD pipelines
+- **Multi-Platform** — works on Windows, Linux, and macOS with .NET 8, 9, and 10
+- **Hierarchical Structure** — organize requirements with sections and subsections for better organization
+- **Test Mapping** — link requirements to test cases for traceability and verification
+- **Source-Specific Test Matching** — restrict coverage evidence to named result files using `filepart@testname`
+  syntax
+- **Justifications** — document the rationale behind each requirement
+- **File Includes** — modularize requirements across multiple YAML files for better maintainability
+- **Circular Include Detection** — automatically detects and reports circular include references
+- **Linting** — inspect requirements files for structural issues and reference errors, reporting all issues in
+  one pass
+- **Validation** — run a built-in self-test suite to qualify the tool in its deployment environment
+- **Tag Filtering** — categorize and filter requirements using tags for focused reporting
+- **Configurable Report Depth** — control Markdown heading levels via `--depth`, `--report-depth`,
+  `--matrix-depth`, and `--justifications-depth` flags
+- **Export Capabilities** — generate Markdown reports for requirements, justifications, and test trace matrices
+- **Continuous Compliance** — automatically generate compliance evidence on every CI run
 
 ## Scope
 
-This introduction covers the following topics:
+This guide covers the following topics:
 
-- What ReqStream is and the problems it solves
-- Key features and capabilities
-- Primary use cases
+- Installation as a global or local .NET tool
+- Requirements YAML file format, including sections, requirements, test mappings, tags, and file includes
+- The full command-line interface with all options and usage examples
+- Exporting requirements reports, justifications, and trace matrices
+- Requirements enforcement in CI/CD pipelines
+- Frequently asked questions and troubleshooting
+
+Prerequisites: a .NET SDK version 8.0, 9.0, or 10.0 is required. Basic familiarity with command-line tools and
+YAML syntax is helpful.
 
 This guide does not cover the internal implementation of ReqStream or advanced customization beyond the documented
 command-line options and YAML format.
 
-## What is ReqStream
+## References
 
-ReqStream is a .NET command-line tool designed to help teams manage software requirements in a structured,
-version-controllable, and maintainable way. By using YAML files to define requirements, ReqStream enables requirements
-to be treated as code, stored in source control, and integrated into CI/CD pipelines.
-
-## Key Features
-
-- **YAML Format** - Manage requirements in human-readable YAML format that can be easily edited and reviewed
-- **Command-Line Interface** - Automate requirement management with CLI tools that integrate with build systems
-- **Multi-Platform** - Works on Windows, Linux, and macOS with .NET 8, 9, and 10
-- **Hierarchical Structure** - Organize requirements with sections and subsections for better organization
-- **Test Mapping** - Link requirements to test cases for traceability and verification
-- **Source-Specific Test Matching** - Restrict coverage evidence to named result files using `filepart@testname` syntax
-- **Justifications** - Document the rationale behind each requirement for better understanding
-- **File Includes** - Modularize requirements across multiple YAML files for better maintainability
-- **Circular Include Detection** - Automatically detects and reports circular include references to prevent infinite loading loops
-- **Linting** - Inspect requirements files for structural issues and reference errors, reporting all problems in one pass
-- **Validation** - Run a built-in self-test suite to qualify the tool in its deployment environment
-- **Tag Filtering** - Categorize and filter requirements using tags for focused reporting and enforcement
-- **Configurable Report Depth** - Control Markdown heading levels in exported reports via `--depth`, `--report-depth`, `--matrix-depth`, and `--justifications-depth` flags
-- **Export Capabilities** - Generate markdown reports for requirements, justifications, and test trace matrices
-- **Continuous Compliance** - Automatically generate compliance evidence on every CI run, following the
-  [Continuous Compliance][continuous-compliance] methodology
-
-## Use Cases
-
-ReqStream is ideal for:
-
-- Software development projects requiring formal requirements documentation
-- Teams practicing DevOps and want requirements versioned alongside code
-- Projects needing traceability between requirements and test cases
-- Organizations requiring compliance documentation
-- Agile teams wanting lightweight, maintainable requirements management
+- [ReqStream releases](https://github.com/demaconsulting/ReqStream/releases) — compiled project documentation
+- [Continuous Compliance](https://github.com/demaconsulting/ContinuousCompliance) — the compliance methodology
+  that ReqStream is designed to support
 
 # Continuous Compliance
 
@@ -1455,18 +1456,9 @@ reqstream --requirements "docs/**/*.yaml"
 A: If you get `reqstream: command not found`, the tool isn't installed or not in your PATH. For global installation,
 ensure `~/.dotnet/tools` is in your PATH. For local installation, use `dotnet reqstream` instead of `reqstream`.
 
----
-
 For more information, visit the [ReqStream GitHub repository][repo].
 
 For support, please [open an issue][issues] or [start a discussion][discussions].
-
-## References
-
-- [Continuous Compliance](https://github.com/demaconsulting/ContinuousCompliance) — the
-  methodology that ReqStream is designed to support.
-- [ReqStream GitHub Repository](https://github.com/demaconsulting/ReqStream) — source code,
-  issues, and releases.
 
 <!-- Link References -->
 [dotnet-sdk]: https://dotnet.microsoft.com/download

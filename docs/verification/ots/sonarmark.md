@@ -1,4 +1,4 @@
-## SonarMark Verification
+## SonarMark
 
 ### Required Functionality
 
@@ -12,18 +12,16 @@ SonarMark is verified by CI pipeline step evidence. The tool's built-in `--valid
 command is executed in the CI pipeline and writes test method results to a TRX file.
 The TRX file is consumed by ReqStream to satisfy the OTS requirement.
 
-Test evidence names (test methods written to the TRX file by `dotnet sonarmark --validate`):
+### Test Scenarios
 
-- `SonarMark_QualityGateRetrieval` — validates that SonarMark can retrieve quality gate data
-- `SonarMark_IssuesRetrieval` — validates that SonarMark can retrieve issue counts
-- `SonarMark_HotSpotsRetrieval` — validates that SonarMark can retrieve hotspot data
-- `SonarMark_MarkdownReportGeneration` — validates that SonarMark can generate a Markdown report
+**Quality Gate Retrieval**: Validates that SonarMark can retrieve quality gate data from
+SonarCloud. This scenario is tested by `SonarMark_QualityGateRetrieval`.
 
-### Coverage Summary
+**Issues Retrieval**: Validates that SonarMark can retrieve issue counts from SonarCloud. This
+scenario is tested by `SonarMark_IssuesRetrieval`.
 
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-OTS-SonarMark` | `SonarMark_QualityGateRetrieval` |
-| `ReqStream-OTS-SonarMark` | `SonarMark_IssuesRetrieval` |
-| `ReqStream-OTS-SonarMark` | `SonarMark_HotSpotsRetrieval` |
-| `ReqStream-OTS-SonarMark` | `SonarMark_MarkdownReportGeneration` |
+**Hotspots Retrieval**: Validates that SonarMark can retrieve hotspot data from SonarCloud. This
+scenario is tested by `SonarMark_HotSpotsRetrieval`.
+
+**Markdown Report Generation**: Validates that SonarMark can generate a Markdown report from
+SonarCloud quality data. This scenario is tested by `SonarMark_MarkdownReportGeneration`.

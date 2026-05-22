@@ -1,4 +1,4 @@
-### Requirement Unit Design
+### Requirement
 
 #### Purpose
 
@@ -8,33 +8,30 @@ during YAML DOM traversal and consumed by `Requirements`, `TraceMatrix`, and the
 
 #### Data Model
 
-##### Properties
+**`Id`**: `string` — unique across all loaded files; must not be blank. YAML key: `id`.
 
-| Property | Type | YAML key | Notes |
-| -------- | ---- | -------- | ----- |
-| `Id` | `string` | `id` | Unique across all loaded files; must not be blank |
-| `Title` | `string` | `title` | Human-readable name; must not be blank |
-| `Justification` | `string?` | `justification` | Optional rationale text |
-| `Tests` | `List<string>` | `tests` | Test identifiers linked to this requirement |
-| `Children` | `List<string>` | `children` | IDs of child requirements |
-| `Tags` | `List<string>` | `tags` | Optional labels for filtering and export |
-| `Location` | `string?` | — | Source path and line/column where the requirement is defined |
+**`Title`**: `string` — human-readable name; must not be blank. YAML key: `title`.
 
-#### Constraints
+**`Justification`**: `string?` — optional rationale text. YAML key: `justification`.
 
-- `Id` must be unique across all files loaded in a single `Requirements.Load` call.
-  Duplicates are detected and reported by `RequirementsLoader`.
-- `Title` must not be blank.
-- Entries in `Tests`, `Children`, and `Tags` must be non-blank scalar strings.
-  Non-scalar or blank entries are reported as errors by `RequirementsLoader`.
+**`Tests`**: `List<string>` — test identifiers linked to this requirement. YAML key: `tests`.
+Initialized to empty list.
 
-**Default property values**: All list properties (`Tests`, `Children`, `Tags`) are initialized
-to empty `List<string>` instances. `Justification` defaults to `null`. `Location` defaults to
+**`Children`**: `List<string>` — IDs of child requirements. YAML key: `children`. Initialized to
+empty list.
+
+**`Tags`**: `List<string>` — optional labels for filtering and export. YAML key: `tags`.
+Initialized to empty list.
+
+**`Location`**: `string?` — source path and line/column where the requirement is defined. Not
+from YAML; set by `RequirementsLoader`. Defaults to `null`.
+
+All list properties are initialized to empty instances. `Justification` and `Location` default to
 `null`. No property is left uninitialized; callers can safely iterate lists without null checks.
 
 #### Key Methods
 
-N/A — `Requirement` is a data-transfer object. It has no methods; all population logic resides
+N/A — `Requirement` is a data-transfer object with no methods. All population logic resides
 in `RequirementsLoader` and all consumption logic resides in the caller units.
 
 #### Error Handling
@@ -43,16 +40,17 @@ N/A — `Requirement` contains no executable logic and performs no validation. A
 checking (blank `Id`, blank `Title`, duplicate `Id`, non-scalar list entries) is performed by
 `RequirementsLoader` during YAML DOM traversal. `Requirement` itself never throws.
 
-#### Interactions
+#### Dependencies
 
-**Dependencies**: N/A — `Requirement` is a data-transfer object with no dependencies on other units, OTS items,
+N/A — `Requirement` is a data-transfer object with no dependencies on other units, OTS items,
 or shared packages. It contains only built-in .NET collection types.
 
-**Callers**:
+#### Callers
 
-| Unit | Nature of interaction |
-| ---- | --------------------- |
-| `RequirementsLoader` | Creates `Requirement` objects and populates their fields during YAML DOM traversal |
-| `Section` | Holds `Requirement` objects in its `Requirements` list |
-| `TraceMatrix` | Reads `Tests`, `Children`, and `Tags` to compute coverage and apply tag filtering |
-| `Requirements` | Exports `Requirement` fields to Markdown via `Export` and `ExportJustifications` |
+- **RequirementsLoader** — creates `Requirement` objects and populates their fields during YAML
+  DOM traversal.
+- **Section** — holds `Requirement` objects in its `Requirements` list.
+- **TraceMatrix** — reads `Tests`, `Children`, and `Tags` to compute coverage and apply tag
+  filtering.
+- **Requirements** — exports `Requirement` fields to Markdown via `Export` and
+  `ExportJustifications`.

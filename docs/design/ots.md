@@ -1,23 +1,24 @@
-# OTS Software Design
+# OTS Dependencies
 
 This chapter covers the design integration of Off-The-Shelf (OTS) software packages used by
-ReqStream. OTS items are not developed in-house. Each section describes how the package is
-integrated, which units call it, and how errors are handled.
+ReqStream. Each OTS item is accessed through a single dedicated wrapper or utility class within
+the system, ensuring minimal coupling and straightforward replacement.
 
 ## Selection Criteria
 
 OTS items for ReqStream are selected based on the following criteria:
 
-- **License compatibility**: Only packages with MIT, Apache-2.0, or BSD-style licenses are used,
+- **License compatibility** — only packages with MIT, Apache-2.0, or BSD-style licenses are used,
   consistent with the MIT license of ReqStream itself.
-- **Community support and maturity**: Packages must have active maintenance, stable versioning, and
-  a history of production use within the .NET ecosystem.
-- **NuGet availability**: All OTS items must be available as NuGet packages and support
-  deterministic builds to ensure reproducibility.
-- **Minimal API surface**: Preference is given to packages with a focused API that closely matches
-  the specific local need, reducing the risk of unintentional coupling to package internals.
-- **Security track record**: Packages must not carry known critical vulnerabilities; advisory
+- **Community support and maturity** — packages must have active maintenance, stable versioning,
+  and a history of production use within the .NET ecosystem.
+- **Security track record** — packages must not carry known critical vulnerabilities; advisory
   notices are reviewed before any version is adopted.
+- **Minimal API surface** — preference is given to packages with a focused API that closely
+  matches the specific local need, reducing the risk of unintentional coupling to package
+  internals.
+- **NuGet availability** — all OTS items must be available as NuGet packages and support
+  deterministic builds to ensure reproducibility.
 
 ## Version Management Policy
 
@@ -29,6 +30,8 @@ current through automated Dependabot pull requests. The following policies apply
   is updated before the upgrade is merged.
 - Version numbers are not recorded in design documentation; authoritative version information is
   maintained in the project file and in published Software Bill of Materials (SBOM) artifacts.
+- Reproducible builds are ensured through lock files and pinned package versions in the project
+  file.
 
 ## General Integration Approach
 
@@ -42,8 +45,7 @@ through a single dedicated wrapper or utility class within ReqStream:
   which encapsulates all glob-pattern matching and exposes a simple `FindMatchingFiles` API to
   the rest of the system.
 - **DemaConsulting.TestResults** is accessed through `TraceMatrix` and `Validation`, which are
-  the only units that call the package's deserialization and serialization APIs directly. Full
-  integration details are in `docs/design/ots/dema-consulting-test-results.md`.
+  the only units that call the package's deserialization and serialization APIs directly.
 
 This single-use-site pattern means that replacing an OTS package requires changes to only one
 unit in the codebase, minimizing the impact of future upgrades or substitutions.
@@ -55,13 +57,3 @@ OTS items are qualified through integration tests in the main test project
 the specific features consumed by ReqStream and confirm that they behave as expected in the
 local execution environment. These tests also serve as regression evidence when OTS package
 versions are upgraded via Dependabot.
-
-## OTS Items
-
-The following OTS packages are used by ReqStream:
-
-| Package | Purpose |
-| ------- | ------- |
-| `YamlDotNet` | YAML parsing in the Modeling subsystem |
-| `Microsoft.Extensions.FileSystemGlobbing` | Glob pattern matching in the Utilities subsystem |
-| `DemaConsulting.TestResults` | Test result deserialization (TRX, JUnit) in the Tracing and SelfTest subsystems |

@@ -1,4 +1,4 @@
-### Validation Unit Verification
+### Validation
 
 #### Verification Approach
 
@@ -16,36 +16,31 @@ completion.
 
 The Validation unit verification is complete when all xUnit tests in `ValidationTests.cs` pass
 without uncaught exceptions and all assertions succeed. The unit is considered verified when every
-requirement in the Requirements Coverage is mapped to at least one passing test method.
+requirement in the Requirements Coverage table is mapped to at least one passing test method.
 
 #### Test Scenarios
 
-##### Self-Validation Scenario
+**Self-Validation**: Tests verify that `Validation.Run` completes successfully and produces
+expected output, including TRX and JUnit XML results file writing. This scenario is tested by
+`Validation_Run_WithNullContext_ThrowsArgumentNullException`,
+`Validation_Run_WithSilentContext_CompletesSuccessfully`,
+`Validation_Run_WithTrxResultsFile_WritesTrxFile`, and
+`Validation_Run_WithXmlResultsFile_WritesXmlFile`.
 
-Tests verify that `Validation.Run` completes successfully and produces expected output.
-
-Test methods:
-
-- `Validation_Run_WithNullContext_ThrowsArgumentNullException` — null → ArgumentNullException
-- `Validation_Run_WithSilentContext_CompletesSuccessfully` — validation runs and produces summary
-- `Validation_Run_WithTrxResultsFile_WritesTrxFile` — TRX file written and contains TestRun
-- `Validation_Run_WithXmlResultsFile_WritesXmlFile` — JUnit XML file written and contains testsuite
-
-##### Error and Continuation Scenario
-
-Tests verify error handling when result files cannot be written.
-
-Test methods:
-
-- `Validation_Run_WithUnwritableResultsFile_ReportsError` — write failure → exit code 1
-- `Validation_Run_WithUnwritableResultsFile_Continues` — write failure → summary still produced
-- `Validation_Run_WithInvalidResultsExtension_ReportsError` — unsupported extension → exit code 1
+**Error and Continuation**: Tests verify error handling when result files cannot be written and
+when an unsupported results file extension is provided, and confirm that processing continues
+even after a write failure. This scenario is tested by
+`Validation_Run_WithUnwritableResultsFile_ReportsError`,
+`Validation_Run_WithUnwritableResultsFile_Continues`, and
+`Validation_Run_WithInvalidResultsExtension_ReportsError`.
 
 #### Requirements Coverage
 
 | Requirement ID | Scenario(s) | Test Method(s) |
 | --- | --- | --- |
-| `ReqStream-Validation-SelfValidation` | Self-Validation Scenario | `Validation_Run_WithSilentContext_CompletesSuccessfully`, `Validation_Run_WithTrxResultsFile_WritesTrxFile`, `Validation_Run_WithXmlResultsFile_WritesXmlFile` |
+| `ReqStream-Validation-SelfValidation` | Self-Validation Scenario | `Validation_Run_WithSilentContext_CompletesSuccessfully` |
+| `ReqStream-Validation-SelfValidation` | Self-Validation Scenario | `Validation_Run_WithTrxResultsFile_WritesTrxFile` |
+| `ReqStream-Validation-SelfValidation` | Self-Validation Scenario | `Validation_Run_WithXmlResultsFile_WritesXmlFile` |
 | `ReqStream-Validation-NullContext` | Self-Validation Scenario | `Validation_Run_WithNullContext_ThrowsArgumentNullException` |
 | `ReqStream-Validation-UnsupportedResultsFormat` | Error and Continuation Scenario | `Validation_Run_WithInvalidResultsExtension_ReportsError` |
 | `ReqStream-Validation-WriteFailure-ReportsError` | Error and Continuation Scenario | `Validation_Run_WithUnwritableResultsFile_ReportsError` |

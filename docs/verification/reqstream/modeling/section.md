@@ -1,4 +1,4 @@
-### Section Unit Verification
+### Section
 
 #### Verification Approach
 
@@ -19,20 +19,18 @@ requirement in the Requirements Coverage table is mapped to at least one passing
 
 #### Test Scenarios
 
-##### Section Container Scenario
-
-Tests verify that a section holds a title, requirements, and child sections correctly.
-
-Test methods:
-
-- `Section_Load_SimpleRequirement_ParsesCorrectly` — single requirement in a section
-- `Section_Load_NestedSections_ParsesHierarchyCorrectly` — nested child sections
-- `Section_Load_BlankSectionTitle_ReportsErrorWithFileLocation` — blank title → error with location
+**Section Container**: Tests verify that a section holds a title, requirements, and child sections
+correctly, and that a blank section title is reported as an error with file location. This
+scenario is tested by `Section_Load_SimpleRequirement_ParsesCorrectly`,
+`Section_Load_NestedSections_ParsesHierarchyCorrectly`, and
+`Section_Load_BlankSectionTitle_ReportsErrorWithFileLocation`.
 
 #### Requirements Coverage
 
 | Requirement ID | Scenario(s) | Test Method(s) |
 | --- | --- | --- |
-| `ReqStream-Section-Container` | Section Container Scenario | `Section_Load_SimpleRequirement_ParsesCorrectly`, `Section_Load_NestedSections_ParsesHierarchyCorrectly` |
-| `ReqStream-Section-Nesting` | Section Container Scenario | `Section_Load_NestedSections_ParsesHierarchyCorrectly`, `Requirements_Export_NestedSections_CreatesHierarchy` |
+| `ReqStream-Section-Container` | Section Container Scenario | `Section_Load_SimpleRequirement_ParsesCorrectly` |
+| `ReqStream-Section-Container` | Section Container Scenario | `Section_Load_NestedSections_ParsesHierarchyCorrectly` |
+| `ReqStream-Section-Nesting` | Section Container Scenario | `Section_Load_NestedSections_ParsesHierarchyCorrectly` |
+| `ReqStream-Section-Nesting` | Section Container Scenario | `Requirements_Export_NestedSections_CreatesHierarchy` |
 | `ReqStream-Section-TitleMerging` | Section Container Scenario | `Requirements_Load_IdenticalSections_MergesCorrectly` |

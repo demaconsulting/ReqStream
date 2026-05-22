@@ -1,6 +1,6 @@
-## SelfTest Subsystem Verification
+## SelfTest
 
-### Verification Strategy
+### Verification Approach
 
 The SelfTest subsystem is verified using xUnit integration tests in `SelfTestTests.cs`. Tests
 invoke `Validation.Run` through a silent `Context` and assert on the exit code, results file
@@ -20,30 +20,18 @@ every requirement in the Requirements Coverage table is mapped to at least one p
 
 ### Test Scenarios
 
-#### Qualification Scenario
+**Qualification**: Tests verify that the self-validation suite completes successfully. This
+scenario is tested by `SelfTest_Qualification_Run_PassesAllTests`, which verifies validation
+passes with exit code 0.
 
-Tests verify that the self-validation suite completes successfully.
+**Results Output**: Tests verify that TRX and JUnit XML result files are written. This scenario
+is tested by `SelfTest_ResultsOutput_TrxResultsPath_WritesTrxFile`, which verifies a TRX file is
+written, and `SelfTest_ResultsOutput_XmlResultsPath_WritesJUnitFile`, which verifies a JUnit XML
+file is written.
 
-Test methods:
-
-- `SelfTest_Qualification_Run_PassesAllTests` — validation passes with exit code 0
-
-#### Results Output Scenario
-
-Tests verify that TRX and JUnit XML result files are written.
-
-Test methods:
-
-- `SelfTest_ResultsOutput_TrxResultsPath_WritesTrxFile` — TRX file written
-- `SelfTest_ResultsOutput_XmlResultsPath_WritesJUnitFile` — JUnit XML file written
-
-#### Failure Reporting Scenario
-
-Tests verify that errors are reported and exit code is 1 on failures.
-
-Test methods:
-
-- `SelfTest_FailureReporting_WithErrors_SetsExitCode1` — errors → exit code 1
+**Failure Reporting**: Tests verify that errors are reported and exit code is 1 on failures. This
+scenario is tested by `SelfTest_FailureReporting_WithErrors_SetsExitCode1`, which verifies errors
+produce exit code 1.
 
 ### Requirements Coverage
 

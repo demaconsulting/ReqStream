@@ -1,12 +1,9 @@
 ---
-# xUnit OTS Software Requirements
-#
-# Requirements for the xUnit testing framework functionality.
-
+# xUnit OTS requirements
 sections:
   - title: OTS Software Requirements
     sections:
-      - title: xUnit Requirements
+      - title: xUnit
         requirements:
           - id: ReqStream-OTS-XUnit
             title: xUnit shall execute unit tests and report results.

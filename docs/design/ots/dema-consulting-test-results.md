@@ -1,44 +1,47 @@
-## DemaConsulting.TestResults Integration Design
+## DemaConsulting.TestResults
+
+`DemaConsulting.TestResults` provides test result deserialization and serialization for the
+ReqStream Tracing and SelfTest subsystems. It reads TRX (MSTest) and JUnit XML result files and
+exposes the results as .NET objects used for coverage analysis and self-validation output.
 
 ### Purpose
 
-`DemaConsulting.TestResults` provides test result deserialization for ReqStream's Tracing
-and SelfTest subsystems. It reads TRX (MSTest) and JUnit XML result files and exposes the
-results as .NET objects that `TraceMatrix` and `Validation` use for coverage analysis and
-self-validation output.
+`DemaConsulting.TestResults` was chosen because it provides a unified API for reading both TRX
+and JUnit XML test result formats with auto-detection, carries a compatible license, and is
+maintained within the same program (DEMA Consulting). It enables ReqStream to consume test
+evidence from diverse CI environments without format-specific parsing logic.
 
-### Integration
+### Features Used
 
-The `DemaConsulting.TestResults.IO.Serializer` class is used by `TraceMatrix` to load each
-test result file. The auto-detection logic in `Serializer` tries TRX format first, then JUnit,
-based on the file content rather than the file extension, ensuring format-agnostic loading.
+- **`DemaConsulting.TestResults.IO.Serializer.Deserialize(content, path)`** — auto-detects the
+  format (TRX or JUnit) based on file content and returns a `TestResults` object.
+- **`DemaConsulting.TestResults.TestResults`** — container holding a list of `TestResult` objects
+  representing individual test executions.
+- **`DemaConsulting.TestResults.TestResult`** — represents a single test execution with `Name`
+  and `Outcome` properties.
+- **`DemaConsulting.TestResults.TestOutcome`** — enum indicating test pass/fail status.
+- **`DemaConsulting.TestResults.IO.TrxSerializer.Serialize(results)`** — serializes test results
+  to TRX format for self-validation output.
+- **`DemaConsulting.TestResults.IO.JUnitSerializer.Serialize(results)`** — serializes test
+  results to JUnit XML format for self-validation output.
 
-`Validation` uses `DemaConsulting.TestResults.IO.TrxSerializer.Serialize` to write self-test
-results to a TRX file when `--results` is provided.
+### Integration Pattern
 
-### Usage in TraceMatrix
+`TraceMatrix` uses the deserialization API to load test results:
 
-- `DemaConsulting.TestResults.IO.Serializer.Deserialize(content, path)` is called for each
-  test result file.
-- The returned `DemaConsulting.TestResults.TestResults` object's `Results` list is iterated
-  to populate `_testExecutions`.
-- Each `TestResult` contributes a `TestExecution` record with `Name`, `SourceFile`, and
-  `Outcome`.
+1. `File.ReadAllText(filePath)` reads the test result file content.
+2. `Serializer.Deserialize(content, filePath)` auto-detects the format and returns a
+   `TestResults` object.
+3. The `Results` list is iterated to populate `_testExecutions` with `TestExecution` records.
 
-### Usage in Validation
+`Validation` uses the serialization API to write self-test results:
 
-- `DemaConsulting.TestResults.TestResults` and `DemaConsulting.TestResults.TestResult` objects
-  are constructed to represent self-validation test outcomes.
-- `DemaConsulting.TestResults.IO.TrxSerializer.Serialize(results)` serializes them to a TRX
-  string written to the results file.
-
-### Error Handling
+1. `TestResults` and `TestResult` objects are constructed to represent self-validation outcomes.
+2. `TrxSerializer.Serialize(results)` or `JUnitSerializer.Serialize(results)` produces the output
+   string based on the requested file extension.
+3. The serialized string is written to the results file via `File.WriteAllText`.
 
 `TraceMatrix` wraps `Serializer.Deserialize` calls: if the file does not exist,
 `FileNotFoundException` is thrown with the file path. If parsing fails,
 `InvalidOperationException` is thrown with the file path and original exception as the inner
-exception. These are caught in `Program.Main` and converted to exit code `1`.
-
-### Dependencies
-
-`TraceMatrix` and `Validation` are the only units that use this package directly.
+exception. `TraceMatrix` and `Validation` are the only units that use this package directly.

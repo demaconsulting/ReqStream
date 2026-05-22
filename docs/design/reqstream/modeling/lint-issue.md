@@ -1,67 +1,52 @@
-### LintIssue Unit Design
+### LintIssue
 
 #### Purpose
 
 `LintIssue` and its companion enum `LintSeverity` represent a single structural issue discovered
-during requirements loading or linting. They are simple value types with no dependencies on other
-units; they carry the three pieces of information needed to display and route a lint diagnostic:
-where the issue occurred, how severe it is, and what the problem is.
+during requirements loading or linting. They are simple value types that carry where the issue
+occurred, how severe it is, and what the problem is.
 
 #### Data Model
 
-##### `LintSeverity`
+**`LintSeverity`**: Enum classifying the severity of a lint issue.
 
-`LintSeverity` is an enum that classifies the severity of a lint issue.
+- `Warning` — a non-fatal issue; processing can continue.
+- `Error` — a fatal issue that prevents successful requirements loading.
 
-| Member | Description |
-| ------ | ----------- |
-| `Warning` | A non-fatal issue; processing can continue. |
-| `Error` | A fatal issue that prevents successful requirements loading. |
+**`LintIssue(location, severity, description)`**: Constructor initializing all three properties.
 
-##### `LintIssue`
+**`Location`**: `string` — the source location (e.g., `"file.yaml"` or `"file.yaml(3,5)"`).
 
-`LintIssue` represents a single issue found during requirements linting or loading.
+**`Severity`**: `LintSeverity` — the severity of the issue.
 
-| Member | Type | Notes |
-| ------ | ---- | ----- |
-| `LintIssue(location, severity, description)` | Constructor | Initializes all three properties |
-| `Location` | `string` | The source location (e.g. `"file.yaml"` or `"file.yaml(3,5)"`) |
-| `Severity` | `LintSeverity` | The severity of the issue |
-| `Description` | `string` | A human-readable description of the issue |
-| `ToString()` | `string` | Returns the issue formatted as `"location: severity: description"` |
+**`Description`**: `string` — a human-readable description of the issue.
 
 #### Key Methods
 
-##### `ToString()`
+**ToString()**: Returns the issue formatted as `"location: severity: description"`.
 
-`ToString()` returns the issue in the standard diagnostic format:
+- *Parameters*: None.
+- *Returns*: `string` — formatted diagnostic string.
+- *Preconditions*: None.
+- *Postconditions*: Format matches `file.yaml(3,5): error: Unknown field 'unknown_field'`.
 
-```text
-file.yaml(3,5): error: Unknown field 'unknown_field'
-```
-
-The `LintSeverity` enum values map to the following lowercase strings in `ToString()` output:
-
-| `LintSeverity` value | String in output |
-| -------------------- | ---------------- |
-| `Error`              | `"error"`        |
-| `Warning`            | `"warning"`      |
-
-This format is recognized by editors and CI tools that can parse file locations and navigate to
-the line containing the issue.
+The `LintSeverity` enum values map to lowercase strings: `Error` → `"error"`, `Warning` →
+`"warning"`. This format is recognized by editors and CI tools that can parse file locations.
 
 #### Error Handling
 
-N/A — `LintIssue` and `LintSeverity` are simple value types with no executable logic.
-`LintIssue` objects are created only by `RequirementsLoader`; no validation or error detection
-occurs within these types themselves.
+N/A — `LintIssue` and `LintSeverity` are simple value types with no executable logic. `LintIssue`
+objects are created only by `RequirementsLoader`; no validation or error detection occurs within
+these types themselves.
 
-#### Interactions
+#### Dependencies
 
 N/A — `LintIssue` and `LintSeverity` are simple value types with no outbound dependencies on
 other units, OTS items, or shared packages.
 
-| Unit | Nature of interaction |
-| ---- | --------------------- |
-| `RequirementsLoader` | Creates `LintIssue` objects for every structural problem found during YAML validation |
-| `LoadResult` | Holds a list of `LintIssue` objects and routes them to the `Context` output channels |
+#### Callers
+
+- **RequirementsLoader** — creates `LintIssue` objects for every structural problem found during
+  YAML validation.
+- **LoadResult** — holds a list of `LintIssue` objects and routes them to the `Context` output
+  channels.

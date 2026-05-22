@@ -1,18 +1,15 @@
 ---
 title: ReqStream Code Quality Report
-subtitle: Code Quality Report
+subtitle: Static Analysis Report for the ReqStream Tool
 author: DEMA Consulting
-description: Code Quality Report for the ReqStream Tool for managing requirements in YAML format
+description: Code Quality Report for ReqStream
 lang: en-US
 keywords:
   - ReqStream
   - Code Quality
   - Static Analysis
-  - SonarCloud
   - CodeQL
-  - Analysis
+  - SonarCloud
   - C#
   - .NET
-  - Requirements
-  - YAML
 ---

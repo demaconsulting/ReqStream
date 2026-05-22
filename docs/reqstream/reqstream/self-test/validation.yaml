@@ -1,65 +1,63 @@
 ---
+# Validation unit requirements
 sections:
   - title: ReqStream Requirements
     sections:
-      - title: SelfTest
-        requirements:
-          - id: ReqStream-Validation-SelfValidation
-            title: The tool shall support self-validation mode.
-            justification: |
-              Self-validation ensures the tool's own integrity and serves as a smoke test for
-              installation and configuration issues.
-            tags:
-              - validation
-            tests:
-              - Validation_Run_WithSilentContext_CompletesSuccessfully
-              - Validation_Run_WithTrxResultsFile_WritesTrxFile
-              - Validation_Run_WithXmlResultsFile_WritesXmlFile
+      - title: SelfTest Requirements
+        sections:
+          - title: Validation Requirements
+            requirements:
+              - id: ReqStream-Validation-SelfValidation
+                title: The tool shall support self-validation mode.
+                justification: |
+                  Self-validation ensures the tool's own integrity and serves as a smoke test for
+                  installation and configuration issues.
+                tags: [validation]
+                tests:
+                  - Validation_Run_WithSilentContext_CompletesSuccessfully
+                  - Validation_Run_WithTrxResultsFile_WritesTrxFile
+                  - Validation_Run_WithXmlResultsFile_WritesXmlFile
 
-          - id: ReqStream-Validation-NullContext
-            title: The tool shall reject a null context in self-validation mode.
-            justification: |
-              Null argument guards prevent undefined behavior and produce clear error messages
-              when the API is misused.
-            tags:
-              - validation
-            tests:
-              - Validation_Run_WithNullContext_ThrowsArgumentNullException
+              - id: ReqStream-Validation-NullContext
+                title: The tool shall reject a null context in self-validation mode.
+                justification: |
+                  Null argument guards prevent undefined behavior and produce clear error messages
+                  when the API is misused.
+                tags: [validation]
+                tests:
+                  - Validation_Run_WithNullContext_ThrowsArgumentNullException
 
-          - id: ReqStream-Validation-UnsupportedResultsFormat
-            title: >-
-              The tool shall report an error when the self-validation results file has an
-              unsupported extension.
-            justification: |
-              Reporting an error for unsupported file extensions prevents silent data loss and
-              guides users to specify a supported format (.trx or .xml).
-            tags:
-              - validation
-            tests:
-              - Validation_Run_WithInvalidResultsExtension_ReportsError
+              - id: ReqStream-Validation-UnsupportedResultsFormat
+                title: >-
+                  The tool shall report an error when the self-validation results file has an
+                  unsupported extension.
+                justification: |
+                  Reporting an error for unsupported file extensions prevents silent data loss and
+                  guides users to specify a supported format (.trx or .xml).
+                tags: [validation]
+                tests:
+                  - Validation_Run_WithInvalidResultsExtension_ReportsError
 
-          - id: ReqStream-Validation-WriteFailure-ReportsError
-            title: >-
-              The tool shall report an error when the self-validation results file cannot be
-              written.
-            justification: |
-              Reporting a write error ensures that the exit code reflects the failure and
-              guides users to diagnose file system conditions that prevent the results file
-              from being created.
-            tags:
-              - validation
-            tests:
-              - Validation_Run_WithUnwritableResultsFile_ReportsError
+              - id: ReqStream-Validation-WriteFailure-ReportsError
+                title: >-
+                  The tool shall report an error when the self-validation results file cannot be
+                  written.
+                justification: |
+                  Reporting a write error ensures that the exit code reflects the failure and
+                  guides users to diagnose file system conditions that prevent the results file
+                  from being created.
+                tags: [validation]
+                tests:
+                  - Validation_Run_WithUnwritableResultsFile_ReportsError
 
-          - id: ReqStream-Validation-WriteFailure-Continues
-            title: >-
-              The tool shall continue processing and produce the self-validation summary when
-              the results file cannot be written.
-            justification: |
-              Continuing execution after a write failure ensures that the self-validation
-              summary is still produced, even when file system conditions prevent the results
-              file from being created.
-            tags:
-              - validation
-            tests:
-              - Validation_Run_WithUnwritableResultsFile_Continues
+              - id: ReqStream-Validation-WriteFailure-Continues
+                title: >-
+                  The tool shall continue processing and produce the self-validation summary when
+                  the results file cannot be written.
+                justification: |
+                  Continuing execution after a write failure ensures that the self-validation
+                  summary is still produced, even when file system conditions prevent the results
+                  file from being created.
+                tags: [validation]
+                tests:
+                  - Validation_Run_WithUnwritableResultsFile_Continues

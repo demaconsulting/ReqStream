@@ -1,4 +1,4 @@
-## WeasyPrint Verification
+## WeasyPrint
 
 ### Required Functionality
 
@@ -10,35 +10,35 @@ documentation build pipeline.
 
 WeasyPrint is verified by CI pipeline step evidence combined with FileAssert document
 validation. Each HTML document (build notes, code quality report, review plan, review report,
-design document, user guide, requirements document, requirements report, and verification
-document) is converted to PDF by WeasyPrint in the CI pipeline. FileAssert then asserts that each generated
-PDF file exists, has a non-trivial size, contains at least one page, and includes expected
-document content in the rendered text. Passing FileAssert assertions confirm WeasyPrint
-executed correctly and produced meaningful output.
+design document, user guide, and verification document) is converted to PDF by WeasyPrint in the
+CI pipeline. FileAssert then asserts that each generated PDF file exists, has a non-trivial size,
+contains at least one page, and includes expected document content in the rendered text. Passing
+FileAssert assertions confirm WeasyPrint executed correctly and produced meaningful output.
 
 Note: `WeasyPrint_RequirementsPdf` and `WeasyPrint_TraceMatrixPdf` are excluded from OTS
 evidence because they depend on ReqStream output (the requirements PDF and trace matrix PDF
 are generated from ReqStream output). These tests cannot serve as pre-ReqStream qualification
 evidence; they exercise ReqStream functionality rather than WeasyPrint independently.
 
-Test evidence names:
+### Test Scenarios
 
-- `WeasyPrint_BuildNotesPdf` — build-notes PDF document validated
-- `WeasyPrint_CodeQualityPdf` — code quality PDF document validated
-- `WeasyPrint_ReviewPlanPdf` — review plan PDF document validated
-- `WeasyPrint_ReviewReportPdf` — review report PDF document validated
-- `WeasyPrint_DesignPdf` — design document PDF validated
-- `WeasyPrint_UserGuidePdf` — user guide PDF document validated
-- `WeasyPrint_VerificationPdf` — verification document PDF validated
+**Build Notes PDF**: Verifies that WeasyPrint converts the build-notes HTML document to a valid
+PDF. This scenario is tested by `WeasyPrint_BuildNotesPdf`.
 
-### Coverage Summary
+**Code Quality PDF**: Verifies that WeasyPrint converts the code quality HTML document to a valid
+PDF. This scenario is tested by `WeasyPrint_CodeQualityPdf`.
 
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-OTS-WeasyPrint` | `WeasyPrint_BuildNotesPdf` |
-| `ReqStream-OTS-WeasyPrint` | `WeasyPrint_CodeQualityPdf` |
-| `ReqStream-OTS-WeasyPrint` | `WeasyPrint_ReviewPlanPdf` |
-| `ReqStream-OTS-WeasyPrint` | `WeasyPrint_ReviewReportPdf` |
-| `ReqStream-OTS-WeasyPrint` | `WeasyPrint_DesignPdf` |
-| `ReqStream-OTS-WeasyPrint` | `WeasyPrint_UserGuidePdf` |
-| `ReqStream-OTS-WeasyPrint` | `WeasyPrint_VerificationPdf` |
+**Review Plan PDF**: Verifies that WeasyPrint converts the review plan HTML document to a valid
+PDF. This scenario is tested by `WeasyPrint_ReviewPlanPdf`.
+
+**Review Report PDF**: Verifies that WeasyPrint converts the review report HTML document to a
+valid PDF. This scenario is tested by `WeasyPrint_ReviewReportPdf`.
+
+**Design Document PDF**: Verifies that WeasyPrint converts the design document HTML to a valid
+PDF. This scenario is tested by `WeasyPrint_DesignPdf`.
+
+**User Guide PDF**: Verifies that WeasyPrint converts the user guide HTML document to a valid PDF.
+This scenario is tested by `WeasyPrint_UserGuidePdf`.
+
+**Verification Document PDF**: Verifies that WeasyPrint converts the verification document HTML to
+a valid PDF. This scenario is tested by `WeasyPrint_VerificationPdf`.

@@ -1,4 +1,5 @@
 ---
+# ReqStream system-level requirements
 includes:
   - reqstream/cli.yaml
   - reqstream/utilities.yaml
@@ -11,7 +12,7 @@ includes:
 sections:
   - title: ReqStream Requirements
     sections:
-      - title: System Integration
+      - title: Functional Requirements
         requirements:
           - id: ReqStream-System-VersionDisplay
             title: >-
@@ -249,9 +250,6 @@ sections:
               system-level requirement.
             tags: [system]
             children:
-              # Each child carries source-filtered test references from the CI matrix job,
-              # providing platform- and runtime-specific evidence. Satisfaction of all
-              # children is sufficient to prove this system-level requirement.
               - ReqStream-Platform-Windows
               - ReqStream-Platform-Linux
               - ReqStream-Platform-MacOS

@@ -1,58 +1,53 @@
 ---
-# LoadResult Unit Requirements
-#
-# PURPOSE:
-# - Define requirements for the LoadResult unit (LoadResult.cs)
-# - LoadResult encapsulates the combined outcome of loading requirements files
-# - Unit requirements describe the result packaging and issue routing behavior
-
+# LoadResult unit requirements
 sections:
-  - title: LoadResult Unit Requirements
-    requirements:
-      - id: ReqStream-LoadResult-UnifiedLoad
-        title: >-
-          LoadResult shall encapsulate a requirements tree and lint issues in a single result,
-          returning both together regardless of whether loading succeeds.
-        justification: |
-          Combining requirement loading and lint reporting into a single result ensures that
-          the two cannot produce inconsistent results. Even when loading fails, the result
-          contains complete lint-issue output, allowing users to diagnose all problems in one pass.
-        tags:
-          - requirements
-        tests:
-          - Requirements_Load_ValidFile_ReturnsRequirementsAndNoIssues
-          - Requirements_Load_WithLintError_ReturnsNullAndIssues
-          - Requirements_Load_MissingFile_ReturnsNullAndIssues
-          - Requirements_Load_MalformedYaml_ReturnsNullAndIssues
-          - Requirements_Load_WithMultipleLintErrors_ReportsAllIssues
-          - Requirements_Load_WithIncludes_LintsIncludedFiles
-          - Requirements_Load_WithLintError_IssueIncludesLocation
+  - title: ReqStream Requirements
+    sections:
+      - title: Modeling Requirements
+        sections:
+          - title: LoadResult Requirements
+            requirements:
+              - id: ReqStream-LoadResult-UnifiedLoad
+                title: >-
+                  LoadResult shall encapsulate a requirements tree and lint issues in a single result,
+                  returning both together regardless of whether loading succeeds.
+                justification: |
+                  Combining requirement loading and lint reporting into a single result ensures that
+                  the two cannot produce inconsistent results. Even when loading fails, the result
+                  contains complete lint-issue output, allowing users to diagnose all problems in one pass.
+                tags: [requirements]
+                tests:
+                  - Requirements_Load_ValidFile_ReturnsRequirementsAndNoIssues
+                  - Requirements_Load_WithLintError_ReturnsNullAndIssues
+                  - Requirements_Load_MissingFile_ReturnsNullAndIssues
+                  - Requirements_Load_MalformedYaml_ReturnsNullAndIssues
+                  - Requirements_Load_WithMultipleLintErrors_ReportsAllIssues
+                  - Requirements_Load_WithIncludes_LintsIncludedFiles
+                  - Requirements_Load_WithLintError_IssueIncludesLocation
 
-      - id: ReqStream-LoadResult-ReportIssues
-        title: >-
-          LoadResult shall route each lint issue to the appropriate context output stream
-          based on its severity.
-        justification: |
-          Routing error-level issues to stderr (via context.WriteError) and warning-level issues
-          to stdout (via context.WriteLine) ensures that errors are always visible to the user
-          and that CI pipelines can distinguish errors from informational messages.
-        tags:
-          - requirements
-        tests:
-          - LoadResult_ReportIssues_ErrorIssue_SetsContextError
-          - LoadResult_ReportIssues_WarningIssue_DoesNotSetContextError
+              - id: ReqStream-LoadResult-ReportIssues
+                title: >-
+                  LoadResult shall route each lint issue to the appropriate context output stream
+                  based on its severity.
+                justification: |
+                  Routing error-level issues to stderr (via context.WriteError) and warning-level issues
+                  to stdout (via context.WriteLine) ensures that errors are always visible to the user
+                  and that CI pipelines can distinguish errors from informational messages.
+                tags: [requirements]
+                tests:
+                  - LoadResult_ReportIssues_ErrorIssue_SetsContextError
+                  - LoadResult_ReportIssues_WarningIssue_DoesNotSetContextError
 
-      - id: ReqStream-LoadResult-HasErrors
-        title: >-
-          LoadResult.HasErrors shall return true if and only if Issues contains at least one
-          LintIssue with LintSeverity.Error.
-        justification: |
-          Providing an explicit HasErrors property allows callers to check for error-level issues
-          without manually filtering the Issues list. Tying the property precisely to error-severity
-          issues prevents warnings from being misclassified as fatal, ensuring that callers only abort
-          processing when a genuine error has been reported.
-        tags:
-          - requirements
-        tests:
-          - LoadResult_HasErrors_WithErrorIssue_ReturnsTrue
-          - LoadResult_HasErrors_WithOnlyWarnings_ReturnsFalse
+              - id: ReqStream-LoadResult-HasErrors
+                title: >-
+                  LoadResult.HasErrors shall return true if and only if Issues contains at least one
+                  LintIssue with LintSeverity.Error.
+                justification: |
+                  Providing an explicit HasErrors property allows callers to check for error-level issues
+                  without manually filtering the Issues list. Tying the property precisely to error-severity
+                  issues prevents warnings from being misclassified as fatal, ensuring that callers only abort
+                  processing when a genuine error has been reported.
+                tags: [requirements]
+                tests:
+                  - LoadResult_HasErrors_WithErrorIssue_ReturnsTrue
+                  - LoadResult_HasErrors_WithOnlyWarnings_ReturnsFalse

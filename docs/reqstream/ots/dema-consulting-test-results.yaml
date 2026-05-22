@@ -1,12 +1,9 @@
 ---
-# DemaConsulting.TestResults OTS Software Requirements
-#
-# Requirements for the DemaConsulting.TestResults test result reading library.
-
+# DemaConsulting.TestResults OTS requirements
 sections:
   - title: OTS Software Requirements
     sections:
-      - title: DemaConsulting.TestResults Requirements
+      - title: DemaConsulting.TestResults
         requirements:
           - id: ReqStream-OTS-TestResults-Trx
             title: DemaConsulting.TestResults shall read TRX test result files.

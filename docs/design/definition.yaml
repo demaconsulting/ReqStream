@@ -8,7 +8,6 @@ resource-path:
   - docs/design/reqstream/self-test
   - docs/design/reqstream/tracing
   - docs/design/reqstream/utilities
-  - docs/design/shared
   - docs/template
 
 input-files:
@@ -35,8 +34,7 @@ input-files:
   - docs/design/ots.md
   - docs/design/ots/yamldotnet.md
   - docs/design/ots/microsoft-extensions-file-system-globbing.md
-  - docs/design/shared.md
-  - docs/design/shared/dema-consulting-test-results.md
+  - docs/design/ots/dema-consulting-test-results.md
 template: template.html
 
 table-of-contents: true

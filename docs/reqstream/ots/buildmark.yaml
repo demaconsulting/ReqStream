@@ -1,12 +1,9 @@
 ---
-# BuildMark OTS Software Requirements
-#
-# Requirements for the BuildMark build documentation tool functionality.
-
+# BuildMark OTS requirements
 sections:
   - title: OTS Software Requirements
     sections:
-      - title: BuildMark Requirements
+      - title: BuildMark
         requirements:
           - id: ReqStream-OTS-BuildMark
             title: BuildMark shall generate build-notes documentation from GitHub Actions metadata.

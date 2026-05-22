@@ -1,4 +1,4 @@
-## ReviewMark Verification
+## ReviewMark
 
 ### Required Functionality
 
@@ -13,14 +13,10 @@ ReviewMark is verified by CI pipeline step evidence. The tool's built-in `--vali
 command is executed in the CI pipeline and writes test method results to a TRX file.
 The TRX file is consumed by ReqStream to satisfy the OTS requirement.
 
-Test evidence names (test methods written to the TRX file by `dotnet reviewmark --validate`):
+### Test Scenarios
 
-- `ReviewMark_ReviewPlanGeneration` — validates that ReviewMark can generate a review plan
-- `ReviewMark_ReviewReportGeneration` — validates that ReviewMark can generate a review report
+**Review Plan Generation**: Validates that ReviewMark can generate a review plan document from
+the review configuration. This scenario is tested by `ReviewMark_ReviewPlanGeneration`.
 
-### Coverage Summary
-
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-OTS-ReviewMark` | `ReviewMark_ReviewPlanGeneration` |
-| `ReqStream-OTS-ReviewMark` | `ReviewMark_ReviewReportGeneration` |
+**Review Report Generation**: Validates that ReviewMark can generate a review report document
+from the review evidence store. This scenario is tested by `ReviewMark_ReviewReportGeneration`.

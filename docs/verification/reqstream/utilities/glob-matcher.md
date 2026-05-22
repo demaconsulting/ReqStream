@@ -1,6 +1,6 @@
-### GlobMatcher Unit Verification
+### GlobMatcher
 
-#### Verification Strategy
+#### Verification Approach
 
 The GlobMatcher unit is verified using xUnit unit tests in `GlobMatcherTests.cs`. Tests create
 temporary directories with known file contents and assert that `FindMatchingFiles` and
@@ -16,60 +16,46 @@ completion.
 
 The GlobMatcher unit verification is complete when all xUnit tests in `GlobMatcherTests.cs` pass
 without uncaught exceptions and all assertions succeed. The unit is considered verified when every
-requirement in the Coverage Summary is mapped to at least one passing test method.
+requirement in the Requirements Coverage table is mapped to at least one passing test method.
 
 #### Test Scenarios
 
-##### Relative Pattern Scenario
+**Relative Pattern**: Tests verify that relative glob patterns are resolved against the current
+working directory. This scenario is tested by
+`GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles`.
 
-Tests verify that relative glob patterns are resolved against the current working directory.
+**Absolute Pattern**: Tests verify that absolute glob patterns are resolved from their rooted
+prefix, including wildcard, double-wildcard, literal, and non-existent directory cases. This
+scenario is tested by `GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles`,
+`GlobMatcher_FindMatchingFiles_AbsolutePatternWithDoubleWildcard_MatchesFilesInSubdirectories`,
+`GlobMatcher_FindMatchingFiles_AbsoluteLiteralPath_MatchesSingleFile`, and
+`GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty`.
 
-Test methods:
+**Result Format**: Tests verify that all returned paths are rooted absolute paths. This scenario
+is tested by `GlobMatcher_FindMatchingFiles_ReturnsAbsolutePaths`.
 
-- `GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles` — relative wildcard matches files in cwd
+**Multi-Pattern**: Tests verify that multiple patterns are combined and deduplicated correctly.
+This scenario is tested by
+`GlobMatcher_FindMatchingFiles_MultiplePatterns_DeduplicatesResults` and
+`GlobMatcher_FindMatchingFiles_MultiplePatterns_CombinesFromDifferentSources`.
 
-##### Absolute Pattern Scenario
+**SplitAbsolutePattern**: Tests verify that `SplitAbsolutePattern` correctly decomposes absolute
+patterns at the boundary before the first wildcard segment. This scenario is tested by
+`GlobMatcher_SplitAbsolutePattern_WildcardAtTopLevel_SplitsAtRoot`,
+`GlobMatcher_SplitAbsolutePattern_LiteralPath_SplitsAtLastSeparator`, and
+`GlobMatcher_SplitAbsolutePattern_DoubleStarWildcard_SplitsBeforeWildcard`.
 
-Tests verify that absolute glob patterns are resolved from their rooted prefix.
-
-Test methods:
-
-- `GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles` — absolute `*.ext` pattern
-- `GlobMatcher_FindMatchingFiles_AbsolutePatternWithDoubleWildcard_MatchesFilesInSubdirectories` — absolute `**/*.ext` pattern
-- `GlobMatcher_FindMatchingFiles_AbsoluteLiteralPath_MatchesSingleFile` — absolute literal path with no wildcard
-- `GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty` — non-existent root returns empty
-
-##### Result Format Scenario
-
-Tests verify the format of returned paths.
-
-Test methods:
-
-- `GlobMatcher_FindMatchingFiles_ReturnsAbsolutePaths` — all returned paths are rooted
-
-##### Multi-Pattern Scenario
-
-Tests verify that multiple patterns are combined and deduplicated correctly.
-
-Test methods:
-
-- `GlobMatcher_FindMatchingFiles_MultiplePatterns_DeduplicatesResults` — overlapping patterns do not produce duplicate paths
-- `GlobMatcher_FindMatchingFiles_MultiplePatterns_CombinesFromDifferentSources` — patterns from separate
-  directories are merged
-
-##### SplitAbsolutePattern Scenario
-
-Tests verify that `SplitAbsolutePattern` correctly decomposes absolute patterns.
-
-Test methods:
-
-- `GlobMatcher_SplitAbsolutePattern_WildcardAtTopLevel_SplitsAtRoot` — wildcard immediately after root splits at root
-- `GlobMatcher_SplitAbsolutePattern_LiteralPath_SplitsAtLastSeparator` — literal path splits at last separator
-- `GlobMatcher_SplitAbsolutePattern_DoubleStarWildcard_SplitsBeforeWildcard` — `**` pattern splits before wildcard segment
-
-#### Coverage Summary
+#### Requirements Coverage
 
 | Requirement ID | Test Method(s) |
 | --- | --- |
-| `ReqStream-Command-RequirementsGlobPatterns` | `GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles`, `GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles`, `GlobMatcher_FindMatchingFiles_AbsolutePatternWithDoubleWildcard_MatchesFilesInSubdirectories`, `GlobMatcher_FindMatchingFiles_AbsoluteLiteralPath_MatchesSingleFile`, `GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty` |
-| `ReqStream-Command-TestGlobPatterns` | `GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles`, `GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles`, `GlobMatcher_FindMatchingFiles_AbsolutePatternWithDoubleWildcard_MatchesFilesInSubdirectories`, `GlobMatcher_FindMatchingFiles_AbsoluteLiteralPath_MatchesSingleFile`, `GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty` |
+| `ReqStream-Command-RequirementsGlobPatterns` | `GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles` |
+| `ReqStream-Command-RequirementsGlobPatterns` | `GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles` |
+| `ReqStream-Command-RequirementsGlobPatterns` | `GlobMatcher_FindMatchingFiles_AbsolutePatternWithDoubleWildcard_MatchesFilesInSubdirectories` |
+| `ReqStream-Command-RequirementsGlobPatterns` | `GlobMatcher_FindMatchingFiles_AbsoluteLiteralPath_MatchesSingleFile` |
+| `ReqStream-Command-RequirementsGlobPatterns` | `GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty` |
+| `ReqStream-Command-TestGlobPatterns` | `GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles` |
+| `ReqStream-Command-TestGlobPatterns` | `GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles` |
+| `ReqStream-Command-TestGlobPatterns` | `GlobMatcher_FindMatchingFiles_AbsolutePatternWithDoubleWildcard_MatchesFilesInSubdirectories` |
+| `ReqStream-Command-TestGlobPatterns` | `GlobMatcher_FindMatchingFiles_AbsoluteLiteralPath_MatchesSingleFile` |
+| `ReqStream-Command-TestGlobPatterns` | `GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty` |

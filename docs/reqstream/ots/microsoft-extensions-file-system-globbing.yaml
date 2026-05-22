@@ -1,12 +1,9 @@
 ---
-# Microsoft.Extensions.FileSystemGlobbing OTS Software Requirements
-#
-# Requirements for the Microsoft.Extensions.FileSystemGlobbing glob pattern matching library.
-
+# Microsoft.Extensions.FileSystemGlobbing OTS requirements
 sections:
   - title: OTS Software Requirements
     sections:
-      - title: Microsoft.Extensions.FileSystemGlobbing Requirements
+      - title: Microsoft.Extensions.FileSystemGlobbing
         requirements:
           - id: ReqStream-OTS-FileSystemGlobbing
             title: >-

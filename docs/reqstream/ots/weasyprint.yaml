@@ -1,12 +1,9 @@
 ---
-# WeasyPrint OTS Software Requirements
-#
-# Requirements for the WeasyPrint PDF generation tool functionality.
-
+# WeasyPrint OTS requirements
 sections:
   - title: OTS Software Requirements
     sections:
-      - title: WeasyPrint Requirements
+      - title: WeasyPrint
         requirements:
           - id: ReqStream-OTS-WeasyPrint
             title: WeasyPrint shall convert HTML documents to valid PDF.

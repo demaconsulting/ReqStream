@@ -1,4 +1,4 @@
-## Tracing Subsystem Design
+## Tracing
 
 ### Overview
 
@@ -11,56 +11,55 @@ and Markdown report output.
 
 The `Tracing` subsystem contains the following software unit:
 
-| Unit | File | Responsibility |
-| ---- | ---- | -------------- |
-| `TraceMatrix` | `Tracing/TraceMatrix.cs` | Test result loading, requirement mapping, and coverage enforcement. |
+- **TraceMatrix** (`Tracing/TraceMatrix.cs`) — Test result loading, requirement mapping, and
+  coverage enforcement.
 
 ### Interfaces
 
-The `Tracing` subsystem exposes the following interface to the rest of the tool:
+**TraceMatrix constructor**: Loads test results and maps them to requirements.
 
-| Interface | Description |
-| --- | --- |
-| `TraceMatrix` constructor | Loads test results and maps them to requirements. |
-| `TraceMatrix.Export` | Exports the trace matrix to a Markdown report. |
-| `TraceMatrix.CalculateSatisfiedRequirements` | Returns satisfied and total requirement counts. |
-| `TraceMatrix.GetUnsatisfiedRequirements` | Returns IDs of requirements not covered by passing tests. |
-| `TraceMatrix.GetTestResult` | Returns pass/fail counts for a named test across results. |
-| `TraceMatrix.GetAllTestResults` | Returns pass/fail `TestMetrics` for all tests referenced in requirements. |
+- *Type*: In-process .NET public API.
+- *Role*: Provider.
+- *Contract*: Accepts a `Requirements` tree and test result file paths; populates internal lookup
+  structures. Throws `FileNotFoundException` for missing files; throws
+  `InvalidOperationException` for unparseable files.
+- *Constraints*: Construction is the only phase that performs I/O.
+
+**TraceMatrix.Export**: Exports the trace matrix to a Markdown report.
+
+- *Type*: In-process .NET public API.
+- *Role*: Provider.
+- *Contract*: Accepts `filePath`, `depth`, and optional `filterTags`; writes a Markdown report
+  with Summary, Requirements, and Testing sections.
+- *Constraints*: Throws `ArgumentException` for null/empty path.
+
+**TraceMatrix.CalculateSatisfiedRequirements**: Returns satisfied and total requirement counts.
+
+- *Type*: In-process .NET public API.
+- *Role*: Provider.
+- *Contract*: Returns `(satisfied, total)` tuple subject to `filterTags` filtering.
+- *Constraints*: Read-only; does not throw.
+
+**TraceMatrix.GetUnsatisfiedRequirements**: Returns IDs of unsatisfied requirements.
+
+- *Type*: In-process .NET public API.
+- *Role*: Provider.
+- *Contract*: Returns a list of requirement IDs not covered by passing tests.
+- *Constraints*: Read-only; does not throw.
 
 ### Design
 
-The `Tracing` subsystem contains a single unit, `TraceMatrix`. Its internal design is a
+The `Tracing` subsystem contains a single unit, `TraceMatrix`. Its internal design follows a
 two-phase construction-then-query pattern:
 
 1. **Construction phase** — the `TraceMatrix` constructor calls `ProcessTestResultFile` for each
-   path in `testResultFiles`. Each call deserializes the file and accumulates `TestExecution`
-   records into `_testExecutions`. After construction, the lookup structures are fully populated
-   and read-only.
+   path in `testResultFiles`. Each call deserializes the file via
+   `DemaConsulting.TestResults.IO.Serializer` and accumulates `TestExecution` records into
+   `_testExecutions`. After construction, the lookup structures are fully populated and read-only.
 2. **Query phase** — `Program` calls `GetTestResult`, `GetAllTestResults`,
    `CalculateSatisfiedRequirements`, `GetUnsatisfiedRequirements`, and `Export` in any order.
-   All query methods are read-only; they do not modify `_testExecutions` or `_requirements`.
+   All query methods are read-only; they do not modify internal state.
 
-The subsystem has no internal unit-to-unit collaboration beyond this single unit.
-
-### Interactions
-
-| Unit | Relationship | Description |
-| ---- | ------------ | ----------- |
-| `Context` | Uses | Receives test file paths from `Context.TestFiles`. |
-| `Requirements` | Uses | Receives the requirement tree to map tests to requirements. |
-| `Program` | Used by | Constructs `TraceMatrix` and calls enforcement/export methods. |
-
-### Error Handling
-
-The `Tracing` subsystem raises the following exceptions at the subsystem boundary. Both
-exceptions are thrown by the `TraceMatrix` constructor and propagate to `Program` for
-display as fatal errors.
-
-- **`FileNotFoundException`** — A path supplied in `testResultFiles` does not exist on disk.
-  The exception message includes the offending file path.
-- **`InvalidOperationException`** — A test result file exists but cannot be parsed
-  (malformed TRX or JUnit XML). The exception message includes the offending file path;
-  the original parse exception is available as the inner exception.
-
-For the full error-handling design of `ProcessTestResultFile`, see the TraceMatrix unit design documentation.
+The subsystem raises `FileNotFoundException` when a test result file does not exist and
+`InvalidOperationException` when a file cannot be parsed. Both exceptions propagate to `Program`
+for display as fatal errors.

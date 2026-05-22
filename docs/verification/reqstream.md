@@ -1,6 +1,6 @@
-# ReqStream System Verification
+# ReqStream
 
-## System Verification Strategy
+## Verification Approach
 
 The ReqStream system is verified at the system level using integration tests that invoke the
 published `dotnet` tool end-to-end. Tests are written using xUnit in `IntegrationTests.cs` and
@@ -28,186 +28,124 @@ three supported platforms (Windows, Linux, macOS) and all three supported .NET r
 .NET 9, .NET 10), and the Requirements Coverage table shows every system requirement mapped to at
 least one passing test method.
 
-## System Test Scenarios
+## Test Scenarios
+
+**Version Display**: Verifies that the tool prints version information and exits with code 0 when
+`--version` is passed. The test captures stdout and asserts it contains a non-empty version
+string. This scenario is tested by
+`ReqStream_System_CliInterface_VersionFlag_PrintsVersion`.
+
+**Help Display**: Verifies that the tool prints usage information and exits with code 0 when
+`--help` is passed. The test captures stdout and asserts it contains expected option
+descriptions. This scenario is tested by `ReqStream_System_CliInterface_HelpFlag_PrintsHelp`.
+
+**Full Pipeline**: Verifies that the tool executes the full requirements-processing pipeline in a
+single invocation, including loading YAML, tracing test results, and generating all reports. This
+scenario is tested by
+`ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces`.
+
+**Source Filter**: Verifies that source-specific test matching restricts coverage evidence to
+tests from named result files. This scenario is tested by
+`ReqStream_SourceFilter_NamedSourceInRequirement_MatchesTestsBySourceFile`.
+
+**Enforcement Mode**: Verifies that the tool exits with a non-zero code when enforcement is
+active and a requirement lacks passing test evidence. This scenario is tested by
+`ReqStream_EnforcementMode_RequirementLacksTestEvidence_FailsWithNonZeroExitCode`.
+
+**Lint**: Verifies that the tool identifies and reports all structural issues in a single linting
+invocation and exits silently when no issues are found. This scenario is tested by
+`ReqStream_System_Lint_Flag_ReportsLintIssues` and
+`ReqStream_System_Lint_ValidRequirementsFile_ExitsSilentlyWithZero`.
+
+**Validate**: Verifies that the tool runs a built-in self-test suite when `--validate` is passed.
+This scenario is tested by `ReqStream_System_Validate_Flag_RunsSelfValidation`.
+
+**Validate Results Output**: Verifies that the tool writes self-validation test results to a file
+when `--results` is passed. This scenario is tested by
+`ReqStream_System_ValidateResultsOutput_ResultsFlag_WritesResultsFile`.
+
+**Requirements Report**: Verifies that the tool exports a requirements Markdown report when the
+`--report` flag is provided. This scenario is tested by
+`ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces`.
+
+**Trace Matrix**: Verifies that the tool exports a trace matrix Markdown report when the
+`--matrix` flag is provided. This scenario is tested by
+`ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces`.
+
+**Justifications**: Verifies that the tool exports requirement justifications when the
+`--justifications` flag is provided. This scenario is tested by
+`ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces`.
+
+**Tag Filter**: Verifies that the tool filters requirements output by tags when the `--filter`
+flag is provided. This scenario is tested by
+`ReqStream_System_TagFilter_Flag_FiltersRequirements`.
+
+**Log File Output**: Verifies that the tool routes all output to the specified log file when
+`--log` is provided. This scenario is tested by
+`ReqStream_System_OutputControl_LogFlag_WritesOutputToFile`.
+
+**Silent Mode**: Verifies that the tool suppresses console output when `--silent` is provided.
+This scenario is tested by
+`ReqStream_System_OutputControl_SilentFlag_SuppressesConsoleOutput`.
+
+**Report Depth**: Verifies that the tool supports configurable report heading depth. This
+scenario is tested by
+`ReqStream_System_ReportDepth_DepthFlag_GeneratesReportWithCorrectHeadingLevel`.
+
+**File Includes**: Verifies that the tool loads requirements from multiple YAML files via file
+includes. This scenario is tested by
+`ReqStream_System_FileIncludes_RequirementsWithIncludes_LoadsAllRequirements`.
+
+**Section Merging**: Verifies that sections with the same title in different included files are
+automatically merged into a single section in the output. This scenario is tested by
+`ReqStream_System_SectionMerging_TwoFilesWithSameSection_ProducesSingleMergedSection`.
+
+**Circular Include Detection**: Verifies that the tool detects circular include references (where
+file A includes file B and file B includes file A) and reports an error, exiting with a non-zero
+code. This scenario is tested by
+`ReqStream_System_CircularIncludeDetection_CircularInclude_ReportsError`.
+
+**Test File Error Handling**: Verifies that the tool reports a fatal error and exits with a
+non-zero code when a test result file path is specified but the file is missing, or when the file
+cannot be parsed. This scenario is tested by
+`ReqStream_System_TestFileErrorHandling_MissingTestFile_ReportsFatalError` and
+`ReqStream_System_TestFileErrorHandling_MalformedTestFile_ReportsFatalError`.
+
+**Matrix Error Handling**: Verifies that the tool reports an error and exits with a non-zero code
+when `--matrix` is requested but no `--tests` files are provided. This scenario is tested by
+`ReqStream_System_MatrixErrorHandling_MatrixWithoutTests_ReportsError`.
+
+**Cyclic Child Detection**: Verifies that the tool detects cyclic references in the
+child-requirement graph (where requirement A lists B as a child and B lists A as a child) and
+reports an error. This is distinct from circular include detection (which detects cycles in
+`includes` file references). This scenario is tested by
+`ReqStream_System_CyclicChildDetection_CyclicChildRequirements_ReportsError`.
+
+**Windows Platform**: Platform requirements are verified by running the self-validation tests on
+Windows in the CI pipeline. This scenario is tested by `windows@ReqStream_VersionDisplay` and
+`windows@ReqStream_HelpDisplay`.
+
+**Linux Platform**: Platform requirements are verified by running the self-validation tests on
+Linux (Ubuntu) in the CI pipeline. This scenario is tested by `ubuntu@ReqStream_VersionDisplay`
+and `ubuntu@ReqStream_HelpDisplay`.
+
+**macOS Platform**: Platform requirements are verified by running the self-validation tests on
+macOS in the CI pipeline. This scenario is tested by `macos@ReqStream_VersionDisplay` and
+`macos@ReqStream_HelpDisplay`.
 
-### Version Display Scenario
+**.NET 8 Runtime**: Runtime requirements are verified by running the self-validation tests under
+.NET 8 in the CI pipeline. This scenario is tested by `dotnet8.x@ReqStream_VersionDisplay` and
+`dotnet8.x@ReqStream_HelpDisplay`.
 
-Verifies that the tool prints version information and exits with code 0 when `--version` is
-passed. The test captures stdout and asserts it contains a non-empty version string.
+**.NET 9 Runtime**: Runtime requirements are verified by running the self-validation tests under
+.NET 9 in the CI pipeline. This scenario is tested by `dotnet9.x@ReqStream_VersionDisplay` and
+`dotnet9.x@ReqStream_HelpDisplay`.
 
-Test method: `ReqStream_System_CliInterface_VersionFlag_PrintsVersion`
+**.NET 10 Runtime**: Runtime requirements are verified by running the self-validation tests under
+.NET 10 in the CI pipeline. This scenario is tested by `dotnet10.x@ReqStream_VersionDisplay` and
+`dotnet10.x@ReqStream_HelpDisplay`.
 
-### Help Display Scenario
-
-Verifies that the tool prints usage information and exits with code 0 when `--help` is passed.
-The test captures stdout and asserts it contains expected option descriptions.
-
-Test method: `ReqStream_System_CliInterface_HelpFlag_PrintsHelp`
-
-### Full Pipeline Scenario
-
-Verifies that the tool executes the full requirements-processing pipeline in a single invocation,
-including loading YAML, tracing test results, and generating all reports.
-
-Test method: `ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces`
-
-### Source Filter Scenario
-
-Verifies that source-specific test matching restricts coverage evidence to tests from named
-result files.
-
-Test method: `ReqStream_SourceFilter_NamedSourceInRequirement_MatchesTestsBySourceFile`
-
-### Enforcement Mode Scenario
-
-Verifies that the tool exits with a non-zero code when enforcement is active and a requirement
-lacks passing test evidence.
-
-Test method: `ReqStream_EnforcementMode_RequirementLacksTestEvidence_FailsWithNonZeroExitCode`
-
-### Lint Scenario
-
-Verifies that the tool identifies and reports all structural issues in a single linting invocation
-and exits silently when no issues are found.
-
-Test methods:
-
-- `ReqStream_System_Lint_Flag_ReportsLintIssues`
-- `ReqStream_System_Lint_ValidRequirementsFile_ExitsSilentlyWithZero`
-
-### Validate Scenario
-
-Verifies that the tool runs a built-in self-test suite when `--validate` is passed.
-
-Test method: `ReqStream_System_Validate_Flag_RunsSelfValidation`
-
-### Validate Results Output Scenario
-
-Verifies that the tool writes self-validation test results to a file when `--results` is passed.
-
-Test method: `ReqStream_System_ValidateResultsOutput_ResultsFlag_WritesResultsFile`
-
-### Requirements Report Scenario
-
-Verifies that the tool exports a requirements Markdown report when the `--report` flag is
-provided.
-
-Test method: `ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces`
-
-### Trace Matrix Scenario
-
-Verifies that the tool exports a trace matrix Markdown report when the `--matrix` flag is
-provided.
-
-Test method: `ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces`
-
-### Justifications Scenario
-
-Verifies that the tool exports requirement justifications when the `--justifications` flag is
-provided.
-
-Test method: `ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces`
-
-### Tag Filter Scenario
-
-Verifies that the tool filters requirements output by tags when the `--filter` flag is provided.
-
-Test method: `ReqStream_System_TagFilter_Flag_FiltersRequirements`
-
-### Log File Output Scenario
-
-Verifies that the tool routes all output to the specified log file when `--log` is provided.
-
-Test method: `ReqStream_System_OutputControl_LogFlag_WritesOutputToFile`
-
-### Silent Mode Scenario
-
-Verifies that the tool suppresses console output when `--silent` is provided.
-
-Test method: `ReqStream_System_OutputControl_SilentFlag_SuppressesConsoleOutput`
-
-### Report Depth Scenario
-
-Verifies that the tool supports configurable report heading depth.
-
-Test method: `ReqStream_System_ReportDepth_DepthFlag_GeneratesReportWithCorrectHeadingLevel`
-
-### File Includes Scenario
-
-Verifies that the tool loads requirements from multiple YAML files via file includes.
-
-Test method: `ReqStream_System_FileIncludes_RequirementsWithIncludes_LoadsAllRequirements`
-
-### Section Merging Scenario
-
-Verifies that sections with the same title in different included files are automatically
-merged into a single section in the output.
-
-Test method: `ReqStream_System_SectionMerging_TwoFilesWithSameSection_ProducesSingleMergedSection`
-
-### Circular Include Detection Scenario
-
-Verifies that the tool detects circular include references (where file A includes file B
-and file B includes file A) and reports an error, exiting with a non-zero code.
-
-Test method: `ReqStream_System_CircularIncludeDetection_CircularInclude_ReportsError`
-
-### Test File Error Handling Scenario
-
-Verifies that the tool reports a fatal error and exits with a non-zero code when a test result
-file path is specified but the file is missing, or when the file cannot be parsed.
-
-Test methods:
-
-- `ReqStream_System_TestFileErrorHandling_MissingTestFile_ReportsFatalError`
-- `ReqStream_System_TestFileErrorHandling_MalformedTestFile_ReportsFatalError`
-
-### Matrix Error Handling Scenario
-
-Verifies that the tool reports an error and exits with a non-zero code when `--matrix` is
-requested but no `--tests` files are provided.
-
-Test method: `ReqStream_System_MatrixErrorHandling_MatrixWithoutTests_ReportsError`
-
-### Cyclic Child Detection Scenario
-
-Verifies that the tool detects cyclic references in the child-requirement graph (where
-requirement A lists B as a child and B lists A as a child) and reports an error. This is
-distinct from circular include detection (which detects cycles in `includes` file references).
-
-Test method: `ReqStream_System_CyclicChildDetection_CyclicChildRequirements_ReportsError`
-
-## Platform Test Scenarios
-
-Platform requirements are verified by running the self-validation tests on each platform and
-runtime. The CI pipeline runs the tool on Windows, Linux (Ubuntu), and macOS, and under
-.NET 8, .NET 9, and .NET 10.
-
-### Windows Platform Scenario
-
-Test methods: `windows@ReqStream_VersionDisplay`, `windows@ReqStream_HelpDisplay`
-
-### Linux Platform Scenario
-
-Test methods: `ubuntu@ReqStream_VersionDisplay`, `ubuntu@ReqStream_HelpDisplay`
-
-### macOS Platform Scenario
-
-Test methods: `macos@ReqStream_VersionDisplay`, `macos@ReqStream_HelpDisplay`
-
-### .NET 8 Runtime Scenario
-
-Test methods: `dotnet8.x@ReqStream_VersionDisplay`, `dotnet8.x@ReqStream_HelpDisplay`
-
-### .NET 9 Runtime Scenario
-
-Test methods: `dotnet9.x@ReqStream_VersionDisplay`, `dotnet9.x@ReqStream_HelpDisplay`
-
-### .NET 10 Runtime Scenario
-
-Test methods: `dotnet10.x@ReqStream_VersionDisplay`, `dotnet10.x@ReqStream_HelpDisplay`
-
-## Coverage Summary
+## Requirements Coverage
 
 | Requirement ID | Test Method(s) |
 | --- | --- |

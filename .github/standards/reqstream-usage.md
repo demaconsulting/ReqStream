@@ -58,6 +58,45 @@ sections:
           - windows@PlatformSpecificTest  # Only test runs on Windows count as evidence
 ```
 
+# Local System/Subsystem/Unit Requirements
+
+Use nested sections to mirror the system/subsystem/unit hierarchy because ReqStream
+does not infer nesting from folder structure — the section hierarchy in the YAML is
+the document hierarchy. Identical section title paths across included files are
+automatically merged by ReqStream.
+
+**Subsystem file** (`docs/reqstream/{system-name}/{subsystem-name}.yaml`):
+
+```yaml
+sections:
+  - title: '{SystemName} Requirements'
+    sections:
+      - title: '{SubsystemName} Requirements'
+        requirements:
+          - id: SystemName-SubsystemName-Feature
+            title: The {SubsystemName} shall perform the required function.
+            children:
+              - SystemName-SubsystemName-UnitName-Feature
+            tests:
+              - SubsystemName_Functionality_Scenario_ExpectedBehavior
+```
+
+**Unit file** (`docs/reqstream/{system-name}/{subsystem-name}/{unit-name}.yaml`):
+
+```yaml
+sections:
+  - title: '{SystemName} Requirements'
+    sections:
+      - title: '{SubsystemName} Requirements'
+        sections:
+          - title: '{UnitName} Requirements'
+            requirements:
+              - id: SystemName-SubsystemName-UnitName-Feature
+                title: '{UnitName} shall perform the required function.'
+                tests:
+                  - UnitName_MethodUnderTest_Scenario_ExpectedBehavior
+```
+
 # OTS Software Requirements
 
 Use nested sections in `docs/reqstream/ots/` because ReqStream renders the `ots/`

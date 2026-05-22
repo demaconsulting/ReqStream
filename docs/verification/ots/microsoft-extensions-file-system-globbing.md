@@ -1,4 +1,4 @@
-## Microsoft.Extensions.FileSystemGlobbing Verification
+## Microsoft.Extensions.FileSystemGlobbing
 
 ### Required Functionality
 
@@ -11,17 +11,18 @@ paths against glob patterns, returning all matching absolute file paths. It is u
 Microsoft.Extensions.FileSystemGlobbing is verified by integration test evidence. The
 `GlobMatcher` unit tests exercise the library on absolute patterns, relative patterns, and
 non-existent directories. Passing tests confirm that the library correctly matches patterns
-and returns the expected results. The following representative test methods are linked as
-evidence:
+and returns the expected results.
 
-- `GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles`
-- `GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles`
-- `GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty`
+### Test Scenarios
 
-### Coverage Summary
+**Absolute Pattern Matching**: Verifies that the library correctly matches absolute glob patterns
+with wildcard characters to the expected files. This scenario is tested by
+`GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles`.
 
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-OTS-FileSystemGlobbing` | `GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles` |
-| `ReqStream-OTS-FileSystemGlobbing` | `GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles` |
-| `ReqStream-OTS-FileSystemGlobbing` | `GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty` |
+**Relative Pattern Matching**: Verifies that relative glob patterns are resolved against the
+current working directory and return matching files. This scenario is tested by
+`GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles`.
+
+**Non-Existent Directory Handling**: Verifies that a pattern with a non-existent root directory
+returns an empty result rather than throwing an exception. This scenario is tested by
+`GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty`.

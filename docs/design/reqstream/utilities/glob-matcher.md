@@ -1,85 +1,69 @@
-### GlobMatcher Unit Design
+### GlobMatcher
 
 #### Purpose
 
 `GlobMatcher` is a static utility class that resolves glob patterns to lists of absolute
 file paths. It wraps `Microsoft.Extensions.FileSystemGlobbing.Matcher` and adds support for
-*absolute* patterns in addition to the relative patterns natively supported by the underlying
+absolute patterns in addition to the relative patterns natively supported by the underlying
 library. This allows callers such as `Context` to accept `--requirements` and `--tests`
-patterns in either form without special-casing.
-
-`GlobMatcher` has no mutable state; all methods are `internal static`.
+patterns in either form without special-casing. `GlobMatcher` has no mutable state; all methods
+are `internal static`.
 
 #### Data Model
 
-N/A — `GlobMatcher` is a static class declared `internal static`. It has no mutable instance
-or class-level state; all state is allocated locally within `FindMatchingFiles` calls and is
-not shared between invocations.
+N/A — `GlobMatcher` is a static class with no mutable instance or class-level state. All state
+is allocated locally within `FindMatchingFiles` calls and is not shared between invocations.
 
 #### Key Methods
 
-##### `FindMatchingFiles(patterns)`
+**FindMatchingFiles(patterns)**: Accepts a collection of glob pattern strings and returns a
+`List<string>` of absolute file paths that match any of the supplied patterns.
 
-`FindMatchingFiles` accepts a collection of glob pattern strings and returns a `List<string>` of
-absolute file paths that match any of the supplied patterns. Duplicates are removed using a
-`HashSet<string>` with the appropriate file-system comparer (ordinal ignore-case on Windows,
-ordinal on case-sensitive systems). Results are sorted using the same comparer.
+- *Parameters*: `IEnumerable<string> patterns` — glob patterns to resolve.
+- *Returns*: `List<string>` — sorted, deduplicated absolute paths.
+- *Preconditions*: None (empty or null patterns produce empty results).
+- *Postconditions*: Duplicates are removed using a `HashSet<string>` with the appropriate
+  file-system comparer. Results are sorted using the same comparer.
 
-For each pattern in `patterns`, the method checks `Path.IsPathRooted(pattern)`:
+For each pattern, the method checks `Path.IsPathRooted(pattern)`:
 
-- **Absolute pattern** — calls `SplitAbsolutePattern` to decompose the pattern into a root
-  directory and a relative sub-pattern. If the root directory does not exist the pattern is
-  skipped. Otherwise a `Matcher` is created with the relative sub-pattern as an include rule,
-  executed against the root directory, and the results are added to the deduplication set.
-- **Relative pattern** — collected into a list and processed together after all absolute
-  patterns. A single `Matcher` with all relative include rules is executed against
-  `Directory.GetCurrentDirectory()`, and results are added to the deduplication set.
+- **Absolute pattern** — calls `SplitAbsolutePattern` to decompose into a root directory and a
+  relative sub-pattern. If the root directory does not exist the pattern is skipped. Otherwise a
+  `Matcher` is created with the relative sub-pattern as an include rule and executed against the
+  root directory.
+- **Relative pattern** — collected into a list and processed together after all absolute patterns.
+  A single `Matcher` with all relative include rules is executed against the current working
+  directory.
 
-The method never throws for non-matching patterns or non-existent directories; it returns an
-empty list in those cases.
+**SplitAbsolutePattern(absolutePattern)**: Decomposes an absolute glob pattern into a
+`(rootDir, relativePattern)` tuple.
 
-##### `SplitAbsolutePattern(absolutePattern)`
+- *Parameters*: `string absolutePattern` — an absolute glob pattern.
+- *Returns*: `(string rootDir, string relativePattern)` tuple.
+- *Preconditions*: Pattern must be rooted.
+- *Postconditions*: `rootDir` is a valid directory path; `relativePattern` is relative.
 
-`SplitAbsolutePattern` decomposes an absolute glob pattern into a `(rootDir, relativePattern)`
-tuple. The algorithm is:
-
-1. Determine `pathRoot` via `Path.GetPathRoot`.
-2. Find the index of the first wildcard character (`*`, `?`, or `[`) in `absolutePattern`.
-3. If **no wildcard** is present, treat the pattern as a literal file path:
-   - `rootDir` = `Path.GetDirectoryName(absolutePattern)` (or `pathRoot` if null)
-   - `relativePattern` = `Path.GetFileName(absolutePattern)`
-4. If a **wildcard is present**, find the last directory separator (`/` or `\`) that precedes
-   the wildcard:
-   - If no separator precedes the wildcard, `rootDir` = `pathRoot` and `relativePattern` =
-     the pattern after stripping the path root prefix.
-   - Otherwise split at that separator: `rootDir` = the left portion, `relativePattern` = the
-     right portion.
-   - If `rootDir` is empty (e.g. Unix pattern `/file.yaml` where the separator is at index 0),
-     `rootDir` is set to `pathRoot`.
-   - If `rootDir` equals the path root without its trailing separator (e.g. Windows `C:` from
-     `C:\*.yaml`), the path root with its trailing separator is used instead, so that
-     `DirectoryInfo` receives a valid drive-root path.
+The algorithm finds the first wildcard character (`*`, `?`, or `[`) and splits the pattern at
+the last directory separator preceding that wildcard. Edge cases (no wildcard, no separator
+before wildcard, empty root) are handled with fallback logic.
 
 #### Error Handling
 
 `GlobMatcher` is designed to be non-throwing for all normal use cases:
 
 - Non-matching patterns return an empty result; no exception is raised.
-- Patterns that reference non-existent directories are skipped silently; no exception is raised.
-- `SplitAbsolutePattern` does not throw; it handles edge cases (no wildcard, no separator before
-  wildcard, empty root) using the fallback logic described in its algorithm.
+- Patterns that reference non-existent directories are skipped silently.
+- `SplitAbsolutePattern` does not throw; it handles edge cases using fallback logic.
 
 The caller (`Context.Create`) is responsible for deciding whether zero matching files is an
 error condition.
 
 #### Dependencies
 
-| Unit | Purpose |
-| ---- | ------- |
-| `Microsoft.Extensions.FileSystemGlobbing` | Provides the `Matcher` class used to evaluate glob patterns against the file system |
+- **Microsoft.Extensions.FileSystemGlobbing** — provides the `Matcher` class used to evaluate
+  glob patterns against the file system.
 
 #### Callers
 
-| Unit | Nature of interaction |
-| ---- | --------------------- |
-| `Context` | `Context.Create` calls `GlobMatcher.FindMatchingFiles` to resolve `--requirements` and `--tests` patterns |
+- **Context** — `Context.Create` calls `GlobMatcher.FindMatchingFiles` to resolve
+  `--requirements` and `--tests` patterns.

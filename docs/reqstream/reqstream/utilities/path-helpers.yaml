@@ -1,55 +1,50 @@
 ---
-# PathHelpers Unit Requirements
-#
-# PURPOSE:
-# - Define requirements for the PathHelpers unit (PathHelpers.cs)
-# - PathHelpers provides safe path combination guarded against path-traversal attacks
-# - Unit requirements describe the combination behavior, traversal rejection, and null guards
-
+# PathHelpers unit requirements
 sections:
-  - title: PathHelpers Unit Requirements
-    requirements:
-      - id: ReqStream-PathHelpers-SafeCombine
-        title: >-
-          PathHelpers shall combine a base path and a relative path segment and return the
-          resulting path when it remains within the base directory.
-        justification: |
-          Combining a base path with a relative segment is a fundamental file-system operation
-          required when resolving include references and glob result paths. Returning the
-          combined path when it is safe enables callers to use the result directly without
-          additional resolution.
-        tags:
-          - utilities
-        tests:
-          - PathHelpers_SafePathCombine_ValidRelativePath_ReturnsCombinedPath
-          - PathHelpers_SafePathCombine_ValidSubdirectory_ReturnsCombinedPath
+  - title: ReqStream Requirements
+    sections:
+      - title: Utilities Requirements
+        sections:
+          - title: PathHelpers Requirements
+            requirements:
+              - id: ReqStream-PathHelpers-SafeCombine
+                title: >-
+                  PathHelpers shall combine a base path and a relative path segment and return the
+                  resulting path when it remains within the base directory.
+                justification: |
+                  Combining a base path with a relative segment is a fundamental file-system operation
+                  required when resolving include references and glob result paths. Returning the
+                  combined path when it is safe enables callers to use the result directly without
+                  additional resolution.
+                tags: [utilities]
+                tests:
+                  - PathHelpers_SafePathCombine_ValidRelativePath_ReturnsCombinedPath
+                  - PathHelpers_SafePathCombine_ValidSubdirectory_ReturnsCombinedPath
 
-      - id: ReqStream-PathHelpers-PathTraversalRejection
-        title: >-
-          PathHelpers shall throw ArgumentException when the resolved combined path escapes the
-          base directory.
-        justification: |
-          Rejecting paths that escape the base directory prevents path-traversal attacks where
-          a crafted relative component (e.g. "../../etc/passwd") or an absolute override could
-          cause the tool to read files outside the intended directory tree. Raising
-          ArgumentException with the offending path component provides a clear, actionable
-          diagnostic that callers can report to the user.
-        tags:
-          - utilities
-        tests:
-          - PathHelpers_SafePathCombine_DotDotPath_ThrowsArgumentException
-          - PathHelpers_SafePathCombine_DeepDotDotPath_ThrowsArgumentException
-          - PathHelpers_SafePathCombine_AbsoluteOverridePath_ThrowsArgumentException
+              - id: ReqStream-PathHelpers-PathTraversalRejection
+                title: >-
+                  PathHelpers shall throw ArgumentException when the resolved combined path escapes the
+                  base directory.
+                justification: |
+                  Rejecting paths that escape the base directory prevents path-traversal attacks where
+                  a crafted relative component (e.g. "../../etc/passwd") or an absolute override could
+                  cause the tool to read files outside the intended directory tree. Raising
+                  ArgumentException with the offending path component provides a clear, actionable
+                  diagnostic that callers can report to the user.
+                tags: [utilities]
+                tests:
+                  - PathHelpers_SafePathCombine_DotDotPath_ThrowsArgumentException
+                  - PathHelpers_SafePathCombine_DeepDotDotPath_ThrowsArgumentException
+                  - PathHelpers_SafePathCombine_AbsoluteOverridePath_ThrowsArgumentException
 
-      - id: ReqStream-PathHelpers-NullGuard
-        title: >-
-          PathHelpers shall throw ArgumentNullException when either path argument is null.
-        justification: |
-          Null argument guards enforce correct API usage and produce clear exception messages
-          that identify which parameter was null, preventing null-dereference exceptions deeper
-          in the path-processing logic and simplifying diagnostic output for callers.
-        tags:
-          - utilities
-        tests:
-          - PathHelpers_SafePathCombine_NullBasePath_ThrowsArgumentNullException
-          - PathHelpers_SafePathCombine_NullRelativePath_ThrowsArgumentNullException
+              - id: ReqStream-PathHelpers-NullGuard
+                title: >-
+                  PathHelpers shall throw ArgumentNullException when either path argument is null.
+                justification: |
+                  Null argument guards enforce correct API usage and produce clear exception messages
+                  that identify which parameter was null, preventing null-dereference exceptions deeper
+                  in the path-processing logic and simplifying diagnostic output for callers.
+                tags: [utilities]
+                tests:
+                  - PathHelpers_SafePathCombine_NullBasePath_ThrowsArgumentNullException
+                  - PathHelpers_SafePathCombine_NullRelativePath_ThrowsArgumentNullException

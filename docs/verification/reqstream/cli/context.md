@@ -1,4 +1,4 @@
-### Context Unit Verification
+### Context
 
 #### Verification Approach
 
@@ -17,98 +17,70 @@ are deleted on test completion.
 
 The Context unit verification is complete when all xUnit tests in `ContextTests.cs` pass without
 uncaught exceptions and all assertions succeed. The unit is considered verified when every
-requirement in the Coverage Summary is mapped to at least one passing test method.
+requirement in the Requirements Coverage table is mapped to at least one passing test method.
 
 #### Test Scenarios
 
-##### CLI Parsing Scenario
+**CLI Parsing**: Tests verify that Context correctly parses all supported command-line arguments.
+This scenario is tested by `Context_Create_NoArguments_ReturnsDefaultContext`,
+`Context_Create_VersionFlag_SetsVersionProperty`, `Context_Create_HelpFlags_SetsHelpProperty`,
+`Context_Create_SilentFlag_SetsSilentProperty`, `Context_Create_ValidateFlag_SetsValidateProperty`,
+`Context_Create_EnforceFlag_SetsEnforceProperty`, `Context_Create_LintFlag_SetsLintProperty`,
+`Context_Create_UnsupportedArgument_ThrowsException`, `Context_Create_MultipleArguments_ParsesAllCorrectly`,
+`Context_Create_MissingLogFilename_ThrowsException`, `Context_Create_MissingResultsFilename_ThrowsException`,
+and `Context_Create_FilterArgumentMissingValue_ThrowsException`.
 
-Tests verify that Context correctly parses all supported command-line arguments.
+**Requirements and Tests Pattern**: Tests verify that glob patterns for requirements and test
+files are correctly expanded. This scenario is tested by
+`Context_Create_WithRequirementsPattern_ExpandsGlobPattern` and
+`Context_Create_WithTestsPattern_ExpandsGlobPattern`.
 
-Test methods:
+**Results and Report Flags**: Tests verify that results file, report, matrix, and justifications
+flags set the corresponding properties. This scenario is tested by
+`Context_Create_ResultsFlag_SetsResultsFileProperty`, `Context_Create_ResultFlag_SetsResultsFileProperty`,
+`Context_Create_ReportFile_SetsReportProperty`, `Context_Create_MissingReportFilename_ThrowsException`,
+`Context_Create_MatrixFile_SetsMatrixProperty`, `Context_Create_MissingMatrixFilename_ThrowsException`,
+`Context_Create_JustificationsFile_SetsJustificationsFileProperty`, and
+`Context_Create_MissingJustificationsFilename_ThrowsException`.
 
-- `Context_Create_NoArguments_ReturnsDefaultContext` — no args → default context
-- `Context_Create_VersionFlag_SetsVersionProperty` — `--version` sets Version
-- `Context_Create_HelpFlags_SetsHelpProperty` — `--help`/`-h`/`-?` sets Help
-- `Context_Create_SilentFlag_SetsSilentProperty` — `--silent` sets Silent
-- `Context_Create_ValidateFlag_SetsValidateProperty` — `--validate` sets Validate
-- `Context_Create_EnforceFlag_SetsEnforceProperty` — `--enforce` sets Enforce
-- `Context_Create_LintFlag_SetsLintProperty` — `--lint` sets Lint
-- `Context_Create_UnsupportedArgument_ThrowsException` — unknown arg throws
-- `Context_Create_MultipleArguments_ParsesAllCorrectly` — multiple flags parsed
-- `Context_Create_MissingLogFilename_ThrowsException` — `--log` without value throws
-- `Context_Create_MissingResultsFilename_ThrowsException` — `--results` without value throws
-- `Context_Create_FilterArgumentMissingValue_ThrowsException` — `--filter` without value throws
+**Depth Flags**: Tests verify that depth flags set the corresponding depth properties and that
+per-report depth values override the global `--depth` setting. This scenario is tested by
+`Context_Create_ReportDepth_SetsReportDepthProperty`, `Context_Create_MatrixDepth_SetsMatrixDepthProperty`,
+`Context_Create_JustificationsDepth_SetsJustificationsDepthProperty`,
+`Context_Create_Depth_SetsAllDepths`, `Context_Create_SpecificDepthOverridesDefaultDepth`,
+`Context_Create_MissingDepth_ThrowsException`, `Context_Create_InvalidDepth_ThrowsException`,
+`Context_Create_MissingJustificationsDepth_ThrowsException`, and
+`Context_Create_InvalidJustificationsDepth_ThrowsException`.
 
-##### Requirements and Tests Pattern Scenario
+**Tag Filter**: Tests verify that `--filter` parses comma-separated tags, trims whitespace, and
+merges multiple filter arguments. This scenario is tested by
+`Context_Create_FilterArgument_ParsesTagsCorrectly`,
+`Context_Create_FilterArgumentWithSpaces_TrimsAndParsesTagsCorrectly`,
+`Context_Create_FilterSingleTag_ParsesCorrectly`, and
+`Context_Create_MultipleFilterArguments_MergesIntoSingleSet`.
 
-Test methods:
+**Output Channel**: Tests verify that output and error output are correctly routed in silent and
+normal modes, and that WriteError sets the exit code to 1. This scenario is tested by
+`Context_WriteLine_SilentMode_WritesToLogFile`, `Context_WriteError_SilentMode_WritesToLogFile`,
+`Context_WriteError_NormalMode_WritesToLogFile`, and `Context_ExitCode_AfterWriteError_ReturnsOne`.
 
-- `Context_Create_WithRequirementsPattern_ExpandsGlobPattern` — glob patterns for requirements
-- `Context_Create_WithTestsPattern_ExpandsGlobPattern` — glob patterns for test results
-
-##### Results and Report Flags Scenario
-
-Test methods:
-
-- `Context_Create_ResultsFlag_SetsResultsFileProperty` — `--results` sets path
-- `Context_Create_ResultFlag_SetsResultsFileProperty` — `--result` alias sets path
-- `Context_Create_ReportFile_SetsReportProperty` — `--report` sets path
-- `Context_Create_MissingReportFilename_ThrowsException` — `--report` without value throws
-- `Context_Create_MatrixFile_SetsMatrixProperty` — `--matrix` sets path
-- `Context_Create_MissingMatrixFilename_ThrowsException` — `--matrix` without value throws
-- `Context_Create_JustificationsFile_SetsJustificationsFileProperty` — `--justifications` sets path
-- `Context_Create_MissingJustificationsFilename_ThrowsException` — `--justifications` without value throws
-
-##### Depth Flags Scenario
-
-Test methods:
-
-- `Context_Create_ReportDepth_SetsReportDepthProperty` — `--report-depth` sets report depth
-- `Context_Create_MatrixDepth_SetsMatrixDepthProperty` — `--matrix-depth` sets matrix depth
-- `Context_Create_JustificationsDepth_SetsJustificationsDepthProperty` — `--justifications-depth`
-- `Context_Create_Depth_SetsAllDepths` — `--depth` sets all depth properties
-- `Context_Create_SpecificDepthOverridesDefaultDepth` — per-report overrides `--depth`
-- `Context_Create_MissingDepth_ThrowsException` — `--depth` without value throws
-- `Context_Create_InvalidDepth_ThrowsException` — non-integer depth throws
-- `Context_Create_MissingJustificationsDepth_ThrowsException` — missing justifications depth throws
-- `Context_Create_InvalidJustificationsDepth_ThrowsException` — invalid justifications depth throws
-
-##### Tag Filter Scenario
-
-Test methods:
-
-- `Context_Create_FilterArgument_ParsesTagsCorrectly` — `--filter` parses comma-separated tags
-- `Context_Create_FilterArgumentWithSpaces_TrimsAndParsesTagsCorrectly` — spaces are trimmed
-- `Context_Create_FilterSingleTag_ParsesCorrectly` — single tag parsed
-- `Context_Create_MultipleFilterArguments_MergesIntoSingleSet` — multiple `--filter` merged
-
-##### Output Channel Scenario
-
-Test methods:
-
-- `Context_WriteLine_SilentMode_WritesToLogFile` — silent mode still writes to log file
-- `Context_WriteError_SilentMode_WritesToLogFile` — silent mode still writes error to log file
-- `Context_WriteError_NormalMode_WritesToLogFile` — normal mode writes error to log file
-- `Context_ExitCode_AfterWriteError_ReturnsOne` — exit code is 1 after error
-
-##### Log File Scenario
-
-Test methods:
-
-- `Context_Create_WithLogFile_WritesToLogFile` — log file receives output
-- `Context_Create_WithLogFileAndSilent_WritesToLogOnly` — silent + log writes only to log
-- `Context_Dispose_WithLogFile_ClosesLogFile` — dispose closes log file
-- `Context_Create_InvalidLogPath_ThrowsException` — invalid log path throws
+**Log File**: Tests verify that output is written to the log file when `--log` is provided,
+that silent mode writes only to the log file, that the log file is closed on disposal, and that
+an invalid log path throws an exception. This scenario is tested by
+`Context_Create_WithLogFile_WritesToLogFile`, `Context_Create_WithLogFileAndSilent_WritesToLogOnly`,
+`Context_Dispose_WithLogFile_ClosesLogFile`, and `Context_Create_InvalidLogPath_ThrowsException`.
 
 #### Requirements Coverage
 
 | Requirement ID | Scenario(s) | Test Method(s) |
 | --- | --- | --- |
-| `ReqStream-Command-Cli` | CLI Parsing Scenario | `Context_Create_NoArguments_ReturnsDefaultContext`, `Context_Create_MultipleArguments_ParsesAllCorrectly` |
+| `ReqStream-Command-Cli` | CLI Parsing Scenario | `Context_Create_NoArguments_ReturnsDefaultContext` |
+| `ReqStream-Command-Cli` | CLI Parsing Scenario | `Context_Create_MultipleArguments_ParsesAllCorrectly` |
 | `ReqStream-Command-Version` | CLI Parsing Scenario | `Context_Create_VersionFlag_SetsVersionProperty` |
 | `ReqStream-Command-Help` | CLI Parsing Scenario | `Context_Create_HelpFlags_SetsHelpProperty` |
-| `ReqStream-Command-Silent` | CLI Parsing Scenario, Output Channel Scenario | `Context_Create_SilentFlag_SetsSilentProperty`, `Context_WriteLine_SilentMode_WritesToLogFile`, `Context_WriteError_SilentMode_WritesToLogFile` |
+| `ReqStream-Command-Silent` | CLI Parsing Scenario, Output Channel Scenario | `Context_Create_SilentFlag_SetsSilentProperty` |
+| `ReqStream-Command-Silent` | CLI Parsing Scenario, Output Channel Scenario | `Context_WriteLine_SilentMode_WritesToLogFile` |
+| `ReqStream-Command-Silent` | CLI Parsing Scenario, Output Channel Scenario | `Context_WriteError_SilentMode_WritesToLogFile` |
 | `ReqStream-Command-ErrorOutput` | Output Channel Scenario | `Context_WriteError_NormalMode_WritesToLogFile` |
 | `ReqStream-Command-UnknownArgs` | CLI Parsing Scenario | `Context_Create_UnsupportedArgument_ThrowsException` |
 | `ReqStream-Command-MissingLogValue` | CLI Parsing Scenario | `Context_Create_MissingLogFilename_ThrowsException` |
@@ -121,12 +93,28 @@ Test methods:
 | `ReqStream-Command-ExitCode` | Output Channel Scenario | `Context_ExitCode_AfterWriteError_ReturnsOne` |
 | `ReqStream-Command-ReportDepth` | Depth Flags Scenario | `Context_Create_ReportDepth_SetsReportDepthProperty` |
 | `ReqStream-Command-MatrixDepth` | Depth Flags Scenario | `Context_Create_MatrixDepth_SetsMatrixDepthProperty` |
-| `ReqStream-Command-Depth` | Depth Flags Scenario | `Context_Create_Depth_SetsAllDepths`, `Context_Create_SpecificDepthOverridesDefaultDepth`, `Context_Create_MissingDepth_ThrowsException`, `Context_Create_InvalidDepth_ThrowsException` |
-| `ReqStream-Command-TagFilter` | Tag Filter Scenario | `Context_Create_FilterArgument_ParsesTagsCorrectly`, `Context_Create_FilterArgumentWithSpaces_TrimsAndParsesTagsCorrectly`, `Context_Create_FilterSingleTag_ParsesCorrectly`, `Context_Create_MultipleFilterArguments_MergesIntoSingleSet` |
+| `ReqStream-Command-Depth` | Depth Flags Scenario | `Context_Create_Depth_SetsAllDepths` |
+| `ReqStream-Command-Depth` | Depth Flags Scenario | `Context_Create_SpecificDepthOverridesDefaultDepth` |
+| `ReqStream-Command-Depth` | Depth Flags Scenario | `Context_Create_MissingDepth_ThrowsException` |
+| `ReqStream-Command-Depth` | Depth Flags Scenario | `Context_Create_InvalidDepth_ThrowsException` |
+| `ReqStream-Command-TagFilter` | Tag Filter Scenario | `Context_Create_FilterArgument_ParsesTagsCorrectly` |
+| `ReqStream-Command-TagFilter` | Tag Filter Scenario | `Context_Create_FilterArgumentWithSpaces_TrimsAndParsesTagsCorrectly` |
+| `ReqStream-Command-TagFilter` | Tag Filter Scenario | `Context_Create_FilterSingleTag_ParsesCorrectly` |
+| `ReqStream-Command-TagFilter` | Tag Filter Scenario | `Context_Create_MultipleFilterArguments_MergesIntoSingleSet` |
 | `ReqStream-Command-Lint` | CLI Parsing Scenario | `Context_Create_LintFlag_SetsLintProperty` |
-| `ReqStream-Command-Results` | Results and Report Flags Scenario | `Context_Create_ResultsFlag_SetsResultsFileProperty`, `Context_Create_ResultFlag_SetsResultsFileProperty`, `Context_Create_MissingResultsFilename_ThrowsException` |
-| `ReqStream-Command-Report` | Results and Report Flags Scenario | `Context_Create_ReportFile_SetsReportProperty`, `Context_Create_MissingReportFilename_ThrowsException` |
-| `ReqStream-Command-Matrix` | Results and Report Flags Scenario | `Context_Create_MatrixFile_SetsMatrixProperty`, `Context_Create_MissingMatrixFilename_ThrowsException` |
-| `ReqStream-Command-Justifications` | Results and Report Flags Scenario | `Context_Create_JustificationsFile_SetsJustificationsFileProperty`, `Context_Create_MissingJustificationsFilename_ThrowsException` |
-| `ReqStream-Command-JustificationsDepth` | Depth Flags Scenario | `Context_Create_JustificationsDepth_SetsJustificationsDepthProperty`, `Context_Create_MissingJustificationsDepth_ThrowsException`, `Context_Create_InvalidJustificationsDepth_ThrowsException` |
-| `ReqStream-Command-LogFileOutput` | Log File Scenario | `Context_Create_WithLogFile_WritesToLogFile`, `Context_Create_WithLogFileAndSilent_WritesToLogOnly`, `Context_Dispose_WithLogFile_ClosesLogFile`, `Context_Create_InvalidLogPath_ThrowsException` |
+| `ReqStream-Command-Results` | Results and Report Flags Scenario | `Context_Create_ResultsFlag_SetsResultsFileProperty` |
+| `ReqStream-Command-Results` | Results and Report Flags Scenario | `Context_Create_ResultFlag_SetsResultsFileProperty` |
+| `ReqStream-Command-Results` | Results and Report Flags Scenario | `Context_Create_MissingResultsFilename_ThrowsException` |
+| `ReqStream-Command-Report` | Results and Report Flags Scenario | `Context_Create_ReportFile_SetsReportProperty` |
+| `ReqStream-Command-Report` | Results and Report Flags Scenario | `Context_Create_MissingReportFilename_ThrowsException` |
+| `ReqStream-Command-Matrix` | Results and Report Flags Scenario | `Context_Create_MatrixFile_SetsMatrixProperty` |
+| `ReqStream-Command-Matrix` | Results and Report Flags Scenario | `Context_Create_MissingMatrixFilename_ThrowsException` |
+| `ReqStream-Command-Justifications` | Results and Report Flags Scenario | `Context_Create_JustificationsFile_SetsJustificationsFileProperty` |
+| `ReqStream-Command-Justifications` | Results and Report Flags Scenario | `Context_Create_MissingJustificationsFilename_ThrowsException` |
+| `ReqStream-Command-JustificationsDepth` | Depth Flags Scenario | `Context_Create_JustificationsDepth_SetsJustificationsDepthProperty` |
+| `ReqStream-Command-JustificationsDepth` | Depth Flags Scenario | `Context_Create_MissingJustificationsDepth_ThrowsException` |
+| `ReqStream-Command-JustificationsDepth` | Depth Flags Scenario | `Context_Create_InvalidJustificationsDepth_ThrowsException` |
+| `ReqStream-Command-LogFileOutput` | Log File Scenario | `Context_Create_WithLogFile_WritesToLogFile` |
+| `ReqStream-Command-LogFileOutput` | Log File Scenario | `Context_Create_WithLogFileAndSilent_WritesToLogOnly` |
+| `ReqStream-Command-LogFileOutput` | Log File Scenario | `Context_Dispose_WithLogFile_ClosesLogFile` |
+| `ReqStream-Command-LogFileOutput` | Log File Scenario | `Context_Create_InvalidLogPath_ThrowsException` |

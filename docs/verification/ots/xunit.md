@@ -1,4 +1,4 @@
-## xUnit Verification
+## xUnit
 
 ### Required Functionality
 
@@ -10,26 +10,25 @@ methods. Passing tests confirm the framework is functioning correctly.
 
 xUnit is verified by integration test evidence. The test suite is executed with `dotnet test`
 as part of the CI pipeline. Passing test methods demonstrate that xUnit discovered and ran
-the tests correctly. The following representative test methods are linked as evidence:
+the tests correctly.
 
-- `Context_Create_NoArguments_ReturnsDefaultContext`
-- `Context_Create_VersionFlag_SetsVersionProperty`
-- `Context_Create_HelpFlags_SetsHelpProperty`
-- `Section_Load_SimpleRequirement_ParsesCorrectly`
-- `Requirement_Properties_DefaultValues`
-- `TraceMatrix_Constructor_WithNoFiles_CreatesEmptyMatrix`
-- `Program_Run_WithVersionFlag_PrintsVersion`
-- `Validation_Run_WithSilentContext_CompletesSuccessfully`
+### Test Scenarios
 
-### Coverage Summary
+**Context Argument Parsing**: Verifies that xUnit discovers and executes Context unit tests
+correctly. This scenario is tested by `Context_Create_NoArguments_ReturnsDefaultContext` and
+`Context_Create_VersionFlag_SetsVersionProperty` and `Context_Create_HelpFlags_SetsHelpProperty`.
 
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-OTS-XUnit` | `Context_Create_NoArguments_ReturnsDefaultContext` |
-| `ReqStream-OTS-XUnit` | `Context_Create_VersionFlag_SetsVersionProperty` |
-| `ReqStream-OTS-XUnit` | `Context_Create_HelpFlags_SetsHelpProperty` |
-| `ReqStream-OTS-XUnit` | `Section_Load_SimpleRequirement_ParsesCorrectly` |
-| `ReqStream-OTS-XUnit` | `Requirement_Properties_DefaultValues` |
-| `ReqStream-OTS-XUnit` | `TraceMatrix_Constructor_WithNoFiles_CreatesEmptyMatrix` |
-| `ReqStream-OTS-XUnit` | `Program_Run_WithVersionFlag_PrintsVersion` |
-| `ReqStream-OTS-XUnit` | `Validation_Run_WithSilentContext_CompletesSuccessfully` |
+**Section Parsing**: Verifies that xUnit discovers and executes Section unit tests correctly.
+This scenario is tested by `Section_Load_SimpleRequirement_ParsesCorrectly`.
+
+**Requirement Properties**: Verifies that xUnit discovers and executes Requirement unit tests
+correctly. This scenario is tested by `Requirement_Properties_DefaultValues`.
+
+**TraceMatrix Construction**: Verifies that xUnit discovers and executes TraceMatrix unit tests
+correctly. This scenario is tested by `TraceMatrix_Constructor_WithNoFiles_CreatesEmptyMatrix`.
+
+**Program Execution**: Verifies that xUnit discovers and executes Program unit tests correctly.
+This scenario is tested by `Program_Run_WithVersionFlag_PrintsVersion`.
+
+**Validation Execution**: Verifies that xUnit discovers and executes Validation unit tests
+correctly. This scenario is tested by `Validation_Run_WithSilentContext_CompletesSuccessfully`.

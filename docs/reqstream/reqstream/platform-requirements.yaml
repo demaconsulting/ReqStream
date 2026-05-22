@@ -1,16 +1,16 @@
 ---
+# ReqStream platform requirements
 sections:
   - title: ReqStream Requirements
     sections:
-      - title: System Integration
+      - title: Platform Support
         requirements:
           - id: ReqStream-Platform-Windows
             title: The tool shall run on Windows operating systems.
             justification: |
               Windows support is essential for .NET developers who primarily work in Windows environments
               and use Visual Studio.
-            tags:
-              - platform
+            tags: [platform]
             tests:
               - "windows@ReqStream_RequirementsProcessing"
               - "windows@ReqStream_TraceMatrix"
@@ -24,8 +24,7 @@ sections:
             justification: |
               Linux support enables use in containerized CI/CD environments and cloud-based build systems
               that typically use Linux.
-            tags:
-              - platform
+            tags: [platform]
             tests:
               - "ubuntu@ReqStream_RequirementsProcessing"
               - "ubuntu@ReqStream_TraceMatrix"
@@ -39,8 +38,7 @@ sections:
             justification: |
               macOS support is essential for developers using Apple platforms who need to run
               ReqStream locally and in CI/CD pipelines on macOS agents.
-            tags:
-              - platform
+            tags: [platform]
             tests:
               - "macos@ReqStream_RequirementsProcessing"
               - "macos@ReqStream_TraceMatrix"
@@ -53,8 +51,7 @@ sections:
             title: The tool shall support .NET 8.0 runtime.
             justification: |
               .NET 8.0 is an LTS release, providing long-term stability and support for enterprise users.
-            tags:
-              - platform
+            tags: [platform]
             tests:
               - "dotnet8.x@ReqStream_RequirementsProcessing"
               - "dotnet8.x@ReqStream_TraceMatrix"
@@ -68,8 +65,7 @@ sections:
             justification: |
               .NET 9.0 support enables users to leverage the latest .NET features and performance
               improvements.
-            tags:
-              - platform
+            tags: [platform]
             tests:
               - "dotnet9.x@ReqStream_RequirementsProcessing"
               - "dotnet9.x@ReqStream_TraceMatrix"
@@ -83,8 +79,7 @@ sections:
             justification: |
               .NET 10.0 support ensures the tool remains compatible with the latest .NET ecosystem and
               future-proofs the project.
-            tags:
-              - platform
+            tags: [platform]
             tests:
               - "dotnet10.x@ReqStream_RequirementsProcessing"
               - "dotnet10.x@ReqStream_TraceMatrix"

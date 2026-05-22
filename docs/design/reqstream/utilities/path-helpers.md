@@ -1,37 +1,40 @@
-### PathHelpers Unit Design
+### PathHelpers
 
 #### Purpose
 
 `PathHelpers` is a static utility class that provides safe path combination guarded against
 path-traversal attacks. It wraps `Path.Combine` with a validation step that ensures the
 resolved combined path remains within the intended base directory. This prevents situations
-where user-supplied path components (for example, `include` entries in requirements YAML files
-or glob results) could escape to unintended locations.
-
-`PathHelpers` has no mutable state; all methods are `internal static`.
+where user-supplied path components (for example, `include` entries in requirements YAML files)
+could escape to unintended locations. `PathHelpers` has no mutable state; all methods are
+`internal static`.
 
 #### Data Model
 
-N/A — `PathHelpers` is a static class declared `internal static`. It has no mutable instance
-or class-level state; all state is local to individual `SafePathCombine` calls.
+N/A — `PathHelpers` is a static class with no mutable instance or class-level state. All state
+is local to individual `SafePathCombine` calls.
 
 #### Key Methods
 
-##### `SafePathCombine(basePath, relativePath)`
+**SafePathCombine(basePath, relativePath)**: Combines two path strings and validates the result.
 
-`SafePathCombine` combines two path strings and validates the result.
+- *Parameters*: `string basePath` — the base directory; `string relativePath` — the relative
+  path to combine.
+- *Returns*: `string` — the combined path (non-resolved form, preserving the caller's style).
+- *Preconditions*: Neither argument is `null`.
+- *Postconditions*: The resolved combined path is within `basePath`.
 
-The algorithm is:
+The algorithm:
 
-1. Combine the paths using `Path.Combine(basePath, relativePath)` to produce `combinedPath`.
-2. Resolve both `basePath` and `combinedPath` to absolute form using `Path.GetFullPath`.
-3. Compute `checkRelative = Path.GetRelativePath(absoluteBase, absoluteCombined)`.
-4. If `checkRelative` starts with `..` (with either separator) or is itself rooted, throw
-   `ArgumentException` — the combined path has escaped the base directory.
-5. Otherwise return `combinedPath` (the non-resolved form, preserving the caller's style).
+1. Combine the paths using `Path.Combine(basePath, relativePath)`.
+2. Resolve both `basePath` and the combined path to absolute form using `Path.GetFullPath`.
+3. Compute relative path from the absolute base to the absolute combined path.
+4. If the relative path starts with `..` or is itself rooted, throw `ArgumentException`.
+5. Otherwise return the combined path.
 
-The method never permits traversal outside `basePath`. It throws `ArgumentNullException` for
-null inputs and `ArgumentException` for path-traversal attempts or invalid path formats.
+The method never permits traversal outside `basePath`. The CodeQL `cs/path-combine` rule is
+suppressed specifically for `PathHelpers.cs` because this is the one location where the raw
+`Path.Combine` call is validated and therefore safe to use.
 
 #### Error Handling
 
@@ -41,23 +44,12 @@ null inputs and `ArgumentException` for path-traversal attempts or invalid path 
 
 No other exceptions are thrown; valid inputs always return a combined path string.
 
-#### Security Rationale
-
-`Path.Combine` on its own accepts relative components such as `../../etc/passwd` and absolute
-components that completely override the base. By normalizing both sides with `Path.GetFullPath`
-and calling `Path.GetRelativePath`, `SafePathCombine` detects any escape attempt independent of
-platform separator style or case-sensitivity. The CodeQL `cs/path-combine` rule is suppressed
-specifically for `PathHelpers.cs` because this is the one location where the raw `Path.Combine`
-call is validated and therefore safe to use.
-
 #### Dependencies
 
-N/A — `PathHelpers` depends only on .NET base class library path APIs (`System.IO.Path`,
-`System.IO.Directory`). It has no dependencies on other ReqStream units, OTS packages, or
-shared packages.
+N/A — `PathHelpers` depends only on .NET base class library path APIs (`System.IO.Path`). It
+has no dependencies on other ReqStream units, OTS packages, or shared packages.
 
 #### Callers
 
-| Unit | Nature of interaction |
-| ---- | --------------------- |
-| `RequirementsLoader` | Calls `PathHelpers.SafePathCombine` to combine include-file directory paths with relative `includes` entries before recursing |
+- **RequirementsLoader** — calls `PathHelpers.SafePathCombine` to combine include-file directory
+  paths with relative `includes` entries before recursing.

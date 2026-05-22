@@ -1,43 +1,40 @@
 # Introduction
 
 This document provides the detailed design for the ReqStream tool, a .NET command-line application
-for managing software requirements in YAML format.
+for managing software requirements in YAML format. It covers full architectural and detailed design
+for local items (the ReqStream system, its subsystems, and units), and integration/usage design for
+the OTS software items consumed by the system.
 
 ## Purpose
 
-The purpose of this document is to describe the internal design of the ReqStream system, its
-subsystems, and each software unit. It captures data models, algorithms, key methods, and
-inter-unit interactions at a level of detail sufficient for formal code review, compliance
-verification, and future maintenance. The document does not restate requirements; it explains how
-they are realized.
+This document defines the design for each software item in ReqStream — full architectural and
+detailed design for local items (systems, subsystems, and units), and integration/usage design for
+OTS software items. A reviewer should be able to understand how each item satisfies its requirements
+without reading source code.
 
 ## Scope
 
-This document covers the detailed design of the following software items, spanning system, subsystem, and unit levels:
+This document covers the detailed design of the following software items:
 
-- **Program** — entry point and execution orchestrator (`Program.cs`)
-- **Context** — command-line argument parser and I/O owner (`Cli/Context.cs`)
-- **GlobMatcher** — glob-pattern file matching utility (`Utilities/GlobMatcher.cs`)
-- **PathHelpers** — safe path combination with traversal protection (`Utilities/PathHelpers.cs`)
-- **Validation** — self-validation test runner (`SelfTest/Validation.cs`)
-- **LintIssue and LoadResult** — lint severity classification, issue data model, and load-result
-  encapsulation (`Modeling/LintIssue.cs`, `Modeling/LoadResult.cs`)
-- **Requirement, Requirements, RequirementsLoader, and Section** — YAML parsing, section merging,
-  validation, lint reporting, and export (`Modeling/Requirement.cs`, `Modeling/Requirements.cs`,
-  `Modeling/RequirementsLoader.cs`, `Modeling/Section.cs`)
-- **TraceMatrix** — test result loader and requirement-coverage analyzer (`Tracing/TraceMatrix.cs`)
+Local items:
+
+- **ReqStream**: system, subsystem, and unit design.
+
+OTS items:
+
+- **YamlDotNet**: integration and usage design.
+- **Microsoft.Extensions.FileSystemGlobbing**: integration and usage design.
+- **DemaConsulting.TestResults**: integration and usage design.
 
 The following topics are out of scope:
 
-- External library internals (YamlDotNet, DemaConsulting.TestResults)
+- Internal design of OTS items (YamlDotNet, Microsoft.Extensions.FileSystemGlobbing,
+  DemaConsulting.TestResults)
 - Build pipeline configuration
 - Deployment and packaging
 - Test projects, test classes, and test infrastructure
 
 ## Software Structure
-
-The following tree shows how the ReqStream software items are organized across the system,
-subsystem, and unit levels:
 
 ```text
 ReqStream (System)
@@ -56,57 +53,16 @@ ReqStream (System)
 │   └── Section (Unit)
 ├── Tracing (Subsystem)
 │   └── TraceMatrix (Unit)
-├── SelfTest (Subsystem)
-│   └── Validation (Unit)
-└── OTS Items
-    ├── YamlDotNet
-    ├── Microsoft.Extensions.FileSystemGlobbing
-    └── DemaConsulting.TestResults
-```
+└── SelfTest (Subsystem)
+    └── Validation (Unit)
 
-Each unit is described in detail in its own chapter within this document.
+OTS Dependencies:
+├── YamlDotNet (OTS)
+├── Microsoft.Extensions.FileSystemGlobbing (OTS)
+└── DemaConsulting.TestResults (OTS)
+```
 
 ## Folder Layout
-
-The design documents are organized into subsystem subdirectories that mirror the top-level subsystem
-breakdown above:
-
-```text
-docs/design/
-├── introduction.md                         — document introduction and architecture overview
-├── reqstream.md                            — system integration design
-├── ots.md                                  — OTS items design overview
-├── ots/
-│   ├── yamldotnet.md                       — YamlDotNet integration design
-│   ├── microsoft-extensions-file-system-globbing.md — Microsoft.Extensions.FileSystemGlobbing design
-│   └── dema-consulting-test-results.md     — DemaConsulting.TestResults integration design
-└── reqstream/
-    ├── program.md                          — Program unit design
-    ├── cli.md                              — Cli subsystem design
-    ├── cli/
-    │   └── context.md                      — Context unit design
-    ├── utilities.md                        — Utilities subsystem design
-    ├── utilities/
-    │   ├── glob-matcher.md                 — GlobMatcher unit design
-    │   └── path-helpers.md                 — PathHelpers unit design
-    ├── modeling.md                         — Modeling subsystem design
-    ├── modeling/
-    │   ├── lint-issue.md                   — LintIssue unit design
-    │   ├── load-result.md                  — LoadResult unit design
-    │   ├── requirement.md                  — Requirement unit design
-    │   ├── requirements-loader.md          — RequirementsLoader unit design
-    │   ├── requirements.md                 — Requirements unit design
-    │   └── section.md                      — Section unit design
-    ├── tracing.md                          — Tracing subsystem design
-    ├── tracing/
-    │   └── trace-matrix.md                 — TraceMatrix unit design
-    ├── self-test.md                        — SelfTest subsystem design
-    └── self-test/
-        └── validation.md                   — Validation unit design
-```
-
-The source code folder structure mirrors the top-level subsystem breakdown above, giving
-reviewers an explicit navigation aid from design to code:
 
 ```text
 src/DemaConsulting.ReqStream/
@@ -127,56 +83,35 @@ src/DemaConsulting.ReqStream/
 │   └── TraceMatrix.cs          — test result loader and requirement-coverage analyzer
 └── SelfTest/
     └── Validation.cs           — self-validation test runner
+
+test/DemaConsulting.ReqStream.Tests/
+├── CliTests.cs                 — CLI subsystem integration tests
+├── Modeling/
+│   └── ModelingTests.cs        — Modeling subsystem integration tests
+├── Tracing/
+│   └── TracingTests.cs         — Tracing subsystem integration tests
+└── Utilities/
+    └── UtilitiesTests.cs       — Utilities subsystem integration tests
 ```
-
-The test project mirrors the same layout under `test/DemaConsulting.ReqStream.Tests/`.
-
-## Document Conventions
-
-Throughout this document:
-
-- Class names, method names, property names, and file names appear in `monospace` font.
-- The word **shall** denotes a design constraint that the implementation must satisfy.
-- Section headings within each unit chapter follow a consistent structure: overview, data model,
-  methods/algorithms, and interactions with other units.
-- Text tables are used in preference to diagrams, which may not render in all PDF viewers.
 
 ## Companion Artifact Structure
 
-Each software item in the structure above has corresponding artifacts in parallel directory trees,
-enabling reviewers and auditors to navigate from any one artifact to all related files:
+Each local software item has corresponding artifacts in parallel directory trees:
 
-```text
-Each software item has parallel artifacts organized as follows:
-- Requirements: docs/reqstream/reqstream/.../{item}.yaml  (kebab-case)
-- Design docs:  docs/design/reqstream/.../{item}.md        (kebab-case)
-- Verification: docs/verification/reqstream/.../{item}.md  (kebab-case)
-- Source code:  src/DemaConsulting.ReqStream/.../{Item}.cs (PascalCase)
-- Tests:        test/DemaConsulting.ReqStream.Tests/.../{Item}Tests.cs (PascalCase)
-- Review-sets:  defined in .reviewmark.yaml
-```
+- Requirements: `docs/reqstream/reqstream.yaml`, `docs/reqstream/reqstream/.../{item}.yaml`
+- Design: `docs/design/reqstream.md`, `docs/design/reqstream/.../{item}.md`
+- Verification: `docs/verification/reqstream.md`, `docs/verification/reqstream/.../{item}.md`
+- Source: `src/DemaConsulting.ReqStream/.../{Item}.cs`
+- Tests: `test/DemaConsulting.ReqStream.Tests/.../{Item}Tests.cs`
 
-For example, the `Requirements` unit maps to:
+OTS items have integration/usage design documentation parallel to system folders:
 
-| Artifact | Path |
-| -------- | ---- |
-| Requirements | `docs/reqstream/reqstream/modeling/requirements.yaml` |
-| Design | `docs/design/reqstream/modeling/requirements.md` |
-| Verification | `docs/verification/reqstream/modeling/requirements.md` |
-| Source | `src/DemaConsulting.ReqStream/Modeling/Requirements.cs` |
-| Tests | `test/DemaConsulting.ReqStream.Tests/Modeling/ModelingTests.cs` |
+- Requirements: `docs/reqstream/ots/{ots-name}.yaml`
+- Design: `docs/design/ots/{ots-name}.md`
+- Verification: `docs/verification/ots/{ots-name}.md`
 
-For OTS software items, the artifact structure uses a flatter layout (no source code or tests):
-
-| Artifact | Path |
-| -------- | ---- |
-| Requirements | `docs/reqstream/ots/{ots-name}.yaml` |
-| Design | `docs/design/ots/{ots-name}.md` |
-| Verification | `docs/verification/ots/{ots-name}.md` |
+Review-sets: defined in `.reviewmark.yaml`
 
 ## References
 
-- ReqStream System Requirements document —
-  [ReqStream releases](https://github.com/demaconsulting/ReqStream/releases)
-- ReqStream Requirements Root document —
-  [ReqStream releases](https://github.com/demaconsulting/ReqStream/releases)
+- [ReqStream releases](https://github.com/demaconsulting/ReqStream/releases)

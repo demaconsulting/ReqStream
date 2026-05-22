@@ -1,4 +1,4 @@
-## SelfTest Subsystem Design
+## SelfTest
 
 ### Overview
 
@@ -10,17 +10,17 @@ evidence about its own correctness.
 
 The `SelfTest` subsystem contains the following software unit:
 
-| Unit | File | Responsibility |
-| ---- | ---- | -------------- |
-| `Validation` | `SelfTest/Validation.cs` | Orchestrating and executing self-validation tests. |
+- **Validation** (`SelfTest/Validation.cs`) — Orchestrating and executing self-validation tests.
 
 ### Interfaces
 
-The `SelfTest` subsystem exposes the following interface to the rest of the tool:
+**Validation.Run**: Runs all self-validation tests, prints a summary, and writes results.
 
-| Interface        | Description                                                           |
-|------------------|-----------------------------------------------------------------------|
-| `Validation.Run` | Runs all self-validation tests, prints a summary, and writes results. |
+- *Type*: In-process .NET internal API (static method).
+- *Role*: Provider (called by `Program.Run` when `--validate` is present).
+- *Contract*: Accepts a `Context`; executes six validation tests sequentially; prints a summary.
+  If `context.ResultsFile` is set, writes results to that file in TRX or JUnit format.
+- *Constraints*: Must not be called concurrently (mutates the process working directory).
 
 ### Design
 
@@ -34,31 +34,11 @@ test-runner pattern:
 2. After all tests complete, `Run` prints a summary and optionally writes results to a file
    via `WriteResultsFile`.
 
+The six tests exercise: requirements processing, trace matrix construction, report export,
+tag filtering, enforcement mode, and lint detection. Each runs in a dedicated temporary
+directory for isolation.
+
 The two nested helper classes, `TemporaryDirectory` and `DirectorySwitch`, are used exclusively
-within the test methods and have no visibility outside `Validation`.
-
-> **Thread-safety constraint**: each test method uses `DirectorySwitch`, which mutates the
-> process-wide current working directory. `Validation.Run` must not be called concurrently;
-> see the Validation unit design documentation for details.
-
-### Interactions
-
-| Unit | Relationship | Description |
-| ---- | ------------ | ----------- |
-| `Context` | Uses | Output channel for header lines, test summaries, and errors. |
-| `Program` | Uses | `Program.Run` is called internally to exercise the tool. |
-
-### Error Handling
-
-The `SelfTest` subsystem handles the following error conditions:
-
-- **One or more self-validation tests fail** — `context.WriteError` is called for each failing test;
-  the method returns without setting a success state, so `context.ExitCode` is `1`.
-- **Results file has an unsupported extension** — `context.WriteError` is called with a descriptive
-  message; no results file is written.
-- **Results file cannot be written** (e.g., permission denied, path invalid) — `context.WriteError`
-  is called with the exception message; the file is not written and execution continues normally.
-
-> **Thread-safety constraint**: `Validation.Run` must not be called concurrently. Each test
-> method uses `DirectorySwitch` to mutate the process working directory, which is a process-wide
-> resource. See the Validation unit design documentation for details.
+within the test methods and have no visibility outside `Validation`. Each test uses both classes
+together to guarantee clean file system state and ensure no test artifacts persist after
+completion.

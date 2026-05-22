@@ -1,48 +1,43 @@
 ---
-# Section Unit Requirements
-#
-# PURPOSE:
-# - Define requirements for the Section unit (Section.cs)
-# - Section is the container node in the requirements hierarchy
-# - Unit requirements describe the data structure and container behavior
-
+# Section unit requirements
 sections:
-  - title: Section Unit Requirements
-    requirements:
-      - id: ReqStream-Section-Container
-        title: >-
-          Section shall hold a title, a list of requirements, and a list of child sections.
-        justification: |
-          The Section data structure is the fundamental organizational unit in the requirements
-          tree. Holding a title, requirements, and child sections enables hierarchical grouping
-          of requirements for both display and navigation purposes.
-        tags:
-          - requirements
-        tests:
-          - Section_Load_SimpleRequirement_ParsesCorrectly
-          - Section_Load_NestedSections_ParsesHierarchyCorrectly
+  - title: ReqStream Requirements
+    sections:
+      - title: Modeling Requirements
+        sections:
+          - title: Section Requirements
+            requirements:
+              - id: ReqStream-Section-Container
+                title: >-
+                  Section shall hold a title, a list of requirements, and a list of child sections.
+                justification: |
+                  The Section data structure is the fundamental organizational unit in the requirements
+                  tree. Holding a title, requirements, and child sections enables hierarchical grouping
+                  of requirements for both display and navigation purposes.
+                tags: [requirements]
+                tests:
+                  - Section_Load_SimpleRequirement_ParsesCorrectly
+                  - Section_Load_NestedSections_ParsesHierarchyCorrectly
 
-      - id: ReqStream-Section-Nesting
-        title: Section shall support nested child sections for hierarchical organization.
-        justification: |
-          Hierarchical organization allows requirements to be grouped logically by system
-          components, features, or concerns, improving maintainability and navigation.
-        tags:
-          - requirements
-        tests:
-          - Section_Load_NestedSections_ParsesHierarchyCorrectly
-          - Requirements_Export_NestedSections_CreatesHierarchy
+              - id: ReqStream-Section-Nesting
+                title: Section shall support nested child sections for hierarchical organization.
+                justification: |
+                  Hierarchical organization allows requirements to be grouped logically by system
+                  components, features, or concerns, improving maintainability and navigation.
+                tags: [requirements]
+                tests:
+                  - Section_Load_NestedSections_ParsesHierarchyCorrectly
+                  - Requirements_Export_NestedSections_CreatesHierarchy
 
-      - id: ReqStream-Section-TitleMerging
-        title: >-
-          Section shall be identified by its title for merging when multiple files contribute
-          to the same hierarchical path.
-        justification: |
-          Title-based identity is the observable invariant that enables modular requirements
-          management: RequirementsLoader uses the title to decide whether to reuse an existing
-          Section or create a new one. Section is responsible for exposing its Title as a
-          stable identity key.
-        tags:
-          - requirements
-        tests:
-          - Requirements_Load_IdenticalSections_MergesCorrectly
+              - id: ReqStream-Section-TitleMerging
+                title: >-
+                  Section shall be identified by its title for merging when multiple files contribute
+                  to the same hierarchical path.
+                justification: |
+                  Title-based identity is the observable invariant that enables modular requirements
+                  management: RequirementsLoader uses the title to decide whether to reuse an existing
+                  Section or create a new one. Section is responsible for exposing its Title as a
+                  stable identity key.
+                tags: [requirements]
+                tests:
+                  - Requirements_Load_IdenticalSections_MergesCorrectly

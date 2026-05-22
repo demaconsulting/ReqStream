@@ -1,6 +1,6 @@
-## Cli Subsystem Verification
+## Cli
 
-### Verification Strategy
+### Verification Approach
 
 The Cli subsystem is verified using xUnit integration tests in `CliTests.cs`. Each test
 constructs a `Context` from a specific set of command-line arguments and then asserts on the
@@ -19,34 +19,29 @@ and are deleted on test completion.
 
 The Cli subsystem verification is complete when all xUnit tests in `CliTests.cs` pass without
 uncaught exceptions and all assertions succeed. The subsystem is considered verified when every
-requirement in the Coverage Summary is mapped to at least one passing test method.
+requirement in the Requirements Coverage is mapped to at least one passing test method.
 
 ### Test Scenarios
 
-#### Interface Scenario
+**Interface**: Tests verify that the Cli subsystem correctly parses flags and rejects unknown
+arguments. This scenario is tested by `Cli_Interface_VersionFlag_SetsVersionProperty`, which
+verifies `--version` sets the Version property; `Cli_Interface_HelpFlag_SetsHelpProperty`, which
+verifies `--help` sets the Help property;
+`Cli_Interface_UnknownArgument_ThrowsArgumentException`, which verifies an unknown argument throws
+`ArgumentException`; `Cli_Interface_MissingArgumentValue_ThrowsArgumentException`, which verifies
+a missing value throws `ArgumentException`;
+`Cli_Interface_InvalidDepthValue_ThrowsArgumentException`, which verifies a non-integer depth
+throws `ArgumentException`; `Cli_Interface_LogFileOpenFailure_ThrowsArgumentException`, which
+verifies an inaccessible log path throws `ArgumentException`; and
+`Cli_Interface_DepthFlag_SetsDefaultForAllReportDepths`, which verifies `--depth` sets all
+per-report depths.
 
-Tests verify that the Cli subsystem correctly parses flags and rejects unknown arguments.
-
-Test methods:
-
-- `Cli_Interface_VersionFlag_SetsVersionProperty` — `--version` sets Version property
-- `Cli_Interface_HelpFlag_SetsHelpProperty` — `--help` sets Help property
-- `Cli_Interface_UnknownArgument_ThrowsArgumentException` — unknown arg throws ArgumentException
-- `Cli_Interface_MissingArgumentValue_ThrowsArgumentException` — missing value throws ArgumentException
-- `Cli_Interface_InvalidDepthValue_ThrowsArgumentException` — non-integer depth throws ArgumentException
-- `Cli_Interface_LogFileOpenFailure_ThrowsArgumentException` — inaccessible log path throws ArgumentException
-- `Cli_Interface_DepthFlag_SetsDefaultForAllReportDepths` — `--depth` sets all per-report depths
-
-#### Output Scenario
-
-Tests verify that output is correctly routed to the console and/or log file.
-
-Test methods:
-
-- `Cli_Output_SilentFlag_SetsSilentProperty` — `--silent` sets Silent property
-- `Cli_Output_LogFlag_WritesOutputToLogFile` — `--log` writes output to file
-- `Cli_Output_WriteError_WritesToErrorChannel` — WriteError writes to stderr
-- `Cli_Output_WriteError_SetsExitCodeToOne` — WriteError sets ExitCode to 1
+**Output**: Tests verify that output is correctly routed to the console and/or log file. This
+scenario is tested by `Cli_Output_SilentFlag_SetsSilentProperty`, which verifies `--silent` sets
+the Silent property; `Cli_Output_LogFlag_WritesOutputToLogFile`, which verifies `--log` writes
+output to a file; `Cli_Output_WriteError_WritesToErrorChannel`, which verifies `WriteError`
+writes to stderr; and `Cli_Output_WriteError_SetsExitCodeToOne`, which verifies `WriteError`
+sets `ExitCode` to 1.
 
 ### Requirements Coverage
 

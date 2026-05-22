@@ -35,9 +35,10 @@ This document covers verification of the following software units:
 - **SelfTest** subsystem:
   - **Validation** unit — self-validation test runner (`SelfTest/Validation.cs`)
 
-The following eleven OTS items are also verified:
+The following OTS items are also verified:
 
 - **BuildMark** — build-notes documentation generator
+- **DemaConsulting.TestResults** — test result file reader
 - **FileAssert** — document assertion tool
 - **xUnit** — unit testing framework
 - **Pandoc** — Markdown to HTML converter
@@ -48,10 +49,6 @@ The following eleven OTS items are also verified:
 - **WeasyPrint** — HTML to PDF converter
 - **YamlDotNet** — YAML parsing library
 - **Microsoft.Extensions.FileSystemGlobbing** — glob pattern matching library
-
-The following shared package is also verified:
-
-- **DemaConsulting.TestResults** — test result file reader
 
 The following topics are out of scope:
 
@@ -85,6 +82,4 @@ Review-sets for all items are defined in `.reviewmark.yaml` at the repository ro
 
 ## References
 
-- ReqStream System Requirements
-- ReqStream Software Design Document
-- ReqStream User Guide
+- [ReqStream releases](https://github.com/demaconsulting/ReqStream/releases)

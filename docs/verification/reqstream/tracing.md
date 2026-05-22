@@ -1,6 +1,6 @@
-## Tracing Subsystem Verification
+## Tracing
 
-### Verification Strategy
+### Verification Approach
 
 The Tracing subsystem is verified using xUnit integration tests in `TracingTests.cs`. Tests
 create temporary YAML requirements files and TRX/JUnit test result files, construct a
@@ -23,40 +23,26 @@ every requirement in the Requirements Coverage table is mapped to at least one p
 
 ### Test Scenarios
 
-#### Test Results Loading Scenario
+**Test Results Loading**: Tests verify that TRX and JUnit result files are loaded correctly. This
+scenario is tested by `Tracing_TestResults_TrxFile_LoadsTestResults`, which verifies a TRX file
+is loaded and results are accessible, and `Tracing_TestResults_JUnitFile_LoadsTestResults`,
+which verifies a JUnit file is loaded and results are accessible.
 
-Tests verify that TRX and JUnit result files are loaded correctly.
+**Coverage**: Tests verify that requirements are correctly classified as satisfied or unsatisfied.
+This scenario is tested by `Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied`, which
+verifies passing tests produce no unsatisfied requirements, and
+`Tracing_Coverage_WithMissingTests_RequirementIsUnsatisfied`, which verifies missing tests produce
+an unsatisfied requirement.
 
-Test methods:
+**Error Handling**: Tests verify that missing and malformed files produce appropriate exceptions.
+This scenario is tested by `Tracing_FileLoading_NonExistentFile_ThrowsFileNotFoundException`,
+which verifies a missing file produces `FileNotFoundException`, and
+`Tracing_FileLoading_MalformedFile_ThrowsInvalidOperationException`, which verifies a malformed
+file produces `InvalidOperationException`.
 
-- `Tracing_TestResults_TrxFile_LoadsTestResults` — TRX file loaded and results accessible
-- `Tracing_TestResults_JUnitFile_LoadsTestResults` — JUnit file loaded and results accessible
-
-#### Coverage Scenario
-
-Tests verify that requirements are correctly classified as satisfied or unsatisfied.
-
-Test methods:
-
-- `Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied` — passing tests → no unsatisfied
-- `Tracing_Coverage_WithMissingTests_RequirementIsUnsatisfied` — missing tests → unsatisfied
-
-#### Error Handling Scenario
-
-Tests verify that missing and malformed files produce appropriate exceptions.
-
-Test methods:
-
-- `Tracing_FileLoading_NonExistentFile_ThrowsFileNotFoundException` — missing file → FileNotFoundException
-- `Tracing_FileLoading_MalformedFile_ThrowsInvalidOperationException` — malformed → InvalidOperationException
-
-#### Reporting Scenario
-
-Tests verify that a Markdown trace matrix report is generated.
-
-Test methods:
-
-- `Tracing_Reporting_SimpleMatrix_CreatesMarkdownFile` — Markdown report generated
+**Reporting**: Tests verify that a Markdown trace matrix report is generated. This scenario is
+tested by `Tracing_Reporting_SimpleMatrix_CreatesMarkdownFile`, which verifies a Markdown report
+is generated.
 
 ### Requirements Coverage
 

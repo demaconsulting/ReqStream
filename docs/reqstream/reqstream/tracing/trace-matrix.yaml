@@ -1,167 +1,154 @@
 ---
+# TraceMatrix unit requirements
 sections:
   - title: ReqStream Requirements
     sections:
-      - title: Tracing
-        requirements:
-          - id: ReqStream-Test-ResultFiles
-            title: The tool shall support processing test result files.
-            justification: |
-              Processing test results enables automated verification of requirement satisfaction and
-              integration with existing test infrastructure.
-            tags:
-              - testing
-            tests:
-              - TraceMatrix_Constructor_WithNoFiles_CreatesEmptyMatrix
-              - TraceMatrix_Constructor_MissingFile_ThrowsFileNotFoundException
-              - TraceMatrix_Constructor_WithMultipleFiles_AggregatesResults
+      - title: Tracing Requirements
+        sections:
+          - title: TraceMatrix Requirements
+            requirements:
+              - id: ReqStream-Test-ResultFiles
+                title: The tool shall support processing test result files.
+                justification: |
+                  Processing test results enables automated verification of requirement satisfaction and
+                  integration with existing test infrastructure.
+                tags: [testing]
+                tests:
+                  - TraceMatrix_Constructor_WithNoFiles_CreatesEmptyMatrix
+                  - TraceMatrix_Constructor_MissingFile_ThrowsFileNotFoundException
+                  - TraceMatrix_Constructor_WithMultipleFiles_AggregatesResults
 
-          - id: ReqStream-Test-ChildRequirements
-            title: >-
-              The tool shall consider child requirements when determining
-              requirement satisfaction.
-            justification: |
-              Child requirement satisfaction inheritance ensures that a parent
-              requirement is only satisfied when all tests across its entire
-              descendant subtree pass, providing accurate hierarchical coverage analysis.
-            tags:
-              - testing
-            tests:
-              - TraceMatrix_Export_WithChildRequirements_ConsidersChildTests
+              - id: ReqStream-Test-ChildRequirements
+                title: >-
+                  The tool shall consider child requirements when determining
+                  requirement satisfaction.
+                justification: |
+                  Child requirement satisfaction inheritance ensures that a parent
+                  requirement is only satisfied when all tests across its entire
+                  descendant subtree pass, providing accurate hierarchical coverage analysis.
+                tags: [testing]
+                tests:
+                  - TraceMatrix_Export_WithChildRequirements_ConsidersChildTests
 
-          - id: ReqStream-Test-TrxFormat
-            title: The tool shall support TRX format test results.
-            justification: |
-              TRX is the native test result format for .NET testing frameworks, enabling seamless
-              integration with .NET projects.
-            tags:
-              - testing
-            tests:
-              - TraceMatrix_Constructor_WithTrxFile_ParsesCorrectly
-              - TraceMatrix_Constructor_WithFailedTests_TracksFailures
+              - id: ReqStream-Test-TrxFormat
+                title: The tool shall support TRX format test results.
+                justification: |
+                  TRX is the native test result format for .NET testing frameworks, enabling seamless
+                  integration with .NET projects.
+                tags: [testing]
+                tests:
+                  - TraceMatrix_Constructor_WithTrxFile_ParsesCorrectly
+                  - TraceMatrix_Constructor_WithFailedTests_TracksFailures
 
-          - id: ReqStream-Test-JUnitFormat
-            title: The tool shall support JUnit format test results.
-            justification: |
-              JUnit format is widely used across multiple programming ecosystems, enabling cross-platform
-              test result integration.
-            tags:
-              - testing
-            tests:
-              - TraceMatrix_Constructor_WithJUnitFile_ParsesCorrectly
-              - TraceMatrix_Constructor_WithJUnitFailedTests_TracksFailures
+              - id: ReqStream-Test-JUnitFormat
+                title: The tool shall support JUnit format test results.
+                justification: |
+                  JUnit format is widely used across multiple programming ecosystems, enabling cross-platform
+                  test result integration.
+                tags: [testing]
+                tests:
+                  - TraceMatrix_Constructor_WithJUnitFile_ParsesCorrectly
+                  - TraceMatrix_Constructor_WithJUnitFailedTests_TracksFailures
 
-          - id: ReqStream-Test-MixedFormats
-            title: The tool shall support processing mixed-format test result files.
-            justification: |
-              Mixed-format support allows requirements to be verified against test results produced
-              by different frameworks (TRX and JUnit) in the same trace matrix run.
-            tags:
-              - testing
-            tests:
-              - TraceMatrix_Constructor_WithMixedFormats_ProcessesBoth
+              - id: ReqStream-Test-MixedFormats
+                title: The tool shall support processing mixed-format test result files.
+                justification: |
+                  Mixed-format support allows requirements to be verified against test results produced
+                  by different frameworks (TRX and JUnit) in the same trace matrix run.
+                tags: [testing]
+                tests:
+                  - TraceMatrix_Constructor_WithMixedFormats_ProcessesBoth
 
-          - id: ReqStream-Test-SourceFiltering
-            title: The tool shall support source-specific test matching using filepart@testname pattern.
-            justification: |
-              Source-specific matching enables requirements to reference tests from specific test runs
-              or platforms, supporting platform-specific requirements validation.
-            tags:
-              - testing
-            tests:
-              - TraceMatrix_GetTestResult_WithSourceSpecificTests_MatchesCorrectly
-              - TraceMatrix_GetTestResult_WithSourceSpecificTests_DoesNotMatchOtherSources
-              - TraceMatrix_GetTestResult_WithMultipleSourceSpecifiers_MatchesAllRequirements
+              - id: ReqStream-Test-SourceFiltering
+                title: The tool shall support source-specific test matching using filepart@testname pattern.
+                justification: |
+                  Source-specific matching enables requirements to reference tests from specific test runs
+                  or platforms, supporting platform-specific requirements validation.
+                tags: [testing]
+                tests:
+                  - TraceMatrix_GetTestResult_WithSourceSpecificTests_MatchesCorrectly
+                  - TraceMatrix_GetTestResult_WithSourceSpecificTests_DoesNotMatchOtherSources
+                  - TraceMatrix_GetTestResult_WithMultipleSourceSpecifiers_MatchesAllRequirements
 
-          - id: ReqStream-Test-CaseInsensitive
-            title: >-
-              The tool shall perform case-insensitive matching of file parts in source-specific
-              test names.
-            justification: |
-              Case-insensitive matching reduces errors and improves usability by allowing flexible
-              specification of file part identifiers.
-            tags:
-              - testing
-            tests:
-              - TraceMatrix_GetTestResult_WithSourceSpecificTests_IsCaseInsensitive
+              - id: ReqStream-Test-CaseInsensitive
+                title: >-
+                  The tool shall perform case-insensitive matching of file parts in source-specific
+                  test names.
+                justification: |
+                  Case-insensitive matching reduces errors and improves usability by allowing flexible
+                  specification of file part identifiers.
+                tags: [testing]
+                tests:
+                  - TraceMatrix_GetTestResult_WithSourceSpecificTests_IsCaseInsensitive
 
-          - id: ReqStream-Test-PartialFilenames
-            title: The tool shall support partial filename matching for source-specific tests.
-            justification: |
-              Partial matching simplifies test specification by allowing short, memorable identifiers
-              rather than requiring full filename matches.
-            tags:
-              - testing
-            tests:
-              - TraceMatrix_GetTestResult_WithSourceSpecificTests_MatchesPartialFilename
+              - id: ReqStream-Test-PartialFilenames
+                title: The tool shall support partial filename matching for source-specific tests.
+                justification: |
+                  Partial matching simplifies test specification by allowing short, memorable identifiers
+                  rather than requiring full filename matches.
+                tags: [testing]
+                tests:
+                  - TraceMatrix_GetTestResult_WithSourceSpecificTests_MatchesPartialFilename
 
-          - id: ReqStream-Test-PlainTestNames
-            title: The tool shall support plain test names that aggregate from all sources.
-            justification: |
-              Plain test names enable requirements to aggregate test results across all platforms and
-              test runs without specifying each source explicitly.
-            tags:
-              - testing
-            tests:
-              - TraceMatrix_GetTestResult_WithPlainTestNames_MatchesAllSources
+              - id: ReqStream-Test-PlainTestNames
+                title: The tool shall support plain test names that aggregate from all sources.
+                justification: |
+                  Plain test names enable requirements to aggregate test results across all platforms and
+                  test runs without specifying each source explicitly.
+                tags: [testing]
+                tests:
+                  - TraceMatrix_GetTestResult_WithPlainTestNames_MatchesAllSources
 
-          - id: ReqStream-Test-MixedTestNames
-            title: >-
-              The tool shall support mixing plain and source-specific test names in the same
-              requirement.
-            justification: |
-              Mixing test name types provides flexibility for requirements that need both platform-specific
-              and cross-platform test coverage.
-            tags:
-              - testing
-            tests:
-              - TraceMatrix_GetTestResult_WithMixedTestNames_MatchesAppropriately
+              - id: ReqStream-Test-MixedTestNames
+                title: >-
+                  The tool shall support mixing plain and source-specific test names in the same
+                  requirement.
+                justification: |
+                  Mixing test name types provides flexibility for requirements that need both platform-specific
+                  and cross-platform test coverage.
+                tags: [testing]
+                tests:
+                  - TraceMatrix_GetTestResult_WithMixedTestNames_MatchesAppropriately
 
-          - id: ReqStream-Test-MultipleRequirements
-            title: >-
-              The tool shall match tests to multiple requirements with mixed filter
-              references.
-            justification: |
-              Supporting multiple requirements with mixed references enables efficient test reuse and
-              accurate traceability across different requirement types.
-            tags:
-              - testing
-            tests:
-              - TraceMatrix_GetTestResult_WithMixedFilterAndPlainReferences_MatchesBoth
+              - id: ReqStream-Test-MultipleRequirements
+                title: >-
+                  The tool shall match tests to multiple requirements with mixed filter
+                  references.
+                justification: |
+                  Supporting multiple requirements with mixed references enables efficient test reuse and
+                  accurate traceability across different requirement types.
+                tags: [testing]
+                tests:
+                  - TraceMatrix_GetTestResult_WithMixedFilterAndPlainReferences_MatchesBoth
 
-      - title: Reporting
-        requirements:
-          - id: ReqStream-Report-TraceMatrix
-            title: The tool shall export trace matrices to markdown format.
-            justification: |
-              Trace matrix export provides visibility into test coverage and requirement satisfaction,
-              essential for quality assurance and compliance.
-            tags:
-              - reporting
-            tests:
-              - TraceMatrix_Export_SimpleTraceMatrix_CreatesMarkdownFile
-              - TraceMatrix_Export_WithFailedTests_ShowsFailures
-              - TraceMatrix_Export_WithNoTests_ShowsNotSatisfied
-              - TraceMatrix_Export_WithNotExecutedTests_ShowsNotExecuted
+              - id: ReqStream-Report-TraceMatrix
+                title: The tool shall export trace matrices to markdown format.
+                justification: |
+                  Trace matrix export provides visibility into test coverage and requirement satisfaction,
+                  essential for quality assurance and compliance.
+                tags: [reporting]
+                tests:
+                  - TraceMatrix_Export_SimpleTraceMatrix_CreatesMarkdownFile
+                  - TraceMatrix_Export_WithFailedTests_ShowsFailures
+                  - TraceMatrix_Export_WithNoTests_ShowsNotSatisfied
+                  - TraceMatrix_Export_WithNotExecutedTests_ShowsNotExecuted
 
-          - id: ReqStream-Report-TraceMatrixDepth
-            title: The tool shall support configurable markdown header depth for trace matrices.
-            justification: |
-              Configurable header depth allows trace matrices to be embedded in larger documents while
-              maintaining proper document structure.
-            tags:
-              - reporting
-            tests:
-              - TraceMatrix_Export_WithCustomDepth_UsesCorrectHeaderLevel
+              - id: ReqStream-Report-TraceMatrixDepth
+                title: The tool shall support configurable markdown header depth for trace matrices.
+                justification: |
+                  Configurable header depth allows trace matrices to be embedded in larger documents while
+                  maintaining proper document structure.
+                tags: [reporting]
+                tests:
+                  - TraceMatrix_Export_WithCustomDepth_UsesCorrectHeaderLevel
 
-          - id: ReqStream-Report-TagFiltering
-            title: The tool shall support filtering trace matrix output by requirement tags.
-            justification: |
-              Tag-based filtering enables selective trace matrix export and coverage enforcement for
-              requirement subsets, supporting focused compliance reviews and targeted builds.
-            tags:
-              - reporting
-            tests:
-              - TraceMatrix_Export_WithFilterTags_ExportsOnlyMatchingRequirements
-              - TraceMatrix_CalculateSatisfiedRequirements_WithFilterTags_CountsOnlyMatchingRequirements
-              - TraceMatrix_GetUnsatisfiedRequirements_WithFilterTags_ReturnsOnlyMatchingRequirements
+              - id: ReqStream-Report-TagFiltering
+                title: The tool shall support filtering trace matrix output by requirement tags.
+                justification: |
+                  Tag-based filtering enables selective trace matrix export and coverage enforcement for
+                  requirement subsets, supporting focused compliance reviews and targeted builds.
+                tags: [reporting]
+                tests:
+                  - TraceMatrix_Export_WithFilterTags_ExportsOnlyMatchingRequirements
+                  - TraceMatrix_CalculateSatisfiedRequirements_WithFilterTags_CountsOnlyMatchingRequirements
+                  - TraceMatrix_GetUnsatisfiedRequirements_WithFilterTags_ReturnsOnlyMatchingRequirements

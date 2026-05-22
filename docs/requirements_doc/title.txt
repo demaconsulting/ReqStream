@@ -1,8 +1,8 @@
 ---
-title: ReqStream Requirements
+title: ReqStream Requirements Document
 subtitle: Requirements Specification for the ReqStream Tool
 author: DEMA Consulting
-description: Requirements Specification for the ReqStream Tool
+description: Requirements Document for ReqStream
 lang: en-US
 keywords:
   - ReqStream

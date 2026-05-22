@@ -1,17 +1,13 @@
 ---
-# ReviewMark OTS Software Requirements
-#
-# Requirements for the ReviewMark file review tool functionality.
-
+# ReviewMark OTS requirements
 sections:
   - title: OTS Software Requirements
     sections:
-      - title: ReviewMark Requirements
+      - title: ReviewMark
         requirements:
           - id: ReqStream-OTS-ReviewMark
             title: ReviewMark shall generate a review plan and review report from the review configuration.
             justification: |
-              # Deliberate compound: plan and report generation are one atomic pipeline operation
               DemaConsulting.ReviewMark reads the .reviewmark.yaml configuration and the review
               evidence store to produce a review plan and review report documenting file review
               coverage and currency. It runs in the same CI pipeline that produces the TRX test

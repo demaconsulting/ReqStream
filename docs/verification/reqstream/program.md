@@ -1,4 +1,4 @@
-## Program Unit Verification
+## Program
 
 ### Verification Approach
 
@@ -17,79 +17,55 @@ files or test result files, and are deleted on test completion.
 
 The Program unit verification is complete when all xUnit tests in `ProgramTests.cs` pass without
 uncaught exceptions and all assertions succeed. The unit is considered verified when every
-requirement in the Coverage Summary is mapped to at least one passing test method.
+requirement in the Requirements Coverage is mapped to at least one passing test method.
 
 ### Test Scenarios
 
-#### Version Display Scenario
+**Version Display**: Tests verify that `--version` causes `Run` to print the version string and
+return exit code 0. This scenario is tested by `Program_Run_WithVersionFlag_PrintsVersion`,
+which asserts `--version` prints the version and returns 0.
 
-Tests verify that `--version` causes `Run` to print the version string and return exit code 0.
+**Help Display**: Tests verify that `--help` causes `Run` to print usage information and return
+exit code 0. This scenario is tested by `Program_Run_WithHelpFlag_PrintsHelp`, which asserts
+`--help` prints usage text.
 
-Test methods:
+**Validate**: Tests verify that the `--validate` flag causes `Run` to invoke the self-validation
+framework and return exit code 0. This scenario is tested by
+`Program_Run_WithValidateFlag_RunsValidation`, which asserts validation runs and exits cleanly,
+and `Program_Run_WithValidateAndResults_WritesResultsFile`, which asserts the results file is
+written.
 
-- `Program_Run_WithVersionFlag_PrintsVersion` — asserts `--version` prints the version and returns 0
+**Requirements Processing**: Tests verify that the default execution path loads and processes
+requirements files. This scenario is tested by `Program_Run_WithNoRequirementsFiles_ShowsMessage`,
+which asserts an informational message when no files are provided;
+`Program_Run_WithRequirementsFiles_ProcessesSuccessfully`, which asserts processing succeeds;
+`Program_Run_WithRequirementsExport_GeneratesReport`, which asserts a requirements report is
+generated; `Program_Run_WithTraceMatrixExport_GeneratesMatrix`, which asserts a trace matrix is
+generated; and `Program_Run_WithJustificationsExport_GeneratesJustificationsReport`, which
+asserts a justifications report.
 
-#### Help Display Scenario
+**Matrix Without Tests**: Tests verify that requesting `--matrix` without providing test files
+produces an error. This scenario is tested by
+`Program_Run_WithMatrixButNoTestFiles_ReportsError`, which asserts an error message and non-zero
+exit code when `--tests` is omitted, and
+`Program_Run_WithMatrixAndUnmatchedTestsPattern_ReportsError`, which asserts an error message and
+non-zero exit code when the `--tests` pattern matches no files.
 
-Tests verify that `--help` causes `Run` to print usage information and return exit code 0.
+**Enforcement**: Tests verify that enforcement mode exits with a non-zero code when requirements
+are unsatisfied. This scenario is tested by
+`Program_Run_WithEnforcementAndFullySatisfiedRequirements_Succeeds`, which asserts all satisfied
+requirements produce exit code 0; `Program_Run_WithEnforcementAndUnsatisfiedRequirements_Fails`,
+which asserts unsatisfied requirements produce a non-zero exit code;
+`Program_Run_WithEnforcementAndNoTests_Fails`, which asserts no tests produce a non-zero exit
+code; and `Program_Run_WithEnforcementAndFailedTests_Fails`, which asserts failed tests produce a
+non-zero exit code.
 
-Test methods:
-
-- `Program_Run_WithHelpFlag_PrintsHelp` — asserts `--help` prints usage text
-
-#### Validate Scenario
-
-Tests verify that the `--validate` flag causes `Run` to invoke the self-validation framework
-and return exit code 0.
-
-Test methods:
-
-- `Program_Run_WithValidateFlag_RunsValidation` — asserts validation runs and exits cleanly
-- `Program_Run_WithValidateAndResults_WritesResultsFile` — asserts results file is written
-
-#### Requirements Processing Scenario
-
-Tests verify that the default execution path loads and processes requirements files.
-
-Test methods:
-
-- `Program_Run_WithNoRequirementsFiles_ShowsMessage` — asserts informational message when no files
-- `Program_Run_WithRequirementsFiles_ProcessesSuccessfully` — asserts processing succeeds
-- `Program_Run_WithRequirementsExport_GeneratesReport` — asserts requirements report is generated
-- `Program_Run_WithTraceMatrixExport_GeneratesMatrix` — asserts trace matrix is generated
-- `Program_Run_WithJustificationsExport_GeneratesJustificationsReport` — asserts justifications report
-
-#### Matrix Without Tests Scenario
-
-Tests verify that requesting `--matrix` without providing test files produces an error.
-
-Test methods:
-
-- `Program_Run_WithMatrixButNoTestFiles_ReportsError` — asserts error message and non-zero exit code when `--tests` is omitted
-- `Program_Run_WithMatrixAndUnmatchedTestsPattern_ReportsError` — asserts error message and non-zero exit code
-  when `--tests` pattern matches no files
-
-#### Enforcement Scenario
-
-Tests verify that enforcement mode exits with a non-zero code when requirements are unsatisfied.
-
-Test methods:
-
-- `Program_Run_WithEnforcementAndFullySatisfiedRequirements_Succeeds` — all satisfied → exit code 0
-- `Program_Run_WithEnforcementAndUnsatisfiedRequirements_Fails` — unsatisfied → non-zero exit code
-- `Program_Run_WithEnforcementAndNoTests_Fails` — no tests → non-zero exit code
-- `Program_Run_WithEnforcementAndFailedTests_Fails` — failed tests → non-zero exit code
-
-#### Lint Scenario
-
-Tests verify that `--lint` reports issues and exits appropriately.
-
-Test methods:
-
-- `Program_Run_WithLintFlag_RunsLinter` — asserts lint runs
-- `Program_Run_WithLintFlag_SuppressesBanner` — asserts banner is suppressed
-- `Program_Run_WithLintFlag_OnlyOutputsIssues` — asserts only issues are output
-- `Program_Run_WithLintAndNoRequirements_PrintsInformationalMessage` — informational message
+**Lint**: Tests verify that `--lint` reports issues and exits appropriately. This scenario is
+tested by `Program_Run_WithLintFlag_RunsLinter`, which asserts lint runs;
+`Program_Run_WithLintFlag_SuppressesBanner`, which asserts the banner is suppressed;
+`Program_Run_WithLintFlag_OnlyOutputsIssues`, which asserts only issues are output; and
+`Program_Run_WithLintAndNoRequirements_PrintsInformationalMessage`, which asserts an
+informational message.
 
 ### Requirements Coverage
 

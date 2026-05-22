@@ -1,4 +1,4 @@
-## BuildMark Verification
+## BuildMark
 
 ### Required Functionality
 
@@ -18,12 +18,8 @@ confirm that BuildMark ran, queried the GitHub API, and wrote the Markdown build
 without error. Structural correctness of the output document is validated by the subsequent
 FileAssert step.
 
-The test evidence name `BuildMark_MarkdownReportGeneration` is linked to the pipeline step
-that invokes BuildMark. A passing result confirms that the generated Markdown build-notes
-document was produced.
+### Test Scenarios
 
-### Coverage Summary
-
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-OTS-BuildMark` | `BuildMark_MarkdownReportGeneration` |
+**Markdown Report Generation**: Verifies that BuildMark runs successfully as a CI pipeline step
+and generates the Markdown build-notes document. This scenario is tested by
+`BuildMark_MarkdownReportGeneration`.

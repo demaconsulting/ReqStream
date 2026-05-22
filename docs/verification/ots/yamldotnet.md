@@ -1,4 +1,4 @@
-## YamlDotNet Verification
+## YamlDotNet
 
 ### Required Functionality
 
@@ -11,21 +11,25 @@ management.
 
 YamlDotNet is verified by integration test evidence. The requirements loading tests exercise
 YamlDotNet on well-formed and malformed YAML inputs. Passing tests confirm that the library
-correctly parses YAML and reports errors with location information. The following representative
-test methods are linked as evidence:
+correctly parses YAML and reports errors with location information.
 
-- `Requirements_Load_ValidFile_ReturnsRequirementsAndNoIssues`
-- `Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation`
-- `Requirements_Load_MalformedYaml_ReturnsNullAndIssues`
-- `Section_Load_SimpleRequirement_ParsesCorrectly`
-- `Requirements_Load_ComplexStructure_ParsesCorrectly`
+### Test Scenarios
 
-### Coverage Summary
+**Well-Formed YAML Parsing**: Verifies that YamlDotNet correctly parses well-formed YAML
+requirements files and returns a populated requirements model. This scenario is tested by
+`Requirements_Load_ValidFile_ReturnsRequirementsAndNoIssues`.
 
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-OTS-YamlDotNet` | `Requirements_Load_ValidFile_ReturnsRequirementsAndNoIssues` |
-| `ReqStream-OTS-YamlDotNet` | `Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation` |
-| `ReqStream-OTS-YamlDotNet` | `Requirements_Load_MalformedYaml_ReturnsNullAndIssues` |
-| `ReqStream-OTS-YamlDotNet` | `Section_Load_SimpleRequirement_ParsesCorrectly` |
-| `ReqStream-OTS-YamlDotNet` | `Requirements_Load_ComplexStructure_ParsesCorrectly` |
+**YAML Error Reporting with Location**: Verifies that YamlDotNet reports parse errors with
+location information for invalid YAML content. This scenario is tested by
+`Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation`.
+
+**Malformed YAML Handling**: Verifies that malformed YAML input causes requirements loading to
+return null with associated error issues. This scenario is tested by
+`Requirements_Load_MalformedYaml_ReturnsNullAndIssues`.
+
+**Simple Requirement Parsing**: Verifies that a single requirement within a section is parsed
+correctly from YAML. This scenario is tested by `Section_Load_SimpleRequirement_ParsesCorrectly`.
+
+**Complex Structure Parsing**: Verifies that a complex multi-section, multi-requirement YAML
+structure is parsed correctly. This scenario is tested by
+`Requirements_Load_ComplexStructure_ParsesCorrectly`.

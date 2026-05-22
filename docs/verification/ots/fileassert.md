@@ -1,4 +1,4 @@
-## FileAssert Verification
+## FileAssert
 
 ### Required Functionality
 
@@ -20,14 +20,14 @@ FileAssert is verified by CI pipeline step evidence using two complementary evid
    confirms that FileAssert's document-validation logic — file existence, structural
    validity, and content assertion — operates correctly end-to-end.
 
-Test evidence names:
+### Test Scenarios
 
-- `FileAssert_VersionDisplay` — validates that FileAssert responds correctly to `--version` (self-validation)
-- `FileAssert_HelpDisplay` — validates that FileAssert responds correctly to `--help` (self-validation)
-- `Pandoc_DesignHtml` — validates that FileAssert successfully validates a real HTML document (document validation acceptance)
+**Version Display**: Validates that FileAssert responds correctly to `--version` as part of
+self-validation. This scenario is tested by `FileAssert_VersionDisplay`.
 
-### Coverage Summary
+**Help Display**: Validates that FileAssert responds correctly to `--help` as part of
+self-validation. This scenario is tested by `FileAssert_HelpDisplay`.
 
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-OTS-FileAssert` | `FileAssert_VersionDisplay`, `FileAssert_HelpDisplay`, `Pandoc_DesignHtml` |
+**Document Validation Acceptance**: Validates that FileAssert successfully validates a real HTML
+document, confirming file existence, structural validity, and content assertions operate correctly
+end-to-end. This scenario is tested by `Pandoc_DesignHtml`.

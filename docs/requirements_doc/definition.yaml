@@ -1,7 +1,5 @@
 ---
-resource-path:
-  - docs/requirements_doc
-  - docs/template
+resource-path: [docs/requirements_doc, docs/template]
 input-files:
   - docs/requirements_doc/title.txt
   - docs/requirements_doc/introduction.md

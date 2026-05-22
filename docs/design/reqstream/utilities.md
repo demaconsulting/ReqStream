@@ -1,4 +1,4 @@
-## Utilities Subsystem Design
+## Utilities
 
 ### Overview
 
@@ -9,22 +9,31 @@ may depend on it without creating circular references.
 
 The `Utilities` subsystem contains the following software units:
 
-| Unit | File | Responsibility |
-| ---- | ---- | -------------- |
-| `GlobMatcher` | `Utilities/GlobMatcher.cs` | Glob-pattern file matching supporting absolute and relative paths. |
-| `PathHelpers` | `Utilities/PathHelpers.cs` | Safe path combination that guards against path-traversal attacks. |
+- **GlobMatcher** (`Utilities/GlobMatcher.cs`) — Glob-pattern file matching supporting absolute
+  and relative paths.
+- **PathHelpers** (`Utilities/PathHelpers.cs`) — Safe path combination that guards against
+  path-traversal attacks.
 
 ### Interfaces
 
-The `Utilities` subsystem exposes the following interfaces to the rest of the tool:
+**GlobMatcher.FindMatchingFiles**: Returns a sorted, deduplicated list of absolute file paths
+matching any of the supplied glob patterns.
 
-- **`GlobMatcher.FindMatchingFiles`** — Returns a sorted, deduplicated list of absolute file
-  paths that match any of the supplied glob patterns. Supports both relative patterns (resolved
-  against the current working directory) and absolute patterns (resolved from the rooted prefix
-  of the pattern).
-- **`PathHelpers.SafePathCombine`** — Combines two paths and validates the result stays within
-  the base directory. Throws `ArgumentException` if the combined path escapes the base (path
-  traversal attempt).
+- *Type*: In-process .NET internal API (static method).
+- *Role*: Provider (Cli subsystem consumes this).
+- *Contract*: Accepts a collection of glob pattern strings; returns `List<string>` of absolute
+  paths. Supports both relative patterns (resolved against the current working directory) and
+  absolute patterns (resolved from the rooted prefix of the pattern).
+- *Constraints*: Never throws for non-matching patterns or non-existent directories.
+
+**PathHelpers.SafePathCombine**: Combines two paths and validates the result stays within the
+base directory.
+
+- *Type*: In-process .NET internal API (static method).
+- *Role*: Provider (Modeling subsystem consumes this).
+- *Contract*: Accepts `basePath` and `relativePath`; returns the combined path. Throws
+  `ArgumentException` if the combined path escapes the base (path traversal attempt).
+- *Constraints*: Never permits traversal outside `basePath`.
 
 ### Design
 
@@ -37,17 +46,6 @@ into resolved file path lists. `PathHelpers.SafePathCombine` is used by `Require
 combine `includes` directory paths with relative include paths before recursing into included
 files. Neither unit calls the other.
 
-### Interactions
-
-It uses only .NET base class library types and `Microsoft.Extensions.FileSystemGlobbing`. The
-`Cli`, `Modeling`, and `SelfTest` subsystems are consumers.
-
-### Error Handling
-
-`GlobMatcher.FindMatchingFiles` does not throw for non-matching patterns or non-existent
-directories; it returns an empty list in those cases, leaving the caller to decide whether
-zero matches is an error condition.
-
-`PathHelpers.SafePathCombine` throws `ArgumentException` if the resolved combined path escapes
-the base directory. Callers are responsible for handling this exception if graceful recovery is
-required.
+The subsystem uses only .NET base class library types and
+`Microsoft.Extensions.FileSystemGlobbing`. The `Cli`, `Modeling`, and `SelfTest` subsystems are
+consumers.

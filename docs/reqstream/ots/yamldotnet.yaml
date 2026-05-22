@@ -1,12 +1,9 @@
 ---
-# YamlDotNet OTS Software Requirements
-#
-# Requirements for the YamlDotNet YAML parsing library.
-
+# YamlDotNet OTS requirements
 sections:
   - title: OTS Software Requirements
     sections:
-      - title: YamlDotNet Requirements
+      - title: YamlDotNet
         requirements:
           - id: ReqStream-OTS-YamlDotNet
             title: YamlDotNet shall parse YAML requirements files into a structured data model and report parse errors with

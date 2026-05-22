@@ -1,12 +1,9 @@
 ---
-# SonarMark OTS Software Requirements
-#
-# Requirements for the SonarMark quality reporting tool functionality.
-
+# SonarMark OTS requirements
 sections:
   - title: OTS Software Requirements
     sections:
-      - title: SonarMark Requirements
+      - title: SonarMark
         requirements:
           - id: ReqStream-OTS-SonarMark
             title: SonarMark shall generate a SonarCloud quality report.
