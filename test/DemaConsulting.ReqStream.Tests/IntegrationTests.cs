@@ -28,7 +28,8 @@ namespace DemaConsulting.ReqStream.Tests;
 public sealed class IntegrationTests : IDisposable
 {
     private readonly string _dllPath;
-    private readonly string _testDirectory;
+    /// <summary>Temporary directory providing isolated file-system workspace for this test class instance.</summary>
+    private readonly TemporaryDirectory _testDirectory = new();
 
     /// <summary>
     /// Initialize test by locating the DLL and creating a temporary test directory.
@@ -38,8 +39,7 @@ public sealed class IntegrationTests : IDisposable
         _dllPath = PathHelpers.SafePathCombine(AppContext.BaseDirectory, "DemaConsulting.ReqStream.dll");
         Assert.True(File.Exists(_dllPath), $"Could not find ReqStream DLL at {_dllPath}");
 
-        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(_testDirectory);
+
     }
 
     /// <summary>
@@ -47,10 +47,7 @@ public sealed class IntegrationTests : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (Directory.Exists(_testDirectory))
-        {
-            Directory.Delete(_testDirectory, recursive: true);
-        }
+        _testDirectory.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -63,7 +60,7 @@ public sealed class IntegrationTests : IDisposable
     public void ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces()
     {
         // Arrange: create requirements file with one covered requirement
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: System Requirements
@@ -86,17 +83,17 @@ public sealed class IntegrationTests : IDisposable
             Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var trxFile = PathHelpers.SafePathCombine(_testDirectory, "results.trx");
+        var trxFile = _testDirectory.GetFilePath("results.trx");
         File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
 
-        var reportFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.md");
-        var justificationsFile = PathHelpers.SafePathCombine(_testDirectory, "justifications.md");
-        var matrixFile = PathHelpers.SafePathCombine(_testDirectory, "matrix.md");
+        var reportFile = _testDirectory.GetFilePath("requirements.md");
+        var justificationsFile = _testDirectory.GetFilePath("justifications.md");
+        var matrixFile = _testDirectory.GetFilePath("matrix.md");
 
         // Act: run the full pipeline as an external process
         var exitCode = Runner.RunInDirectory(
             out _,
-            _testDirectory,
+            _testDirectory.DirectoryPath,
             "dotnet",
             _dllPath,
             "--requirements", "requirements.yaml",
@@ -133,7 +130,7 @@ public sealed class IntegrationTests : IDisposable
     public void ReqStream_EnforcementMode_RequirementLacksTestEvidence_FailsWithNonZeroExitCode()
     {
         // Arrange: create requirements file with one requirement that has no matching test
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: System Requirements
@@ -148,13 +145,13 @@ public sealed class IntegrationTests : IDisposable
 
         // Arrange: create TRX file with no tests (empty results)
         var testResults = new DemaConsulting.TestResults.TestResults { Name = "EmptyRun" };
-        var trxFile = PathHelpers.SafePathCombine(_testDirectory, "empty.trx");
+        var trxFile = _testDirectory.GetFilePath("empty.trx");
         File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
 
         // Act: run enforcement mode as an external process
         var exitCode = Runner.RunInDirectory(
             out _,
-            _testDirectory,
+            _testDirectory.DirectoryPath,
             "dotnet",
             _dllPath,
             "--requirements", "requirements.yaml",
@@ -174,7 +171,7 @@ public sealed class IntegrationTests : IDisposable
     public void ReqStream_SourceFilter_NamedSourceInRequirement_MatchesTestsBySourceFile()
     {
         // Arrange: create requirements file with source-specific test reference
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: Platform Requirements
@@ -197,7 +194,7 @@ public sealed class IntegrationTests : IDisposable
             Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var platformAFile = PathHelpers.SafePathCombine(_testDirectory, "platform-a.trx");
+        var platformAFile = _testDirectory.GetFilePath("platform-a.trx");
         File.WriteAllText(platformAFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(platformAResults));
 
         // Arrange: create platform-b.trx with a failing test (same test name, different source)
@@ -210,13 +207,13 @@ public sealed class IntegrationTests : IDisposable
             Outcome = DemaConsulting.TestResults.TestOutcome.Failed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var platformBFile = PathHelpers.SafePathCombine(_testDirectory, "platform-b.trx");
+        var platformBFile = _testDirectory.GetFilePath("platform-b.trx");
         File.WriteAllText(platformBFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(platformBResults));
 
         // Act: run enforcement using both result files as external process
         var exitCode = Runner.RunInDirectory(
             out _,
-            _testDirectory,
+            _testDirectory.DirectoryPath,
             "dotnet",
             _dllPath,
             "--requirements", "requirements.yaml",
@@ -236,7 +233,7 @@ public sealed class IntegrationTests : IDisposable
     public void ReqStream_System_Lint_ValidRequirementsFile_ExitsSilentlyWithZero()
     {
         // Arrange: create a structurally valid requirements file
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: System Requirements
@@ -250,7 +247,7 @@ public sealed class IntegrationTests : IDisposable
         // Act: run lint as an external process
         var exitCode = Runner.RunInDirectory(
             out var output,
-            _testDirectory,
+            _testDirectory.DirectoryPath,
             "dotnet",
             _dllPath,
             "--lint",
@@ -271,7 +268,7 @@ public sealed class IntegrationTests : IDisposable
     public void ReqStream_System_Lint_Flag_ReportsLintIssues()
     {
         // Arrange: create a requirements file with a structural issue (missing title)
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: System Requirements
@@ -282,7 +279,7 @@ public sealed class IntegrationTests : IDisposable
         // Act: run lint as an external process
         var exitCode = Runner.RunInDirectory(
             out var output,
-            _testDirectory,
+            _testDirectory.DirectoryPath,
             "dotnet",
             _dllPath,
             "--lint",
@@ -328,7 +325,7 @@ public sealed class IntegrationTests : IDisposable
     public void ReqStream_System_ValidateResultsOutput_ResultsFlag_WritesResultsFile()
     {
         // Arrange: create a temporary file path for the results output
-        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "validation.trx");
+        var resultsFile = _testDirectory.GetFilePath("validation.trx");
 
         // Act: run validate with results flag as an external process
         var exitCode = Runner.Run(
@@ -356,7 +353,7 @@ public sealed class IntegrationTests : IDisposable
     public void ReqStream_System_TagFilter_Flag_FiltersRequirements()
     {
         // Arrange: create requirements file with two requirements, each with a different tag
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: System Requirements
@@ -377,12 +374,12 @@ public sealed class IntegrationTests : IDisposable
                       - FilterTest_Beta
             """);
 
-        var reportFile = PathHelpers.SafePathCombine(_testDirectory, "filtered-report.md");
+        var reportFile = _testDirectory.GetFilePath("filtered-report.md");
 
         // Act: run with --filter alpha to export only alpha-tagged requirements
         var exitCode = Runner.RunInDirectory(
             out _,
-            _testDirectory,
+            _testDirectory.DirectoryPath,
             "dotnet",
             _dllPath,
             "--requirements", "requirements.yaml",
@@ -453,7 +450,7 @@ public sealed class IntegrationTests : IDisposable
     public void ReqStream_System_OutputControl_LogFlag_WritesOutputToFile()
     {
         // Arrange: create a minimal requirements file
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: System Requirements
@@ -464,12 +461,12 @@ public sealed class IntegrationTests : IDisposable
                       - LogTest1
             """);
 
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "output.log");
+        var logFile = _testDirectory.GetFilePath("output.log");
 
         // Act: run with --log flag to route output to a file
         var exitCode = Runner.RunInDirectory(
             out _,
-            _testDirectory,
+            _testDirectory.DirectoryPath,
             "dotnet",
             _dllPath,
             "--requirements", "requirements.yaml",
@@ -493,7 +490,7 @@ public sealed class IntegrationTests : IDisposable
     public void ReqStream_System_OutputControl_SilentFlag_SuppressesConsoleOutput()
     {
         // Arrange: create a minimal requirements file
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: System Requirements
@@ -507,7 +504,7 @@ public sealed class IntegrationTests : IDisposable
         // Act: run with --silent flag and capture output
         var exitCode = Runner.RunInDirectory(
             out var output,
-            _testDirectory,
+            _testDirectory.DirectoryPath,
             "dotnet",
             _dllPath,
             "--requirements", "requirements.yaml",
@@ -526,7 +523,7 @@ public sealed class IntegrationTests : IDisposable
     public void ReqStream_System_FileIncludes_RequirementsWithIncludes_LoadsAllRequirements()
     {
         // Arrange: create a child requirements file
-        var childFile = PathHelpers.SafePathCombine(_testDirectory, "child-requirements.yaml");
+        var childFile = _testDirectory.GetFilePath("child-requirements.yaml");
         File.WriteAllText(childFile, """
             sections:
               - title: Child Requirements
@@ -538,7 +535,7 @@ public sealed class IntegrationTests : IDisposable
             """);
 
         // Arrange: create a root requirements file that includes the child file
-        var rootFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var rootFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(rootFile, """
             includes:
               - child-requirements.yaml
@@ -551,12 +548,12 @@ public sealed class IntegrationTests : IDisposable
                       - RootTest1
             """);
 
-        var reportFile = PathHelpers.SafePathCombine(_testDirectory, "report.md");
+        var reportFile = _testDirectory.GetFilePath("report.md");
 
         // Act: run with the root requirements file that uses includes
         var exitCode = Runner.RunInDirectory(
             out _,
-            _testDirectory,
+            _testDirectory.DirectoryPath,
             "dotnet",
             _dllPath,
             "--requirements", "requirements.yaml",
@@ -580,7 +577,7 @@ public sealed class IntegrationTests : IDisposable
     public void ReqStream_System_OutputControl_LogFlag_WithoutSilent_WritesOutputToFileAndConsole()
     {
         // Arrange: create a minimal requirements file
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: System Requirements
@@ -591,12 +588,12 @@ public sealed class IntegrationTests : IDisposable
                       - LogWithoutSilentTest1
             """);
 
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "output.log");
+        var logFile = _testDirectory.GetFilePath("output.log");
 
         // Act: run with --log flag but without --silent
         var exitCode = Runner.RunInDirectory(
             out var output,
-            _testDirectory,
+            _testDirectory.DirectoryPath,
             "dotnet",
             _dllPath,
             "--requirements", "requirements.yaml",
@@ -622,7 +619,7 @@ public sealed class IntegrationTests : IDisposable
     public void ReqStream_System_ReportDepth_DepthFlag_GeneratesReportWithCorrectHeadingLevel()
     {
         // Arrange: create a minimal requirements file
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: Depth Test Section
@@ -633,12 +630,12 @@ public sealed class IntegrationTests : IDisposable
                       - DepthTest1
             """);
 
-        var reportFile = PathHelpers.SafePathCombine(_testDirectory, "report.md");
+        var reportFile = _testDirectory.GetFilePath("report.md");
 
         // Act: run with --depth 3 to use heading level 3 (###)
         var exitCode = Runner.RunInDirectory(
             out _,
-            _testDirectory,
+            _testDirectory.DirectoryPath,
             "dotnet",
             _dllPath,
             "--requirements", "requirements.yaml",
@@ -662,8 +659,8 @@ public sealed class IntegrationTests : IDisposable
     public void ReqStream_System_CircularIncludeDetection_CircularInclude_ReportsError()
     {
         // Arrange: create two files that include each other (circular)
-        var fileA = PathHelpers.SafePathCombine(_testDirectory, "a.yaml");
-        var fileB = PathHelpers.SafePathCombine(_testDirectory, "b.yaml");
+        var fileA = _testDirectory.GetFilePath("a.yaml");
+        var fileB = _testDirectory.GetFilePath("b.yaml");
         File.WriteAllText(fileA, """
             includes:
               - b.yaml
@@ -690,7 +687,7 @@ public sealed class IntegrationTests : IDisposable
         // Act: run lint with the circular-include root file
         var exitCode = Runner.RunInDirectory(
             out var output,
-            _testDirectory,
+            _testDirectory.DirectoryPath,
             "dotnet",
             _dllPath,
             "--lint",
@@ -714,7 +711,7 @@ public sealed class IntegrationTests : IDisposable
     public void ReqStream_System_SectionMerging_TwoFilesWithSameSection_ProducesSingleMergedSection()
     {
         // Arrange: create two child files both contributing to the same section title
-        var childFileA = PathHelpers.SafePathCombine(_testDirectory, "child-a.yaml");
+        var childFileA = _testDirectory.GetFilePath("child-a.yaml");
         File.WriteAllText(childFileA, """
             sections:
               - title: Shared Section
@@ -725,7 +722,7 @@ public sealed class IntegrationTests : IDisposable
                       - MergeTestA
             """);
 
-        var childFileB = PathHelpers.SafePathCombine(_testDirectory, "child-b.yaml");
+        var childFileB = _testDirectory.GetFilePath("child-b.yaml");
         File.WriteAllText(childFileB, """
             sections:
               - title: Shared Section
@@ -737,19 +734,19 @@ public sealed class IntegrationTests : IDisposable
             """);
 
         // Arrange: create root file that includes both children
-        var rootFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var rootFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(rootFile, """
             includes:
               - child-a.yaml
               - child-b.yaml
             """);
 
-        var reportFile = PathHelpers.SafePathCombine(_testDirectory, "report.md");
+        var reportFile = _testDirectory.GetFilePath("report.md");
 
         // Act: generate a report from the merged requirements
         var exitCode = Runner.RunInDirectory(
             out _,
-            _testDirectory,
+            _testDirectory.DirectoryPath,
             "dotnet",
             _dllPath,
             "--requirements", "requirements.yaml",
@@ -780,7 +777,7 @@ public sealed class IntegrationTests : IDisposable
     public void ReqStream_System_TestFileErrorHandling_MissingTestFile_ReportsFatalError()
     {
         // Arrange: create a minimal requirements file
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: System Requirements
@@ -794,7 +791,7 @@ public sealed class IntegrationTests : IDisposable
         // Act: run with a non-existent test file path
         var exitCode = Runner.RunInDirectory(
             out var output,
-            _testDirectory,
+            _testDirectory.DirectoryPath,
             "dotnet",
             _dllPath,
             "--requirements", "requirements.yaml",
@@ -818,7 +815,7 @@ public sealed class IntegrationTests : IDisposable
     public void ReqStream_System_TestFileErrorHandling_MalformedTestFile_ReportsFatalError()
     {
         // Arrange: create a minimal requirements file
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: System Requirements
@@ -830,13 +827,13 @@ public sealed class IntegrationTests : IDisposable
             """);
 
         // Arrange: create a malformed test result file (not valid TRX or JUnit XML)
-        var malformedFile = PathHelpers.SafePathCombine(_testDirectory, "malformed.trx");
+        var malformedFile = _testDirectory.GetFilePath("malformed.trx");
         File.WriteAllText(malformedFile, "this is not valid XML or TRX content <<<");
 
         // Act: run with the malformed test file path
         var exitCode = Runner.RunInDirectory(
             out var output,
-            _testDirectory,
+            _testDirectory.DirectoryPath,
             "dotnet",
             _dllPath,
             "--requirements", "requirements.yaml",
@@ -860,7 +857,7 @@ public sealed class IntegrationTests : IDisposable
     public void ReqStream_System_MatrixErrorHandling_MatrixWithoutTests_ReportsError()
     {
         // Arrange: create a minimal requirements file
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: System Requirements
@@ -871,12 +868,12 @@ public sealed class IntegrationTests : IDisposable
                       - SomeTest
             """);
 
-        var matrixFile = PathHelpers.SafePathCombine(_testDirectory, "matrix.md");
+        var matrixFile = _testDirectory.GetFilePath("matrix.md");
 
         // Act: run with --matrix but without --tests
         var exitCode = Runner.RunInDirectory(
             out var output,
-            _testDirectory,
+            _testDirectory.DirectoryPath,
             "dotnet",
             _dllPath,
             "--requirements", "requirements.yaml",
@@ -900,7 +897,7 @@ public sealed class IntegrationTests : IDisposable
     public void ReqStream_System_CyclicChildDetection_CyclicChildRequirements_ReportsError()
     {
         // Arrange: create a requirements file with a cyclic children graph
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: System Requirements
@@ -922,7 +919,7 @@ public sealed class IntegrationTests : IDisposable
         // Act: run lint with the cyclic requirements file
         var exitCode = Runner.RunInDirectory(
             out var output,
-            _testDirectory,
+            _testDirectory.DirectoryPath,
             "dotnet",
             _dllPath,
             "--lint",
@@ -945,7 +942,7 @@ public sealed class IntegrationTests : IDisposable
     public void ReqStream_System_EnforceNoTests_EnforceWithoutTests_ReportsError()
     {
         // Arrange: create a minimal requirements file
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, """
             sections:
               - title: System Requirements
@@ -959,7 +956,7 @@ public sealed class IntegrationTests : IDisposable
         // Act: run with --enforce but without --tests
         var exitCode = Runner.RunInDirectory(
             out var output,
-            _testDirectory,
+            _testDirectory.DirectoryPath,
             "dotnet",
             _dllPath,
             "--requirements", "requirements.yaml",

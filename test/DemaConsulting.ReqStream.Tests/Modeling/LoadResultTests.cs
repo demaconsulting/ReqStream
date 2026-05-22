@@ -30,16 +30,15 @@ namespace DemaConsulting.ReqStream.Tests.Modeling;
 /// </summary>
 public sealed class LoadResultTests : IDisposable
 {
-    /// <summary>Unique temporary directory for this test instance's fixture files.</summary>
-    private readonly string _testDirectory;
+    /// <summary>Temporary directory providing isolated file-system workspace for this test class instance.</summary>
+    private readonly TemporaryDirectory _testDirectory = new();
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
     public LoadResultTests()
     {
-        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_load_result_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(_testDirectory);
+
     }
 
     /// <summary>
@@ -47,10 +46,7 @@ public sealed class LoadResultTests : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (Directory.Exists(_testDirectory))
-        {
-            Directory.Delete(_testDirectory, recursive: true);
-        }
+        _testDirectory.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -69,13 +65,13 @@ sections:
         title: ""A requirement.""
         unknown_field: bad
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         var result = Requirements.Load(filePath);
 
         // Act: report the issues via context
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "report-issues-error.log");
+        var logFile = _testDirectory.GetFilePath("report-issues-error.log");
         int exitCode;
         using (var context = Context.Create(["--silent", "--log", logFile]))
         {
@@ -101,7 +97,7 @@ sections:
             [new LintIssue("file.yaml", LintSeverity.Warning, "A warning")]);
 
         // Act: report issues via context
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "report-issues-warning.log");
+        var logFile = _testDirectory.GetFilePath("report-issues-warning.log");
         int exitCode;
         using (var context = Context.Create(["--silent", "--log", logFile]))
         {
@@ -129,13 +125,13 @@ sections:
       - id: ""REQ-001""
         title: ""A valid requirement.""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         var result = Requirements.Load(filePath);
 
         // Act: report issues via context
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "report-issues-none.log");
+        var logFile = _testDirectory.GetFilePath("report-issues-none.log");
         int exitCode;
         using (var context = Context.Create(["--silent", "--log", logFile]))
         {

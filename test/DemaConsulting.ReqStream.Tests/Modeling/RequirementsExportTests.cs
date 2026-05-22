@@ -28,16 +28,15 @@ namespace DemaConsulting.ReqStream.Tests.Modeling;
 /// </summary>
 public sealed class RequirementsExportTests : IDisposable
 {
-    /// <summary>Unique temporary directory for this test instance's fixture files.</summary>
-    private readonly string _testDirectory;
+    /// <summary>Temporary directory providing isolated file-system workspace for this test class instance.</summary>
+    private readonly TemporaryDirectory _testDirectory = new();
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
     public RequirementsExportTests()
     {
-        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(_testDirectory);
+
     }
 
     /// <summary>
@@ -45,10 +44,7 @@ public sealed class RequirementsExportTests : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (Directory.Exists(_testDirectory))
-        {
-            Directory.Delete(_testDirectory, recursive: true);
-        }
+        _testDirectory.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -68,14 +64,14 @@ sections:
       - id: SYS-SEC-002
         title: The system shall enforce password complexity.
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Act: export requirements to a Markdown file
-        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.md");
+        var mdPath = _testDirectory.GetFilePath("requirements.md");
         requirements.Export(mdPath);
 
         // Assert: file is created and contains the expected section heading and requirement table rows
@@ -101,14 +97,14 @@ sections:
       - id: SYS-SEC-001
         title: The system shall support credentials authentication.
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Act: export with depth 3
-        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.md");
+        var mdPath = _testDirectory.GetFilePath("requirements.md");
         requirements.Export(mdPath, depth: 3);
 
         // Assert: heading uses the requested depth level (###)
@@ -136,14 +132,14 @@ sections:
           - id: LOG-001
             title: All requests shall be logged.
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Act: export requirements to Markdown
-        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.md");
+        var mdPath = _testDirectory.GetFilePath("requirements.md");
         requirements.Export(mdPath);
 
         // Assert: parent and child section headings are nested at correct depths
@@ -171,14 +167,14 @@ sections:
           - id: CHILD-001
             title: Child requirement.
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Act: export requirements to Markdown
-        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.md");
+        var mdPath = _testDirectory.GetFilePath("requirements.md");
         requirements.Export(mdPath);
 
         // Assert: parent section heading is emitted even though it contains no direct requirements
@@ -202,7 +198,7 @@ sections:
       - id: SYS-SEC-001
         title: The system shall support credentials authentication.
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -227,7 +223,7 @@ sections:
       - id: SYS-SEC-001
         title: The system shall support credentials authentication.
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -256,14 +252,14 @@ sections:
       - id: DATA-001
         title: All requests shall be logged.
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Act: export requirements to Markdown
-        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.md");
+        var mdPath = _testDirectory.GetFilePath("requirements.md");
         requirements.Export(mdPath);
 
         // Assert: both top-level section headings and their requirement rows are present
@@ -283,14 +279,14 @@ sections:
         // Arrange: create an empty requirements YAML file
         var yamlContent = @"---
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Act: export requirements to Markdown
-        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.md");
+        var mdPath = _testDirectory.GetFilePath("requirements.md");
         requirements.Export(mdPath);
 
         // Assert: file is created and its content is empty (no sections to emit)
@@ -321,14 +317,14 @@ sections:
           Strong passwords reduce the risk of unauthorized access through
           brute force or dictionary attacks.
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Act: export justifications to Markdown
-        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "justifications.md");
+        var mdPath = _testDirectory.GetFilePath("justifications.md");
         requirements.ExportJustifications(mdPath);
 
         // Assert: file is created with section heading, requirement sub-headings, bold titles, and justification text
@@ -358,14 +354,14 @@ sections:
         title: The system shall support credentials authentication.
         justification: This ensures data security.
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Act: export justifications with depth 2
-        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "justifications.md");
+        var mdPath = _testDirectory.GetFilePath("justifications.md");
         requirements.ExportJustifications(mdPath, depth: 2);
 
         // Assert: section heading uses depth 2 (##) and requirement sub-heading uses depth 3 (###)
@@ -389,14 +385,14 @@ sections:
       - id: SYS-SEC-001
         title: The system shall support credentials authentication.
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Act: export justifications to Markdown
-        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "justifications.md");
+        var mdPath = _testDirectory.GetFilePath("justifications.md");
         requirements.ExportJustifications(mdPath);
 
         // Assert: expected structure is present and no justification body text appears
@@ -425,14 +421,14 @@ sections:
             title: All requests shall be authenticated.
             justification: Protects against unauthorized access.
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Act: export justifications to Markdown
-        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "justifications.md");
+        var mdPath = _testDirectory.GetFilePath("justifications.md");
         requirements.ExportJustifications(mdPath);
 
         // Assert: parent and child section headings are at correct depths with requirement sub-headings
@@ -469,14 +465,14 @@ sections:
         tags:
           - performance
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Act: export with security filter
-        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.md");
+        var mdPath = _testDirectory.GetFilePath("requirements.md");
         var filterTags = new HashSet<string> { "security" };
         requirements.Export(mdPath, filterTags: filterTags);
 
@@ -514,14 +510,14 @@ sections:
         tags:
           - data-integrity
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Act: export with security and data-integrity filter
-        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.md");
+        var mdPath = _testDirectory.GetFilePath("requirements.md");
         var filterTags = new HashSet<string> { "security", "data-integrity" };
         requirements.Export(mdPath, filterTags: filterTags);
 
@@ -549,14 +545,14 @@ sections:
         tags:
           - security
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Act: export with a performance filter that matches nothing
-        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.md");
+        var mdPath = _testDirectory.GetFilePath("requirements.md");
         var filterTags = new HashSet<string> { "performance" };
         requirements.Export(mdPath, filterTags: filterTags);
 
@@ -587,14 +583,14 @@ sections:
         tags:
           - performance
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Act: export with no filter
-        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.md");
+        var mdPath = _testDirectory.GetFilePath("requirements.md");
         requirements.Export(mdPath);
 
         // Assert: all requirements from all tags are present in the output
@@ -627,14 +623,14 @@ sections:
         tags:
           - performance
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Act: export justifications with security filter
-        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "justifications.md");
+        var mdPath = _testDirectory.GetFilePath("justifications.md");
         var filterTags = new HashSet<string> { "security" };
         requirements.ExportJustifications(mdPath, filterTags: filterTags);
 
@@ -669,14 +665,14 @@ sections:
         tags:
           - performance
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, yamlContent);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
         // Act: export with security filter
-        var mdPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.md");
+        var mdPath = _testDirectory.GetFilePath("requirements.md");
         var filterTags = new HashSet<string> { "security" };
         requirements.Export(mdPath, filterTags: filterTags);
 

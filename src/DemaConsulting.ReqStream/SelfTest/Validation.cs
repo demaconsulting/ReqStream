@@ -86,12 +86,33 @@ public static class Validation
         RunEnforcementModeTest(context, testResults);
         RunLintTest(context, testResults);
 
-        // Calculate totals
+        // Print summary and set exit code
+        ReportSummary(context, testResults);
+
+        // Write results file if requested
+        if (context.ResultsFile != null)
+        {
+            WriteResultsFile(context, testResults);
+        }
+    }
+
+    /// <summary>
+    ///     Prints the test summary and sets the exit code if any tests failed.
+    /// </summary>
+    /// <remarks>
+    ///     Extracted as an <see langword="internal"/> method so that tests can call it directly
+    ///     with a pre-built <see cref="DemaConsulting.TestResults.TestResults"/> containing
+    ///     known outcomes, without needing to drive the full
+    ///     <see cref="Run"/> pipeline or manipulate the file system to induce failures.
+    /// </remarks>
+    /// <param name="context">The context for output and exit code.</param>
+    /// <param name="testResults">The completed test results to summarize.</param>
+    internal static void ReportSummary(Context context, DemaConsulting.TestResults.TestResults testResults)
+    {
         var totalTests = testResults.Results.Count;
         var passedTests = testResults.Results.Count(t => t.Outcome == DemaConsulting.TestResults.TestOutcome.Passed);
         var failedTests = testResults.Results.Count(t => t.Outcome == DemaConsulting.TestResults.TestOutcome.Failed);
 
-        // Print summary
         context.WriteLine("");
         context.WriteLine($"Total Tests: {totalTests}");
         context.WriteLine($"Passed: {passedTests}");
@@ -102,12 +123,6 @@ public static class Validation
         else
         {
             context.WriteLine($"Failed: {failedTests}");
-        }
-
-        // Write results file if requested
-        if (context.ResultsFile != null)
-        {
-            WriteResultsFile(context, testResults);
         }
     }
 
@@ -787,44 +802,6 @@ public static class Validation
         test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
         test.ErrorMessage = $"Exception: {ex.Message}";
         context.WriteError($"✗ {testName} - Failed: {ex.Message}");
-    }
-
-    /// <summary>
-    ///     Represents a temporary directory that is automatically deleted when disposed.
-    /// </summary>
-    /// <remarks>
-    ///     Each validation test requires an isolated file-system workspace so that fixture files
-    ///     written by one test do not interfere with another and so that no test artifacts persist
-    ///     after the test completes. <see cref="TemporaryDirectory"/> creates a uniquely-named
-    ///     directory under <see cref="Path.GetTempPath"/> and deletes it recursively on disposal,
-    ///     guaranteeing cleanup regardless of whether the test passes or fails.
-    /// </remarks>
-    private sealed class TemporaryDirectory : IDisposable
-    {
-        /// <summary>
-        ///     Gets the path to the temporary directory.
-        /// </summary>
-        public string DirectoryPath { get; }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="TemporaryDirectory"/> class.
-        /// </summary>
-        public TemporaryDirectory()
-        {
-            DirectoryPath = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_validation_{Guid.NewGuid()}");
-            Directory.CreateDirectory(DirectoryPath);
-        }
-
-        /// <summary>
-        ///     Deletes the temporary directory and all its contents.
-        /// </summary>
-        public void Dispose()
-        {
-            if (Directory.Exists(DirectoryPath))
-            {
-                Directory.Delete(DirectoryPath, true);
-            }
-        }
     }
 
     /// <summary>

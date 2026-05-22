@@ -29,15 +29,15 @@ namespace DemaConsulting.ReqStream.Tests.SelfTest;
 /// </summary>
 public sealed class ValidationTests : IDisposable
 {
-    private readonly string _testDirectory;
+    /// <summary>Temporary directory providing isolated file-system workspace for this test class instance.</summary>
+    private readonly TemporaryDirectory _testDirectory = new();
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
     public ValidationTests()
     {
-        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(_testDirectory);
+
     }
 
     /// <summary>
@@ -45,10 +45,7 @@ public sealed class ValidationTests : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (Directory.Exists(_testDirectory))
-        {
-            Directory.Delete(_testDirectory, recursive: true);
-        }
+        _testDirectory.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -71,7 +68,7 @@ public sealed class ValidationTests : IDisposable
     public void Validation_Run_WithSilentContext_CompletesSuccessfully()
     {
         // Arrange - create a log file path and a silent context
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "validation.log");
+        var logFile = _testDirectory.GetFilePath("validation.log");
 
         // Act - run validation and dispose context to flush the log file
         using (var context = Context.Create(["--silent", "--log", logFile]))
@@ -103,7 +100,7 @@ public sealed class ValidationTests : IDisposable
     public void Validation_Run_WithTrxResultsFile_WritesTrxFile()
     {
         // Arrange - create a results file path with .trx extension and a silent context
-        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "validation-results.trx");
+        var resultsFile = _testDirectory.GetFilePath("validation-results.trx");
 
         // Act - run validation and dispose context to flush output
         using (var context = Context.Create(["--silent", "--results", resultsFile]))
@@ -128,7 +125,7 @@ public sealed class ValidationTests : IDisposable
     public void Validation_Run_WithXmlResultsFile_WritesXmlFile()
     {
         // Arrange - create a results file path with .xml extension and a silent context
-        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "validation-results.xml");
+        var resultsFile = _testDirectory.GetFilePath("validation-results.xml");
 
         // Act - run validation and dispose context to flush output
         using (var context = Context.Create(["--silent", "--results", resultsFile]))
@@ -153,7 +150,7 @@ public sealed class ValidationTests : IDisposable
     public void Validation_Run_WithUnwritableResultsFile_ReportsError()
     {
         // Arrange: create a directory at the results file path to force a write failure
-        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "unwritable-results.trx");
+        var resultsFile = _testDirectory.GetFilePath("unwritable-results.trx");
         Directory.CreateDirectory(resultsFile);
         using var context = Context.Create(["--silent", "--results", resultsFile]);
 
@@ -171,8 +168,8 @@ public sealed class ValidationTests : IDisposable
     public void Validation_Run_WithUnwritableResultsFile_Continues()
     {
         // Arrange: create a log file to capture output, and a directory at the results path to force a write failure
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "validation-continues.log");
-        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "unwritable-results2.trx");
+        var logFile = _testDirectory.GetFilePath("validation-continues.log");
+        var resultsFile = _testDirectory.GetFilePath("unwritable-results2.trx");
         Directory.CreateDirectory(resultsFile);
 
         // Act: run validation with the unwritable results file, capturing output to the log
@@ -196,7 +193,7 @@ public sealed class ValidationTests : IDisposable
     public void Validation_Run_WithInvalidResultsExtension_ReportsError()
     {
         // Arrange - create a results file path with an unsupported .invalid extension
-        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "validation-results.invalid");
+        var resultsFile = _testDirectory.GetFilePath("validation-results.invalid");
 
         // Act - run validation and dispose context to flush output
         using var context = Context.Create(["--silent", "--results", resultsFile]);

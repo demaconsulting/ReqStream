@@ -11,12 +11,9 @@ to avoid side effects and are isolated from one another.
 #### Data Model
 
 N/A — `Validation` is a static class with no instance state. All shared state within a
-validation run is allocated locally within `Run` and the individual test methods. The two nested
-helper classes `TemporaryDirectory` and `DirectorySwitch` carry local instance state but are
-scoped to individual test method calls.
-
-**TemporaryDirectory** (nested helper class): `IDisposable` that creates a uniquely named
-directory under `Path.GetTempPath()` on construction and deletes it recursively on disposal.
+validation run is allocated locally within `Run` and the individual test methods. The nested
+helper class `DirectorySwitch` carries local instance state but is scoped to individual test
+method calls.
 
 **DirectorySwitch** (nested helper class): `IDisposable` that changes the process working
 directory on construction and restores the original on disposal.
@@ -82,6 +79,8 @@ The only exception that can escape `Run` is an unexpected runtime error, which p
   individual test methods.
 - **Requirements** — `Requirements.Load` is called with fixture YAML files.
 - **TraceMatrix** — constructed with fixture test-result files.
+- **TemporaryDirectory** — used by each test method to create an isolated scratch directory;
+  replaces the former private nested `TemporaryDirectory` class that used `Path.GetTempPath()`.
 
 ##### Callers
 

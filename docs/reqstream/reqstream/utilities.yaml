@@ -3,6 +3,7 @@
 includes:
   - utilities/glob-matcher.yaml
   - utilities/path-helpers.yaml
+  - utilities/temporary-directory.yaml
 
 sections:
   - title: ReqStream Requirements
@@ -53,3 +54,26 @@ sections:
               - ReqStream-Utilities-PathHelpers-SafeCombine
               - ReqStream-Utilities-PathHelpers-PathTraversalRejection
               - ReqStream-Utilities-PathHelpers-NullGuard
+
+          - id: ReqStream-Utilities-TemporaryDirectory
+            title: >-
+              The Utilities subsystem shall provide a disposable temporary directory for isolated file-system workspaces.
+            justification: |
+              Self-validation tests and unit tests require isolated scratch space that
+              is created before the test body and deleted after, even when the test
+              throws. A centralized disposable class prevents code duplication,
+              ensures consistent cleanup, and removes the need for each caller to
+              implement its own directory-lifecycle management.
+            tags: [utilities]
+            tests:
+              - TemporaryDirectory_Constructor_Default_CreatesDirectory
+              - TemporaryDirectory_Constructor_TwoInstances_CreateUniqueDirectories
+              - TemporaryDirectory_GetFilePath_SimpleFile_ReturnsPathUnderDirectory
+              - TemporaryDirectory_GetFilePath_NestedPath_CreatesIntermediateDirectories
+              - TemporaryDirectory_GetFilePath_TraversalAttempt_ThrowsArgumentException
+              - TemporaryDirectory_Dispose_PopulatedDirectory_DeletesDirectory
+              - TemporaryDirectory_Dispose_AlreadyDeleted_DoesNotThrow
+            children:
+              - ReqStream-Utilities-TemporaryDirectory-Lifecycle
+              - ReqStream-Utilities-TemporaryDirectory-SafePathCombine
+              - ReqStream-Utilities-TemporaryDirectory-IntermediateDirectories

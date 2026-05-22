@@ -234,6 +234,15 @@ reviews:
       - "src/**/Utilities/PathHelpers.cs"                        # implementation
       - "test/**/Utilities/PathHelpersTests.cs"                  # unit tests
 
+  - id: ReqStream-Utilities-TemporaryDirectory
+    title: Review that ReqStream Utilities TemporaryDirectory Implementation is Correct
+    paths:
+      - "docs/reqstream/reqstream/utilities/temporary-directory.yaml"   # unit requirements
+      - "docs/design/reqstream/utilities/temporary-directory.md"        # unit design
+      - "docs/verification/reqstream/utilities/temporary-directory.md"  # unit verification design
+      - "src/**/Utilities/TemporaryDirectory.cs"                        # implementation
+      - "test/**/Utilities/TemporaryDirectoryTests.cs"                  # unit tests
+
   # OTS Items
   - id: OTS-BuildMark
     title: Review that BuildMark Provides Required Functionality

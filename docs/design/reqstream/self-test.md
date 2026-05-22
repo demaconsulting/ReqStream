@@ -87,7 +87,7 @@ all fixture file paths within the test methods and within `WriteResultsFile`. Th
 `WriteResultsFile` helper calls `TrxSerializer.Serialize` or `JUnitSerializer.Serialize`
 (from the OTS `DemaConsulting.TestResults.IO` package) to produce the results output.
 
-The two nested helper classes, `TemporaryDirectory` and `DirectorySwitch`, are used exclusively
-within the test methods and have no visibility outside `Validation`. Each test uses both classes
-together to guarantee clean file system state and ensure no test artifacts persist after
-completion.
+The nested helper class `DirectorySwitch` is used exclusively within the test methods and has
+no visibility outside `Validation`. Each test uses `TemporaryDirectory` (from the `Utilities`
+subsystem) together with `DirectorySwitch` to guarantee clean file-system state and ensure no
+test artifacts persist after completion.

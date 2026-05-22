@@ -1,0 +1,46 @@
+---
+# Software Unit Requirements for the TemporaryDirectory Class
+#
+# The TemporaryDirectory class manages the lifecycle of a disposable temporary
+# directory rooted under Environment.CurrentDirectory. It provides safe path
+# construction via GetFilePath and guarantees cleanup on Dispose.
+
+sections:
+  - title: TemporaryDirectory Unit Requirements
+    requirements:
+      - id: ReqStream-Utilities-TemporaryDirectory-Lifecycle
+        title: The TemporaryDirectory class shall create a unique directory on construction and delete it on disposal.
+        justification: |
+          Tests that rely on isolated scratch space must not interfere with one another
+          or leave artifacts on disk. Creating a unique directory per instance prevents
+          collisions between concurrent or sequential tests, and deleting it on disposal
+          ensures the working directory is left clean even if the test fails or throws.
+        tests:
+          - TemporaryDirectory_Constructor_Default_CreatesDirectory
+          - TemporaryDirectory_Constructor_TwoInstances_CreateUniqueDirectories
+          - TemporaryDirectory_Dispose_PopulatedDirectory_DeletesDirectory
+          - TemporaryDirectory_Dispose_AlreadyDeleted_DoesNotThrow
+
+      - id: ReqStream-Utilities-TemporaryDirectory-SafePathCombine
+        title: >-
+          The TemporaryDirectory class shall construct safe file paths under the temporary directory, rejecting
+          path-traversal attempts.
+        justification: |
+          Callers supply relative file paths to GetFilePath to resolve output locations
+          inside the temporary directory. Using PathHelpers.SafePathCombine ensures that
+          path-traversal attempts (e.g., "../escaped.txt") are rejected with a clear
+          ArgumentException, preventing accidental or malicious writes outside the
+          sandbox.
+        tests:
+          - TemporaryDirectory_GetFilePath_SimpleFile_ReturnsPathUnderDirectory
+          - TemporaryDirectory_GetFilePath_TraversalAttempt_ThrowsArgumentException
+
+      - id: ReqStream-Utilities-TemporaryDirectory-IntermediateDirectories
+        title: The TemporaryDirectory class shall create intermediate subdirectories when resolving a nested file path.
+        justification: |
+          Callers that write to nested paths (e.g., "sub/dir/file.yaml") should not be
+          required to create intermediate directories themselves. Automatic creation in
+          GetFilePath removes this boilerplate and prevents write failures caused by
+          missing parent directories.
+        tests:
+          - TemporaryDirectory_GetFilePath_NestedPath_CreatesIntermediateDirectories

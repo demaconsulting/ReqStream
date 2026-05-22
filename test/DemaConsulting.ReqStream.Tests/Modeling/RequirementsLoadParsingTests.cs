@@ -28,16 +28,15 @@ namespace DemaConsulting.ReqStream.Tests.Modeling;
 /// </summary>
 public sealed class RequirementsLoadParsingTests : IDisposable
 {
-    /// <summary>Unique temporary directory for this test instance's fixture files.</summary>
-    private readonly string _testDirectory;
+    /// <summary>Temporary directory providing isolated file-system workspace for this test class instance.</summary>
+    private readonly TemporaryDirectory _testDirectory = new();
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
     public RequirementsLoadParsingTests()
     {
-        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(_testDirectory);
+
     }
 
     /// <summary>
@@ -45,10 +44,7 @@ public sealed class RequirementsLoadParsingTests : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (Directory.Exists(_testDirectory))
-        {
-            Directory.Delete(_testDirectory, recursive: true);
-        }
+        _testDirectory.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -76,8 +72,8 @@ sections:
       - id: ""DATA-001""
         title: ""All requests shall be logged.""
 ";
-        var mainPath = PathHelpers.SafePathCombine(_testDirectory, "main.yaml");
-        var includedPath = PathHelpers.SafePathCombine(_testDirectory, "additional.yaml");
+        var mainPath = _testDirectory.GetFilePath("main.yaml");
+        var includedPath = _testDirectory.GetFilePath("additional.yaml");
         File.WriteAllText(mainPath, mainYaml);
         File.WriteAllText(includedPath, includedYaml);
 
@@ -119,8 +115,8 @@ sections:
       - id: ""SYS-SEC-002""
         title: ""The system shall enforce password complexity.""
 ";
-        var mainPath = PathHelpers.SafePathCombine(_testDirectory, "main.yaml");
-        var includedPath = PathHelpers.SafePathCombine(_testDirectory, "additional.yaml");
+        var mainPath = _testDirectory.GetFilePath("main.yaml");
+        var includedPath = _testDirectory.GetFilePath("additional.yaml");
         File.WriteAllText(mainPath, mainYaml);
         File.WriteAllText(includedPath, includedYaml);
 
@@ -165,8 +161,8 @@ sections:
 includes:
   - ""fileA.yaml""
 ";
-        var pathA = PathHelpers.SafePathCombine(_testDirectory, "fileA.yaml");
-        var pathB = PathHelpers.SafePathCombine(_testDirectory, "fileB.yaml");
+        var pathA = _testDirectory.GetFilePath("fileA.yaml");
+        var pathB = _testDirectory.GetFilePath("fileB.yaml");
         File.WriteAllText(pathA, fileA);
         File.WriteAllText(pathB, fileB);
 
@@ -187,7 +183,7 @@ includes:
     public void Requirements_Load_FileNotFound_ReportsError()
     {
         // Arrange: create a path to a file that does not exist
-        var nonExistentPath = PathHelpers.SafePathCombine(_testDirectory, "nonexistent.yaml");
+        var nonExistentPath = _testDirectory.GetFilePath("nonexistent.yaml");
 
         // Act: load the non-existent file
         var result = Requirements.Load(nonExistentPath);
@@ -213,7 +209,7 @@ sections:
       - id: ""SYS-SEC-001""
         text: ""This uses an invalid property name.""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -236,7 +232,7 @@ sections:
         // Arrange: create an empty YAML file
         var yamlContent = @"---
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -288,7 +284,7 @@ mappings:
       - ""Logging_ValidRequest_Logged""
       - ""Logging_InvalidRequest_Logged""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -351,9 +347,9 @@ sections:
       - id: ""PERF-001""
         title: ""The system shall respond within 100ms.""
 ";
-        var file1Path = PathHelpers.SafePathCombine(_testDirectory, "file1.yaml");
-        var file2Path = PathHelpers.SafePathCombine(_testDirectory, "file2.yaml");
-        var file3Path = PathHelpers.SafePathCombine(_testDirectory, "file3.yaml");
+        var file1Path = _testDirectory.GetFilePath("file1.yaml");
+        var file2Path = _testDirectory.GetFilePath("file2.yaml");
+        var file3Path = _testDirectory.GetFilePath("file3.yaml");
         File.WriteAllText(file1Path, file1Yaml);
         File.WriteAllText(file2Path, file2Yaml);
         File.WriteAllText(file3Path, file3Yaml);
@@ -395,8 +391,8 @@ sections:
       - id: ""SYS-SEC-002""
         title: ""The system shall enforce password complexity.""
 ";
-        var file1Path = PathHelpers.SafePathCombine(_testDirectory, "file1.yaml");
-        var file2Path = PathHelpers.SafePathCombine(_testDirectory, "file2.yaml");
+        var file1Path = _testDirectory.GetFilePath("file1.yaml");
+        var file2Path = _testDirectory.GetFilePath("file2.yaml");
         File.WriteAllText(file1Path, file1Yaml);
         File.WriteAllText(file2Path, file2Yaml);
 
@@ -428,7 +424,7 @@ sections:
       - id: ""SYS-SEC-001""
         title: ""The system shall support credentials authentication.""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file

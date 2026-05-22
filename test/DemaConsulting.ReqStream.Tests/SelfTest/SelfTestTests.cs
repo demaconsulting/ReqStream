@@ -21,24 +21,26 @@
 using DemaConsulting.ReqStream.Cli;
 using DemaConsulting.ReqStream.SelfTest;
 
+using DemaConsulting.ReqStream.Utilities;
+
 namespace DemaConsulting.ReqStream.Tests.SelfTest;
 
 /// <summary>
 /// Tests for the SelfTest subsystem, proving the Validation class is sufficient to
 /// implement the SelfTest subsystem requirements.
 /// </summary>
+[Collection("Sequential")]
 public sealed class SelfTestTests : IDisposable
 {
-    /// <summary>Absolute path to the isolated temporary directory created for this test class instance.</summary>
-    private readonly string _testDirectory;
+    /// <summary>Temporary directory providing isolated file-system workspace for this test class instance.</summary>
+    private readonly TemporaryDirectory _testDirectory = new();
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
     public SelfTestTests()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), $"reqstream_self_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(_testDirectory);
+
     }
 
     /// <summary>
@@ -46,10 +48,7 @@ public sealed class SelfTestTests : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (Directory.Exists(_testDirectory))
-        {
-            Directory.Delete(_testDirectory, recursive: true);
-        }
+        _testDirectory.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -76,7 +75,7 @@ public sealed class SelfTestTests : IDisposable
     public void SelfTest_ResultsOutput_TrxResultsPath_WritesTrxFile()
     {
         // Arrange: define path for the TRX results output file
-        var resultsFile = Path.Combine(_testDirectory, "validation-results.trx");
+        var resultsFile = _testDirectory.GetFilePath("validation-results.trx");
         using var context = Context.Create(["--silent", "--results", resultsFile]);
 
         // Act: run self-validation
@@ -96,7 +95,7 @@ public sealed class SelfTestTests : IDisposable
     public void SelfTest_ResultsOutput_XmlResultsPath_WritesJUnitFile()
     {
         // Arrange: define path for the JUnit XML results output file
-        var resultsFile = Path.Combine(_testDirectory, "validation-results.xml");
+        var resultsFile = _testDirectory.GetFilePath("validation-results.xml");
         using var context = Context.Create(["--silent", "--results", resultsFile]);
 
         // Act: run self-validation
@@ -116,8 +115,8 @@ public sealed class SelfTestTests : IDisposable
     public void SelfTest_FailureReporting_WithErrors_SetsExitCode1()
     {
         // Arrange: create a results file path with an unsupported extension to trigger an error
-        var resultsFile = Path.Combine(_testDirectory, "validation-results.invalid");
-        var logFile = Path.Combine(_testDirectory, "failure-test.log");
+        var resultsFile = _testDirectory.GetFilePath("validation-results.invalid");
+        var logFile = _testDirectory.GetFilePath("failure-test.log");
 
         int exitCode;
         using (var context = Context.Create(["--silent", "--log", logFile, "--results", resultsFile]))
@@ -134,44 +133,27 @@ public sealed class SelfTestTests : IDisposable
     }
 
     /// <summary>
-    /// Test that self-validation sets exit code 1 when genuine internal test failures occur
-    /// (i.e., when one or more of the six self-validation tests themselves fail, not only when
-    /// a results-file write fails).
+    /// Test that self-validation sets exit code 1 when genuine internal test failures occur.
+    /// Calls <see cref="Validation.ReportSummary"/> directly with a pre-built failed result,
+    /// exercising the <c>failedTests &gt; 0</c> branch without manipulating the file system.
     /// </summary>
     [Fact]
     public void SelfTest_FailureReporting_GenuineFailure_SetsExitCode1()
     {
-        // Arrange: create a file at a path that will be used as the temp directory base so that
-        // TemporaryDirectory construction inside Validation fails with an I/O exception, causing
-        // all six internal test methods to be recorded as Failed.
-        var fakeTempBase = Path.Combine(_testDirectory, "fake-temp");
-        File.WriteAllText(fakeTempBase, string.Empty);
-
-        var savedTmp = Environment.GetEnvironmentVariable("TMP");
-        var savedTemp = Environment.GetEnvironmentVariable("TEMP");
-        var savedTmpDir = Environment.GetEnvironmentVariable("TMPDIR");
-        Environment.SetEnvironmentVariable("TMP", fakeTempBase);
-        Environment.SetEnvironmentVariable("TEMP", fakeTempBase);
-        Environment.SetEnvironmentVariable("TMPDIR", fakeTempBase);
-
-        int exitCode;
-        try
+        // Arrange: build a TestResults with one failed outcome to exercise the failedTests > 0 branch
+        var testResults = new DemaConsulting.TestResults.TestResults();
+        testResults.Results.Add(new DemaConsulting.TestResults.TestResult
         {
-            // Act: run self-validation — all six internal tests fail because TemporaryDirectory
-            // cannot create a subdirectory under a path that is a file, not a directory.
-            using var context = Context.Create(["--silent"]);
-            Validation.Run(context);
-            exitCode = context.ExitCode;
-        }
-        finally
-        {
-            // Restore original temp directory environment variables regardless of outcome
-            Environment.SetEnvironmentVariable("TMP", savedTmp);
-            Environment.SetEnvironmentVariable("TEMP", savedTemp);
-            Environment.SetEnvironmentVariable("TMPDIR", savedTmpDir);
-        }
+            Name = "FakeTest",
+            ClassName = "Test",
+            Outcome = DemaConsulting.TestResults.TestOutcome.Failed
+        });
+        using var context = Context.Create(["--silent"]);
 
-        // Assert: exit code is 1 because genuine internal self-validation test failures occurred
-        Assert.Equal(1, exitCode);
+        // Act: call ReportSummary directly — no file-system or OS-permission manipulation needed
+        Validation.ReportSummary(context, testResults);
+
+        // Assert: exit code is 1 because failedTests > 0 triggered WriteError
+        Assert.Equal(1, context.ExitCode);
     }
 }

@@ -13,6 +13,7 @@ The `Utilities` subsystem contains the following software units:
   and relative paths.
 - **PathHelpers** (`Utilities/PathHelpers.cs`) — Safe path combination that guards against
   path-traversal attacks.
+- **TemporaryDirectory** (`Utilities/TemporaryDirectory.cs`) — Disposable temporary directory providing isolated file-system workspaces.
 
 ### Interfaces
 
@@ -36,19 +37,34 @@ base directory.
   `ArgumentNullException` if `basePath` or `relativePath` is null.
 - *Constraints*: Never permits traversal outside `basePath`.
 
+**TemporaryDirectory**: Disposable wrapper that creates a uniquely named directory under
+`Environment.CurrentDirectory` and deletes it on disposal.
+
+- *Type*: In-process .NET internal class instance.
+- *Role*: Provider (Validation and test classes consume this).
+- *Contract*: Constructor creates the directory; `GetFilePath(relativePath)` validates and
+  constructs a child path (creating intermediate directories); `Dispose` deletes the directory
+  tree. Throws `ArgumentException` on path-traversal attempts via `GetFilePath`.
+- *Constraints*: Disposal errors (IOException, UnauthorizedAccessException) are suppressed.
+
 ### Design
 
-The `Utilities` subsystem contains two units, `GlobMatcher` and `PathHelpers`, with a
-one-directional dependency: `GlobMatcher` depends on `PathHelpers`, but `PathHelpers` has no
-dependency on `GlobMatcher`. Both are declared `internal static`; they expose no instances
-and are accessible only within the assembly.
+The `Utilities` subsystem contains three units, `GlobMatcher`, `PathHelpers`, and
+`TemporaryDirectory`, with one-directional dependencies: `GlobMatcher` depends on
+`PathHelpers`; `TemporaryDirectory` also depends on `PathHelpers`; `PathHelpers` has no
+dependency on either. All three are declared `internal`; they expose no public API and are
+accessible only within the assembly.
 
 `GlobMatcher` is used by `Context.Create` to expand `--requirements` and `--tests` glob patterns
 into resolved file path lists. Within `FindMatchingFiles`, `GlobMatcher` calls
 `PathHelpers.SafePathCombine` to construct safe absolute file paths for each matched result.
 `PathHelpers.SafePathCombine` is also used by `RequirementsLoader` to combine `includes`
 directory paths with relative include paths before recursing into included files.
-`PathHelpers` itself does not call `GlobMatcher`.
+`TemporaryDirectory` depends on `PathHelpers.SafePathCombine` to construct both the root
+directory path in the constructor and child paths in `GetFilePath`. `TemporaryDirectory` is
+used by `Validation` (replacing its former private nested class) and by every test class that
+requires an isolated file-system workspace.
+`PathHelpers` itself does not call `GlobMatcher` or `TemporaryDirectory`.
 
 The subsystem uses only .NET base class library types and
 `Microsoft.Extensions.FileSystemGlobbing`. The `Cli`, `Modeling`, and `SelfTest` subsystems are

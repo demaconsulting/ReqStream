@@ -43,7 +43,8 @@ ReqStream (System)
 │   └── Context (Unit)
 ├── Utilities (Subsystem)
 │   ├── GlobMatcher (Unit)
-│   └── PathHelpers (Unit)
+│   ├── PathHelpers (Unit)
+│   └── TemporaryDirectory (Unit)
 ├── Modeling (Subsystem)
 │   ├── LintIssue (Unit)
 │   ├── LoadResult (Unit)
@@ -71,7 +72,8 @@ src/DemaConsulting.ReqStream/
 │   └── Context.cs              — command-line argument parser and I/O owner
 ├── Utilities/
 │   ├── GlobMatcher.cs          — glob-pattern file matching utility
-│   └── PathHelpers.cs          — safe path combination with traversal protection
+│   ├── PathHelpers.cs          — safe path combination with traversal protection
+│   └── TemporaryDirectory.cs   — disposable temporary directory for isolated file-system workspaces
 ├── Modeling/
 │   ├── LintIssue.cs            — lint issue severity and data model
 │   ├── LoadResult.cs           — combined result of loading requirements and associated lint issues
@@ -94,8 +96,9 @@ test/DemaConsulting.ReqStream.Tests/
 ├── Tracing/
 │   └── TracingTests.cs         — Tracing subsystem integration tests
 └── Utilities/
-    ├── GlobMatcherTests.cs         — GlobMatcher unit tests
-    └── PathHelpersTests.cs         — PathHelpers unit tests
+    ├── GlobMatcherTests.cs              — GlobMatcher unit tests
+    ├── PathHelpersTests.cs              — PathHelpers unit tests
+    └── TemporaryDirectoryTests.cs       — TemporaryDirectory unit tests
 ```
 
 ## Companion Artifact Structure

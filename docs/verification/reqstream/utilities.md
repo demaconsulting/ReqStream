@@ -7,10 +7,11 @@ has its own test class that exercises the public methods with various input comb
 including edge cases and boundary conditions.
 
 Unit tests serve as the sole compliance evidence for the subsystem-level requirements because
-no separate subsystem integration tests exist. The subsystem contains only two units —
-`GlobMatcher` and `PathHelpers` — which have no dependency on each other and are individually
-fully verified by their respective unit test classes. Together these unit tests fully satisfy
-both subsystem requirements.
+no separate subsystem integration tests exist. The subsystem contains three units —
+`GlobMatcher`, `PathHelpers`, and `TemporaryDirectory` — which have no dependency on each
+other (other than `GlobMatcher` and `TemporaryDirectory` both depending on `PathHelpers`) and
+are individually fully verified by their respective unit test classes. Together these unit tests
+fully satisfy all subsystem requirements.
 
 ### Test Environment
 
@@ -20,10 +21,10 @@ which are deleted on test completion.
 
 ### Acceptance Criteria
 
-The Utilities subsystem verification is complete when all xUnit unit tests for `GlobMatcher` and
-`PathHelpers` pass without uncaught exceptions and all assertions succeed. The subsystem is
-considered verified when every requirement in the Requirements Coverage is mapped to at least one
-passing test method.
+The Utilities subsystem verification is complete when all xUnit unit tests for `GlobMatcher`,
+`PathHelpers`, and `TemporaryDirectory` pass without uncaught exceptions and all assertions
+succeed. The subsystem is considered verified when every requirement in the Requirements
+Coverage is mapped to at least one passing test method.
 
 ### Test Scenarios
 
@@ -68,6 +69,19 @@ absolute path override is rejected;
 path is rejected; and `PathHelpers_SafePathCombine_NullRelativePath_ThrowsArgumentNullException`,
 which verifies a null relative path is rejected.
 
+**TemporaryDirectory**: Tests verify that a `TemporaryDirectory` instance creates a directory on
+construction, that two instances receive distinct paths, that `GetFilePath` returns a path rooted
+inside the temporary directory and creates intermediate directories, that path-traversal attempts
+are rejected with `ArgumentException`, and that `Dispose` deletes the directory including any
+files written inside it and that disposing an already-deleted directory does not throw. This
+scenario is tested by `TemporaryDirectory_Constructor_Default_CreatesDirectory`,
+`TemporaryDirectory_Constructor_TwoInstances_CreateUniqueDirectories`,
+`TemporaryDirectory_GetFilePath_SimpleFile_ReturnsPathUnderDirectory`,
+`TemporaryDirectory_GetFilePath_NestedPath_CreatesIntermediateDirectories`,
+`TemporaryDirectory_GetFilePath_TraversalAttempt_ThrowsArgumentException`,
+`TemporaryDirectory_Dispose_PopulatedDirectory_DeletesDirectory`, and
+`TemporaryDirectory_Dispose_AlreadyDeleted_DoesNotThrow`.
+
 ### Requirements Coverage
 
 | Requirement ID | Test Method(s) |
@@ -93,3 +107,10 @@ which verifies a null relative path is rejected.
 | `ReqStream-Utilities-SafePath` | `PathHelpers_SafePathCombine_AbsoluteOverridePath_ThrowsArgumentException` |
 | `ReqStream-Utilities-SafePath` | `PathHelpers_SafePathCombine_NullBasePath_ThrowsArgumentNullException` |
 | `ReqStream-Utilities-SafePath` | `PathHelpers_SafePathCombine_NullRelativePath_ThrowsArgumentNullException` |
+| `ReqStream-Utilities-TemporaryDirectory` | `TemporaryDirectory_Constructor_Default_CreatesDirectory` |
+| `ReqStream-Utilities-TemporaryDirectory` | `TemporaryDirectory_Constructor_TwoInstances_CreateUniqueDirectories` |
+| `ReqStream-Utilities-TemporaryDirectory` | `TemporaryDirectory_GetFilePath_SimpleFile_ReturnsPathUnderDirectory` |
+| `ReqStream-Utilities-TemporaryDirectory` | `TemporaryDirectory_GetFilePath_NestedPath_CreatesIntermediateDirectories` |
+| `ReqStream-Utilities-TemporaryDirectory` | `TemporaryDirectory_GetFilePath_TraversalAttempt_ThrowsArgumentException` |
+| `ReqStream-Utilities-TemporaryDirectory` | `TemporaryDirectory_Dispose_PopulatedDirectory_DeletesDirectory` |
+| `ReqStream-Utilities-TemporaryDirectory` | `TemporaryDirectory_Dispose_AlreadyDeleted_DoesNotThrow` |

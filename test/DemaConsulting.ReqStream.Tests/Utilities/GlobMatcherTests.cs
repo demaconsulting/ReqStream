@@ -27,16 +27,15 @@ namespace DemaConsulting.ReqStream.Tests.Utilities;
 /// </summary>
 public sealed class GlobMatcherTests : IDisposable
 {
-    /// <summary>Unique temporary directory for this test instance's fixture files.</summary>
-    private readonly string _testDirectory;
+    /// <summary>Temporary directory providing isolated file-system workspace for this test class instance.</summary>
+    private readonly TemporaryDirectory _testDirectory = new();
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
     public GlobMatcherTests()
     {
-        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_glob_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(_testDirectory);
+
     }
 
     /// <summary>
@@ -44,10 +43,7 @@ public sealed class GlobMatcherTests : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (Directory.Exists(_testDirectory))
-        {
-            Directory.Delete(_testDirectory, recursive: true);
-        }
+        _testDirectory.Dispose();
 
         GC.SuppressFinalize(this);
     }
@@ -59,15 +55,15 @@ public sealed class GlobMatcherTests : IDisposable
     public void GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles()
     {
         // Arrange: create test files in the test directory and set it as current
-        var file1 = PathHelpers.SafePathCombine(_testDirectory, "file1.yaml");
-        var file2 = PathHelpers.SafePathCombine(_testDirectory, "file2.yaml");
+        var file1 = _testDirectory.GetFilePath("file1.yaml");
+        var file2 = _testDirectory.GetFilePath("file2.yaml");
         File.WriteAllText(file1, "test");
         File.WriteAllText(file2, "test");
 
         var originalDir = Directory.GetCurrentDirectory();
         try
         {
-            Directory.SetCurrentDirectory(_testDirectory);
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
 
             // Act: find files using a relative glob pattern
             var files = GlobMatcher.FindMatchingFiles(["*.yaml"]);
@@ -90,13 +86,13 @@ public sealed class GlobMatcherTests : IDisposable
     public void GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles()
     {
         // Arrange: create test files in the test directory
-        var file1 = PathHelpers.SafePathCombine(_testDirectory, "test1.trx");
-        var file2 = PathHelpers.SafePathCombine(_testDirectory, "test2.trx");
+        var file1 = _testDirectory.GetFilePath("test1.trx");
+        var file2 = _testDirectory.GetFilePath("test2.trx");
         File.WriteAllText(file1, "test");
         File.WriteAllText(file2, "test");
 
         // Act: find files using an absolute glob pattern
-        var pattern = PathHelpers.SafePathCombine(_testDirectory, "*.trx");
+        var pattern = _testDirectory.GetFilePath("*.trx");
         var files = GlobMatcher.FindMatchingFiles([pattern]);
 
         // Assert: both files are found
@@ -112,7 +108,7 @@ public sealed class GlobMatcherTests : IDisposable
     public void GlobMatcher_FindMatchingFiles_AbsolutePatternWithDoubleWildcard_MatchesFilesInSubdirectories()
     {
         // Arrange: create test files in a subdirectory
-        var subDir = PathHelpers.SafePathCombine(_testDirectory, "sub");
+        var subDir = _testDirectory.GetFilePath("sub");
         Directory.CreateDirectory(subDir);
         var file1 = PathHelpers.SafePathCombine(subDir, "test1.trx");
         var file2 = PathHelpers.SafePathCombine(subDir, "test2.trx");
@@ -120,7 +116,7 @@ public sealed class GlobMatcherTests : IDisposable
         File.WriteAllText(file2, "test");
 
         // Act: find files using an absolute glob pattern with **
-        var pattern = PathHelpers.SafePathCombine(PathHelpers.SafePathCombine(_testDirectory, "**"), "*.trx");
+        var pattern = PathHelpers.SafePathCombine(_testDirectory.GetFilePath("**"), "*.trx");
         var files = GlobMatcher.FindMatchingFiles([pattern]);
 
         // Assert: both files are found
@@ -136,7 +132,7 @@ public sealed class GlobMatcherTests : IDisposable
     public void GlobMatcher_FindMatchingFiles_AbsoluteLiteralPath_MatchesSingleFile()
     {
         // Arrange: create a test file
-        var file = PathHelpers.SafePathCombine(_testDirectory, "exact.yaml");
+        var file = _testDirectory.GetFilePath("exact.yaml");
         File.WriteAllText(file, "test");
 
         // Act: find file using an absolute literal path (no wildcards)
@@ -154,7 +150,7 @@ public sealed class GlobMatcherTests : IDisposable
     public void GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty()
     {
         // Arrange: construct a pattern rooted in a directory that does not exist
-        var nonExistentDir = PathHelpers.SafePathCombine(_testDirectory, "does_not_exist");
+        var nonExistentDir = _testDirectory.GetFilePath("does_not_exist");
         var pattern = PathHelpers.SafePathCombine(nonExistentDir, "*.yaml");
 
         // Act: find files using the pattern
@@ -171,13 +167,13 @@ public sealed class GlobMatcherTests : IDisposable
     public void GlobMatcher_FindMatchingFiles_ReturnsAbsolutePaths()
     {
         // Arrange: create a test file and set the working directory
-        var file = PathHelpers.SafePathCombine(_testDirectory, "abs.yaml");
+        var file = _testDirectory.GetFilePath("abs.yaml");
         File.WriteAllText(file, "test");
 
         var originalDir = Directory.GetCurrentDirectory();
         try
         {
-            Directory.SetCurrentDirectory(_testDirectory);
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
 
             // Act: find file using a relative pattern
             var files = GlobMatcher.FindMatchingFiles(["abs.yaml"]);
@@ -199,7 +195,7 @@ public sealed class GlobMatcherTests : IDisposable
     public void GlobMatcher_SplitAbsolutePattern_WildcardAtTopLevel_SplitsAtRoot()
     {
         // Arrange
-        var root = Path.GetPathRoot(_testDirectory)!;
+        var root = Path.GetPathRoot(_testDirectory.DirectoryPath)!;
         var pattern = PathHelpers.SafePathCombine(root, "*.yaml");
 
         // Act
@@ -217,13 +213,13 @@ public sealed class GlobMatcherTests : IDisposable
     public void GlobMatcher_SplitAbsolutePattern_LiteralPath_SplitsAtLastSeparator()
     {
         // Arrange
-        var pattern = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var pattern = _testDirectory.GetFilePath("requirements.yaml");
 
         // Act
         var (rootDir, relativePattern) = GlobMatcher.SplitAbsolutePattern(pattern);
 
         // Assert
-        Assert.Equal(_testDirectory, rootDir);
+        Assert.Equal(_testDirectory.DirectoryPath, rootDir);
         Assert.Equal("requirements.yaml", relativePattern);
     }
 
@@ -234,13 +230,13 @@ public sealed class GlobMatcherTests : IDisposable
     public void GlobMatcher_SplitAbsolutePattern_DoubleStarWildcard_SplitsBeforeWildcard()
     {
         // Arrange
-        var pattern = PathHelpers.SafePathCombine(PathHelpers.SafePathCombine(_testDirectory, "**"), "*.trx");
+        var pattern = PathHelpers.SafePathCombine(_testDirectory.GetFilePath("**"), "*.trx");
 
         // Act
         var (rootDir, relativePattern) = GlobMatcher.SplitAbsolutePattern(pattern);
 
         // Assert: rootDir is the test directory; relativePattern contains the wildcard segments
-        Assert.Equal(_testDirectory, rootDir);
+        Assert.Equal(_testDirectory.DirectoryPath, rootDir);
         Assert.Contains("**", relativePattern);
         Assert.Contains("*.trx", relativePattern);
     }
@@ -252,14 +248,14 @@ public sealed class GlobMatcherTests : IDisposable
     public void GlobMatcher_FindMatchingFiles_MultiplePatterns_DeduplicatesResults()
     {
         // Arrange: create test files
-        var file1 = PathHelpers.SafePathCombine(_testDirectory, "shared1.yaml");
-        var file2 = PathHelpers.SafePathCombine(_testDirectory, "shared2.yaml");
+        var file1 = _testDirectory.GetFilePath("shared1.yaml");
+        var file2 = _testDirectory.GetFilePath("shared2.yaml");
         File.WriteAllText(file1, "test");
         File.WriteAllText(file2, "test");
 
         // Act: two patterns that both match the same files
-        var absoluteWildcard = PathHelpers.SafePathCombine(_testDirectory, "*.yaml");
-        var absoluteLiteral1 = PathHelpers.SafePathCombine(_testDirectory, "shared1.yaml");
+        var absoluteWildcard = _testDirectory.GetFilePath("*.yaml");
+        var absoluteLiteral1 = _testDirectory.GetFilePath("shared1.yaml");
         var files = GlobMatcher.FindMatchingFiles([absoluteWildcard, absoluteLiteral1]);
 
         // Assert: each file appears only once despite being matched by multiple patterns
@@ -275,15 +271,15 @@ public sealed class GlobMatcherTests : IDisposable
     public void GlobMatcher_FindMatchingFiles_MultipleMatches_ReturnsSortedResults()
     {
         // Arrange: create files whose names would be unsorted if added in creation order
-        var fileB = PathHelpers.SafePathCombine(_testDirectory, "b_file.yaml");
-        var fileA = PathHelpers.SafePathCombine(_testDirectory, "a_file.yaml");
-        var fileC = PathHelpers.SafePathCombine(_testDirectory, "c_file.yaml");
+        var fileB = _testDirectory.GetFilePath("b_file.yaml");
+        var fileA = _testDirectory.GetFilePath("a_file.yaml");
+        var fileC = _testDirectory.GetFilePath("c_file.yaml");
         File.WriteAllText(fileB, "test");
         File.WriteAllText(fileA, "test");
         File.WriteAllText(fileC, "test");
 
         // Act: find files using an absolute glob pattern
-        var pattern = PathHelpers.SafePathCombine(_testDirectory, "*.yaml");
+        var pattern = _testDirectory.GetFilePath("*.yaml");
         var files = GlobMatcher.FindMatchingFiles([pattern]);
 
         // Assert: files are returned in lexicographic ascending order (a before b before c)
@@ -315,8 +311,8 @@ public sealed class GlobMatcherTests : IDisposable
     public void GlobMatcher_FindMatchingFiles_MultiplePatterns_CombinesFromDifferentSources()
     {
         // Arrange: create files in two separate subdirectories
-        var dir1 = PathHelpers.SafePathCombine(_testDirectory, "dir1");
-        var dir2 = PathHelpers.SafePathCombine(_testDirectory, "dir2");
+        var dir1 = _testDirectory.GetFilePath("dir1");
+        var dir2 = _testDirectory.GetFilePath("dir2");
         Directory.CreateDirectory(dir1);
         Directory.CreateDirectory(dir2);
         var file1 = PathHelpers.SafePathCombine(dir1, "req1.yaml");
@@ -353,9 +349,9 @@ public sealed class GlobMatcherTests : IDisposable
     public void GlobMatcher_FindMatchingFiles_NullElementInPatterns_SkipsElement()
     {
         // Arrange: create a test file matched by the non-null pattern
-        var file = PathHelpers.SafePathCombine(_testDirectory, "skip_null.yaml");
+        var file = _testDirectory.GetFilePath("skip_null.yaml");
         File.WriteAllText(file, "test");
-        var pattern = PathHelpers.SafePathCombine(_testDirectory, "*.yaml");
+        var pattern = _testDirectory.GetFilePath("*.yaml");
 
         // Act: collection contains a null element alongside a valid pattern
         var files = GlobMatcher.FindMatchingFiles([null!, pattern]);
