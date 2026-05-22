@@ -159,7 +159,8 @@ public sealed class CliTests : IDisposable
     public void Cli_Interface_LogFileOpenFailure_ThrowsArgumentException()
     {
         // Arrange: use a path inside a directory that does not exist
-        var invalidLogPath = Path.Combine(_testDirectory.DirectoryPath, "nonexistent-subdir", "output.log");
+        var invalidLogDirectory = PathHelpers.SafePathCombine(_testDirectory.DirectoryPath, "nonexistent-subdir");
+        var invalidLogPath = PathHelpers.SafePathCombine(invalidLogDirectory, "output.log");
 
         // Act + Assert: creating a context with an inaccessible log file throws ArgumentException
         Assert.Throws<ArgumentException>(() => Context.Create(["--log", invalidLogPath]));
