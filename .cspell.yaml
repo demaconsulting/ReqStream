@@ -35,6 +35,13 @@ words:
   - tracematrix
   - xunit
   - Xunit
+  - APFS
+  - callees
+  - NTFS
+  - Postconditions
+  - RAII
+  - unloadable
+  - unparseable
   - Unwritable
   - venv
   - versionmark

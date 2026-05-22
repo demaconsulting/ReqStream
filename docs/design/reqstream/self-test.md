@@ -57,11 +57,11 @@ paths safely, and by `WriteResultsFile` when building the output file path.
   `ArgumentException` if the combined path would escape the base directory.
 
 **TrxSerializer.Serialize / JUnitSerializer.Serialize**: Invoked by `WriteResultsFile` to
-serialise the `TestResults` collection into TRX or JUnit XML format.
+serialize the `TestResults` collection into TRX or JUnit XML format.
 
 - *Type*: OTS API, `DemaConsulting.TestResults.IO` package.
 - *Role*: Consumer.
-- *Contract*: Accepts a `TestResults` collection; returns a serialised string in the
+- *Contract*: Accepts a `TestResults` collection; returns a serialized string in the
   respective format.
 
 ### Design

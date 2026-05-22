@@ -8,8 +8,8 @@ sections:
     sections:
       - title: FileAssert
         requirements:
-            # Note: ID uses the project-wide ReqStream-OTS-{ToolName} pattern (accepted deviation
-            # from the System-Component-Feature standard; renaming would break test file traceability).
+          # Note: ID uses the project-wide ReqStream-OTS-{ToolName} pattern (accepted deviation
+          # from the System-Component-Feature standard; renaming would break test file traceability).
           - id: ReqStream-OTS-FileAssert
             title: FileAssert shall validate generated documents against acceptance criteria.
             justification: |

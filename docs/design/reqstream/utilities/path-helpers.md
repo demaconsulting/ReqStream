@@ -43,7 +43,7 @@ this is the one location where the raw `Path.Combine` call is validated and ther
   traversal attempt detected), or when either argument contains invalid path characters.
 
 - **`NotSupportedException`** — propagated from `Path.Combine` or `Path.GetFullPath` when a
-  supplied path contains an unsupported format (e.g. a path with an unrecognised prefix on
+  supplied path contains an unsupported format (e.g. a path with an unrecognized prefix on
   Windows). This exception originates in the .NET runtime; `SafePathCombine` does not throw it
   explicitly.
 - **`PathTooLongException`** — propagated from `Path.Combine` or `Path.GetFullPath` when the

@@ -219,20 +219,20 @@ reviews:
   - id: ReqStream-Utilities-GlobMatcher
     title: Review that ReqStream Utilities GlobMatcher Implementation is Correct
     paths:
-      - "docs/reqstream/reqstream/utilities/glob-matcher.yaml"  # unit requirements
-      - "docs/design/reqstream/utilities/glob-matcher.md"       # unit design
-      - "docs/verification/reqstream/utilities/glob-matcher.md" # unit verification design
-      - "src/**/Utilities/GlobMatcher.cs"                       # implementation
-      - "test/**/Utilities/GlobMatcherTests.cs"                 # unit tests
+      - "docs/reqstream/reqstream/utilities/glob-matcher.yaml"   # unit requirements
+      - "docs/design/reqstream/utilities/glob-matcher.md"        # unit design
+      - "docs/verification/reqstream/utilities/glob-matcher.md"  # unit verification design
+      - "src/**/Utilities/GlobMatcher.cs"                        # implementation
+      - "test/**/Utilities/GlobMatcherTests.cs"                  # unit tests
 
   - id: ReqStream-Utilities-PathHelpers
     title: Review that ReqStream Utilities PathHelpers Implementation is Correct
     paths:
-      - "docs/reqstream/reqstream/utilities/path-helpers.yaml"  # unit requirements
-      - "docs/design/reqstream/utilities/path-helpers.md"       # unit design
-      - "docs/verification/reqstream/utilities/path-helpers.md" # unit verification design
-      - "src/**/Utilities/PathHelpers.cs"                       # implementation
-      - "test/**/Utilities/PathHelpersTests.cs"                 # unit tests
+      - "docs/reqstream/reqstream/utilities/path-helpers.yaml"   # unit requirements
+      - "docs/design/reqstream/utilities/path-helpers.md"        # unit design
+      - "docs/verification/reqstream/utilities/path-helpers.md"  # unit verification design
+      - "src/**/Utilities/PathHelpers.cs"                        # implementation
+      - "test/**/Utilities/PathHelpersTests.cs"                  # unit tests
 
   # OTS Items
   - id: OTS-BuildMark
