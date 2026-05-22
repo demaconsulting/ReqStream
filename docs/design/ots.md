@@ -41,6 +41,9 @@ through a single dedicated wrapper or utility class within ReqStream:
 - **Microsoft.Extensions.FileSystemGlobbing** is accessed exclusively through `GlobMatcher`,
   which encapsulates all glob-pattern matching and exposes a simple `FindMatchingFiles` API to
   the rest of the system.
+- **DemaConsulting.TestResults** is accessed through `TraceMatrix` and `Validation`, which are
+  the only units that call the package's deserialization and serialization APIs directly. Full
+  integration details are in `docs/design/ots/dema-consulting-test-results.md`.
 
 This single-use-site pattern means that replacing an OTS package requires changes to only one
 unit in the codebase, minimizing the impact of future upgrades or substitutions.
@@ -61,3 +64,4 @@ The following OTS packages are used by ReqStream:
 | ------- | ------- |
 | `YamlDotNet` | YAML parsing in the Modeling subsystem |
 | `Microsoft.Extensions.FileSystemGlobbing` | Glob pattern matching in the Utilities subsystem |
+| `DemaConsulting.TestResults` | Test result deserialization (TRX, JUnit) in the Tracing and SelfTest subsystems |

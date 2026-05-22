@@ -13,7 +13,7 @@ provided in the sections below. Per-item verification files are in `docs/verific
 
 ## Overview
 
-The ReqStream tool uses eleven OTS (Off-The-Shelf) software items to provide build, test,
+The ReqStream tool uses twelve OTS (Off-The-Shelf) software items to provide build, test,
 documentation, and quality-reporting functionality. OTS items are not developed in-house and
 have no design documentation. Verification evidence is collected from CI pipeline run results,
 self-validation output, and integration test execution rather than from unit tests of internal
@@ -53,6 +53,7 @@ details for each item are provided in the individual OTS item verification docum
 | WeasyPrint | CI pipeline step evidence combined with FileAssert document validation |
 | YamlDotNet | Integration test evidence |
 | Microsoft.Extensions.FileSystemGlobbing | Integration test evidence |
+| DemaConsulting.TestResults | Integration test evidence |
 
 ## OTS Coverage Table Convention
 

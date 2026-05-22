@@ -15,5 +15,4 @@ includes:
   - docs/reqstream/ots/fileassert.yaml
   - docs/reqstream/ots/yamldotnet.yaml
   - docs/reqstream/ots/microsoft-extensions-file-system-globbing.yaml
-  # Shared package requirements
-  - docs/reqstream/shared/dema-consulting-test-results.yaml
+  - docs/reqstream/ots/dema-consulting-test-results.yaml

@@ -58,13 +58,13 @@ See the subsystem and unit design chapters for individual collaboration details.
 ## Dependencies
 
 The ReqStream system depends on the following external software items. Detailed integration and
-usage design for each is in the OTS and Shared Package design chapters.
+usage design for each is in the OTS design chapter.
 
 | Item | Type | Purpose |
 | ---- | ---- | ------- |
 | `YamlDotNet` | OTS | YAML parsing via the RepresentationModel DOM API in `RequirementsLoader` |
 | `Microsoft.Extensions.FileSystemGlobbing` | OTS | Glob pattern matching used by `GlobMatcher.FindMatchingFiles` |
-| `DemaConsulting.TestResults` | Shared Package | Test result deserialization (TRX, JUnit) in `TraceMatrix` and `Validation` |
+| `DemaConsulting.TestResults` | OTS | Test result deserialization (TRX, JUnit) in `TraceMatrix` and `Validation` |
 
 ## Risk Control Measures
 

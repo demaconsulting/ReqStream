@@ -64,8 +64,7 @@ reviews:
       - "docs/design/ots.md"                                      # OTS items design overview
       - "docs/design/ots/yamldotnet.md"                           # YamlDotNet integration design
       - "docs/design/ots/microsoft-extensions-file-system-globbing.md"  # FileSystemGlobbing design
-      - "docs/design/shared.md"                                   # shared packages design overview
-      - "docs/design/shared/dema-consulting-test-results.md"      # TestResults integration design
+      - "docs/design/ots/dema-consulting-test-results.md"         # TestResults integration design
 
   - id: ReqStream-AllRequirements
     title: Review that All ReqStream Requirements are Complete
@@ -74,7 +73,6 @@ reviews:
       - "docs/reqstream/reqstream.yaml"                           # system requirements file
       - "docs/reqstream/reqstream/**/*.yaml"                      # all subsystem requirements files
       - "docs/reqstream/ots/**/*.yaml"                            # OTS requirements files
-      - "docs/reqstream/shared/**/*.yaml"                         # Shared package requirements files
 
   # ReqStream - Program
   - id: ReqStream-Program
@@ -241,11 +239,11 @@ reviews:
       - "docs/reqstream/ots/yamldotnet.yaml"                       # OTS requirements
       - "docs/verification/ots/yamldotnet.md"                      # OTS verification
 
-  - id: Shared-TestResults
+  - id: OTS-TestResults
     title: Review that DemaConsulting.TestResults Provides Required Functionality
     paths:
-      - "docs/reqstream/shared/dema-consulting-test-results.yaml"         # Shared Package requirements
-      - "docs/verification/shared/dema-consulting-test-results.md"         # shared verification
+      - "docs/reqstream/ots/dema-consulting-test-results.yaml"          # OTS requirements
+      - "docs/verification/ots/dema-consulting-test-results.md"         # OTS verification
 
   - id: OTS-ReviewMark
     title: Review that ReviewMark Provides Required Functionality

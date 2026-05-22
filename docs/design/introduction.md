@@ -58,10 +58,9 @@ ReqStream (System)
 │   └── TraceMatrix (Unit)
 ├── SelfTest (Subsystem)
 │   └── Validation (Unit)
-├── OTS Items
-│   ├── YamlDotNet
-│   └── Microsoft.Extensions.FileSystemGlobbing
-└── Shared Packages
+└── OTS Items
+    ├── YamlDotNet
+    ├── Microsoft.Extensions.FileSystemGlobbing
     └── DemaConsulting.TestResults
 ```
 
@@ -79,9 +78,7 @@ docs/design/
 ├── ots.md                                  — OTS items design overview
 ├── ots/
 │   ├── yamldotnet.md                       — YamlDotNet integration design
-│   └── microsoft-extensions-file-system-globbing.md — Microsoft.Extensions.FileSystemGlobbing design
-├── shared.md                               — shared packages design overview
-├── shared/
+│   ├── microsoft-extensions-file-system-globbing.md — Microsoft.Extensions.FileSystemGlobbing design
 │   └── dema-consulting-test-results.md     — DemaConsulting.TestResults integration design
 └── reqstream/
     ├── program.md                          — Program unit design
@@ -176,14 +173,6 @@ For OTS software items, the artifact structure uses a flatter layout (no source 
 | Requirements | `docs/reqstream/ots/{ots-name}.yaml` |
 | Design | `docs/design/ots/{ots-name}.md` |
 | Verification | `docs/verification/ots/{ots-name}.md` |
-
-For shared packages, the artifact structure is similar to OTS:
-
-| Artifact | Path |
-| -------- | ---- |
-| Requirements | `docs/reqstream/shared/{shared-name}.yaml` (where applicable) |
-| Design | `docs/design/shared/{shared-name}.md` |
-| Verification | `docs/verification/shared/{shared-name}.md` |
 
 ## References
 
