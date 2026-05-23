@@ -9,7 +9,7 @@ description: Follow these standards when configuring file reviews with ReviewMar
 
 Read these standards first before applying this standard:
 
-- **`software-items.md`** - Software categorization (System/Subsystem/Unit/OTS)
+- **`software-items.md`** - Software categorization (System/Subsystem/Unit/OTS/Shared Package)
 
 ## Purpose
 
@@ -139,6 +139,23 @@ Reviews architectural and design consistency:
   - Design introduction: `docs/design/introduction.md`
   - System design: `docs/design/{system-name}.md`
   - System design files: `docs/design/{system-name}/**/*.md`
+  - OTS overview: `docs/design/ots.md` _(only if OTS items exist)_
+  - Shared Package overview: `docs/design/shared.md` _(only if Shared Package items exist)_
+
+## `{System}-Verification` Review (one per system)
+
+Reviews verification completeness and consistency:
+
+- **Purpose**: Proves the system verification design is consistent and covers all requirements
+- **Title**: "Review that {System} Verification is Consistent and Complete"
+- **Scope**: Only brings in top-level requirements and all verification docs for the system
+- **File Path Patterns**:
+  - System requirements: `docs/reqstream/{system-name}.yaml`
+  - Verification introduction: `docs/verification/introduction.md`
+  - System verification: `docs/verification/{system-name}.md`
+  - System verification files: `docs/verification/{system-name}/**/*.md`
+  - OTS overview: `docs/verification/ots.md` _(only if OTS items exist)_
+  - Shared Package overview: `docs/verification/shared.md` _(only if Shared Package items exist)_
 
 ## `{System}-AllRequirements` Review (one per system)
 
@@ -182,16 +199,29 @@ Reviews individual software unit implementation:
 
 ## `OTS-{OtsName}` Review (one per OTS item)
 
-Reviews OTS item requirements and verification evidence:
+Reviews OTS item integration design, requirements, and verification evidence:
 
-- **Purpose**: Proves that the OTS item provides the required functionality
+- **Purpose**: Proves that the OTS item provides the required functionality and is correctly integrated
 - **Title**: "Review that {OtsName} Provides Required Functionality"
-- **Scope**: OTS items have no in-house design or source; review covers requirements and
-  verification evidence only
+- **Scope**: No local source code; review covers integration design, requirements, and verification evidence
 - **File Path Patterns**:
   - OTS requirements: `docs/reqstream/ots/{ots-name}.yaml`
+  - OTS integration design: `docs/design/ots/{ots-name}.md`
   - OTS verification: `docs/verification/ots/{ots-name}.md`
-  - Tests (if applicable): `test/{OtsSoftwareTests}/...` (cased per language)
+  - Tests (if applicable): `test/OtsSoftwareTests/...` (C#) or `test/ots_software_tests/...`
+    (Python/other) — fixed repo-level name, no system prefix
+
+## `Shared-{PackageName}` Review (one per Shared Package)
+
+Reviews Shared Package integration design, requirements, and verification evidence:
+
+- **Purpose**: Proves that the Shared Package provides the required advertised features and is correctly integrated
+- **Title**: "Review that {PackageName} Provides Required Features"
+- **Scope**: No local source code; review covers integration design, requirements, and verification evidence
+- **File Path Patterns**:
+  - Shared Package requirements: `docs/reqstream/shared/{package-name}.yaml`
+  - Shared Package integration design: `docs/design/shared/{package-name}.md`
+  - Shared Package verification: `docs/verification/shared/{package-name}.md`
 
 **Note**: File path patterns use `{ext}` as a placeholder for language-specific
 extensions (`.cs`, `.cpp`/`.hpp`, `.py`, etc.). Adapt to your repository's languages.
@@ -207,9 +237,12 @@ Before submitting ReviewMark configuration, verify:
 - [ ] Subsystem reviews follow hierarchical scope principle (exclude unit source code)
 - [ ] Only unit reviews include actual source code files
 - [ ] Architecture review-sets include system verification design alongside system design
+- [ ] Design review-sets include all system design files
+- [ ] Verification review-sets include all system verification files
 - [ ] Subsystem review-sets include subsystem verification design
 - [ ] Unit review-sets include unit verification design
-- [ ] OTS review-sets include OTS requirements and verification evidence
+- [ ] OTS review-sets include OTS requirements, integration design, and verification evidence
+- [ ] Shared Package review-sets include Shared Package requirements, integration design, and verification evidence
 - [ ] Each review-set focuses on a single compliance question (single focus principle)
 - [ ] File patterns use correct glob syntax and match intended files
 - [ ] Review-set file counts remain manageable (context management principle)

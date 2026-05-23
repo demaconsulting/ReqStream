@@ -1,0 +1,23 @@
+---
+# Microsoft.Extensions.FileSystemGlobbing OTS requirements
+# Note: Requirement IDs in OTS files use the project-wide ReqStream-OTS-{ToolName} pattern,
+# which is an accepted deviation from the System-Component-Feature naming standard defined
+# in reqstream-usage.md. Renaming would break traceability across all test files.
+sections:
+  - title: OTS Software Requirements
+    sections:
+      - title: Microsoft.Extensions.FileSystemGlobbing
+        requirements:
+          - id: ReqStream-OTS-FileSystemGlobbing
+            title: >-
+              Microsoft.Extensions.FileSystemGlobbing shall match file paths against glob
+              patterns, returning all matching absolute file paths.
+            justification: |
+              GlobMatcher uses FileSystemGlobbing to expand --requirements and --tests
+              command-line patterns into resolved file path lists. It must correctly match
+              relative and absolute glob patterns on all supported platforms.
+            tags: [ots]
+            tests:
+              - GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles
+              - GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles
+              - GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty

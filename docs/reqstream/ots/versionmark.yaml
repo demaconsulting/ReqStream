@@ -1,12 +1,12 @@
 ---
-# VersionMark OTS Software Requirements
-#
-# Requirements for the VersionMark version tracking tool functionality.
-
+# VersionMark OTS requirements
+# Note: Requirement IDs in OTS files use the project-wide ReqStream-OTS-{ToolName} pattern,
+# which is an accepted deviation from the System-Component-Feature naming standard defined
+# in reqstream-usage.md. Renaming would break traceability across all test files.
 sections:
   - title: OTS Software Requirements
     sections:
-      - title: VersionMark Requirements
+      - title: VersionMark
         requirements:
           - id: ReqStream-OTS-VersionMark
             title: VersionMark shall publish captured tool-version information.

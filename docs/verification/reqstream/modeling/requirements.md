@@ -1,95 +1,97 @@
-### Requirements Unit Verification
+### Requirements
 
-#### Verification Strategy
+#### Verification Approach
 
 The Requirements unit is verified using xUnit integration tests across multiple test files:
 `RequirementsLoadTests.cs`, `RequirementsLoadParsingTests.cs`, and `RequirementsExportTests.cs`.
 Tests create YAML requirements files with various structures, invoke `Requirements.Load`, and
 assert on the parsed data model, lint issues, and generated Markdown exports.
 
+#### Test Environment
+
+The Requirements unit tests require no setup beyond the standard xUnit test runner and .NET runtime.
+Temporary YAML requirements files and Markdown export files are created on disk and deleted on test
+completion.
+
+#### Acceptance Criteria
+
+The Requirements unit verification is complete when all xUnit tests across `RequirementsLoadTests.cs`,
+`RequirementsLoadParsingTests.cs`, and `RequirementsExportTests.cs` pass without uncaught exceptions
+and all assertions succeed. The unit is considered verified when every requirement in the Requirements
+Coverage table is mapped to at least one passing test method.
+
 #### Test Scenarios
 
-##### YAML Processing Scenario
+**YAML Processing**: Tests verify that complex YAML structures are parsed correctly. Note:
+section-level tests are covered in Section unit verification. This scenario is tested by
+`Requirements_Load_ComplexStructure_ParsesCorrectly`.
 
-Test methods:
+**Validation**: Tests verify that invalid YAML content is reported as an error with file location.
+Note: section-level tests are covered in Section unit verification. This scenario is tested by
+`Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation`.
 
-- `Section_Load_SimpleRequirement_ParsesCorrectly` — single requirement parsed
-- `Requirements_Load_ComplexStructure_ParsesCorrectly` — complex structure parsed
+**Hierarchy**: Tests verify that nested sections are correctly exported. Note: section-level tests
+are covered in Section unit verification. This scenario is tested by
+`Requirements_Export_NestedSections_CreatesHierarchy`.
 
-##### Validation Scenario
+**Includes**: Tests verify that included files are merged correctly, that multiple files are all
+merged, and that include loops are handled without infinite recursion. This scenario is tested by
+`Requirements_Load_WithIncludes_MergesFilesCorrectly`,
+`Requirements_Load_MultipleFiles_MergesAllFiles`, and
+`Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop`.
 
-Test methods:
+**Section Merging**: Tests verify that sections with identical titles from the same or different
+files are merged correctly. This scenario is tested by
+`Requirements_Load_IdenticalSections_MergesCorrectly` and
+`Requirements_Load_MultipleFilesWithSameSections_MergesSections`.
 
-- `Section_Load_BlankSectionTitle_ReportsErrorWithFileLocation` — blank section title → error
-- `Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation` — blank req ID → error
-- `Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation` — blank req title → error
-- `Requirements_Load_DuplicateRequirementId_ReportsError` — duplicate ID → error
-- `Requirements_Load_DuplicateRequirementId_ErrorIncludesFileLocation` — error includes location
-- `Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation` — YAML error → error
+**Export**: Tests verify that requirements and justifications are exported to Markdown files with
+correct heading levels, tag filtering, and content. This scenario is tested by
+`Requirements_Export_SimpleRequirements_CreatesMarkdownFile`,
+`Requirements_Export_MultipleSections_ExportsAll`,
+`Requirements_Export_EmptyRequirements_CreatesEmptyFile`,
+`Requirements_Export_WithCustomDepth_UsesCorrectHeaderLevel`,
+`Requirements_Export_WithFilterTags_ExportsOnlyMatchingRequirements`,
+`Requirements_Export_WithMultipleFilterTags_ExportsRequirementsMatchingAnyTag`,
+`Requirements_ExportJustifications_WithJustifications_CreatesMarkdownFile`,
+`Requirements_ExportJustifications_WithoutJustifications_CreatesHeadersOnly`,
+`Requirements_ExportJustifications_NestedSections_CreatesHierarchy`,
+`Requirements_ExportJustifications_WithCustomDepth_UsesCorrectHeaderLevel`, and
+`Requirements_ExportJustifications_WithFilterTags_ExportsOnlyMatchingRequirements`.
 
-##### Hierarchy Scenario
+**Load Result**: Tests verify the full `Requirements.Load` result for valid files, lint errors,
+missing files, malformed YAML, multiple lint errors, included file linting, and issue location
+reporting. This scenario is tested by
+`Requirements_Load_ValidFile_ReturnsRequirementsAndNoIssues`,
+`Requirements_Load_WithLintError_ReturnsNullAndIssues`,
+`Requirements_Load_MissingFile_ReturnsNullAndIssues`,
+`Requirements_Load_MalformedYaml_ReturnsNullAndIssues`,
+`Requirements_Load_WithMultipleLintErrors_ReportsAllIssues`,
+`Requirements_Load_WithIncludes_LintsIncludedFiles`, and
+`Requirements_Load_WithLintError_IssueIncludesLocation`.
 
-Test methods:
+#### Requirements Coverage
 
-- `Section_Load_NestedSections_ParsesHierarchyCorrectly` — nested sections parsed
-- `Requirements_Export_NestedSections_CreatesHierarchy` — nested sections exported
-
-##### Includes Scenario
-
-Test methods:
-
-- `Requirements_Load_WithIncludes_MergesFilesCorrectly` — includes merged
-- `Requirements_Load_MultipleFiles_MergesAllFiles` — multiple files merged
-- `Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop` — include loops handled
-
-##### Section Merging Scenario
-
-Test methods:
-
-- `Requirements_Load_IdenticalSections_MergesCorrectly` — same-title sections merged
-- `Requirements_Load_MultipleFilesWithSameSections_MergesSections` — cross-file merging
-
-##### Export Scenario
-
-Test methods:
-
-- `Requirements_Export_SimpleRequirements_CreatesMarkdownFile` — simple export
-- `Requirements_Export_MultipleSections_ExportsAll` — all sections exported
-- `Requirements_Export_EmptyRequirements_CreatesEmptyFile` — empty → empty file
-- `Requirements_Export_WithCustomDepth_UsesCorrectHeaderLevel` — custom depth applied
-- `Requirements_Export_WithFilterTags_ExportsOnlyMatchingRequirements` — tag filter applied
-- `Requirements_Export_WithMultipleFilterTags_ExportsRequirementsMatchingAnyTag` — multiple tags
-- `Requirements_ExportJustifications_WithJustifications_CreatesMarkdownFile` — justifications export
-- `Requirements_ExportJustifications_WithoutJustifications_CreatesHeadersOnly` — no justifications
-- `Requirements_ExportJustifications_NestedSections_CreatesHierarchy` — nested justifications
-- `Requirements_ExportJustifications_WithCustomDepth_UsesCorrectHeaderLevel` — custom depth
-- `Requirements_ExportJustifications_WithFilterTags_ExportsOnlyMatchingRequirements` — tag filter
-
-##### Load Result Scenario
-
-Test methods:
-
-- `Requirements_Load_ValidFile_ReturnsRequirementsAndNoIssues` — valid → requirements and no issues
-- `Requirements_Load_WithLintError_ReturnsNullAndIssues` — error → null and issues
-- `Requirements_Load_MissingFile_ReturnsNullAndIssues` — missing → null and issues
-- `Requirements_Load_MalformedYaml_ReturnsNullAndIssues` — malformed → null and issues
-- `Requirements_Load_WithMultipleLintErrors_ReportsAllIssues` — multiple errors all reported
-- `Requirements_Load_WithIncludes_LintsIncludedFiles` — included files linted
-- `Requirements_Load_WithLintError_IssueIncludesLocation` — issue includes location
-
-#### Coverage Summary
-
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-Requirements-YamlProcessing` | `Section_Load_SimpleRequirement_ParsesCorrectly`, `Requirements_Load_ComplexStructure_ParsesCorrectly` |
-| `ReqStream-Requirements-Validation` | `Section_Load_BlankSectionTitle_ReportsErrorWithFileLocation`, `Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation`, `Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation`, `Requirements_Load_DuplicateRequirementId_ReportsError`, `Requirements_Load_DuplicateRequirementId_ErrorIncludesFileLocation` |
-| `ReqStream-Requirements-YamlErrorReporting` | `Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation` |
-| `ReqStream-Requirements-Hierarchy` | `Section_Load_NestedSections_ParsesHierarchyCorrectly`, `Requirements_Export_NestedSections_CreatesHierarchy` |
-| `ReqStream-Requirements-Includes` | `Requirements_Load_WithIncludes_MergesFilesCorrectly`, `Requirements_Load_MultipleFiles_MergesAllFiles`, `Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop` |
-| `ReqStream-Requirements-SectionMerging` | `Requirements_Load_IdenticalSections_MergesCorrectly`, `Requirements_Load_MultipleFilesWithSameSections_MergesSections` |
-| `ReqStream-Report-MarkdownExport` | `Requirements_Export_SimpleRequirements_CreatesMarkdownFile`, `Requirements_Export_MultipleSections_ExportsAll`, `Requirements_Export_EmptyRequirements_CreatesEmptyFile` |
-| `ReqStream-Report-HeaderDepth` | `Requirements_Export_WithCustomDepth_UsesCorrectHeaderLevel` |
-| `ReqStream-Report-Justifications` | `Requirements_ExportJustifications_WithJustifications_CreatesMarkdownFile`, `Requirements_ExportJustifications_WithoutJustifications_CreatesHeadersOnly`, `Requirements_ExportJustifications_NestedSections_CreatesHierarchy` |
-| `ReqStream-Report-JustificationsDepth` | `Requirements_ExportJustifications_WithCustomDepth_UsesCorrectHeaderLevel` |
-| `ReqStream-Report-TagFilterExport` | `Requirements_Export_WithFilterTags_ExportsOnlyMatchingRequirements`, `Requirements_Export_WithMultipleFilterTags_ExportsRequirementsMatchingAnyTag`, `Requirements_ExportJustifications_WithFilterTags_ExportsOnlyMatchingRequirements` |
-| `ReqStream-Requirements-UnifiedLoad` | `Requirements_Load_ValidFile_ReturnsRequirementsAndNoIssues`, `Requirements_Load_WithLintError_ReturnsNullAndIssues`, `Requirements_Load_MissingFile_ReturnsNullAndIssues`, `Requirements_Load_MalformedYaml_ReturnsNullAndIssues`, `Requirements_Load_WithMultipleLintErrors_ReportsAllIssues`, `Requirements_Load_WithIncludes_LintsIncludedFiles`, `Requirements_Load_WithLintError_IssueIncludesLocation` |
+| Requirement ID | Scenario(s) | Test Method(s) |
+| --- | --- | --- |
+| `ReqStream-Requirements-YamlProcessing` | YAML Processing Scenario | `Requirements_Load_ComplexStructure_ParsesCorrectly` |
+| `ReqStream-Requirements-Validation` | Validation Scenario | `Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation` |
+| `ReqStream-Requirements-YamlErrorReporting` | Validation Scenario | `Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation` |
+| `ReqStream-Requirements-Hierarchy` | Hierarchy Scenario | `Requirements_Export_NestedSections_CreatesHierarchy` |
+| `ReqStream-Requirements-Includes` | Includes Scenario | `Requirements_Load_WithIncludes_MergesFilesCorrectly` |
+| `ReqStream-Requirements-Includes` | Includes Scenario | `Requirements_Load_MultipleFiles_MergesAllFiles` |
+| `ReqStream-Requirements-Includes` | Includes Scenario | `Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop` |
+| `ReqStream-Requirements-CircularInclude` | Includes Scenario | `Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop` |
+| `ReqStream-Requirements-SectionMerging` | Section Merging Scenario | `Requirements_Load_IdenticalSections_MergesCorrectly` |
+| `ReqStream-Requirements-SectionMerging` | Section Merging Scenario | `Requirements_Load_MultipleFilesWithSameSections_MergesSections` |
+| `ReqStream-Report-MarkdownExport` | Export Scenario | `Requirements_Export_SimpleRequirements_CreatesMarkdownFile` |
+| `ReqStream-Report-MarkdownExport` | Export Scenario | `Requirements_Export_MultipleSections_ExportsAll` |
+| `ReqStream-Report-MarkdownExport` | Export Scenario | `Requirements_Export_EmptyRequirements_CreatesEmptyFile` |
+| `ReqStream-Report-HeaderDepth` | Export Scenario | `Requirements_Export_WithCustomDepth_UsesCorrectHeaderLevel` |
+| `ReqStream-Report-Justifications` | Export Scenario | `Requirements_ExportJustifications_WithJustifications_CreatesMarkdownFile` |
+| `ReqStream-Report-Justifications` | Export Scenario | `Requirements_ExportJustifications_WithoutJustifications_CreatesHeadersOnly` |
+| `ReqStream-Report-Justifications` | Export Scenario | `Requirements_ExportJustifications_NestedSections_CreatesHierarchy` |
+| `ReqStream-Report-JustificationsDepth` | Export Scenario | `Requirements_ExportJustifications_WithCustomDepth_UsesCorrectHeaderLevel` |
+| `ReqStream-Report-TagFilterExport` | Export Scenario | `Requirements_Export_WithFilterTags_ExportsOnlyMatchingRequirements` |
+| `ReqStream-Report-TagFilterExport` | Export Scenario | `Requirements_Export_WithMultipleFilterTags_ExportsRequirementsMatchingAnyTag` |
+| `ReqStream-Report-TagFilterExport` | Export Scenario | `Requirements_ExportJustifications_WithFilterTags_ExportsOnlyMatchingRequirements` |

@@ -61,6 +61,10 @@ reviews:
       - "docs/design/reqstream/**/*.md"                           # all system design documents
       - "docs/verification/introduction.md"                       # verification introduction
       - "docs/verification/ots.md"                                # OTS verification overview
+      - "docs/design/ots.md"                                      # OTS items design overview
+      - "docs/design/ots/yamldotnet.md"                           # YamlDotNet integration design
+      - "docs/design/ots/microsoft-extensions-file-system-globbing.md"  # FileSystemGlobbing design
+      - "docs/design/ots/dema-consulting-test-results.md"         # TestResults integration design
 
   - id: ReqStream-AllRequirements
     title: Review that All ReqStream Requirements are Complete
@@ -204,6 +208,41 @@ reviews:
       - "src/**/SelfTest/Validation.cs"                           # implementation
       - "test/**/SelfTest/ValidationTests.cs"                     # unit tests
 
+  # ReqStream - Utilities
+  - id: ReqStream-Utilities
+    title: Review that ReqStream Utilities Satisfies Subsystem Requirements
+    paths:
+      - "docs/reqstream/reqstream/utilities.yaml"               # subsystem requirements
+      - "docs/design/reqstream/utilities.md"                    # subsystem design
+      - "docs/verification/reqstream/utilities.md"              # subsystem verification design
+
+  - id: ReqStream-Utilities-GlobMatcher
+    title: Review that ReqStream Utilities GlobMatcher Implementation is Correct
+    paths:
+      - "docs/reqstream/reqstream/utilities/glob-matcher.yaml"   # unit requirements
+      - "docs/design/reqstream/utilities/glob-matcher.md"        # unit design
+      - "docs/verification/reqstream/utilities/glob-matcher.md"  # unit verification design
+      - "src/**/Utilities/GlobMatcher.cs"                        # implementation
+      - "test/**/Utilities/GlobMatcherTests.cs"                  # unit tests
+
+  - id: ReqStream-Utilities-PathHelpers
+    title: Review that ReqStream Utilities PathHelpers Implementation is Correct
+    paths:
+      - "docs/reqstream/reqstream/utilities/path-helpers.yaml"   # unit requirements
+      - "docs/design/reqstream/utilities/path-helpers.md"        # unit design
+      - "docs/verification/reqstream/utilities/path-helpers.md"  # unit verification design
+      - "src/**/Utilities/PathHelpers.cs"                        # implementation
+      - "test/**/Utilities/PathHelpersTests.cs"                  # unit tests
+
+  - id: ReqStream-Utilities-TemporaryDirectory
+    title: Review that ReqStream Utilities TemporaryDirectory Implementation is Correct
+    paths:
+      - "docs/reqstream/reqstream/utilities/temporary-directory.yaml"   # unit requirements
+      - "docs/design/reqstream/utilities/temporary-directory.md"        # unit design
+      - "docs/verification/reqstream/utilities/temporary-directory.md"  # unit verification design
+      - "src/**/Utilities/TemporaryDirectory.cs"                        # implementation
+      - "test/**/Utilities/TemporaryDirectoryTests.cs"                  # unit tests
+
   # OTS Items
   - id: OTS-BuildMark
     title: Review that BuildMark Provides Required Functionality
@@ -238,8 +277,8 @@ reviews:
   - id: OTS-TestResults
     title: Review that DemaConsulting.TestResults Provides Required Functionality
     paths:
-      - "docs/reqstream/ots/testresults.yaml"                      # OTS requirements
-      - "docs/verification/ots/testresults.md"                     # OTS verification
+      - "docs/reqstream/ots/dema-consulting-test-results.yaml"          # OTS requirements
+      - "docs/verification/ots/dema-consulting-test-results.md"         # OTS verification
 
   - id: OTS-ReviewMark
     title: Review that ReviewMark Provides Required Functionality
@@ -270,3 +309,9 @@ reviews:
     paths:
       - "docs/reqstream/ots/weasyprint.yaml"                      # OTS requirements
       - "docs/verification/ots/weasyprint.md"                     # OTS verification
+
+  - id: OTS-FileSystemGlobbing
+    title: Review that Microsoft.Extensions.FileSystemGlobbing Provides Required Functionality
+    paths:
+      - "docs/reqstream/ots/microsoft-extensions-file-system-globbing.yaml"   # OTS requirements
+      - "docs/verification/ots/microsoft-extensions-file-system-globbing.md"  # OTS verification

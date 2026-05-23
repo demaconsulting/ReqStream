@@ -29,12 +29,43 @@ namespace DemaConsulting.ReqStream.SelfTest;
 /// <summary>
 ///     Provides self-validation functionality for the ReqStream tool.
 /// </summary>
+/// <remarks>
+///     <para>
+///         <see cref="Validation"/> is a static class with no instance state. All shared state
+///         within a validation run is allocated locally within <see cref="Run"/> and the individual
+///         test methods; no fields are retained between invocations.
+///     </para>
+///     <para>
+///         <strong>Thread safety:</strong> This class is not thread-safe. <see cref="Run"/> must
+///         not be called concurrently. Each validation test uses <see cref="DirectorySwitch"/>,
+///         which mutates the process-wide current working directory
+///         (<see cref="Directory.SetCurrentDirectory"/>). Concurrent calls will race on this
+///         shared global state, causing tests to resolve relative paths against the wrong directory.
+///     </para>
+/// </remarks>
 public static class Validation
 {
     /// <summary>
     ///     Runs self-validation tests and optionally writes results to a file.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         <see cref="Run"/> exists to support the self-hosting compliance workflow: it
+    ///         verifies that ReqStream can correctly process its own requirements YAML files and
+    ///         test results, producing structured, machine-readable evidence (TRX or JUnit XML)
+    ///         that can then be fed back into ReqStream to verify the tool's own requirements
+    ///         coverage. This makes the tool self-qualifying.
+    ///     </para>
+    ///     <para>
+    ///         <strong>Non-reentrant:</strong> This method must not be called concurrently. Each
+    ///         of the six validation tests calls <see cref="DirectorySwitch"/>, which mutates the
+    ///         process-wide current working directory (<see cref="Directory.SetCurrentDirectory"/>).
+    ///         Concurrent calls will race on this shared global state, causing tests to resolve
+    ///         relative paths against the wrong directory.
+    ///     </para>
+    /// </remarks>
     /// <param name="context">The context containing command line arguments and program state.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="context"/> is null.</exception>
     public static void Run(Context context)
     {
         // Validate input
@@ -55,12 +86,33 @@ public static class Validation
         RunEnforcementModeTest(context, testResults);
         RunLintTest(context, testResults);
 
-        // Calculate totals
+        // Print summary and set exit code
+        ReportSummary(context, testResults);
+
+        // Write results file if requested
+        if (context.ResultsFile != null)
+        {
+            WriteResultsFile(context, testResults);
+        }
+    }
+
+    /// <summary>
+    ///     Prints the test summary and sets the exit code if any tests failed.
+    /// </summary>
+    /// <remarks>
+    ///     Extracted as an <see langword="internal"/> method so that tests can call it directly
+    ///     with a pre-built <see cref="DemaConsulting.TestResults.TestResults"/> containing
+    ///     known outcomes, without needing to drive the full
+    ///     <see cref="Run"/> pipeline or manipulate the file system to induce failures.
+    /// </remarks>
+    /// <param name="context">The context for output and exit code.</param>
+    /// <param name="testResults">The completed test results to summarize.</param>
+    internal static void ReportSummary(Context context, DemaConsulting.TestResults.TestResults testResults)
+    {
         var totalTests = testResults.Results.Count;
         var passedTests = testResults.Results.Count(t => t.Outcome == DemaConsulting.TestResults.TestOutcome.Passed);
         var failedTests = testResults.Results.Count(t => t.Outcome == DemaConsulting.TestResults.TestOutcome.Failed);
 
-        // Print summary
         context.WriteLine("");
         context.WriteLine($"Total Tests: {totalTests}");
         context.WriteLine($"Passed: {passedTests}");
@@ -72,17 +124,17 @@ public static class Validation
         {
             context.WriteLine($"Failed: {failedTests}");
         }
-
-        // Write results file if requested
-        if (context.ResultsFile != null)
-        {
-            WriteResultsFile(context, testResults);
-        }
     }
 
     /// <summary>
     ///     Prints the validation header with system information.
     /// </summary>
+    /// <remarks>
+    ///     Groups the version, machine, OS, runtime, and timestamp fields under a named section
+    ///     header so that readers of the console output or log file can immediately locate the
+    ///     environment context for the validation run. Grouping related information under one
+    ///     section improves readability and traceability in audit evidence.
+    /// </remarks>
     /// <param name="context">The context for output.</param>
     private static void PrintValidationHeader(Context context)
     {
@@ -101,6 +153,12 @@ public static class Validation
     /// <summary>
     ///     Runs a test for requirements processing functionality.
     /// </summary>
+    /// <remarks>
+    ///     Self-hosting pattern: the tool validates itself by loading its own input format (YAML
+    ///     requirements files) and verifying that the loading and export workflow completes without
+    ///     error. A passing result is evidence that the requirements-processing pipeline operates
+    ///     correctly on the current platform and runtime version.
+    /// </remarks>
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results collection.</param>
     private static void RunRequirementsProcessingTest(Context context, DemaConsulting.TestResults.TestResults testResults)
@@ -175,6 +233,12 @@ public static class Validation
     /// <summary>
     ///     Runs a test for trace matrix functionality.
     /// </summary>
+    /// <remarks>
+    ///     Self-hosting pattern: the tool validates its own trace-matrix construction by loading
+    ///     a fixture TRX test-result file and verifying that the resulting Markdown matrix contains
+    ///     the expected requirement IDs and test names. A passing result is evidence that the
+    ///     tracing pipeline correctly links tests to requirements on the current platform.
+    /// </remarks>
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results collection.</param>
     private static void RunTraceMatrixTest(Context context, DemaConsulting.TestResults.TestResults testResults)
@@ -260,6 +324,12 @@ public static class Validation
     /// <summary>
     ///     Runs a test for report export functionality.
     /// </summary>
+    /// <remarks>
+    ///     Self-hosting pattern: the tool validates its own report-export pipeline by loading a
+    ///     fixture requirements file and verifying that the exported Markdown report contains the
+    ///     expected requirement IDs and titles. A passing result is evidence that the export
+    ///     workflow operates correctly on the current platform.
+    /// </remarks>
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results collection.</param>
     private static void RunReportExportTest(Context context, DemaConsulting.TestResults.TestResults testResults)
@@ -330,6 +400,12 @@ public static class Validation
     /// <summary>
     ///     Runs a test for requirement tags filtering functionality.
     /// </summary>
+    /// <remarks>
+    ///     Self-hosting pattern: the tool validates its own tag-based filtering by loading
+    ///     requirements with distinct tags and verifying that the filtered report includes only
+    ///     the requirements matching the requested tag. A passing result is evidence that the
+    ///     filtering pipeline correctly restricts output on the current platform.
+    /// </remarks>
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results collection.</param>
     private static void RunTagsFilteringTest(Context context, DemaConsulting.TestResults.TestResults testResults)
@@ -404,6 +480,12 @@ public static class Validation
     /// <summary>
     ///     Runs a test for enforcement mode functionality.
     /// </summary>
+    /// <remarks>
+    ///     Self-hosting pattern: the tool validates its own <c>--enforce</c> flag by verifying
+    ///     that a fully-satisfied requirement tree exits with code 0 and that an unsatisfied
+    ///     requirement tree exits with code 1. A passing result is evidence that the enforcement
+    ///     exit-code contract is upheld on the current platform.
+    /// </remarks>
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results collection.</param>
     private static void RunEnforcementModeTest(Context context, DemaConsulting.TestResults.TestResults testResults)
@@ -504,6 +586,13 @@ public static class Validation
     /// <summary>
     ///     Runs a test for lint functionality.
     /// </summary>
+    /// <remarks>
+    ///     Self-hosting pattern: the tool validates its own linter by first asserting that a valid
+    ///     requirements file produces no lint output, then asserting that a file containing a
+    ///     duplicate requirement ID produces a descriptive error and a non-zero exit code.
+    ///     A passing result is evidence that the linter correctly detects and reports structural
+    ///     issues on the current platform.
+    /// </remarks>
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results collection.</param>
     private static void RunLintTest(Context context, DemaConsulting.TestResults.TestResults testResults)
@@ -596,6 +685,13 @@ public static class Validation
     /// <summary>
     ///     Writes test results to a file in TRX or JUnit format.
     /// </summary>
+    /// <remarks>
+    ///     The results file is written atomically at the end of the validation run (not during
+    ///     individual tests). This ensures that the output file either contains the complete
+    ///     evidence for all six tests or does not exist; a partial file would be misleading audit
+    ///     evidence that could overstate or understate coverage. Writing at the end also avoids
+    ///     partial-write corruption if a test throws unexpectedly.
+    /// </remarks>
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results to write.</param>
     private static void WriteResultsFile(Context context, DemaConsulting.TestResults.TestResults testResults)
@@ -639,6 +735,15 @@ public static class Validation
     /// <summary>
     ///     Creates a new test result object with common properties.
     /// </summary>
+    /// <remarks>
+    ///     Acts as a mutable builder for a single test: <see cref="CreateTestResult"/> allocates
+    ///     the object with initial state (name, class, code base) and an implicit
+    ///     <see cref="DemaConsulting.TestResults.TestOutcome.Failed"/> outcome. The caller then
+    ///     sets <see cref="DemaConsulting.TestResults.TestResult.Outcome"/> to
+    ///     <see cref="DemaConsulting.TestResults.TestOutcome.Passed"/> only on success, so any
+    ///     early-exit path (exception, assertion failure) automatically records a failure without
+    ///     requiring explicit failure assignment on every error branch.
+    /// </remarks>
     /// <param name="testName">The name of the test.</param>
     /// <returns>A new test result object.</returns>
     private static DemaConsulting.TestResults.TestResult CreateTestResult(string testName)
@@ -654,6 +759,14 @@ public static class Validation
     /// <summary>
     ///     Finalizes a test result by setting its duration and adding it to the collection.
     /// </summary>
+    /// <remarks>
+    ///     Completes the mutable builder pattern started by <see cref="CreateTestResult"/>:
+    ///     the duration cannot be set at creation time because it depends on when the test
+    ///     finishes, so <see cref="FinalizeTestResult"/> stamps the elapsed time and appends
+    ///     the completed result to the shared collection. Separating creation from finalization
+    ///     keeps each test method responsible only for setting outcome and error message, not
+    ///     for timing or collection management.
+    /// </remarks>
     /// <param name="test">The test result to finalize.</param>
     /// <param name="startTime">The start time of the test.</param>
     /// <param name="testResults">The test results collection to add to.</param>
@@ -669,6 +782,13 @@ public static class Validation
     /// <summary>
     ///     Handles test exceptions by setting failure information and logging the error.
     /// </summary>
+    /// <remarks>
+    ///     Exceptions are caught here rather than propagated so that every test failure is
+    ///     recorded as structured evidence in the results collection. If exceptions propagated
+    ///     out of a test method they would abort the entire run, leaving subsequent tests
+    ///     unexecuted and their requirements without coverage evidence. Catching here ensures
+    ///     all six tests always run and that the final summary reflects the complete picture.
+    /// </remarks>
     /// <param name="test">The test result to update.</param>
     /// <param name="context">The context for output.</param>
     /// <param name="testName">The name of the test for error messages.</param>
@@ -685,39 +805,17 @@ public static class Validation
     }
 
     /// <summary>
-    ///     Represents a temporary directory that is automatically deleted when disposed.
-    /// </summary>
-    private sealed class TemporaryDirectory : IDisposable
-    {
-        /// <summary>
-        ///     Gets the path to the temporary directory.
-        /// </summary>
-        public string DirectoryPath { get; }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="TemporaryDirectory"/> class.
-        /// </summary>
-        public TemporaryDirectory()
-        {
-            DirectoryPath = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_validation_{Guid.NewGuid()}");
-            Directory.CreateDirectory(DirectoryPath);
-        }
-
-        /// <summary>
-        ///     Deletes the temporary directory and all its contents.
-        /// </summary>
-        public void Dispose()
-        {
-            if (Directory.Exists(DirectoryPath))
-            {
-                Directory.Delete(DirectoryPath, true);
-            }
-        }
-    }
-
-    /// <summary>
     ///     Represents a directory switch that restores the original directory when disposed.
     /// </summary>
+    /// <remarks>
+    ///     ReqStream resolves relative paths (e.g., <c>*.yaml</c> glob patterns) against the
+    ///     process working directory, so tests must operate within their temporary directory for
+    ///     file references to resolve correctly. <see cref="DirectorySwitch"/> uses
+    ///     <see cref="Directory.SetCurrentDirectory"/> to change the working directory on
+    ///     construction and restores the saved original path on disposal (RAII pattern). This
+    ///     guarantees that the working directory is always restored even when a test throws,
+    ///     preventing one test's directory from leaking into subsequent tests.
+    /// </remarks>
     private sealed class DirectorySwitch : IDisposable
     {
         private readonly string _originalDirectory;

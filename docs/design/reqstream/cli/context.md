@@ -1,100 +1,126 @@
-### Context Unit Design
+### Context
 
-#### Overview
+#### Purpose
 
 `Context` is the command-line argument parser and I/O owner for ReqStream. It is the single
 authoritative source for all runtime options and is the only unit permitted to write to the console
 or the log file. `Context` never touches YAML content, test result data, or domain objects; its
-sole concerns are parsing arguments and surfacing results to the caller.
+sole concerns are parsing arguments and surfacing results to the caller. It implements
+`IDisposable` so that the log-file `StreamWriter` is closed deterministically when the enclosing
+`using` block in `Program.Main` exits.
 
-`Context` implements `IDisposable` so that the log-file `StreamWriter` is closed deterministically
-when the enclosing `using` block in `Program.Main` exits.
+#### Data Model
 
-#### Private State
+**`_logWriter`**: `StreamWriter?` — Open writer for the optional log file; `null` when no log file
+was requested.
 
-- **`_logWriter`** (`StreamWriter?`, `--log`) — Open writer for the optional log file; `null` when no log file was requested.
-- **`_hasErrors`** (`bool`) — Accumulates error state; initially `false`; set to `true` by `WriteError`.
+**`_hasErrors`**: `bool` — Accumulates error state; initially `false`; set to `true` by
+`WriteError`.
 
-#### Properties
+**`Version`**: `bool` — `true` when `--version` or `-v` was specified.
 
-| Property | Type | CLI flag | Notes |
-| -------- | ---- | -------- | ----- |
-| `Version` | `bool` | `--version` / `-v` | Print version and exit |
-| `Help` | `bool` | `--help` / `-?` / `-h` | Print usage and exit |
-| `Silent` | `bool` | `--silent` | Suppress console output |
-| `Validate` | `bool` | `--validate` | Run self-validation tests |
-| `Lint` | `bool` | `--lint` | Lint requirements files |
-| `ResultsFile` | `string?` | `--results` / `--result` | Path for validation test-results output file |
-| `Enforce` | `bool` | `--enforce` | Fail if requirements are not fully covered |
-| `FilterTags` | `HashSet<string>?` | `--filter` | Comma-separated tag filter; `null` when not specified |
-| `RequirementsFiles` | `List<string>` | `--requirements` | Expanded list of requirement file paths |
-| `TestFiles` | `List<string>` | `--tests` | Expanded list of test-result file paths |
-| `RequirementsReport` | `string?` | `--report` | Destination path for requirements report |
-| `Depth` | `int` | `--depth` | Default heading depth for all reports (default: 1) |
-| `ReportDepth` | `int` | `--report-depth` | Heading depth for requirements report; defaults to `Depth` |
-| `Matrix` | `string?` | `--matrix` | Destination path for trace matrix report |
-| `MatrixDepth` | `int` | `--matrix-depth` | Heading depth for trace matrix report; defaults to `Depth` |
-| `JustificationsFile` | `string?` | `--justifications` | Destination path for justifications report |
-| `JustificationsDepth` | `int` | `--justifications-depth` | Justifications report heading depth; defaults to `Depth` |
-| `ExitCode` | `int` | — | Computed: `_hasErrors ? 1 : 0` |
+**`Help`**: `bool` — `true` when `--help`, `-?`, or `-h` was specified.
 
-#### Methods
+**`Silent`**: `bool` — `true` when `--silent` was specified.
 
-##### `Create(args)`
+**`Validate`**: `bool` — `true` when `--validate` was specified.
 
-`Create` is the static factory method that constructs and returns a fully initialized `Context`. It
-implements a sequential switch-based parser over the `args` array. Each recognized flag sets the
-corresponding property; flags that consume the next element (e.g., `--requirements`) advance the
-index by one additional step. An unrecognized argument or a missing value for a flag that requires
-one causes an `ArgumentException`, which surfaces to the caller as a user-actionable error message
-rather than an unhandled exception.
+**`Lint`**: `bool` — `true` when `--lint` was specified.
 
-`--filter` values are split on `','` and accumulated into `FilterTags`; multiple `--filter`
-arguments merge into the same set. `--requirements` and `--tests` values are passed to
-`GlobMatcher.FindMatchingFiles` and the resulting absolute paths are appended to the respective
-file lists. If `--log` is specified, the named
-file is opened for writing and assigned to `_logWriter` before the method returns. If the log file
-cannot be opened (for example, due to an invalid path or insufficient permissions), `Create` catches
-the underlying I/O exception, wraps it in an `ArgumentException`, and rethrows it so the caller
-receives a user-actionable error message rather than an unhandled exception.
+**`ResultsFile`**: `string?` — Path for validation test-results output file (`--results` /
+`--result`); `null` when not specified.
 
-`--depth` sets the default heading depth (`Depth`). The per-report depth arguments
-(`--report-depth`, `--matrix-depth`, `--justifications-depth`) override this default if
-specified; otherwise each report inherits the value of `Depth`.
+**`Enforce`**: `bool` — `true` when `--enforce` was specified.
 
-##### Glob Resolution
+**`FilterTags`**: `HashSet<string>?` — Comma-separated tag filter from `--filter`; `null` when
+not specified.
 
-`Create` accumulates each `--requirements` and `--tests` pattern value into a separate list
-during argument parsing. After all arguments are parsed, `GlobMatcher.FindMatchingFiles` is
-called once per list, receiving all patterns together. `GlobMatcher` supports both relative
-patterns (resolved against the current working directory) and absolute patterns (resolved from
-the rooted prefix of the pattern), and deduplicates results across all supplied patterns. The
-resolved absolute file paths are stored in `RequirementsFiles` and `TestFiles` respectively.
+**`RequirementsFiles`**: `List<string>` — Expanded list of requirement file paths from
+`--requirements`.
 
-##### `WriteLine(message)`
+**`TestFiles`**: `List<string>` — Expanded list of test-result file paths from `--tests`.
 
-`WriteLine` writes a message to the console (unless `Silent` is `true`) and to `_logWriter` if a
-log file is open.
+**`RequirementsReport`**: `string?` — Destination path for requirements report (`--report`).
 
-##### `WriteError(message)`
+**`Depth`**: `int` — Default heading depth for all reports (`--depth`; default: 1).
 
-`WriteError` sets `_hasErrors = true`, writes the message to `Console.Error` in red (unless
-`Silent` is `true`), and also writes it to `_logWriter` if a log file is open. Setting
-`_hasErrors` ensures that `ExitCode` returns `1` after any error is reported.
+**`ReportDepth`**: `int` — Heading depth for requirements report; defaults to `Depth`.
 
-##### `Dispose()`
+**`Matrix`**: `string?` — Destination path for trace matrix report (`--matrix`).
 
-`Dispose` flushes and closes `_logWriter` if it is not `null`, then sets it to `null`. This
-ensures the log file is not truncated and file handles are not leaked even when the process exits
-via an early return path.
+**`MatrixDepth`**: `int` — Heading depth for trace matrix report; defaults to `Depth`.
 
-#### Interactions with Other Units
+**`JustificationsFile`**: `string?` — Destination path for justifications report
+(`--justifications`).
 
-| Unit | Nature of interaction |
-| ---- | --------------------- |
-| `Program` | Creates `Context` via `Create`; calls `WriteLine` and `WriteError`; reads `ExitCode` |
-| `Validation` | Calls `context.WriteLine`, `context.WriteError`, reads `ResultsFile`, `Silent` |
-| `LoadResult` | Calls `context.WriteError` via `ReportIssues` to report linting issues |
-| `Requirements` | Receives `RequirementsFiles`; does not hold a reference to `Context` |
-| `TraceMatrix` | Receives `TestFiles`; does not hold a reference to `Context` |
-| `GlobMatcher` | Called by `Create` to expand `--requirements` and `--tests` glob patterns to file paths |
+**`JustificationsDepth`**: `int` — Justifications report heading depth; defaults to `Depth`.
+
+**`ExitCode`**: `int` — Computed: `_hasErrors ? 1 : 0`.
+
+#### Key Methods
+
+**Create(args)**: Static factory method that constructs and returns a fully initialized `Context`.
+
+- *Parameters*: `string[] args` — command-line arguments.
+- *Returns*: `Context` — fully initialized instance.
+- *Preconditions*: `args` must not be `null`.
+- *Postconditions*: All properties reflect the parsed state; glob patterns are expanded.
+
+Implements a sequential switch-based parser over the `args` array. Each recognized flag sets the
+corresponding property; flags that consume the next element advance the index by one additional
+step. `--filter` values are split on `','` and accumulated into `FilterTags`. `--requirements` and
+`--tests` values are passed to `GlobMatcher.FindMatchingFiles`. If `--log` is specified, the file
+is opened with `AutoFlush = true`. `--depth` sets the default; per-report depth arguments override
+it.
+
+**WriteLine(message)**: Writes a message to the console (unless `Silent` is `true`) and to
+`_logWriter` if a log file is open.
+
+- *Parameters*: `string message` — text to write.
+- *Returns*: `void`.
+- *Preconditions*: None.
+- *Postconditions*: Message is written to applicable outputs.
+
+**WriteError(message)**: Sets `_hasErrors = true`, writes the message to `Console.Error` in red
+(unless `Silent` is `true`), and writes to `_logWriter` if a log file is open.
+
+- *Parameters*: `string message` — error text.
+- *Returns*: `void`.
+- *Preconditions*: None.
+- *Postconditions*: `_hasErrors` is `true`; message is written.
+
+**Dispose()**: Flushes and closes `_logWriter` if it is not `null`, then sets it to `null`.
+
+- *Parameters*: None.
+- *Returns*: `void`.
+- *Preconditions*: None.
+- *Postconditions*: Log file handle is released; `_logWriter` is `null`.
+
+#### Error Handling
+
+`Context.Create` throws `ArgumentNullException` when `args` is `null`.
+
+`Context.Create` throws `ArgumentException` under the following conditions:
+
+- **Unknown argument** — an unrecognized flag is present in `args`.
+- **Missing argument value** — a flag that requires a value is the last argument.
+- **Invalid depth value** — a `--depth`, `--report-depth`, `--matrix-depth`, or
+  `--justifications-depth` value is not a positive integer.
+- **Log file open failure** — the file path provided to `--log` cannot be opened for writing.
+
+All other `Context` methods (`WriteLine`, `WriteError`, `Dispose`) do not throw.
+
+#### Interactions
+
+##### Dependencies
+
+- **GlobMatcher** — called by `Create` to expand `--requirements` and `--tests` glob patterns
+  into absolute file path lists.
+
+##### Callers
+
+- **Program** — creates `Context` via `Create`; calls `WriteLine` and `WriteError`; reads
+  `ExitCode`.
+- **Validation** — calls `context.WriteLine`, `context.WriteError`; reads `ResultsFile` and
+  `Silent`.
+- **LoadResult** — calls `context.WriteError` via `ReportIssues` to route lint issues.

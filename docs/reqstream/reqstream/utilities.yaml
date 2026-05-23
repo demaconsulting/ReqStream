@@ -1,0 +1,79 @@
+---
+# Utilities subsystem requirements
+includes:
+  - utilities/glob-matcher.yaml
+  - utilities/path-helpers.yaml
+  - utilities/temporary-directory.yaml
+
+sections:
+  - title: ReqStream Requirements
+    sections:
+      - title: Utilities Requirements
+        requirements:
+          - id: ReqStream-Utilities-GlobMatching
+            title: >-
+              The Utilities subsystem shall expand glob patterns to a sorted, deduplicated list of
+              matching absolute file paths.
+            justification: |
+              Glob expansion is used by the Cli subsystem to resolve requirements and test result
+              file lists from user-supplied patterns. Returning absolute paths ensures callers can
+              open files without any further resolution, and deduplication prevents duplicate
+              processing when overlapping patterns match the same file.
+            tags: [utilities]
+            tests:
+              - GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles
+              - GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles
+              - GlobMatcher_FindMatchingFiles_MultiplePatterns_DeduplicatesResults
+              - GlobMatcher_FindMatchingFiles_ReturnsAbsolutePaths
+              - GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty
+            children:
+              - ReqStream-GlobMatcher-RelativePatterns
+              - ReqStream-GlobMatcher-AbsolutePatterns
+              - ReqStream-GlobMatcher-Deduplication
+              - ReqStream-GlobMatcher-AbsolutePaths
+              - ReqStream-GlobMatcher-EmptyResult
+              - ReqStream-GlobMatcher-SortOrder
+
+          - id: ReqStream-Utilities-SafePath
+            title: >-
+              The Utilities subsystem shall safely combine two path segments, rejecting any attempt
+              to escape the base directory.
+            justification: |
+              Safe path combination is used when constructing file paths from user-supplied relative
+              components such as include references in requirements YAML files and glob result paths.
+              Rejecting paths that escape the base directory prevents path-traversal vulnerabilities
+              where a crafted path (e.g. "../../etc/passwd") could cause the tool to read files
+              outside the intended directory tree.
+            tags: [utilities]
+            tests:
+              - PathHelpers_SafePathCombine_ValidRelativePath_ReturnsCombinedPath
+              - PathHelpers_SafePathCombine_DotDotPath_ThrowsArgumentException
+              - PathHelpers_SafePathCombine_AbsoluteOverridePath_ThrowsArgumentException
+              - PathHelpers_SafePathCombine_NullBasePath_ThrowsArgumentNullException
+            children:
+              - ReqStream-Utilities-PathHelpers-SafeCombine
+              - ReqStream-Utilities-PathHelpers-PathTraversalRejection
+              - ReqStream-Utilities-PathHelpers-NullGuard
+
+          - id: ReqStream-Utilities-TemporaryDirectory
+            title: >-
+              The Utilities subsystem shall provide a disposable temporary directory for isolated file-system workspaces.
+            justification: |
+              Self-validation tests and unit tests require isolated scratch space that
+              is created before the test body and deleted after, even when the test
+              throws. A centralized disposable class prevents code duplication,
+              ensures consistent cleanup, and removes the need for each caller to
+              implement its own directory-lifecycle management.
+            tags: [utilities]
+            tests:
+              - TemporaryDirectory_Constructor_Default_CreatesDirectory
+              - TemporaryDirectory_Constructor_TwoInstances_CreateUniqueDirectories
+              - TemporaryDirectory_GetFilePath_SimpleFile_ReturnsPathUnderDirectory
+              - TemporaryDirectory_GetFilePath_NestedPath_CreatesIntermediateDirectories
+              - TemporaryDirectory_GetFilePath_TraversalAttempt_ThrowsArgumentException
+              - TemporaryDirectory_Dispose_PopulatedDirectory_DeletesDirectory
+              - TemporaryDirectory_Dispose_AlreadyDeleted_DoesNotThrow
+            children:
+              - ReqStream-Utilities-TemporaryDirectory-Lifecycle
+              - ReqStream-Utilities-TemporaryDirectory-SafePathCombine
+              - ReqStream-Utilities-TemporaryDirectory-IntermediateDirectories

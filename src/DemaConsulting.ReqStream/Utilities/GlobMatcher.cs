@@ -26,22 +26,44 @@ namespace DemaConsulting.ReqStream.Utilities;
 /// <summary>
 ///     Provides glob-pattern file matching utilities.
 /// </summary>
+/// <remarks>
+///     All methods are stateless and thread-safe; no shared mutable state exists at the class
+///     level. Multiple threads may call <see cref="FindMatchingFiles"/> and
+///     <see cref="SplitAbsolutePattern"/> concurrently without synchronization.
+/// </remarks>
 internal static class GlobMatcher
 {
     /// <summary>
     ///     Finds all files matching the specified glob patterns.
     /// </summary>
+    /// <remarks>
+    ///     Case sensitivity is determined at runtime by checking
+    ///     <see cref="OperatingSystem.IsWindows"/>: ordinal ignore-case is used on Windows and
+    ///     ordinal (case-sensitive) on all other platforms. This ensures deduplication correctly
+    ///     handles file-system semantics on each OS.
+    ///
+    ///     Relative patterns are batched into a single <c>Matcher</c> call against the current
+    ///     working directory. Each absolute pattern is processed individually after decomposing it
+    ///     into a root directory and relative sub-pattern via <see cref="SplitAbsolutePattern"/>.
+    ///     Individual null elements within <paramref name="patterns"/> are skipped silently.
+    /// </remarks>
     /// <param name="patterns">
-    ///     Glob patterns to match. Patterns may be relative (matched against the current working
-    ///     directory) or absolute (matched from the rooted prefix of the pattern).
+    ///     Glob patterns to match. Must not be null. Patterns may be relative (matched against
+    ///     the current working directory) or absolute (matched from the rooted prefix of the
+    ///     pattern). Individual null elements are skipped.
     /// </param>
     /// <returns>
     ///     Sorted list of full file paths matching any of the supplied patterns. Duplicate paths
     ///     are removed using the file-system-appropriate comparer (ordinal ignore-case on Windows,
     ///     ordinal on case-sensitive systems).
     /// </returns>
+    /// <exception cref="ArgumentNullException">
+    ///     Thrown when <paramref name="patterns"/> is null.
+    /// </exception>
     internal static List<string> FindMatchingFiles(IEnumerable<string> patterns)
     {
+        ArgumentNullException.ThrowIfNull(patterns);
+
         // Use a comparer that matches the underlying file-system's case-sensitivity so that
         // deduplication is correct: case-insensitive on Windows, case-sensitive elsewhere.
         var fsComparer = OperatingSystem.IsWindows()
@@ -52,6 +74,12 @@ internal static class GlobMatcher
 
         foreach (var pattern in patterns)
         {
+            // Skip null elements so callers do not need to filter their collections
+            if (pattern is null)
+            {
+                continue;
+            }
+
             if (Path.IsPathRooted(pattern))
             {
                 // Handle absolute path by extracting the root directory and relative pattern

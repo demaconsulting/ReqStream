@@ -1,4 +1,4 @@
-// Copyright (c) 2026 DEMA Consulting
+// Copyright (c) 2025 DEMA Consulting
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
 
 using DemaConsulting.ReqStream.Cli;
 using DemaConsulting.ReqStream.SelfTest;
+
 using DemaConsulting.ReqStream.Utilities;
 
 namespace DemaConsulting.ReqStream.Tests.SelfTest;
@@ -28,17 +29,18 @@ namespace DemaConsulting.ReqStream.Tests.SelfTest;
 /// Tests for the SelfTest subsystem, proving the Validation class is sufficient to
 /// implement the SelfTest subsystem requirements.
 /// </summary>
+[Collection("Sequential")]
 public sealed class SelfTestTests : IDisposable
 {
-    private readonly string _testDirectory;
+    /// <summary>Temporary directory providing isolated file-system workspace for this test class instance.</summary>
+    private readonly TemporaryDirectory _testDirectory = new();
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
     public SelfTestTests()
     {
-        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_self_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(_testDirectory);
+
     }
 
     /// <summary>
@@ -46,10 +48,7 @@ public sealed class SelfTestTests : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (Directory.Exists(_testDirectory))
-        {
-            Directory.Delete(_testDirectory, recursive: true);
-        }
+        _testDirectory.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -76,7 +75,7 @@ public sealed class SelfTestTests : IDisposable
     public void SelfTest_ResultsOutput_TrxResultsPath_WritesTrxFile()
     {
         // Arrange: define path for the TRX results output file
-        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "validation-results.trx");
+        var resultsFile = _testDirectory.GetFilePath("validation-results.trx");
         using var context = Context.Create(["--silent", "--results", resultsFile]);
 
         // Act: run self-validation
@@ -96,7 +95,7 @@ public sealed class SelfTestTests : IDisposable
     public void SelfTest_ResultsOutput_XmlResultsPath_WritesJUnitFile()
     {
         // Arrange: define path for the JUnit XML results output file
-        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "validation-results.xml");
+        var resultsFile = _testDirectory.GetFilePath("validation-results.xml");
         using var context = Context.Create(["--silent", "--results", resultsFile]);
 
         // Act: run self-validation
@@ -116,8 +115,8 @@ public sealed class SelfTestTests : IDisposable
     public void SelfTest_FailureReporting_WithErrors_SetsExitCode1()
     {
         // Arrange: create a results file path with an unsupported extension to trigger an error
-        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "validation-results.invalid");
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "failure-test.log");
+        var resultsFile = _testDirectory.GetFilePath("validation-results.invalid");
+        var logFile = _testDirectory.GetFilePath("failure-test.log");
 
         int exitCode;
         using (var context = Context.Create(["--silent", "--log", logFile, "--results", resultsFile]))
@@ -131,5 +130,30 @@ public sealed class SelfTestTests : IDisposable
         Assert.Equal(1, exitCode);
         var logContent = File.ReadAllText(logFile);
         Assert.Contains("Error:", logContent);
+    }
+
+    /// <summary>
+    /// Test that self-validation sets exit code 1 when genuine internal test failures occur.
+    /// Calls <see cref="Validation.ReportSummary"/> directly with a pre-built failed result,
+    /// exercising the <c>failedTests &gt; 0</c> branch without manipulating the file system.
+    /// </summary>
+    [Fact]
+    public void SelfTest_FailureReporting_GenuineFailure_SetsExitCode1()
+    {
+        // Arrange: build a TestResults with one failed outcome to exercise the failedTests > 0 branch
+        var testResults = new DemaConsulting.TestResults.TestResults();
+        testResults.Results.Add(new DemaConsulting.TestResults.TestResult
+        {
+            Name = "FakeTest",
+            ClassName = "Test",
+            Outcome = DemaConsulting.TestResults.TestOutcome.Failed
+        });
+        using var context = Context.Create(["--silent"]);
+
+        // Act: call ReportSummary directly — no file-system or OS-permission manipulation needed
+        Validation.ReportSummary(context, testResults);
+
+        // Assert: exit code is 1 because failedTests > 0 triggered WriteError
+        Assert.Equal(1, context.ExitCode);
     }
 }

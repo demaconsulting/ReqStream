@@ -1,0 +1,48 @@
+---
+# DemaConsulting.TestResults OTS requirements
+# Note: Requirement IDs in OTS files use the project-wide ReqStream-OTS-{ToolName} pattern,
+# which is an accepted deviation from the System-Component-Feature naming standard defined
+# in reqstream-usage.md. Renaming would break traceability across all test files.
+sections:
+  - title: OTS Software Requirements
+    sections:
+      - title: DemaConsulting.TestResults
+        requirements:
+          - id: ReqStream-OTS-TestResults-Trx
+            title: DemaConsulting.TestResults shall read TRX test result files.
+            justification: |
+              ReqStream uses DemaConsulting.TestResults to read TRX (MSTest/xUnit) test result
+              files. TRX is the native output format of the .NET test runner, and reading TRX
+              files enables ReqStream to map .NET test execution records to requirements for
+              coverage analysis.
+            tags: [ots]
+            tests:
+              - TraceMatrix_Constructor_WithTrxFile_ParsesCorrectly
+          - id: ReqStream-OTS-TestResults-JUnit
+            title: DemaConsulting.TestResults shall read JUnit XML test result files.
+            justification: |
+              ReqStream uses DemaConsulting.TestResults to read JUnit XML test result files.
+              JUnit XML is the cross-platform test result format supported by many CI/CD tools,
+              and reading JUnit XML enables ReqStream to map those test execution records to
+              requirements for coverage analysis.
+            tags: [ots]
+            tests:
+              - TraceMatrix_Constructor_WithJUnitFile_ParsesCorrectly
+          - id: ReqStream-OTS-TestResults-TrxSerialize
+            title: DemaConsulting.TestResults shall serialize test results to TRX format.
+            justification: |
+              ReqStream uses DemaConsulting.TestResults to write self-test results to TRX files.
+              Serializing to TRX enables the results of the self-validation test run to be consumed
+              by .NET-compatible CI/CD tools and test reporting dashboards.
+            tags: [ots]
+            tests:
+              - Validation_Run_WithTrxResultsFile_WritesTrxFile
+          - id: ReqStream-OTS-TestResults-JUnitSerialize
+            title: DemaConsulting.TestResults shall serialize test results to JUnit XML format.
+            justification: |
+              ReqStream uses DemaConsulting.TestResults to write self-test results to JUnit XML
+              files. Serializing to JUnit XML enables the results of the self-validation test run
+              to be consumed by cross-platform CI/CD tools and test reporting dashboards.
+            tags: [ots]
+            tests:
+              - Validation_Run_WithXmlResultsFile_WritesXmlFile

@@ -1,113 +1,117 @@
 ---
-# Cli Subsystem Requirements
-#
-# PURPOSE:
-# - Define requirements for the ReqStream Cli subsystem
-# - The Cli subsystem spans Context.cs (command-line argument parsing and I/O)
-# - Subsystem requirements describe the externally visible command-line interface behavior
-
+# Cli subsystem requirements
 includes:
   - cli/context.yaml
 
 sections:
-  - title: Cli Subsystem Requirements
-    requirements:
-      - id: ReqStream-Cli-Interface
-        title: The Cli subsystem shall provide a command-line interface for the tool.
-        justification: |
-          A CLI interface enables automation in CI/CD pipelines and allows integration with scripts
-          and build processes. This is essential for the tool's primary use case.
-        tests:
-          - Cli_Interface_VersionFlag_SetsVersionProperty
-          - Cli_Interface_HelpFlag_SetsHelpProperty
-          - Cli_Interface_UnknownArgument_ThrowsArgumentException
-        children:
-          - ReqStream-Command-Cli
-          - ReqStream-Command-Version
-          - ReqStream-Command-Help
-          - ReqStream-Command-UnknownArgs
-          - ReqStream-Command-Lint
-          - ReqStream-Command-Validate
-          - ReqStream-Command-Results
-          - ReqStream-Command-Enforce
-          - ReqStream-Command-RequirementsGlobPatterns
-          - ReqStream-Command-TestGlobPatterns
-          - ReqStream-Command-Report
-          - ReqStream-Command-ReportDepth
-          - ReqStream-Command-Matrix
-          - ReqStream-Command-MatrixDepth
-          - ReqStream-Command-Justifications
-          - ReqStream-Command-JustificationsDepth
-          - ReqStream-Command-Depth
-          - ReqStream-Command-TagFilter
+  - title: ReqStream Requirements
+    sections:
+      - title: Cli Requirements
+        requirements:
+          - id: ReqStream-Cli-Interface
+            title: The Cli subsystem shall provide a command-line interface for the tool.
+            justification: |
+              A CLI interface enables automation in CI/CD pipelines and allows integration with scripts
+              and build processes. This is essential for the tool's primary use case.
+            tags: [cli]
+            tests:
+              - Cli_Interface_VersionFlag_SetsVersionProperty
+              - Cli_Interface_HelpFlag_SetsHelpProperty
+              - Cli_Interface_UnknownArgument_ThrowsArgumentException
+            children:
+              - ReqStream-Command-Cli
+              - ReqStream-Command-Version
+              - ReqStream-Command-Help
+              - ReqStream-Command-UnknownArgs
+              - ReqStream-Command-Lint
+              - ReqStream-Command-Validate
+              - ReqStream-Command-Results
+              - ReqStream-Command-Enforce
+              - ReqStream-Command-RequirementsGlobPatterns
+              - ReqStream-Command-TestGlobPatterns
+              - ReqStream-Command-Report
+              - ReqStream-Command-ReportDepth
+              - ReqStream-Command-Matrix
+              - ReqStream-Command-MatrixDepth
+              - ReqStream-Command-Justifications
+              - ReqStream-Command-JustificationsDepth
+              - ReqStream-Command-Depth
+              - ReqStream-Command-TagFilter
 
-      - id: ReqStream-Cli-Output
-        title: The Cli subsystem shall provide output channels to write messages to the console and optional log file.
-        justification: |
-          Centralized output routing ensures consistent formatting and allows output to be
-          suppressed or redirected to a log file as needed.
-        tests:
-          - Cli_Output_SilentFlag_SetsSilentProperty
-          - Cli_Output_LogFlag_WritesOutputToLogFile
-        children:
-          - ReqStream-Command-Silent
-          - ReqStream-Command-LogFileOutput
+          - id: ReqStream-Cli-Output
+            title: The Cli subsystem shall provide output channels to write messages to the console and optional log file.
+            justification: |
+              Centralized output routing ensures consistent formatting and allows output to be
+              suppressed or redirected to a log file as needed.
+            tags: [cli]
+            tests:
+              - Cli_Output_SilentFlag_SetsSilentProperty
+              - Cli_Output_LogFlag_WritesOutputToLogFile
+            children:
+              - ReqStream-Command-Silent
+              - ReqStream-Command-LogFileOutput
 
-      - id: ReqStream-Cli-StderrRouting
-        title: The Cli subsystem shall route error messages to stderr.
-        justification: |
-          Error messages must be written to stderr so they remain visible to the user
-          without polluting stdout, which consumers may pipe or redirect for data capture.
-        tests:
-          - Cli_Output_WriteError_WritesToErrorChannel
-        children:
-          - ReqStream-Command-ErrorOutput
+          - id: ReqStream-Cli-StderrRouting
+            title: The Cli subsystem shall route error messages to stderr.
+            justification: |
+              Error messages must be written to stderr so they remain visible to the user
+              without polluting stdout, which consumers may pipe or redirect for data capture.
+            tags: [cli]
+            tests:
+              - Cli_Output_WriteError_WritesToErrorChannel
+            children:
+              - ReqStream-Command-ErrorOutput
 
-      - id: ReqStream-Cli-ExitCodeSignaling
-        title: The Cli subsystem shall signal failure via a non-zero exit code when an error has been reported.
-        justification: |
-          A non-zero exit code allows callers to detect failure conditions by inspecting the
-          process exit code, enabling correct CI/CD pipeline behavior without parsing output.
-        tests:
-          - Cli_Output_WriteError_SetsExitCodeToOne
-        children:
-          - ReqStream-Command-ExitCode
+          - id: ReqStream-Cli-ExitCodeSignaling
+            title: The Cli subsystem shall signal failure via a non-zero exit code when an error has been reported.
+            justification: |
+              A non-zero exit code allows callers to detect failure conditions by inspecting the
+              process exit code, enabling correct CI/CD pipeline behavior without parsing output.
+            tags: [cli]
+            tests:
+              - Cli_Output_WriteError_SetsExitCodeToOne
+            children:
+              - ReqStream-Command-ExitCode
 
-      - id: ReqStream-Cli-MissingArgumentValue
-        title: The Cli subsystem shall reject a flag that requires a value when no value is provided.
-        justification: |
-          Providing clear feedback when a required argument value is omitted prevents silent
-          misconfiguration and helps users quickly identify and correct command-line errors.
-        tests:
-          - Cli_Interface_MissingArgumentValue_ThrowsArgumentException
-        children:
-          - ReqStream-Command-MissingLogValue
-          - ReqStream-Command-MissingResultsValue
-          - ReqStream-Command-MissingFilterValue
+          - id: ReqStream-Cli-MissingArgumentValue
+            title: The Cli subsystem shall reject a flag that requires a value when no value is provided.
+            justification: |
+              Providing clear feedback when a required argument value is omitted prevents silent
+              misconfiguration and helps users quickly identify and correct command-line errors.
+            tags: [cli]
+            tests:
+              - Cli_Interface_MissingArgumentValue_ThrowsArgumentException
+            children:
+              - ReqStream-Command-MissingLogValue
+              - ReqStream-Command-MissingResultsValue
+              - ReqStream-Command-MissingFilterValue
 
-      - id: ReqStream-Cli-InvalidDepthValue
-        title: The Cli subsystem shall reject a non-integer depth value with a descriptive error.
-        justification: |
-          The depth argument must be a valid integer; rejecting non-integer values prevents
-          downstream formatting errors and gives users actionable feedback.
-        tests:
-          - Cli_Interface_InvalidDepthValue_ThrowsArgumentException
+          - id: ReqStream-Cli-InvalidDepthValue
+            title: The Cli subsystem shall reject a non-integer depth value with a descriptive error.
+            justification: |
+              The depth argument must be a valid integer; rejecting non-integer values prevents
+              downstream formatting errors and gives users actionable feedback.
+            tags: [cli]
+            tests:
+              - Cli_Interface_InvalidDepthValue_ThrowsArgumentException
 
-      - id: ReqStream-Cli-LogFileOpenFailure
-        title: The Cli subsystem shall reject a log file path that cannot be opened for writing.
-        justification: |
-          Detecting an inaccessible log file path at startup prevents silent loss of log output
-          and gives users a clear error message before any processing begins.
-        tests:
-          - Cli_Interface_LogFileOpenFailure_ThrowsArgumentException
+          - id: ReqStream-Cli-LogFileOpenFailure
+            title: The Cli subsystem shall reject a log file path that cannot be opened for writing.
+            justification: |
+              Detecting an inaccessible log file path at startup prevents silent loss of log output
+              and gives users a clear error message before any processing begins.
+            tags: [cli]
+            tests:
+              - Cli_Interface_LogFileOpenFailure_ThrowsArgumentException
 
-      - id: ReqStream-Cli-DepthInheritance
-        title: >-
-          The Cli subsystem shall apply the depth value as the default for per-report
-          depth options not individually specified.
-        justification: |
-          Providing a single --depth option that sets the default for all per-report depth
-          options reduces repetition in common invocations and simplifies pipeline configuration
-          while still allowing individual overrides.
-        tests:
-          - Cli_Interface_DepthFlag_SetsDefaultForAllReportDepths
+          - id: ReqStream-Cli-DepthInheritance
+            title: >-
+              The Cli subsystem shall apply the depth value as the default for per-report
+              depth options not individually specified.
+            justification: |
+              Providing a single --depth option that sets the default for all per-report depth
+              options reduces repetition in common invocations and simplifies pipeline configuration
+              while still allowing individual overrides.
+            tags: [cli]
+            tests:
+              - Cli_Interface_DepthFlag_SetsDefaultForAllReportDepths

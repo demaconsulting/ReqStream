@@ -1,12 +1,14 @@
 ---
-# BuildMark OTS Software Requirements
-#
-# Requirements for the BuildMark build documentation tool functionality.
-
+# BuildMark OTS requirements
+# Note: Requirement IDs in OTS files use the project-wide ReqStream-OTS-{ToolName} pattern,
+# which is an accepted deviation from the System-Component-Feature naming standard defined
+# in reqstream-usage.md. Renaming would break traceability across all test files.
+# Note: The 'tags' field is a supported ReqStream extension field used for categorization.
+# It is silently accepted by ReqStream and does not affect report generation or validation.
 sections:
   - title: OTS Software Requirements
     sections:
-      - title: BuildMark Requirements
+      - title: BuildMark
         requirements:
           - id: ReqStream-OTS-BuildMark
             title: BuildMark shall generate build-notes documentation from GitHub Actions metadata.

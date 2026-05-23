@@ -1,98 +1,88 @@
-### Validation Unit Design
+### Validation
 
-#### Overview
+#### Purpose
 
-`Validation` is the self-validation test runner for ReqStream. Its purpose is to execute a suite
-of end-to-end tests that verify the tool's own behavior and to produce structured test-result
-evidence in TRX or JUnit format. This evidence can then be fed back into ReqStream to validate the
-tool's own requirements — enabling a self-hosting compliance workflow.
+`Validation` is the self-validation test runner for ReqStream. It executes a suite of end-to-end
+tests that verify the tool's own behavior and produces structured test-result evidence in TRX or
+JUnit format. This evidence can then be fed back into ReqStream to validate the tool's own
+requirements — enabling a self-hosting compliance workflow. All tests run in temporary directories
+to avoid side effects and are isolated from one another.
 
-All tests run in temporary directories to avoid side effects and are isolated from one another.
+#### Data Model
 
-#### Methods
+N/A — `Validation` is a static class with no instance state. All shared state within a
+validation run is allocated locally within `Run` and the individual test methods. The nested
+helper class `DirectorySwitch` carries local instance state but is scoped to individual test
+method calls.
 
-##### `Run(context)`
+**DirectorySwitch** (nested helper class): `IDisposable` that changes the process working
+directory on construction and restores the original on disposal.
 
-`Run` is the single public entry point. It prints a header block to `context` containing the tool
-version, machine name, operating system, .NET runtime version, and current UTC timestamp. It then
-executes the six validation tests in order and prints a multi-line summary block showing the total
-number of tests, how many passed, and how many failed (using `WriteError` for the failed count when
-any tests have failed). If `context.ResultsFile` is set, it calls `WriteResultsFile(context, testResults)`
-to persist the results.
+#### Key Methods
 
-> **Thread-safety constraint**: `Run` must not be called concurrently. Each validation test uses
-> `DirectorySwitch`, which mutates the process-wide current working directory
-> (`Directory.SetCurrentDirectory`). Concurrent calls would race on this shared state, causing
-> tests to resolve relative paths against the wrong directory. The validation subsystem therefore
-> accesses global process state and is not thread-safe.
+**Run(context)**: Single public entry point that executes all validation tests.
 
-The six validation tests exist to provide structured, machine-readable evidence that ReqStream
-correctly processes its own input formats. This evidence can be fed back into ReqStream to verify
-the tool's own requirements coverage, enabling a self-hosting compliance workflow.
+- *Parameters*: `Context context` — provides output channels and `ResultsFile` path.
+- *Returns*: `void`.
+- *Preconditions*: Must not be called concurrently (mutates process working directory).
+- *Postconditions*: Summary printed; results file written if `context.ResultsFile` is set.
 
-The six tests are listed in the order they are executed:
+Prints a header block (version, machine name, OS, .NET runtime, UTC timestamp), executes six
+tests sequentially, and prints a multi-line summary. The six tests:
 
-| # | Method | What it verifies |
-| - | ------ | ---------------- |
-| 1 | `RunRequirementsProcessingTest` | Requirements YAML files are read, merged, and exported |
-| 2 | `RunTraceMatrixTest` | Test results are loaded and mapped to requirements |
-| 3 | `RunReportExportTest` | Requirements and justifications reports are written correctly |
-| 4 | `RunTagsFilteringTest` | Tag-based filtering restricts output and coverage calculation |
-| 5 | `RunEnforcementModeTest` | `--enforce` produces a non-zero exit code when coverage fails |
-| 6 | `RunLintTest` | The linter detects and reports structural issues in YAML files |
+1. `RunRequirementsProcessingTest` — verifies YAML files are read, merged, and exported.
+2. `RunTraceMatrixTest` — verifies test results are loaded and mapped to requirements.
+3. `RunReportExportTest` — verifies requirements and justifications reports are written.
+4. `RunTagsFilteringTest` — verifies tag-based filtering restricts output and coverage.
+5. `RunEnforcementModeTest` — verifies `--enforce` produces non-zero exit code on failure.
+6. `RunLintTest` — verifies the linter detects and reports structural issues.
 
-Each test runs in a dedicated `TemporaryDirectory` with `DirectorySwitch` active, writes fixture
-files, invokes the relevant workflow, asserts expected outcomes, and returns a `TestResult` with
-outcome `Passed` or `Failed`.
+**WriteResultsFile(context, testResults)**: Serializes test results to a structured file.
 
-##### `WriteResultsFile(context, testResults)`
+- *Parameters*: `Context context`; `List<TestResult> testResults`.
+- *Returns*: `void`.
+- *Preconditions*: None — if `context.ResultsFile` is null the method returns immediately without
+  error.
+- *Postconditions*: File written in TRX (`.trx`) or JUnit (`.xml`) format when `context.ResultsFile`
+  is non-null.
 
-`WriteResultsFile` serializes the collected `TestResult` list to a structured file.
+Dispatches based on file extension: `.trx` uses TRX serializer, `.xml` uses JUnit serializer,
+any other extension reports an error via `context.WriteError`.
 
-**Format dispatch**:
+#### Error Handling
 
-| File extension | Serializer |
-| -------------- | ---------- |
-| `.trx` | TRX serializer (`DemaConsulting.TestResults.IO`) |
-| `.xml` | JUnit serializer (`DemaConsulting.TestResults.IO`) |
-| Any other | Reports error via `context.WriteError` and returns |
+`Validation.Run` does not throw for test failures; each failing test is recorded as a
+`TestResult` with outcome `Failed` and reported via `context.WriteError`. The method runs all
+tests regardless of individual failures.
 
-The serializer is called with the assembled `TestResults` object, returning a serialized string.
-The string is then written to the resolved output path via `File.WriteAllText`.
+The following conditions are handled without throwing:
 
-#### Supporting Types
+- **Test failure** — `context.WriteError` is called for each failing test.
+- **Unsupported results file extension** — `context.WriteError` with descriptive message.
+- **Results file write failure** — `context.WriteError` with exception message; execution
+  continues.
+- `ArgumentNullException` — thrown by `Run` when `context` is `null`.
 
-##### `TemporaryDirectory` (nested helper class)
+The only exception that can escape `Run` is an unexpected runtime error, which propagates to
+`Program.Run`.
 
-`TemporaryDirectory` is an `IDisposable` helper that creates a uniquely named directory under
-`Path.GetTempPath()` on construction and deletes it recursively on disposal. It exists to give
-each validation test a clean, isolated file-system workspace that is guaranteed to be removed after
-the test completes, regardless of whether the test passes or fails.
+#### Interactions
 
-##### `DirectorySwitch` (nested helper class)
+##### Dependencies
 
-`DirectorySwitch` is an `IDisposable` helper that changes the process working directory to a
-supplied path on construction and restores the original directory on disposal. It exists because
-ReqStream resolves relative paths against the working directory; tests must operate within their
-temporary directory for file references to resolve correctly.
+- **DemaConsulting.TestResults** — provides `TestResults`, `TestResult`, `TestOutcome` model
+  types.
+- **DemaConsulting.TestResults.IO.Serializer** — provides TRX and JUnit file serialization.
+- **Context** — output channel for header lines, test summaries, and errors; provides
+  `ResultsFile` and `Silent`.
+- **Program** — `Program.Version` is read for the header block; `Program.Run` is exercised by
+  individual test methods.
+- **Requirements** — `Requirements.Load` is called with fixture YAML files.
+- **TraceMatrix** — constructed with fixture test-result files.
+- **TemporaryDirectory** — used by each test method to create an isolated scratch directory;
+  replaces the former private nested `TemporaryDirectory` class that used `Path.GetTempPath()`.
 
-Each test uses both classes together: `TemporaryDirectory` owns the directory lifetime and
-`DirectorySwitch` makes it the working directory for the duration of the test. This pattern
-guarantees that each test starts with a clean file system state and that no test artifacts persist
-after the test completes, regardless of whether the test passes or fails.
+##### Callers
 
-#### Dependencies
-
-| Library / Type | Role |
-| -------------- | ---- |
-| `DemaConsulting.TestResults` | `TestResults`, `TestResult`, `TestOutcome` model types |
-| `DemaConsulting.TestResults.IO.Serializer` | TRX and JUnit file serialization |
-
-#### Interactions with Other Units
-
-| Unit | Nature of interaction |
-| ---- | --------------------- |
-| `Context` | Reads `ResultsFile`, `Silent`; calls `WriteLine` for headers and summary |
-| `Program` | Reads `Program.Version`; `Run` exercises `Program.Run` or individual workflow methods |
-| `Requirements` | Tests exercise `Requirements.Load` with fixture YAML files |
-| `TraceMatrix` | Tests exercise `TraceMatrix` construction with fixture test-result files |
+- **Program** — calls `Validation.Run(context)` when `--validate` is present on the command
+  line.

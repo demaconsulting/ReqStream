@@ -43,6 +43,10 @@ When creating a new document collection, create these three files together and u
 the existing collections under `docs/` as templates - they share a consistent
 structure across all collections.
 
+The `generated/` folder is **never committed** to the repository - it is created
+locally and in CI by the build pipeline. Do not flag its absence as a conformance
+issue.
+
 **`title.txt`** - YAML front matter with document metadata. Use the existing
 files under `docs/` as a pattern and keep fields consistent with the rest of
 the repository.

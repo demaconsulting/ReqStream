@@ -29,15 +29,15 @@ namespace DemaConsulting.ReqStream.Tests.Modeling;
 /// </summary>
 public sealed class SectionTests : IDisposable
 {
-    private readonly string _testDirectory;
+    /// <summary>Temporary directory providing isolated file-system workspace for this test class instance.</summary>
+    private readonly TemporaryDirectory _testDirectory = new();
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
     public SectionTests()
     {
-        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_section_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(_testDirectory);
+
     }
 
     /// <summary>
@@ -45,10 +45,7 @@ public sealed class SectionTests : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (Directory.Exists(_testDirectory))
-        {
-            Directory.Delete(_testDirectory, recursive: true);
-        }
+        _testDirectory.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -66,7 +63,7 @@ sections:
       - id: ""SYS-SEC-001""
         title: ""The system shall support credentials authentication.""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -103,7 +100,7 @@ sections:
           - id: ""LOG-001""
             title: ""All requests shall be logged.""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -136,7 +133,7 @@ sections:
       - id: ""SYS-SEC-001""
         title: ""The system shall support credentials authentication.""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file

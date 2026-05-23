@@ -1,94 +1,84 @@
 ---
-# Tracing Subsystem Requirements
-#
-# PURPOSE:
-# - Define requirements for the ReqStream Tracing subsystem
-# - The Tracing subsystem spans TraceMatrix.cs (test result loading and mapping)
-# - Subsystem requirements describe the traceability and coverage enforcement behavior
-
+# Tracing subsystem requirements
 includes:
   - tracing/trace-matrix.yaml
 
 sections:
-  - title: Tracing Subsystem Requirements
-    requirements:
-      - id: ReqStream-Tracing-TestResults
-        title: The Tracing subsystem shall load test results from supported file formats.
-        justification: |
-          Supporting both TRX and JUnit XML formats ensures the tool works with the major
-          test frameworks used in .NET development, maximizing interoperability.
-        tags:
-          - testing
-        tests:
-          - Tracing_TestResults_TrxFile_LoadsTestResults
-          - Tracing_TestResults_JUnitFile_LoadsTestResults
-        children:
-          - ReqStream-Test-TrxFormat
-          - ReqStream-Test-JUnitFormat
-          - ReqStream-Test-ResultFiles
-          - ReqStream-Test-MixedFormats
+  - title: ReqStream Requirements
+    sections:
+      - title: Tracing Requirements
+        requirements:
+          - id: ReqStream-Tracing-TestResults
+            title: The Tracing subsystem shall load test results from supported file formats.
+            justification: |
+              Supporting both TRX and JUnit XML formats ensures the tool works with the major
+              test frameworks used in .NET development, maximizing interoperability.
+            tags: [testing]
+            tests:
+              - Tracing_TestResults_TrxFile_LoadsTestResults
+              - Tracing_TestResults_JUnitFile_LoadsTestResults
+            children:
+              - ReqStream-Test-TrxFormat
+              - ReqStream-Test-JUnitFormat
+              - ReqStream-Test-ResultFiles
+              - ReqStream-Test-MixedFormats
 
-      - id: ReqStream-Tracing-Mapping
-        title: The Tracing subsystem shall map test results to requirements.
-        justification: |
-          Mapping each test execution to the requirements it references enables traceability
-          evidence that links implementation testing to specific software requirements.
-        tags:
-          - testing
-        tests:
-          - Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied
-        children:
-          - ReqStream-Test-SourceFiltering
-          - ReqStream-Test-PlainTestNames
-          - ReqStream-Test-MixedTestNames
-          - ReqStream-Test-CaseInsensitive
-          - ReqStream-Test-PartialFilenames
-          - ReqStream-Test-MultipleRequirements
+          - id: ReqStream-Tracing-Mapping
+            title: The Tracing subsystem shall map test results to requirements.
+            justification: |
+              Mapping each test execution to the requirements it references enables traceability
+              evidence that links implementation testing to specific software requirements.
+            tags: [testing]
+            tests:
+              - Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied
+            children:
+              - ReqStream-Test-SourceFiltering
+              - ReqStream-Test-PlainTestNames
+              - ReqStream-Test-MixedTestNames
+              - ReqStream-Test-CaseInsensitive
+              - ReqStream-Test-PartialFilenames
+              - ReqStream-Test-MultipleRequirements
 
-      - id: ReqStream-Tracing-Coverage
-        title: The Tracing subsystem shall determine whether each requirement is covered by passing tests.
-        justification: |
-          Determining requirement coverage from mapped test results enables enforcement of full
-          test coverage as a quality gate.
-        tags:
-          - testing
-        tests:
-          - Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied
-          - Tracing_Coverage_WithMissingTests_RequirementIsUnsatisfied
-        children:
-          - ReqStream-Test-ChildRequirements
+          - id: ReqStream-Tracing-Coverage
+            title: The Tracing subsystem shall determine whether each requirement is covered by passing tests.
+            justification: |
+              Determining requirement coverage from mapped test results enables enforcement of full
+              test coverage as a quality gate.
+            tags: [testing]
+            tests:
+              - Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied
+              - Tracing_Coverage_WithMissingTests_RequirementIsUnsatisfied
+            children:
+              - ReqStream-Test-ChildRequirements
 
-      - id: ReqStream-Tracing-MissingFile
-        title: The Tracing subsystem shall raise FileNotFoundException when a test result file path does not exist.
-        justification: |
-          Raising a FileNotFoundException with the offending path allows callers to report a clear
-          fatal error, preventing silent data loss from ignored missing files.
-        tags:
-          - testing
-        tests:
-          - Tracing_FileLoading_NonExistentFile_ThrowsFileNotFoundException
+          - id: ReqStream-Tracing-MissingFile
+            title: The Tracing subsystem shall raise FileNotFoundException when a test result file path does not exist.
+            justification: |
+              Raising a FileNotFoundException with the offending path allows callers to report a clear
+              fatal error, preventing silent data loss from ignored missing files.
+            tags: [testing]
+            tests:
+              - Tracing_FileLoading_NonExistentFile_ThrowsFileNotFoundException
 
-      - id: ReqStream-Tracing-MalformedFile
-        title: The Tracing subsystem shall raise InvalidOperationException when a test result file cannot be parsed.
-        justification: |
-          Raising an InvalidOperationException with the offending path and the original parse
-          exception as the inner exception allows callers to provide actionable diagnostic output.
-        tags:
-          - testing
-        tests:
-          - Tracing_FileLoading_MalformedFile_ThrowsInvalidOperationException
+          - id: ReqStream-Tracing-MalformedFile
+            title: The Tracing subsystem shall raise InvalidOperationException when a test result file cannot be parsed.
+            justification: |
+              Raising an InvalidOperationException with the offending path and the original parse
+              exception as the inner exception allows callers to provide actionable diagnostic output.
+            tags: [testing]
+            tests:
+              - Tracing_FileLoading_MalformedFile_ThrowsInvalidOperationException
 
-      - id: ReqStream-Tracing-Reporting
-        title: The Tracing subsystem shall export a trace matrix report to a Markdown file.
-        justification: |
-          Exporting a trace matrix as a Markdown file provides human-readable coverage evidence
-          that can be embedded in documentation, reviewed in pull requests, and consumed by
-          reporting pipelines.
-        tags:
-          - reporting
-        tests:
-          - Tracing_Reporting_SimpleMatrix_CreatesMarkdownFile
-        children:
-          - ReqStream-Report-TraceMatrix
-          - ReqStream-Report-TraceMatrixDepth
-          - ReqStream-Report-TagFiltering
+          - id: ReqStream-Tracing-Reporting
+            title: The Tracing subsystem shall export a trace matrix report to a Markdown file.
+            justification: |
+              Exporting a trace matrix as a Markdown file provides human-readable coverage evidence
+              that can be embedded in documentation, reviewed in pull requests, and consumed by
+              reporting pipelines.
+            tags: [reporting]
+            tests:
+              - Tracing_Reporting_SimpleMatrix_CreatesMarkdownFile
+            children:
+              - ReqStream-Report-TraceMatrix
+              - ReqStream-Report-TraceMatrixDepth
+              - ReqStream-Report-TagFiltering

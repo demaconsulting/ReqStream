@@ -28,15 +28,15 @@ namespace DemaConsulting.ReqStream.Tests.Modeling;
 /// </summary>
 public sealed class RequirementsLoadTests : IDisposable
 {
-    private readonly string _testDirectory;
+    /// <summary>Temporary directory providing isolated file-system workspace for this test class instance.</summary>
+    private readonly TemporaryDirectory _testDirectory = new();
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
     public RequirementsLoadTests()
     {
-        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_load_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(_testDirectory);
+
     }
 
     /// <summary>
@@ -44,10 +44,7 @@ public sealed class RequirementsLoadTests : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (Directory.Exists(_testDirectory))
-        {
-            Directory.Delete(_testDirectory, recursive: true);
-        }
+        _testDirectory.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -65,7 +62,7 @@ sections:
       - id: ""REQ-001""
         title: ""A valid requirement.""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -93,7 +90,7 @@ sections:
         title: ""A requirement.""
         unknown_field: bad
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -134,7 +131,7 @@ sections:
     requirements: [
   invalid yaml here
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "malformed.yaml");
+        var filePath = _testDirectory.GetFilePath("malformed.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the malformed file
@@ -156,7 +153,7 @@ sections:
         // Arrange: create a YAML file with an unknown field at root level
         var yamlContent = @"unknown_field: value
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "location-test.yaml");
+        var filePath = _testDirectory.GetFilePath("location-test.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -187,7 +184,7 @@ sections:
         title: Duplicate id
 unknown_root_field: bad
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "multiple-issues.yaml");
+        var filePath = _testDirectory.GetFilePath("multiple-issues.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -219,7 +216,7 @@ unknown_root_field: bad
     public void Requirements_Load_WithIncludes_LintsIncludedFiles()
     {
         // Arrange: create a root YAML file and an included file with a lint error
-        var includedFile = PathHelpers.SafePathCombine(_testDirectory, "included.yaml");
+        var includedFile = _testDirectory.GetFilePath("included.yaml");
         File.WriteAllText(includedFile, @"sections:
   - title: Included Section
     requirements:
@@ -228,7 +225,7 @@ unknown_root_field: bad
         unknown_field: bad
 ");
 
-        var rootFile = PathHelpers.SafePathCombine(_testDirectory, "root.yaml");
+        var rootFile = _testDirectory.GetFilePath("root.yaml");
         File.WriteAllText(rootFile, $@"includes:
   - included.yaml
 sections:

@@ -1,56 +1,63 @@
 ---
-# SelfTest Subsystem Requirements
-#
-# PURPOSE:
-# - Define requirements for the ReqStream SelfTest subsystem
-# - The SelfTest subsystem spans Validation.cs (self-validation test execution)
-# - Subsystem requirements describe the self-validation mechanism for tool qualification
-
+# SelfTest subsystem requirements
 includes:
   - self-test/validation.yaml
 
 sections:
-  - title: SelfTest Subsystem Requirements
-    requirements:
-      - id: ReqStream-SelfTest-Qualification
-        title: The tool shall provide a self-validation mechanism to qualify the tool in its deployment environment.
-        tags: [self-test]
-        justification: |
-          In regulated environments, tool qualification evidence is required to demonstrate
-          that the tool functions correctly in its deployment environment before it is used
-          to generate compliance artifacts. The SelfTest subsystem provides a built-in
-          self-validation suite that exercises core behaviors and produces a pass/fail
-          summary, enabling quality assurance teams to obtain tool qualification evidence
-          without requiring a separate test harness.
-        tests:
-          - SelfTest_Qualification_Run_PassesAllTests
-        children:
-          - ReqStream-Validation-SelfValidation
-          - ReqStream-Validation-NullContext
+  - title: ReqStream Requirements
+    sections:
+      - title: SelfTest Requirements
+        requirements:
+          - id: ReqStream-SelfTest-Qualification
+            title: The tool shall provide a self-validation mechanism to qualify the tool in its deployment environment.
+            justification: |
+              In regulated environments, tool qualification evidence is required to demonstrate
+              that the tool functions correctly in its deployment environment before it is used
+              to generate compliance artifacts. The SelfTest subsystem provides a built-in
+              self-validation suite that exercises core behaviors and produces a pass/fail
+              summary, enabling quality assurance teams to obtain tool qualification evidence
+              without requiring a separate test harness.
+            tags: [self-test]
+            tests:
+              - SelfTest_Qualification_Run_PassesAllTests
+            children:
+              - ReqStream-Validation-SelfValidation
+              - ReqStream-Validation-NullContext
 
-      - id: ReqStream-SelfTest-ResultsOutput
-        title: The tool shall write self-validation results to a standard test result file when --results is provided.
-        tags: [self-test]
-        justification: |
-          CI/CD pipelines and requirements traceability tools (such as ReqStream itself)
-          consume test result files in standard formats. By supporting both TRX (MSTest) and
-          JUnit XML output, the SelfTest subsystem enables self-validation results to be fed
-          directly into pipeline tooling and traceability reports without additional
-          conversion steps, satisfying audit trail requirements.
-        tests:
-          - SelfTest_ResultsOutput_TrxResultsPath_WritesTrxFile
-          - SelfTest_ResultsOutput_XmlResultsPath_WritesJUnitFile
-        children:
-          - ReqStream-Validation-UnsupportedResultsFormat
-          - ReqStream-Validation-WriteFailure-ReportsError
-          - ReqStream-Validation-WriteFailure-Continues
+          - id: ReqStream-SelfTest-ResultsOutput
+            title: The tool shall write self-validation results to a standard test result file when --results is provided.
+            justification: |
+              CI/CD pipelines and requirements traceability tools (such as ReqStream itself)
+              consume test result files in standard formats. By supporting both TRX (MSTest) and
+              JUnit XML output, the SelfTest subsystem enables self-validation results to be fed
+              directly into pipeline tooling and traceability reports without additional
+              conversion steps, satisfying audit trail requirements.
+            tags: [self-test]
+            tests:
+              - SelfTest_ResultsOutput_TrxResultsPath_WritesTrxFile
+              - SelfTest_ResultsOutput_XmlResultsPath_WritesJUnitFile
+            children:
+              - ReqStream-Validation-UnsupportedResultsFormat
+              - ReqStream-Validation-WriteFailure-ReportsError
+              - ReqStream-Validation-WriteFailure-Continues
 
-      - id: ReqStream-SelfTest-FailureReporting
-        title: The tool shall report an error and set exit code 1 when self-validation encounters failures.
-        tags: [self-test]
-        justification: |
-          Automated test pipelines and CI/CD systems rely on non-zero exit codes to detect
-          tool failures. Reporting each error via WriteError and exiting with code 1 ensures
-          that failures are surfaced to the pipeline and not silently ignored.
-        tests:
-          - SelfTest_FailureReporting_WithErrors_SetsExitCode1
+          - id: ReqStream-SelfTest-FailureReporting-Error
+            title: The tool shall report an error when self-validation encounters failures.
+            justification: |
+              Reporting each self-validation failure via WriteError ensures that failures are
+              surfaced to the user and to log files, and are not silently ignored.
+            tags: [self-test]
+            tests:
+              - SelfTest_FailureReporting_GenuineFailure_SetsExitCode1
+              - SelfTest_FailureReporting_WithErrors_SetsExitCode1
+
+          - id: ReqStream-SelfTest-FailureReporting-ExitCode
+            title: The tool shall set exit code 1 when self-validation encounters failures.
+            justification: |
+              Automated test pipelines and CI/CD systems rely on non-zero exit codes to detect
+              tool failures. Exiting with code 1 when self-validation encounters failures ensures
+              that they are surfaced to the pipeline and not silently ignored.
+            tags: [self-test]
+            tests:
+              - SelfTest_FailureReporting_GenuineFailure_SetsExitCode1
+              - SelfTest_FailureReporting_WithErrors_SetsExitCode1

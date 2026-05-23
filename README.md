@@ -9,29 +9,20 @@
 [![Security][security-shield]][security-url]
 [![NuGet][nuget-shield]][nuget-url]
 
-Requirements Management Tool
-
 ## Overview
 
-ReqStream is a .NET command-line tool for managing requirements written in YAML files. It provides functionality to
-validate and manage requirement documents in a structured and maintainable way.
+ReqStream is a .NET command-line tool for managing software requirements in YAML format,
+providing validation, linting, traceability, and test-mapping capabilities.
 
 ## Features
 
 - 📝 **YAML Format** - Manage requirements in human-readable YAML format
-- 🔧 **Command-Line Interface** - Automate requirement management with CLI tools
-- 🌐 **Multi-Platform** - Support for .NET 8, 9, and 10 across Windows, Linux, and macOS
-- 🔗 **Hierarchical Structure** - Organize requirements with sections and subsections
-- 🧪 **Test Mapping** - Link requirements to test cases for traceability
-- 🎯 **Source-Specific Test Matching** - Restrict coverage evidence to named result files using `filepart@testname` syntax
-- 📦 **File Includes** - Modularize requirements across multiple YAML files
-- ✅ **Validation** - Run a built-in self-test suite to qualify the tool in its deployment environment
+- 🔗 **Hierarchical Structure** - Organize requirements with sections, subsections, and file includes
+- 🧪 **Test Mapping** - Link requirements to test cases for traceability, including source-specific matching
+- 🚦 **Enforcement Mode** - Fail CI/CD builds when any requirement lacks passing test evidence
 - 🔍 **Linting** - Validate requirements YAML structure and references, reporting all issues in one pass
 - 🏷️ **Tag Filtering** - Categorize and filter requirements using tags
-- 📋 **Justifications** - Document the rationale behind each requirement
-- 📤 **Export Capabilities** - Generate markdown reports for requirements, justifications, and test trace matrices
-- 📐 **Configurable Report Depth** - Control Markdown heading levels in exported reports via
-  `--depth`, `--report-depth`, `--matrix-depth`, and `--justifications-depth` flags
+- 📤 **Export Capabilities** - Generate markdown reports for requirements, trace matrices, and justifications
 - 🔒 **Continuous Compliance** - Compliance evidence generated automatically on every CI run, following
   the [Continuous Compliance][link-continuous-compliance] methodology
 
@@ -483,35 +474,16 @@ reqstream --requirements "**/*.yaml" --justifications justifications.md --depth 
 This adjusts the header levels in the output, useful when embedding the reports in larger documentation
 structures.
 
-## Development
+## Building
 
-### Requirements
-
-- .NET SDK 8.0, 9.0, or 10.0
-- C# 12
-
-### Architecture
-
-For a comprehensive guide to the architecture and internal workings of ReqStream, see the
-[Architecture Documentation][architecture].
-
-### Building
-
-```bash
-dotnet build
+```pwsh
+pwsh ./build.ps1
 ```
 
-### Testing
+## User Guide
 
-```bash
-dotnet test
-```
-
-### Packaging
-
-```bash
-dotnet pack
-```
+The ReqStream User Guide is available on the
+[ReqStream releases page](https://github.com/demaconsulting/ReqStream/releases).
 
 ## Contributing
 
@@ -530,15 +502,14 @@ in this project you agree to abide by its terms.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE][license] file for details.
+This project is licensed under the MIT License — see the [LICENSE][license] file for details.
 
 By contributing to this project, you agree that your contributions will be licensed under the MIT License.
 
 ## Support
 
-- 🐛 **[Report a Bug][bug-report]** - Found an issue? Let us know
-- 💡 **[Request a Feature][feature-request]** - Have an idea? Share it with us
-- 💬 **[Ask Questions][discussions]** - Need help? Start a discussion
+- [Report a bug or request a feature][issues]
+- [Ask a question or start a discussion][discussions]
 
 ## Acknowledgements
 
@@ -571,18 +542,16 @@ For information about reporting security vulnerabilities, please see our [Securi
 [nuget-shield]: https://img.shields.io/nuget/v/DemaConsulting.ReqStream
 [nuget-url]: https://www.nuget.org/packages/DemaConsulting.ReqStream
 [license]: https://github.com/demaconsulting/ReqStream/blob/main/LICENSE
-[architecture]: https://github.com/demaconsulting/ReqStream/blob/main/docs/design/introduction.md
 [contributing]: https://github.com/demaconsulting/ReqStream/blob/main/CONTRIBUTING.md
 [code-of-conduct]: https://github.com/demaconsulting/ReqStream/blob/main/CODE_OF_CONDUCT.md
 [security]: https://github.com/demaconsulting/ReqStream/blob/main/SECURITY.md
 [dotnet-sdk]: https://dotnet.microsoft.com/download
-[bug-report]: https://github.com/demaconsulting/ReqStream/issues/new?template=bug_report.md
-[feature-request]: https://github.com/demaconsulting/ReqStream/issues/new?template=feature_request.md
+[issues]: https://github.com/demaconsulting/ReqStream/issues
 [discussions]: https://github.com/demaconsulting/ReqStream/discussions
 [dotnet]: https://dotnet.microsoft.com/
 [yamldotnet]: https://github.com/aaubry/YamlDotNet
 [mstest]: https://github.com/microsoft/testfx
 [github-actions]: https://github.com/features/actions
 [sonarcloud]: https://sonarcloud.io
-[link-guide]: https://github.com/demaconsulting/ReqStream/blob/main/docs/user_guide/introduction.md
+[link-guide]: https://github.com/demaconsulting/ReqStream/releases
 [link-continuous-compliance]: https://github.com/demaconsulting/ContinuousCompliance

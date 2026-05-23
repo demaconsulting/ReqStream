@@ -1,16 +1,16 @@
 ---
+# Program subsystem requirements
 sections:
   - title: ReqStream Requirements
     sections:
-      - title: Program
+      - title: Program Requirements
         requirements:
           - id: ReqStream-Program-Version
             title: The tool shall print version information and exit when the version flag is provided.
             justification: |
               Printing version information and exiting immediately allows callers to query the installed
               version without triggering any other processing, supporting scripted compatibility checks.
-            tags:
-              - cli
+            tags: [cli]
             tests:
               - Program_Run_WithVersionFlag_PrintsVersion
 
@@ -19,18 +19,29 @@ sections:
             justification: |
               Printing usage help and exiting immediately gives users quick access to command-line
               options without requiring separate documentation or triggering unintended processing.
-            tags:
-              - cli
+            tags: [cli]
             tests:
               - Program_Run_WithHelpFlag_PrintsHelp
+
+          - id: ReqStream-Program-Banner
+            title: >-
+              The tool shall display its name and version on startup for non-lint invocations.
+            justification: |
+              Displaying the tool name and version on startup provides a visible record of which
+              version was used in each run, supporting compliance traceability and troubleshooting.
+              The banner is suppressed during lint runs so that build pipelines and editors that
+              parse lint output receive only actionable issue lines.
+            tags: [cli]
+            tests:
+              - Program_Run_WithHelpFlag_PrintsHelp
+              - Program_Run_WithLintFlag_SuppressesBanner
 
           - id: ReqStream-Program-Validate
             title: The tool shall run self-validation when the validate flag is provided.
             justification: |
               Self-validation allows the tool to test its own behavior in the target environment,
               providing confidence that the installation is correct and the tool operates as expected.
-            tags:
-              - cli
+            tags: [cli]
             tests:
               - Program_Run_WithValidateFlag_RunsValidation
               - Program_Run_WithValidateAndResults_WritesResultsFile
@@ -40,8 +51,7 @@ sections:
             justification: |
               Loading and processing requirements files is the primary function of the tool, enabling
               generation of reports and trace matrices from structured requirements data.
-            tags:
-              - requirements
+            tags: [requirements]
             tests:
               - Program_Run_WithNoRequirementsFiles_ShowsMessage
               - Program_Run_WithRequirementsFiles_ProcessesSuccessfully
@@ -54,8 +64,7 @@ sections:
             justification: |
               Enforcement prevents unverified requirements from passing silently through a CI/CD pipeline,
               ensuring that every requirement is backed by at least one passing test before a build succeeds.
-            tags:
-              - requirements
+            tags: [requirements]
             tests:
               - Program_Run_WithEnforcementAndFullySatisfiedRequirements_Succeeds
               - Program_Run_WithEnforcementAndUnsatisfiedRequirements_Fails
@@ -68,11 +77,10 @@ sections:
               Linting requirements files allows users to identify structural problems such as malformed YAML,
               missing mandatory fields, unknown fields, and duplicate requirement IDs before processing,
               improving the quality and reliability of requirement definitions.
-            tags:
-              - cli
-              - requirements
+            tags: [cli, requirements]
             tests:
               - Program_Run_WithLintFlag_RunsLinter
+              - Program_Run_WithLintFlag_OnlyOutputsIssues
 
           - id: ReqStream-Program-LintNoBanner
             title: The tool shall suppress the application banner when the lint flag is provided.
@@ -80,8 +88,7 @@ sections:
               Suppressing the banner during lint allows lint scripts to treat silence as success
               and only inspect reported issue lines, simplifying integration into build pipelines
               and editors that parse tool output.
-            tags:
-              - cli
+            tags: [cli]
             tests:
               - Program_Run_WithLintFlag_SuppressesBanner
 
@@ -90,10 +97,10 @@ sections:
             justification: |
               Producing no output when linting finds no issues allows build pipelines and scripts
               to treat silence as success without needing to parse a "No issues found" summary.
-            tags:
-              - cli
+            tags: [cli]
             tests:
-              - Program_Run_WithLintFlag_OnlyOutputsIssues
+              - Program_Run_WithLintFlag_RunsLinter
+              - Program_Run_WithLintFlag_SuppressesBanner
 
           - id: ReqStream-Program-LintFailure
             title: The tool shall exit with a non-zero exit code when linting detects any issues.
@@ -101,9 +108,7 @@ sections:
               Exiting with a non-zero exit code when lint finds issues allows build pipelines
               and scripts to detect and report requirements quality problems, preventing
               malformed requirements from silently entering the codebase.
-            tags:
-              - cli
-              - requirements
+            tags: [cli, requirements]
             tests:
               - Program_Run_WithLintFlag_OnlyOutputsIssues
 
@@ -115,9 +120,7 @@ sections:
               Reporting an error when --matrix is requested but no test files are available
               prevents silent no-op runs that produce no matrix file and no diagnostic,
               giving users actionable feedback to correct their invocation.
-            tags:
-              - cli
-              - requirements
+            tags: [cli, requirements]
             tests:
               - Program_Run_WithMatrixButNoTestFiles_ReportsError
               - Program_Run_WithMatrixAndUnmatchedTestsPattern_ReportsError
@@ -130,8 +133,6 @@ sections:
               Reporting a clear message when the lint flag is used without any --requirements
               arguments prevents silent no-op runs and provides actionable feedback to users
               who may have forgotten to specify the requirements files to lint.
-            tags:
-              - cli
-              - requirements
+            tags: [cli, requirements]
             tests:
               - Program_Run_WithLintAndNoRequirements_PrintsInformationalMessage

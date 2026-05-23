@@ -32,15 +32,15 @@ namespace DemaConsulting.ReqStream.Tests.Tracing;
 /// </summary>
 public sealed class TraceMatrixReadTests : IDisposable
 {
-    private readonly string _testDirectory;
+    /// <summary>Temporary directory providing isolated file-system workspace for this test class instance.</summary>
+    private readonly TemporaryDirectory _testDirectory = new();
 
     /// <summary>
     ///     Initialize test by creating a temporary test directory.
     /// </summary>
     public TraceMatrixReadTests()
     {
-        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(_testDirectory);
+
     }
 
     /// <summary>
@@ -48,10 +48,7 @@ public sealed class TraceMatrixReadTests : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (Directory.Exists(_testDirectory))
-        {
-            Directory.Delete(_testDirectory, recursive: true);
-        }
+        _testDirectory.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -73,7 +70,7 @@ sections:
           - ""Test_Credentials_Valid""
           - ""Test_Credentials_Invalid""
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -98,7 +95,7 @@ sections:
             Duration = TimeSpan.FromSeconds(1)
         });
 
-        var trxPath = PathHelpers.SafePathCombine(_testDirectory, "results.trx");
+        var trxPath = _testDirectory.GetFilePath("results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
         // Act:
@@ -135,7 +132,7 @@ sections:
         tests:
           - ""Test_PlatformBasic""
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -151,7 +148,7 @@ sections:
             Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var trx1Path = PathHelpers.SafePathCombine(_testDirectory, "windows-results.trx");
+        var trx1Path = _testDirectory.GetFilePath("windows-results.trx");
         File.WriteAllText(trx1Path, TrxSerializer.Serialize(testResults1));
 
         // Create second TRX file (Linux, passed)
@@ -164,7 +161,7 @@ sections:
             Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var trx2Path = PathHelpers.SafePathCombine(_testDirectory, "linux-results.trx");
+        var trx2Path = _testDirectory.GetFilePath("linux-results.trx");
         File.WriteAllText(trx2Path, TrxSerializer.Serialize(testResults2));
 
         // Create third TRX file (macOS, failed)
@@ -178,7 +175,7 @@ sections:
             ErrorMessage = "Test failed on macOS",
             Duration = TimeSpan.FromSeconds(1)
         });
-        var trx3Path = PathHelpers.SafePathCombine(_testDirectory, "macos-results.trx");
+        var trx3Path = _testDirectory.GetFilePath("macos-results.trx");
         File.WriteAllText(trx3Path, TrxSerializer.Serialize(testResults3));
 
         // Act:
@@ -210,7 +207,7 @@ sections:
         tests:
           - ""Test_Auth_Valid""
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -243,7 +240,7 @@ sections:
             Duration = TimeSpan.FromSeconds(1)
         });
 
-        var trxPath = PathHelpers.SafePathCombine(_testDirectory, "results.trx");
+        var trxPath = _testDirectory.GetFilePath("results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
         // Act:
@@ -304,13 +301,13 @@ sections:
         tests:
           - ""SomeTest""
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
         var requirements = loadResult.Requirements;
 
-        var nonExistentPath = PathHelpers.SafePathCombine(_testDirectory, "nonexistent.trx");
+        var nonExistentPath = _testDirectory.GetFilePath("nonexistent.trx");
 
         // Act / Assert:
         var ex = Assert.Throws<FileNotFoundException>(() => _ = new TraceMatrix(requirements, nonExistentPath));
@@ -335,7 +332,7 @@ sections:
           - ""Test_Passing""
           - ""Test_Failing""
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -361,7 +358,7 @@ sections:
             Duration = TimeSpan.FromSeconds(1)
         });
 
-        var trxPath = PathHelpers.SafePathCombine(_testDirectory, "results.trx");
+        var trxPath = _testDirectory.GetFilePath("results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(testResults));
 
         // Act:
@@ -399,7 +396,7 @@ sections:
         tests:
           - ""SomeTest""
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -436,7 +433,7 @@ sections:
           - ""Test_ValidData""
           - ""Test_InvalidData""
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -461,7 +458,7 @@ sections:
             Duration = TimeSpan.FromSeconds(1.3)
         });
 
-        var junitPath = PathHelpers.SafePathCombine(_testDirectory, "results.xml");
+        var junitPath = _testDirectory.GetFilePath("results.xml");
         File.WriteAllText(junitPath, JUnitSerializer.Serialize(testResults));
 
         // Act:
@@ -499,7 +496,7 @@ sections:
           - ""Test_TrxFormat""
           - ""Test_JUnitFormat""
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -515,7 +512,7 @@ sections:
             Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var trxPath = PathHelpers.SafePathCombine(_testDirectory, "results.trx");
+        var trxPath = _testDirectory.GetFilePath("results.trx");
         File.WriteAllText(trxPath, TrxSerializer.Serialize(trxResults));
 
         // Create JUnit file
@@ -528,7 +525,7 @@ sections:
             Outcome = TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1.5)
         });
-        var junitPath = PathHelpers.SafePathCombine(_testDirectory, "results.xml");
+        var junitPath = _testDirectory.GetFilePath("results.xml");
         File.WriteAllText(junitPath, JUnitSerializer.Serialize(junitResults));
 
         // Act:
@@ -567,7 +564,7 @@ sections:
           - ""Test_JUnit_Passing""
           - ""Test_JUnit_Failing""
 ";
-        var reqPath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqPath, reqYaml);
         var loadResult = Requirements.Load(reqPath);
         Assert.NotNull(loadResult.Requirements);
@@ -593,7 +590,7 @@ sections:
             Duration = TimeSpan.FromSeconds(1)
         });
 
-        var junitPath = PathHelpers.SafePathCombine(_testDirectory, "results.xml");
+        var junitPath = _testDirectory.GetFilePath("results.xml");
         File.WriteAllText(junitPath, JUnitSerializer.Serialize(testResults));
 
         // Act:

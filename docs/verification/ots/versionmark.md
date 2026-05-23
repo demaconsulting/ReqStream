@@ -1,4 +1,4 @@
-## VersionMark Verification
+## VersionMark
 
 ### Required Functionality
 
@@ -13,13 +13,17 @@ VersionMark is verified by CI pipeline step evidence. The tool's built-in `--val
 command is executed in the CI pipeline and writes test method results to a TRX file.
 The TRX file is consumed by ReqStream to satisfy the OTS requirement.
 
-Test evidence names (test methods written to the TRX file by `dotnet versionmark --validate`):
+### Test Scenarios
 
-- `VersionMark_CapturesVersions` — validates that VersionMark can capture tool version metadata
-- `VersionMark_GeneratesMarkdownReport` — validates that VersionMark can generate a Markdown report
+**Version Capture**: Validates that VersionMark can capture tool version metadata for all
+configured tools. This scenario is tested by `VersionMark_CapturesVersions`.
 
-### Coverage Summary
+**Markdown Report Generation**: Validates that VersionMark can generate a Markdown report from
+captured version metadata. This scenario is tested by `VersionMark_GeneratesMarkdownReport`.
 
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-OTS-VersionMark` | `VersionMark_CapturesVersions`, `VersionMark_GeneratesMarkdownReport` |
+### Requirements Coverage
+
+| Requirement | Scenario | Test Method(s) |
+| --- | --- | --- |
+| ReqStream-OTS-VersionMark | Version Capture | `VersionMark_CapturesVersions` |
+| ReqStream-OTS-VersionMark | Markdown Report Generation | `VersionMark_GeneratesMarkdownReport` |

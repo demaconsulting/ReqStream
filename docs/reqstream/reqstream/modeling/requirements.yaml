@@ -1,143 +1,135 @@
 ---
-# Requirements Unit Requirements
-#
-# PURPOSE:
-# - Define requirements for the Requirements unit (Requirements.cs)
-# - Requirements is the root of the section tree and the public API entry point
-# - Unit requirements describe YAML loading, section hierarchy, includes, merging, and export behavior
-
+# Requirements unit requirements
+# Note: Some requirement IDs use the historical 'ReqStream-Report-*' prefix that predates the
+# current naming convention (which would use 'ReqStream-Modeling-*' for modeling-layer reporting).
+# Renaming is a breaking change requiring coordinated updates across all artifact trees and is deferred.
+# Note: Requirement IDs in this file use the 'ReqStream-Requirements-*' prefix rather than the
+# standard 'ReqStream-Modeling-Requirements-*' form. This naming predates the Modeling namespace
+# hierarchy and is accepted as a historical deviation to avoid breaking changes to traceability links.
 sections:
   - title: ReqStream Requirements
     sections:
-      - title: Modeling
-        requirements:
-          - id: ReqStream-Requirements-YamlProcessing
-            title: The tool shall process YAML requirements files.
-            justification: |
-              YAML provides a human-readable, version-control-friendly format for managing requirements.
-              This makes requirements accessible to both technical and non-technical stakeholders.
-            tags:
-              - requirements
-            tests:
-              - Section_Load_SimpleRequirement_ParsesCorrectly
-              - Requirements_Load_ComplexStructure_ParsesCorrectly
+      - title: Modeling Requirements
+        sections:
+          - title: Requirements Requirements
+            requirements:
+              - id: ReqStream-Requirements-YamlProcessing
+                title: The tool shall process YAML requirements files.
+                justification: |
+                  YAML provides a human-readable, version-control-friendly format for managing requirements.
+                  This makes requirements accessible to both technical and non-technical stakeholders.
+                tags: [requirements]
+                tests:
+                  - Requirements_Load_ComplexStructure_ParsesCorrectly
 
-          - id: ReqStream-Requirements-Validation
-            title: The tool shall validate requirements file structure.
-            justification: |
-              Early validation prevents runtime errors and ensures requirements data integrity, catching
-              issues before they impact downstream processes.
-            tags:
-              - requirements
-            tests:
-              - Section_Load_BlankSectionTitle_ReportsErrorWithFileLocation
-              - Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation
-              - Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation
-              - Requirements_Load_DuplicateRequirementId_ReportsError
-              - Requirements_Load_DuplicateRequirementId_ErrorIncludesFileLocation
+              - id: ReqStream-Requirements-Validation
+                title: The tool shall validate requirements file structure.
+                justification: |
+                  Early validation prevents runtime errors and ensures requirements data integrity, catching
+                  issues before they impact downstream processes.
+                tags: [requirements]
+                tests:
+                  - Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation
 
-          - id: ReqStream-Requirements-YamlErrorReporting
-            title: The tool shall report YAML deserialization errors with the filename and location.
-            justification: |
-              Clear error messages including the filename and line/column position allow users to quickly
-              locate and fix issues in their requirements files without decoding internal type information.
-            tags:
-              - requirements
-            tests:
-              - Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation
+              - id: ReqStream-Requirements-YamlErrorReporting
+                title: The tool shall report YAML deserialization errors with the filename and location.
+                justification: |
+                  Clear error messages including the filename and line/column position allow users to quickly
+                  locate and fix issues in their requirements files without decoding internal type information.
+                tags: [requirements]
+                tests:
+                  - Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation
 
-          - id: ReqStream-Requirements-Hierarchy
-            title: The tool shall support hierarchical sections and subsections.
-            justification: |
-              Hierarchical organization allows requirements to be grouped logically by system components,
-              features, or concerns, improving maintainability and navigation.
-            tags:
-              - requirements
-            tests:
-              - Section_Load_NestedSections_ParsesHierarchyCorrectly
-              - Requirements_Export_NestedSections_CreatesHierarchy
+              - id: ReqStream-Requirements-Hierarchy
+                title: The tool shall support hierarchical sections and subsections.
+                justification: |
+                  Hierarchical organization allows requirements to be grouped logically by system components,
+                  features, or concerns, improving maintainability and navigation.
+                tags: [requirements]
+                tests:
+                  - Requirements_Export_NestedSections_CreatesHierarchy
 
-          - id: ReqStream-Requirements-Includes
-            title: The tool shall support file includes in requirements files.
-            justification: |
-              File includes enable modular requirements management, allowing teams to organize requirements
-              across multiple files and reducing merge conflicts in version control.
-            tags:
-              - requirements
-            tests:
-              - Requirements_Load_WithIncludes_MergesFilesCorrectly
-              - Requirements_Load_MultipleFiles_MergesAllFiles
-              - Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop
+              - id: ReqStream-Requirements-Includes
+                title: The tool shall support file includes in requirements files.
+                justification: |
+                  File includes enable modular requirements management, allowing teams to organize requirements
+                  across multiple files and reducing merge conflicts in version control.
+                tags: [requirements]
+                tests:
+                  - Requirements_Load_WithIncludes_MergesFilesCorrectly
+                  - Requirements_Load_MultipleFiles_MergesAllFiles
+                  - Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop
 
-          - id: ReqStream-Requirements-SectionMerging
-            title: The tool shall merge sections with the same hierarchy path.
-            justification: |
-              Section merging allows multiple files to contribute to the same logical section, supporting
-              distributed authoring and modular organization of requirements.
-            tags:
-              - requirements
-            tests:
-              - Requirements_Load_IdenticalSections_MergesCorrectly
-              - Requirements_Load_MultipleFilesWithSameSections_MergesSections
-            children:
-              - ReqStream-Section-TitleMerging
+              - id: ReqStream-Requirements-CircularInclude
+                title: >-
+                  The tool shall detect and report circular include references in requirements files.
+                justification: |
+                  Circular file include references (where file A includes B and B includes A) would
+                  cause infinite loading loops. Detecting and reporting them prevents hangs and
+                  provides users with a clear error message identifying the problematic file.
+                tags: [requirements]
+                tests:
+                  - Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop
 
-      - title: Reporting
-        requirements:
-          - id: ReqStream-Report-MarkdownExport
-            title: The tool shall export requirements to markdown format.
-            justification: |
-              Markdown export enables requirements to be included in documentation, wikis, and other
-              human-readable formats for stakeholder communication.
-            tags:
-              - reporting
-            tests:
-              - Requirements_Export_SimpleRequirements_CreatesMarkdownFile
-              - Requirements_Export_MultipleSections_ExportsAll
-              - Requirements_Export_EmptyRequirements_CreatesEmptyFile
+              - id: ReqStream-Requirements-SectionMerging
+                title: The tool shall merge sections with the same hierarchy path.
+                justification: |
+                  Section merging allows multiple files to contribute to the same logical section, supporting
+                  distributed authoring and modular organization of requirements.
+                tags: [requirements]
+                tests:
+                  - Requirements_Load_IdenticalSections_MergesCorrectly
+                  - Requirements_Load_MultipleFilesWithSameSections_MergesSections
 
-          - id: ReqStream-Report-HeaderDepth
-            title: The tool shall support configurable markdown header depth for requirements reports.
-            justification: |
-              Configurable header depth allows requirements reports to be embedded in larger documents
-              while maintaining proper document structure.
-            tags:
-              - reporting
-            tests:
-              - Requirements_Export_WithCustomDepth_UsesCorrectHeaderLevel
+              - id: ReqStream-Report-MarkdownExport
+                title: The tool shall export requirements to markdown format.
+                justification: |
+                  Markdown export enables requirements to be included in documentation, wikis, and other
+                  human-readable formats for stakeholder communication.
+                tags: [reporting]
+                tests:
+                  - Requirements_Export_SimpleRequirements_CreatesMarkdownFile
+                  - Requirements_Export_MultipleSections_ExportsAll
+                  - Requirements_Export_EmptyRequirements_CreatesEmptyFile
 
-          - id: ReqStream-Report-Justifications
-            title: The tool shall export requirement justifications to markdown format.
-            justification: |
-              Justification export enables stakeholders to understand the rationale behind
-              requirements, supporting design reviews, audits, and compliance activities.
-            tags:
-              - reporting
-            tests:
-              - Requirements_ExportJustifications_WithJustifications_CreatesMarkdownFile
-              - Requirements_ExportJustifications_WithoutJustifications_CreatesHeadersOnly
-              - Requirements_ExportJustifications_NestedSections_CreatesHierarchy
+              - id: ReqStream-Report-HeaderDepth
+                title: The tool shall support configurable markdown header depth for requirements reports.
+                justification: |
+                  Configurable header depth allows requirements reports to be embedded in larger documents
+                  while maintaining proper document structure.
+                tags: [reporting]
+                tests:
+                  - Requirements_Export_WithCustomDepth_UsesCorrectHeaderLevel
 
-          - id: ReqStream-Report-JustificationsDepth
-            title: >-
-              The tool shall support configurable markdown header depth for justification
-              reports.
-            justification: |
-              Configurable header depth allows justification reports to be embedded in larger
-              documents while maintaining proper document structure.
-            tags:
-              - reporting
-            tests:
-              - Requirements_ExportJustifications_WithCustomDepth_UsesCorrectHeaderLevel
+              - id: ReqStream-Report-Justifications
+                title: The tool shall export requirement justifications to markdown format.
+                justification: |
+                  Justification export enables stakeholders to understand the rationale behind
+                  requirements, supporting design reviews, audits, and compliance activities.
+                tags: [reporting]
+                tests:
+                  - Requirements_ExportJustifications_WithJustifications_CreatesMarkdownFile
+                  - Requirements_ExportJustifications_WithoutJustifications_CreatesHeadersOnly
+                  - Requirements_ExportJustifications_NestedSections_CreatesHierarchy
 
-          - id: ReqStream-Report-TagFilterExport
-            title: The tool shall support filtering requirements by tags during export.
-            justification: |
-              Tag-based filtering enables selective export of requirement subsets for focused reports,
-              security audits, compliance documentation, and targeted reviews.
-            tags:
-              - reporting
-            tests:
-              - Requirements_Export_WithFilterTags_ExportsOnlyMatchingRequirements
-              - Requirements_Export_WithMultipleFilterTags_ExportsRequirementsMatchingAnyTag
-              - Requirements_ExportJustifications_WithFilterTags_ExportsOnlyMatchingRequirements
+              - id: ReqStream-Report-JustificationsDepth
+                title: >-
+                  The tool shall support configurable markdown header depth for justification
+                  reports.
+                justification: |
+                  Configurable header depth allows justification reports to be embedded in larger
+                  documents while maintaining proper document structure.
+                tags: [reporting]
+                tests:
+                  - Requirements_ExportJustifications_WithCustomDepth_UsesCorrectHeaderLevel
+
+              - id: ReqStream-Report-TagFilterExport
+                title: The tool shall support filtering requirements by tags during export.
+                justification: |
+                  Tag-based filtering enables selective export of requirement subsets for focused reports,
+                  security audits, compliance documentation, and targeted reviews.
+                tags: [reporting]
+                tests:
+                  - Requirements_Export_WithFilterTags_ExportsOnlyMatchingRequirements
+                  - Requirements_Export_WithMultipleFilterTags_ExportsRequirementsMatchingAnyTag
+                  - Requirements_ExportJustifications_WithFilterTags_ExportsOnlyMatchingRequirements

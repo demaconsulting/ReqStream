@@ -1,96 +1,103 @@
 ---
-# Requirement Unit Requirements
-#
-# PURPOSE:
-# - Define requirements for the Requirement unit (Requirement.cs)
-# - Requirement is the domain model for a single requirement entry
-# - Unit requirements describe the data that each requirement must hold
-
+# Requirement unit requirements
 sections:
-  - title: Requirement Unit Requirements
-    requirements:
-      - id: ReqStream-Requirements-UniqueIds
-        title: Each requirement shall have a unique identifier.
-        justification: |
-          Unique identifiers enable unambiguous referencing of requirements in documentation, test
-          mappings, and traceability reports.
-        tags:
-          - requirements
-        tests:
-          - Requirements_Load_DuplicateRequirementId_ReportsError
-          - Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation
-          - Requirements_Load_MultipleFilesWithDuplicateIds_ReportsError
+  - title: ReqStream Requirements
+    sections:
+      - title: Modeling Requirements
+        sections:
+          - title: Requirement Requirements
+            requirements:
+              - id: ReqStream-Requirements-UniqueIds
+                title: Each requirement shall have a unique identifier.
+                justification: |
+                  Unique identifiers enable unambiguous referencing of requirements in documentation, test
+                  mappings, and traceability reports.
+                tags: [requirements]
+                tests:
+                  - Requirements_Load_DuplicateRequirementId_ReportsError
+                  - Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation
+                  - Requirements_Load_MultipleFilesWithDuplicateIds_ReportsError
 
-      - id: ReqStream-Requirements-RequiredTitle
-        title: Each requirement shall have a title.
-        justification: |
-          Titles provide human-readable descriptions of requirements, making them understandable to
-          stakeholders without needing to reference external documentation.
-        tags:
-          - requirements
-        tests:
-          - Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation
+              - id: ReqStream-Requirements-RequiredTitle
+                title: Each requirement shall have a title.
+                justification: |
+                  Titles provide human-readable descriptions of requirements, making them understandable to
+                  stakeholders without needing to reference external documentation.
+                tags: [requirements]
+                tests:
+                  - Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation
 
-      - id: ReqStream-Requirements-ParentChild
-        title: Requirement shall support parent-child relationships to other requirements.
-        justification: |
-          Parent-child relationships enable hierarchical requirement decomposition, allowing
-          high-level requirements to be satisfied through lower-level requirements.
-        tags:
-          - requirements
-        tests:
-          - Requirements_Load_RequirementWithChildren_ParsesChildrenCorrectly
+              - id: ReqStream-Requirements-ParentChild
+                title: Requirement shall support parent-child relationships to other requirements.
+                justification: |
+                  Parent-child relationships enable hierarchical requirement decomposition, allowing
+                  high-level requirements to be satisfied through lower-level requirements.
+                tags: [requirements]
+                tests:
+                  - Requirements_Load_RequirementWithChildren_ParsesChildrenCorrectly
 
-      - id: ReqStream-Requirements-BlankChildId
-        title: The tool shall reject blank child IDs in requirement definitions.
-        justification: |
-          Rejecting blank child IDs prevents silent failures in cycle detection and
-          trace matrix generation, providing clear error feedback to authors.
-        tags:
-          - requirements
-        tests:
-          - Requirements_Load_BlankChildIdInRequirement_ReportsErrorWithFileLocation
+              - id: ReqStream-Requirements-BlankChildId
+                title: The tool shall reject blank child IDs in requirement definitions.
+                justification: |
+                  Rejecting blank child IDs prevents silent failures in cycle detection and
+                  trace matrix generation, providing clear error feedback to authors.
+                tags: [requirements]
+                tests:
+                  - Requirements_Load_BlankChildIdInRequirement_ReportsErrorWithFileLocation
 
-      - id: ReqStream-Requirements-Tags
-        title: Requirement shall support an optional list of tags for categorization.
-        justification: |
-          Tags enable filtering requirements by category (e.g. "cli", "lint", "reporting"),
-          allowing targeted trace matrix exports and focused coverage analysis.
-        tags:
-          - requirements
-        tests:
-          - Requirements_Load_RequirementWithTags_ParsesTagsCorrectly
+              - id: ReqStream-Requirements-Tags
+                title: Requirement shall support an optional list of tags for categorization.
+                justification: |
+                  Tags enable filtering requirements by category (e.g. "cli", "lint", "reporting"),
+                  allowing targeted trace matrix exports and focused coverage analysis.
+                tags: [requirements]
+                tests:
+                  - Requirements_Load_RequirementWithTags_ParsesTagsCorrectly
 
-      - id: ReqStream-Requirements-BlankTagName
-        title: The tool shall reject blank tag names in requirement definitions.
-        justification: |
-          Blank tag names produce meaningless filter keys that silently match or exclude
-          requirements in unexpected ways. Rejecting them provides clear error feedback.
-        tags:
-          - requirements
-        tests:
-          - Requirements_Load_BlankTagName_ReportsErrorWithFileLocation
+              - id: ReqStream-Requirements-BlankTagName
+                title: The tool shall reject blank tag names in requirement definitions.
+                justification: |
+                  Blank tag names produce meaningless filter keys that silently match or exclude
+                  requirements in unexpected ways. Rejecting them provides clear error feedback.
+                tags: [requirements]
+                tests:
+                  - Requirements_Load_BlankTagName_ReportsErrorWithFileLocation
 
-      - id: ReqStream-Requirements-Justification
-        title: Requirement shall support an optional justification field.
-        justification: |
-          Justification text allows stakeholders to understand why a requirement exists without
-          needing to consult external documentation, improving auditability and traceability.
-        tags:
-          - requirements
-        tests:
-          - Requirements_Load_RequirementWithJustification_ParsesJustificationCorrectly
+              - id: ReqStream-Requirements-Justification
+                title: Requirement shall support an optional justification field.
+                justification: |
+                  Justification text allows stakeholders to understand why a requirement exists without
+                  needing to consult external documentation, improving auditability and traceability.
+                tags: [requirements]
+                tests:
+                  - Requirements_Load_RequirementWithJustification_ParsesJustificationCorrectly
 
-      - id: ReqStream-Requirements-TestMappings
-        title: Requirement shall store linked test identifiers.
-        justification: |
-          Test mappings establish traceability between requirements and tests, enabling verification
-          that requirements are adequately tested and satisfied.
-        tags:
-          - requirements
-        tests:
-          - Requirements_Load_RequirementWithTests_ParsesTestsCorrectly
-          - Requirements_Load_BlankTestNameInRequirement_ReportsErrorWithFileLocation
-          - Requirements_Load_TestMappings_AppliesMappingsCorrectly
-          - Requirements_Load_BlankTestNameInMapping_ReportsErrorWithFileLocation
-          - Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation
+              - id: ReqStream-Requirements-TestMappings
+                title: Requirement shall store linked test identifiers.
+                justification: |
+                  Test mappings establish traceability between requirements and tests, enabling verification
+                  that requirements are adequately tested and satisfied.
+                tags: [requirements]
+                tests:
+                  - Requirements_Load_RequirementWithTests_ParsesTestsCorrectly
+                  - Requirements_Load_BlankTestNameInRequirement_ReportsErrorWithFileLocation
+                  - Requirements_Load_TestMappings_AppliesMappingsCorrectly
+                  - Requirements_Load_BlankTestNameInMapping_ReportsErrorWithFileLocation
+                  - Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation
+
+              - id: ReqStream-Requirement-Location
+                title: Requirement definitions shall carry a source file location, and validation errors shall include file-location
+                  information.
+                justification: |
+                  Carrying a source file location on each requirement enables precise error reporting
+                  that directs authors to the exact file where an invalid value was declared,
+                  reducing the time needed to diagnose and correct lint issues in large requirement sets.
+                tags: [requirements]
+                tests:
+                  - Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation
+                  - Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation
+                  - Requirements_Load_BlankTestNameInRequirement_ReportsErrorWithFileLocation
+                  - Requirements_Load_BlankTestNameInMapping_ReportsErrorWithFileLocation
+                  - Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation
+                  - Requirements_Load_BlankTagName_ReportsErrorWithFileLocation
+                  - Requirements_Load_BlankChildIdInRequirement_ReportsErrorWithFileLocation

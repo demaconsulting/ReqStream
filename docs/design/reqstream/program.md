@@ -1,119 +1,112 @@
-## Program Unit Design
+## Program
 
-### Overview
+### Purpose
 
 `Program` is the entry point of the ReqStream executable. It owns the top-level execution flow,
-dispatches to the appropriate subsystem based on the parsed command-line options, and establishes the
-error-handling boundary for the entire process. All meaningful work is delegated to `Context`,
+dispatches to the appropriate subsystem based on the parsed command-line options, and establishes
+the error-handling boundary for the entire process. All meaningful work is delegated to `Context`,
 `Validation`, `Requirements`, and `TraceMatrix`; `Program` itself contains no domain logic.
 
-### Properties
+There is no subsystem containing `Program`; it sits directly under the ReqStream system as a
+top-level unit.
 
-#### `Version`
+### Data Model
 
-`Version` is a static read-only property backed by the private `_version` field, which is
-initialized once at class startup to avoid repeated reflection on every access.
+N/A — `Program` is a static entry-point class with no instance fields. The private static field
+`_version` is an implementation detail that caches the assembly version string; it is documented
+in Key Methods.
 
-Resolution order:
+### Key Methods
 
-| Priority | Source | API |
-| -------- | ------ | --- |
-| 1 | `AssemblyInformationalVersionAttribute` | `Assembly.GetExecutingAssembly()` |
-| 2 | `AssemblyName.Version` | `Assembly.GetExecutingAssembly().GetName().Version` |
-| 3 | Fallback literal | `"Unknown"` |
+**Program.Main**: Process entry point.
 
-The informational version (set by the build system) is preferred because it carries pre-release
-labels and build metadata. If the attribute is absent or empty the numeric `AssemblyName.Version`
-string is used. If neither is available the string `"Unknown"` is returned so that the property
-never throws and never returns `null`.
+- *Type*: CLI entry point.
+- *Role*: Provider (host environment calls this).
+- *Contract*: Accepts `string[] args`; returns process exit code (`0` or `1`).
+- *Constraints*: Must never block waiting for interactive input.
 
-### Methods
+**Program.Run**: Internal dispatch method.
 
-#### `Main(args)`
+- *Type*: In-process .NET internal method.
+- *Role*: Provider (called by `Main` and `Validation`).
+- *Contract*: Accepts a `Context`; dispatches to the appropriate workflow based on flags using a
+  priority-ordered sequence:
+  1. `--version` — print version string and return.
+  2. If not lint mode — print banner (falls through to next step).
+  3. `--help` — print usage and return.
+  4. `--validate` — call `Validation.Run(context)` and return.
+  5. `--lint` with no files — print "No requirements files specified" and return.
+  6. `--lint` — load requirements, report lint issues, and return.
+  7. Default — call `ProcessRequirements(context)`.
+- *Constraints*: None.
 
-`Main` is the process entry point. Its responsibilities are:
+**Program.Version**: Static read-only property.
 
-1. Create a `Context` instance via `Context.Create(args)`.
-2. Invoke `Run(context)` inside a `using` block so that `Context.Dispose()` is called on exit.
-3. Return `context.ExitCode` as the process exit code.
+- *Type*: In-process .NET public API.
+- *Role*: Provider.
+- *Contract*: Returns the assembly informational version string. Backed by the private `_version`
+  field, which is initialized once at class load by reading
+  `AssemblyInformationalVersionAttribute`, falling back to `AssemblyName.Version`, then
+  `"Unknown"`. This avoids repeated reflection on every access.
+- *Constraints*: Never throws; never returns `null`.
 
-**Error-handling contract**:
+**ProcessRequirements** (private): Orchestrates the normal (non-version, non-help, non-validate,
+non-lint) run.
 
-| Exception type | Handling |
-| -------------- | -------- |
-| `ArgumentException` | Message written to `Console.Error`; returns exit code `1` |
-| `InvalidOperationException` | Message written to `Console.Error`; returns exit code `1` |
-| Any other exception | Message written to `Console.Error`; exception re-thrown |
+- If `context.RequirementsFiles.Count == 0`, writes an informational "No requirements files
+  specified." message via `context.WriteLine` and returns early without performing any further
+  processing.
+- Loads requirements via `Requirements.Load`.
+- Reports any lint issues found; aborts if loading failed.
+- Exports the requirements report if `context.RequirementsReport` is set.
+- If `context.JustificationsFile` is set, `requirements.ExportJustifications` is called to
+  produce the justifications report before the trace matrix is constructed.
+- Constructs a `TraceMatrix` if `context.TestFiles` is non-empty; exports the matrix if
+  `context.Matrix` is set.
+- If `context.Matrix` is set and `context.TestFiles` is empty, writes an error via
+  `context.WriteError` and returns without constructing a `TraceMatrix`.
+- If `--enforce` is set but `context.TestFiles` is empty (so no `TraceMatrix` was constructed),
+  an error is reported via `context.WriteError` and the method returns without enforcing coverage.
+- Enforces coverage if `--enforce` is set, via `EnforceRequirementsCoverage`.
 
-`ArgumentException` is thrown by `Context.Create` for invalid arguments and is user-actionable.
-`InvalidOperationException` signals a domain error (YAML validation, test-result parse failure);
-its message is sufficient for diagnosis. All other exceptions are re-thrown so the operating
-system or process supervisor captures the full stack trace for unexpected failures.
+**EnforceRequirementsCoverage** (private): Evaluates whether all requirements are covered by
+passing tests. Never throws; all failure signalling goes through `context.WriteError`.
 
-#### `Run(context)`
+### Error Handling
 
-`Run` implements the priority-ordered dispatch shown in the table below. Return steps exit
-immediately; the banner step (row 2) prints the banner and then falls through to the next step.
+`Main` is the sole error boundary for the process:
 
-| Priority | Condition | Action |
-| -------- | --------- | ------ |
-| 1 | `context.Version` is `true` | Print version string only; return |
-| 2 | `context.Lint` is `false` | Call `PrintBanner` (no return; falls through to next step) |
-| 3 | `context.Help` is `true` | Call `PrintHelp`; return |
-| 4 | `context.Validate` is `true` | Call `Validation.Run(context)`; return |
-| 5 | `context.Lint` is `true`, no RequirementsFiles | Print "No requirements files specified"; return |
-| 6 | `context.Lint` is `true` | Call `Requirements.Load(context.RequirementsFiles)`; report lint issues; return |
-| 7 | (default) | Call `ProcessRequirements(context)` |
+- **`ArgumentException`**: Caught; the exception message is written to `Console.Error` prefixed
+  with `"Error: "` and exit code `1` is returned. This covers invalid or missing argument values
+  detected during `Context.Create`.
+- **`InvalidOperationException`**: Caught; handled identically to `ArgumentException`. This
+  covers operational failures raised by domain logic (e.g., malformed input files).
+- **Unexpected exceptions**: Not caught; the exception message is first written to `Console.Error`
+  (prefixed with `"Unexpected error: "`) so the error is visible even when the runtime's
+  unhandled-exception handler suppresses the stack trace, then the exception is re-thrown to
+  preserve the full stack trace and generate event logs.
 
-With priorities 5 and 6 the `Run` method enters the `if (context.Lint)` block. Priority 5 guards
-the early-exit path for the no-files case; priority 6 is the normal lint path that follows.
+Errors that occur within `Run` and its callees (e.g., I/O failures, parse errors) that are not
+`ArgumentException` or `InvalidOperationException` propagate unhandled through `Run` and are
+caught by the `Main` unexpected-exception handler.
 
-#### `PrintBanner`
+### Interactions
 
-`PrintBanner` writes three lines to `context`: the tool name with version string, the copyright
-notice, and a blank line. It is called at priority step 2 for all invocations except version
-queries and lint runs, so that every non-trivial invocation identifies the running version.
-The banner is suppressed during lint to keep output clean for lint script integration — only
-actionable issue lines are emitted.
+**Dependencies** (units and subsystems this unit calls):
 
-#### `PrintHelp`
+- `Cli.Context` — created by `Main` via `Context.Create(args)`; all output and program state flow
+  through it.
+- `Modeling.Requirements` — loaded via `Requirements.Load` in both the lint and default dispatch
+  paths.
+- `SelfTest.Validation` — invoked via `Validation.Run(context)` in the `--validate` dispatch
+  path.
+- `Tracing.TraceMatrix` — constructed directly in `ProcessRequirements` when test files are
+  present.
 
-`PrintHelp` writes the full option listing to `context`. It documents every supported flag and
-argument, grouped logically. It is only called when `--help` is present.
+**Callers** (who calls this unit):
 
-#### `ProcessRequirements`
-
-`ProcessRequirements` orchestrates the normal (non-version, non-help, non-validate, non-lint) run.
-If `context.RequirementsFiles` is empty, it writes "No requirements files specified." and returns
-immediately. Otherwise it calls `Requirements.Load(context.RequirementsFiles)` to build the parsed
-requirement tree. It then conditionally generates the requirements report (if `--report` is set)
-and the justifications report (if `--justifications` is set). If `--tests` files are provided, a
-`TraceMatrix` is constructed from the requirement tree and the test result files to enable coverage
-analysis. If `--matrix` is set and a `TraceMatrix` was built, the trace matrix report is exported;
-if `--matrix` is set but no test files were provided, an error is reported via `context.WriteError`
-and no matrix file is written.
-If `--enforce` is active, `EnforceRequirementsCoverage` is called last so that all reports are
-generated even when coverage fails. All export methods respect `context.FilterTags` for tag-filtered
-output.
-
-#### `EnforceRequirementsCoverage`
-
-`EnforceRequirementsCoverage` evaluates whether all requirements are covered by passing tests. If
-no `TraceMatrix` was built (i.e., no `--tests` argument was provided), it reports an error
-indicating that enforcement requires test results. Otherwise, it calls
-`traceMatrix.CalculateSatisfiedRequirements(context.FilterTags)` to obtain satisfied and total
-counts. If any requirements are unsatisfied, it calls
-`traceMatrix.GetUnsatisfiedRequirements(context.FilterTags)` to retrieve the list of unsatisfied
-requirement IDs and reports each one via `context.WriteError`.
-
-This method never throws; all failure signalling goes through `context.WriteError`, which sets the
-internal error flag and eventually produces a non-zero exit code.
-
-### Interactions with Other Units
-
-| Unit | Nature of interaction |
-| ---- | --------------------- |
-| `Context` | Created in `Main`; passed to all subsystems; owns output and exit code |
-| `Validation` | Called by `Run` when `--validate` is present |
-| `Requirements` | Constructed in `ProcessRequirements`; provides the requirement tree; also used for linting |
-| `TraceMatrix` | Constructed in `ProcessRequirements` when test files are present |
+- The host operating system calls `Main` as the process entry point.
+- `SelfTest.Validation` calls `Program.Run` during self-validation to exercise the full dispatch
+  path without spawning a child process.
+- Test code calls `Program.Run` directly, supplying a pre-constructed `Context`, to exercise all
+  dispatch branches without spawning a child process.

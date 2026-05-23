@@ -1,12 +1,12 @@
 ---
-# SonarMark OTS Software Requirements
-#
-# Requirements for the SonarMark quality reporting tool functionality.
-
+# SonarMark OTS requirements
+# Note: Requirement IDs in OTS files use the project-wide ReqStream-OTS-{ToolName} pattern,
+# which is an accepted deviation from the System-Component-Feature naming standard defined
+# in reqstream-usage.md. Renaming would break traceability across all test files.
 sections:
   - title: OTS Software Requirements
     sections:
-      - title: SonarMark Requirements
+      - title: SonarMark
         requirements:
           - id: ReqStream-OTS-SonarMark
             title: SonarMark shall generate a SonarCloud quality report.

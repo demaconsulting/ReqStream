@@ -1,22 +1,15 @@
 # Introduction
 
-This document specifies the requirements for the ReqStream tool, a .NET command-line application designed for
-managing software requirements in YAML format.
+This document lists all requirements for ReqStream.
 
 ## Purpose
 
-The purpose of this document is to define the functional and non-functional requirements that the ReqStream tool
-must satisfy. These requirements guide the development, testing, and validation of the tool.
+To provide a complete, traceable record of all requirements for ReqStream, including
+functional requirements at the system, subsystem, and unit levels, plus OTS and Shared Package requirements.
 
 ## Scope
 
-This document covers:
-
-- Command-line interface requirements
-- Requirements file processing capabilities
-- Test integration features
-- Reporting and export functionality
-- Platform and runtime support
+This document covers all requirements defined in `docs/reqstream/` for ReqStream.
 
 ## Document Conventions
 
@@ -28,5 +21,4 @@ Throughout this document:
 
 ## References
 
-- ReqStream User Guide: Provides detailed usage instructions and examples
-- ReqStream Repository: <https://github.com/demaconsulting/ReqStream>
+- [ReqStream releases](https://github.com/demaconsulting/ReqStream/releases) — compiled project documentation

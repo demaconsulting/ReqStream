@@ -25,19 +25,25 @@ using DemaConsulting.ReqStream.Utilities;
 namespace DemaConsulting.ReqStream.Tests;
 
 /// <summary>
+/// Collection definition to disable parallel execution for ProgramTests.
+/// </summary>
+[CollectionDefinition("Sequential", DisableParallelization = true)]
+public sealed class SequentialCollectionDefinition;
+
+/// <summary>
 /// Unit tests for the Program class Run method.
 /// </summary>
+[Collection("Sequential")]
 public sealed class ProgramTests : IDisposable
 {
-    private readonly string _testDirectory;
+    /// <summary>Temporary directory providing isolated file-system workspace for this test class instance.</summary>
+    private readonly TemporaryDirectory _testDirectory = new();
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
     public ProgramTests()
     {
-        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(_testDirectory);
     }
 
     /// <summary>
@@ -45,10 +51,7 @@ public sealed class ProgramTests : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (Directory.Exists(_testDirectory))
-        {
-            Directory.Delete(_testDirectory, recursive: true);
-        }
+        _testDirectory.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -59,7 +62,7 @@ public sealed class ProgramTests : IDisposable
     public void Program_Run_WithVersionFlag_PrintsVersion()
     {
         // Arrange: create log file path to capture output
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "version.log");
+        var logFile = _testDirectory.GetFilePath("version.log");
 
         // Act: run with version flag, capturing output to log file
         using (var context = Context.Create(["--version", "--log", logFile]))
@@ -73,6 +76,7 @@ public sealed class ProgramTests : IDisposable
         // Assert: log file contains version output (read after context disposal to ensure flush)
         var outputText = File.ReadAllText(logFile).Trim();
         Assert.False(string.IsNullOrWhiteSpace(outputText));
+        Assert.Contains(Program.Version, outputText);
         Assert.DoesNotContain("Copyright", outputText);
         Assert.DoesNotContain("Usage", outputText);
     }
@@ -84,7 +88,7 @@ public sealed class ProgramTests : IDisposable
     public void Program_Run_WithHelpFlag_PrintsHelp()
     {
         // Arrange: create log file path to capture output
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "help.log");
+        var logFile = _testDirectory.GetFilePath("help.log");
 
         // Act: run with help flag, capturing output to log file
         using (var context = Context.Create(["--help", "--log", logFile]))
@@ -107,7 +111,7 @@ public sealed class ProgramTests : IDisposable
     public void Program_Run_WithValidateFlag_RunsValidation()
     {
         // Arrange: set up log file path for validation output
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "validation.log");
+        var logFile = _testDirectory.GetFilePath("validation.log");
 
         // Act: run with validate flag, capturing output to log file
         using (var context = Context.Create(["--validate", "--silent", "--log", logFile]))
@@ -141,8 +145,8 @@ public sealed class ProgramTests : IDisposable
     public void Program_Run_WithValidateAndResults_WritesResultsFile()
     {
         // Arrange: set up log file and results file paths
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "validation.log");
-        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "validation-results.trx");
+        var logFile = _testDirectory.GetFilePath("validation.log");
+        var resultsFile = _testDirectory.GetFilePath("validation-results.trx");
 
         // Act: run with validate and results flags
         using (var context = Context.Create(["--validate", "--silent", "--log", logFile, "--results", resultsFile]))
@@ -176,8 +180,8 @@ public sealed class ProgramTests : IDisposable
     public void Program_Run_WithValidateAndJUnitResults_WritesJUnitFile()
     {
         // Arrange: set up log file and JUnit results file paths
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "validation.log");
-        var resultsFile = PathHelpers.SafePathCombine(_testDirectory, "validation-results.xml");
+        var logFile = _testDirectory.GetFilePath("validation.log");
+        var resultsFile = _testDirectory.GetFilePath("validation-results.xml");
 
         // Act: run with validate flag and JUnit results file path
         using (var context = Context.Create(["--validate", "--silent", "--log", logFile, "--results", resultsFile]))
@@ -204,36 +208,13 @@ public sealed class ProgramTests : IDisposable
     }
 
     /// <summary>
-    /// Test Run with no requirements files prints an informational message.
-    /// </summary>
-    [Fact]
-    public void Program_Run_WithNoFiles_PrintsMessage()
-    {
-        // Arrange: create log file path to capture output
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "no-files.log");
-
-        // Act: run program with no arguments, capturing output to log file
-        using (var context = Context.Create(["--log", logFile]))
-        {
-            Program.Run(context);
-
-            // Assert: exit code is 0
-            Assert.Equal(0, context.ExitCode);
-        }
-
-        // Assert: message includes "No requirements files specified"
-        var outputText = File.ReadAllText(logFile);
-        Assert.Contains("No requirements files specified", outputText);
-    }
-
-    /// <summary>
     /// Test Run with no requirements files shows message.
     /// </summary>
     [Fact]
     public void Program_Run_WithNoRequirementsFiles_ShowsMessage()
     {
         // Arrange: create log file path to capture output
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "no-req-files.log");
+        var logFile = _testDirectory.GetFilePath("no-req-files.log");
 
         // Act: run with no arguments, capturing output to log file
         using (var context = Context.Create(["--log", logFile]))
@@ -256,7 +237,7 @@ public sealed class ProgramTests : IDisposable
     public void Program_Run_WithRequirementsFiles_ProcessesSuccessfully()
     {
         // Arrange: create a test requirements file in the temp directory
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, @"
 sections:
   - title: Test Section
@@ -268,7 +249,7 @@ sections:
         var originalDir = Directory.GetCurrentDirectory();
         try
         {
-            Directory.SetCurrentDirectory(_testDirectory);
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
 
             // Act: run with requirements file glob
             using var context = Context.Create(["--requirements", "*.yaml"]);
@@ -290,7 +271,7 @@ sections:
     public void Program_Run_WithRequirementsExport_GeneratesReport()
     {
         // Arrange: create a test requirements file and set report output path
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, @"
 sections:
   - title: Test Section
@@ -299,12 +280,12 @@ sections:
         title: Test Requirement
 ");
 
-        var reportFile = PathHelpers.SafePathCombine(_testDirectory, "report.md");
+        var reportFile = _testDirectory.GetFilePath("report.md");
 
         var originalDir = Directory.GetCurrentDirectory();
         try
         {
-            Directory.SetCurrentDirectory(_testDirectory);
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
 
             // Act: run with requirements and report flags
             using var context = Context.Create(["--requirements", "*.yaml", "--report", reportFile]);
@@ -331,7 +312,7 @@ sections:
     public void Program_Run_WithTraceMatrixExport_GeneratesMatrix()
     {
         // Arrange: create requirements file and TRX test results file
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, @"
 sections:
   - title: Test Section
@@ -352,15 +333,15 @@ sections:
             Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
             Duration = TimeSpan.FromSeconds(1)
         });
-        var trxFile = PathHelpers.SafePathCombine(_testDirectory, "tests.trx");
+        var trxFile = _testDirectory.GetFilePath("tests.trx");
         File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
 
-        var matrixFile = PathHelpers.SafePathCombine(_testDirectory, "matrix.md");
+        var matrixFile = _testDirectory.GetFilePath("matrix.md");
 
         var originalDir = Directory.GetCurrentDirectory();
         try
         {
-            Directory.SetCurrentDirectory(_testDirectory);
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
 
             // Act: run with requirements, tests, and matrix flags
             using var context = Context.Create([
@@ -391,7 +372,7 @@ sections:
     public void Program_Run_WithVersionAndHelp_ProcessesVersionFirst()
     {
         // Arrange: create log file path to capture output
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "version-and-help.log");
+        var logFile = _testDirectory.GetFilePath("version-and-help.log");
 
         // Act: run with both version and help flags, capturing output to log file
         using (var context = Context.Create(["--version", "--help", "--log", logFile]))
@@ -413,7 +394,7 @@ sections:
     public void Program_Run_WithHelpAndValidate_ProcessesHelpFirst()
     {
         // Arrange: create log file path to capture output
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "help-and-validate.log");
+        var logFile = _testDirectory.GetFilePath("help-and-validate.log");
 
         // Act: run with both help and validate flags, capturing output to log file
         using (var context = Context.Create(["--help", "--validate", "--log", logFile]))
@@ -434,7 +415,7 @@ sections:
     public void Program_Run_WithEnforcementAndFullySatisfiedRequirements_Succeeds()
     {
         // Arrange: create requirements file and TRX with all requirements covered by passing tests
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, @"
 sections:
   - title: Test Section
@@ -456,13 +437,13 @@ sections:
             Duration = TimeSpan.FromSeconds(1)
         });
 
-        var trxFile = PathHelpers.SafePathCombine(_testDirectory, "tests.trx");
+        var trxFile = _testDirectory.GetFilePath("tests.trx");
         File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
 
         var originalDir = Directory.GetCurrentDirectory();
         try
         {
-            Directory.SetCurrentDirectory(_testDirectory);
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
 
             // Act: run with requirements, tests, and enforce flags
             using var context = Context.Create([
@@ -488,7 +469,7 @@ sections:
     public void Program_Run_WithEnforcementAndUnsatisfiedRequirements_Fails()
     {
         // Arrange: create requirements file with one tested and one untested requirement, and a passing TRX
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, @"
 sections:
   - title: Test Section
@@ -512,15 +493,15 @@ sections:
             Duration = TimeSpan.FromSeconds(1)
         });
 
-        var trxFile = PathHelpers.SafePathCombine(_testDirectory, "tests.trx");
+        var trxFile = _testDirectory.GetFilePath("tests.trx");
         File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
 
         var originalDir = Directory.GetCurrentDirectory();
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "enforcement-test.log");
+        var logFile = _testDirectory.GetFilePath("enforcement-test.log");
 
         try
         {
-            Directory.SetCurrentDirectory(_testDirectory);
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
 
             // Act: run with requirements, tests, and enforce flags
             int exitCode;
@@ -558,7 +539,7 @@ sections:
     public void Program_Run_WithEnforcementAndNoTests_Fails()
     {
         // Arrange: create a requirements file with no test TRX
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, @"
 sections:
   - title: Test Section
@@ -570,7 +551,7 @@ sections:
         var originalDir = Directory.GetCurrentDirectory();
         try
         {
-            Directory.SetCurrentDirectory(_testDirectory);
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
 
             // Act: run with requirements and enforce flags but no test files
             using var context = Context.Create([
@@ -595,7 +576,7 @@ sections:
     public void Program_Run_WithLintFlag_RunsLinter()
     {
         // Arrange: create a valid requirements file with no issues
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, @"
 sections:
   - title: Test Section
@@ -604,12 +585,12 @@ sections:
         title: Test Requirement
 ");
 
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "lint.log");
+        var logFile = _testDirectory.GetFilePath("lint.log");
 
         var originalDir = Directory.GetCurrentDirectory();
         try
         {
-            Directory.SetCurrentDirectory(_testDirectory);
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
 
             // Act: run with lint flag against a clean requirements file
             using var context = Context.Create(["--lint", "--requirements", "*.yaml", "--silent", "--log", logFile]);
@@ -636,7 +617,7 @@ sections:
     public void Program_Run_WithLintFlag_SuppressesBanner()
     {
         // Arrange: create a valid requirements file and log file to capture output
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, @"
 sections:
   - title: Test Section
@@ -645,12 +626,12 @@ sections:
         title: Test Requirement
 ");
 
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "lint-banner.log");
+        var logFile = _testDirectory.GetFilePath("lint-banner.log");
 
         var originalDir = Directory.GetCurrentDirectory();
         try
         {
-            Directory.SetCurrentDirectory(_testDirectory);
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
 
             // Act: run with lint flag, capturing output to log file
             using var context = Context.Create(["--lint", "--requirements", "*.yaml", "--log", logFile]);
@@ -679,7 +660,7 @@ sections:
     public void Program_Run_WithLintFlag_OnlyOutputsIssues()
     {
         // Arrange: create a valid requirements file and a second file with a duplicate ID
-        var validFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var validFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(validFile, @"
 sections:
   - title: Test Section
@@ -689,7 +670,7 @@ sections:
 ");
 
         // Create a second file with a duplicate ID to cause a lint issue
-        var badFile = PathHelpers.SafePathCombine(_testDirectory, "bad-requirements.yaml");
+        var badFile = _testDirectory.GetFilePath("bad-requirements.yaml");
         File.WriteAllText(badFile, @"
 sections:
   - title: Bad Section
@@ -698,12 +679,12 @@ sections:
         title: Duplicate Requirement
 ");
 
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "lint-issues.log");
+        var logFile = _testDirectory.GetFilePath("lint-issues.log");
 
         var originalDir = Directory.GetCurrentDirectory();
         try
         {
-            Directory.SetCurrentDirectory(_testDirectory);
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
 
             // Act: run lint across both files
             using var context = Context.Create([
@@ -737,7 +718,7 @@ sections:
     public void Program_Run_WithEnforcementAndFailedTests_Fails()
     {
         // Arrange: create requirements file and TRX with a failed test
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, @"
 sections:
   - title: Test Section
@@ -759,13 +740,13 @@ sections:
             Duration = TimeSpan.FromSeconds(1)
         });
 
-        var trxFile = PathHelpers.SafePathCombine(_testDirectory, "tests.trx");
+        var trxFile = _testDirectory.GetFilePath("tests.trx");
         File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
 
         var originalDir = Directory.GetCurrentDirectory();
         try
         {
-            Directory.SetCurrentDirectory(_testDirectory);
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
 
             // Act: run with requirements, tests, and enforce flags
             using var context = Context.Create([
@@ -791,7 +772,7 @@ sections:
     public void Program_Run_WithLintAndNoRequirements_PrintsInformationalMessage()
     {
         // Arrange: create log file path to capture output
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "lint-no-req.log");
+        var logFile = _testDirectory.GetFilePath("lint-no-req.log");
 
         // Act: run with lint flag but no requirements files
         using (var context = Context.Create(["--lint", "--log", logFile]))
@@ -814,7 +795,7 @@ sections:
     public void Program_Run_WithJustificationsExport_GeneratesJustificationsReport()
     {
         // Arrange: create a test requirements file with justification text and set report output path
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, @"
 sections:
   - title: Test Section
@@ -824,12 +805,12 @@ sections:
         justification: This requirement exists to test the justifications export feature.
 ");
 
-        var justificationsFile = PathHelpers.SafePathCombine(_testDirectory, "justifications.md");
+        var justificationsFile = _testDirectory.GetFilePath("justifications.md");
 
         var originalDir = Directory.GetCurrentDirectory();
         try
         {
-            Directory.SetCurrentDirectory(_testDirectory);
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
 
             // Act: run with requirements and justifications flags
             using var context = Context.Create(["--requirements", "*.yaml", "--justifications", justificationsFile]);
@@ -854,7 +835,7 @@ sections:
     public void Program_Run_WithMatrixButNoTestFiles_ReportsError()
     {
         // Arrange: create a requirements file but no test result files
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, @"
 sections:
   - title: Test Section
@@ -863,13 +844,13 @@ sections:
         title: Test Requirement
 ");
 
-        var matrixFile = PathHelpers.SafePathCombine(_testDirectory, "matrix.md");
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "matrix-no-tests.log");
+        var matrixFile = _testDirectory.GetFilePath("matrix.md");
+        var logFile = _testDirectory.GetFilePath("matrix-no-tests.log");
 
         var originalDir = Directory.GetCurrentDirectory();
         try
         {
-            Directory.SetCurrentDirectory(_testDirectory);
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
 
             // Act: run with requirements and matrix flags but no test files
             int exitCode;
@@ -906,7 +887,7 @@ sections:
     public void Program_Run_WithMatrixAndUnmatchedTestsPattern_ReportsError()
     {
         // Arrange: create a requirements file but no test result files matching the pattern
-        var reqFile = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(reqFile, @"
 sections:
   - title: Test Section
@@ -915,13 +896,13 @@ sections:
         title: Test Requirement
 ");
 
-        var matrixFile = PathHelpers.SafePathCombine(_testDirectory, "matrix.md");
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "matrix-unmatched-tests.log");
+        var matrixFile = _testDirectory.GetFilePath("matrix.md");
+        var logFile = _testDirectory.GetFilePath("matrix-unmatched-tests.log");
 
         var originalDir = Directory.GetCurrentDirectory();
         try
         {
-            Directory.SetCurrentDirectory(_testDirectory);
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
 
             // Act: run with requirements, matrix, and --tests pointing at a pattern that matches nothing
             int exitCode;

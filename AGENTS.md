@@ -26,6 +26,19 @@
     └── DemaConsulting.ReqStream.Tests/
 ```
 
+# Language and Spelling (ALL Agents)
+
+Always use **US English** spelling in all output (code, comments, documentation,
+commit messages, and reports).
+
+# Reference Template
+
+This repository follows a reference template for structure and file conventions.
+
+- **Template URL**: `https://github.com/demaconsulting/Agents/raw/refs/heads/template`
+- **Repository map**: `{template-url}/repository-map.md`
+- **Template files**: `{template-url}/{file-path}` for files described in the map
+
 # Codebase Navigation (ALL Agents)
 
 When working with source code, design, or requirements artifacts, read
@@ -54,17 +67,15 @@ before searching the filesystem.
 Before performing any work, agents must read and apply the relevant standards
 from `.github/standards/`. Use this matrix to determine which to load:
 
-| Work involves...     | Load these standards                                                               |
-|----------------------|------------------------------------------------------------------------------------|
-| Any code             | `coding-principles.md`                                                             |
-| C# code              | `coding-principles.md`, `csharp-language.md`                                       |
-| Any tests            | `testing-principles.md`                                                            |
-| C# tests             | `testing-principles.md`, `csharp-testing.md`                                       |
-| Requirements         | `requirements-principles.md`, `software-items.md`, `reqstream-usage.md`            |
-| Design docs          | `software-items.md`, `design-documentation.md`, `technical-documentation.md`       |
-| Verification docs    | `software-items.md`, `verification-documentation.md`, `technical-documentation.md` |
-| Review configuration | `software-items.md`, `reviewmark-usage.md`                                         |
-| Any documentation    | `technical-documentation.md`                                                       |
+- **Any code**: `coding-principles.md`
+- **C# code**: `coding-principles.md`, `csharp-language.md`
+- **Any tests**: `testing-principles.md`
+- **C# tests**: `testing-principles.md`, `csharp-testing.md`
+- **Requirements**: `requirements-principles.md`, `software-items.md`, `reqstream-usage.md`
+- **Design docs**: `software-items.md`, `design-documentation.md`, `technical-documentation.md`
+- **Verification docs**: `software-items.md`, `verification-documentation.md`, `technical-documentation.md`
+- **Review configuration**: `software-items.md`, `reviewmark-usage.md`
+- **Any documentation**: `technical-documentation.md`
 
 Load only the standards relevant to your specific task scope.
 
@@ -79,6 +90,7 @@ Delegate to specialized agents only for specific scenarios:
 - **Formal feature implementation** (complex, multi-step) → Call the implementation agent
 - **Formal bug resolution** (complex debugging, systematic fixes) → Call the implementation agent
 - **Formal reviews** (compliance verification, detailed analysis) → Call the formal-review agent
+- **Structural audit**: (repository layout vs. template) → Call the template-sync agent
 
 # Agent Reporting (Specialized Agents Must Follow)
 

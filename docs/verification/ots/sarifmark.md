@@ -1,4 +1,4 @@
-## SarifMark Verification
+## SarifMark
 
 ### Required Functionality
 
@@ -13,13 +13,17 @@ SarifMark is verified by CI pipeline step evidence. The tool's built-in `--valid
 command is executed in the CI pipeline and writes test method results to a TRX file.
 The TRX file is consumed by ReqStream to satisfy the OTS requirement.
 
-Test evidence names (test methods written to the TRX file by `dotnet sarifmark --validate`):
+### Test Scenarios
 
-- `SarifMark_SarifReading` — validates that SarifMark can read SARIF input
-- `SarifMark_MarkdownReportGeneration` — validates that SarifMark can generate a Markdown report
+**SARIF Reading**: Validates that SarifMark can read and parse SARIF input produced by CodeQL.
+This scenario is tested by `SarifMark_SarifReading`.
 
-### Coverage Summary
+**Markdown Report Generation**: Validates that SarifMark can generate a Markdown report from
+parsed SARIF data. This scenario is tested by `SarifMark_MarkdownReportGeneration`.
 
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-OTS-SarifMark` | `SarifMark_SarifReading`, `SarifMark_MarkdownReportGeneration` |
+### Requirements Coverage
+
+| Requirement | Scenario | Test Method(s) |
+| --- | --- | --- |
+| ReqStream-OTS-SarifMark | SARIF Reading | `SarifMark_SarifReading` |
+| ReqStream-OTS-SarifMark | Markdown Report Generation | `SarifMark_MarkdownReportGeneration` |

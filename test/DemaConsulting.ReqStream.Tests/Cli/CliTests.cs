@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using DemaConsulting.ReqStream.Cli;
+
 using DemaConsulting.ReqStream.Utilities;
 
 namespace DemaConsulting.ReqStream.Tests.Cli;
@@ -29,15 +30,15 @@ namespace DemaConsulting.ReqStream.Tests.Cli;
 /// </summary>
 public sealed class CliTests : IDisposable
 {
-    private readonly string _testDirectory;
+    /// <summary>Temporary directory providing isolated file-system workspace for this test class instance.</summary>
+    private readonly TemporaryDirectory _testDirectory = new();
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
     public CliTests()
     {
-        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_cli_{Guid.NewGuid()}");
-        Directory.CreateDirectory(_testDirectory);
+
     }
 
     /// <summary>
@@ -45,10 +46,7 @@ public sealed class CliTests : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (Directory.Exists(_testDirectory))
-        {
-            Directory.Delete(_testDirectory, recursive: true);
-        }
+        _testDirectory.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -116,7 +114,7 @@ public sealed class CliTests : IDisposable
     public void Cli_Output_LogFlag_WritesOutputToLogFile()
     {
         // Arrange: define path for the log output file
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "output.log");
+        var logFile = _testDirectory.GetFilePath("output.log");
 
         // Act: create a context with the --log flag, write a message, then dispose to flush
         using (var context = Context.Create(["--silent", "--log", logFile]))
@@ -161,7 +159,8 @@ public sealed class CliTests : IDisposable
     public void Cli_Interface_LogFileOpenFailure_ThrowsArgumentException()
     {
         // Arrange: use a path inside a directory that does not exist
-        var invalidLogPath = PathHelpers.SafePathCombine(PathHelpers.SafePathCombine(_testDirectory, "nonexistent-subdir"), "output.log");
+        var invalidLogDirectory = PathHelpers.SafePathCombine(_testDirectory.DirectoryPath, "nonexistent-subdir");
+        var invalidLogPath = PathHelpers.SafePathCombine(invalidLogDirectory, "output.log");
 
         // Act + Assert: creating a context with an inaccessible log file throws ArgumentException
         Assert.Throws<ArgumentException>(() => Context.Create(["--log", invalidLogPath]));

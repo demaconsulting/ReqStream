@@ -30,15 +30,15 @@ namespace DemaConsulting.ReqStream.Tests.Modeling;
 /// </summary>
 public sealed class LoadResultTests : IDisposable
 {
-    private readonly string _testDirectory;
+    /// <summary>Temporary directory providing isolated file-system workspace for this test class instance.</summary>
+    private readonly TemporaryDirectory _testDirectory = new();
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
     public LoadResultTests()
     {
-        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_load_result_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(_testDirectory);
+
     }
 
     /// <summary>
@@ -46,10 +46,7 @@ public sealed class LoadResultTests : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (Directory.Exists(_testDirectory))
-        {
-            Directory.Delete(_testDirectory, recursive: true);
-        }
+        _testDirectory.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -68,13 +65,13 @@ sections:
         title: ""A requirement.""
         unknown_field: bad
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         var result = Requirements.Load(filePath);
 
         // Act: report the issues via context
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "report-issues-error.log");
+        var logFile = _testDirectory.GetFilePath("report-issues-error.log");
         int exitCode;
         using (var context = Context.Create(["--silent", "--log", logFile]))
         {
@@ -100,7 +97,7 @@ sections:
             [new LintIssue("file.yaml", LintSeverity.Warning, "A warning")]);
 
         // Act: report issues via context
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "report-issues-warning.log");
+        var logFile = _testDirectory.GetFilePath("report-issues-warning.log");
         int exitCode;
         using (var context = Context.Create(["--silent", "--log", logFile]))
         {
@@ -128,13 +125,13 @@ sections:
       - id: ""REQ-001""
         title: ""A valid requirement.""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         var result = Requirements.Load(filePath);
 
         // Act: report issues via context
-        var logFile = PathHelpers.SafePathCombine(_testDirectory, "report-issues-none.log");
+        var logFile = _testDirectory.GetFilePath("report-issues-none.log");
         int exitCode;
         using (var context = Context.Create(["--silent", "--log", logFile]))
         {
@@ -148,6 +145,22 @@ sections:
     }
 
     /// <summary>
+    /// Test that HasErrors is false when Issues is an empty collection.
+    /// </summary>
+    [Fact]
+    public void LoadResult_HasErrors_NoIssues_ReturnsFalse()
+    {
+        // Arrange: create a load result with no issues
+        var result = new LoadResult(new Requirements(), []);
+
+        // Act: evaluate HasErrors
+        var hasErrors = result.HasErrors;
+
+        // Assert: HasErrors is false when there are no issues
+        Assert.False(hasErrors);
+    }
+
+    /// <summary>
     /// Test that HasErrors is false when there are only warnings.
     /// </summary>
     [Fact]
@@ -158,8 +171,11 @@ sections:
             new Requirements(),
             [new LintIssue("file.yaml", LintSeverity.Warning, "A warning")]);
 
+        // Act: evaluate HasErrors
+        var hasErrors = result.HasErrors;
+
         // Assert: HasErrors is false and Requirements is not null for warnings-only results
-        Assert.False(result.HasErrors);
+        Assert.False(hasErrors);
         Assert.NotNull(result.Requirements);
     }
 
@@ -174,8 +190,11 @@ sections:
             null,
             [new LintIssue("file.yaml", LintSeverity.Error, "An error")]);
 
+        // Act: evaluate HasErrors
+        var hasErrors = result.HasErrors;
+
         // Assert: HasErrors is true and Requirements is null for error results
-        Assert.True(result.HasErrors);
+        Assert.True(hasErrors);
         Assert.Null(result.Requirements);
     }
 }

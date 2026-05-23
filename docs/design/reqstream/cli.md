@@ -1,71 +1,60 @@
-## Cli Subsystem Design
-
-The `Cli` subsystem provides the command-line interface for ReqStream.
-It is responsible for accepting user input from the command line and routing output to
-the console and an optional log file.
+## Cli
 
 ### Overview
 
-The `Cli` subsystem acts as the primary boundary between the user's shell invocation and
-the tool's internal logic. It owns argument parsing, output formatting, and error tracking.
-All other subsystems receive a `Context` object from the `Cli` subsystem to read parsed
-flags and write output.
-
-### Units
+The `Cli` subsystem provides the command-line interface for ReqStream. It acts as the primary
+boundary between the user's shell invocation and the tool's internal logic, owning argument
+parsing, output formatting, and error tracking. All other subsystems receive a `Context` object
+from the `Cli` subsystem to read parsed flags and write output.
 
 The `Cli` subsystem contains the following software unit:
 
-| Unit                          | File             | Responsibility                                                |
-|-------------------------------|------------------|---------------------------------------------------------------|
-| `Context`                     | `Cli/Context.cs` | Argument parsing, output channels, and exit code.             |
+- **Context** (`Cli/Context.cs`) — Argument parsing, output channels, and exit code.
 
 ### Interfaces
 
-The `Cli` subsystem exposes the following interface to the rest of the tool:
+**Context.Create**: Factory method constructing a `Context` from `string[] args`.
 
-- **`Context.Create`** — Factory method constructing a `Context` from `string[] args`.
-- **`Context.Version`** — `true` when `--version` was specified.
-- **`Context.Help`** — `true` when `--help` was specified.
-- **`Context.Silent`** — `true` when `--silent` was specified.
-- **`Context.Validate`** — `true` when `--validate` was specified.
-- **`Context.Lint`** — `true` when `--lint` was specified.
-- **`Context.Enforce`** — `true` when `--enforce` was specified.
-- **`Context.ResultsFile`** — Path for validation results output file (`--results`), or `null`.
-- **`Context.FilterTags`** — Set of filter tags from `--filter`, or `null` when not specified.
-- **`Context.RequirementsFiles`** — Glob-expanded list of requirements file paths from `--requirements`.
-- **`Context.TestFiles`** — Glob-expanded list of test result file paths from `--tests`.
-- **`Context.RequirementsReport`** — Path for requirements report output file (`--report`), or `null`.
-- **`Context.Depth`** — Default markdown header depth for all reports (`--depth`; default 1).
-- **`Context.ReportDepth`** — Markdown header depth for the requirements report.
-- **`Context.Matrix`** — Path for trace matrix output file (`--matrix`), or `null`.
-- **`Context.MatrixDepth`** — Markdown header depth for the trace matrix.
-- **`Context.JustificationsFile`** — Path for justifications output file (`--justifications`), or `null`.
-- **`Context.JustificationsDepth`** — Markdown header depth for the justifications report.
-- **`Context.WriteLine`** — Writes a message to console and optional log file.
-- **`Context.WriteError`** — Writes an error to stderr (suppressed when `--silent` is active),
-  appends it to the log file if logging is enabled, and sets the error exit code.
-- **`Context.ExitCode`** — Returns 0 for success or 1 when errors have been reported.
-- **`Context.Dispose`** — Closes the log file writer and releases resources.
+- *Type*: In-process .NET public API (static factory).
+- *Role*: Provider (other units consume the returned `Context`).
+- *Contract*: Parses CLI flags; expands glob patterns via `GlobMatcher`; returns a fully
+  initialized `Context`. Throws `ArgumentException` for invalid arguments.
+- *Constraints*: Must not write to console output channels (`Console.Out` / `Console.Error`); read-only filesystem access for glob pattern expansion is permitted.
 
-### Interactions
+**Context output channels**: `WriteLine` and `WriteError` methods.
+
+- *Type*: In-process .NET public API.
+- *Role*: Provider (all subsystems write output through these methods).
+- *Contract*: `WriteLine` writes to stdout and optional log; `WriteError` writes to stderr,
+  sets the error flag, and optionally logs.
+- *Constraints*: Suppressed when `--silent` is active.
+
+**Context properties**: Parsed flags and file lists (`Version`, `Help`, `Silent`, `Validate`,
+`Lint`, `Enforce`, `RequirementsFiles`, `TestFiles`, `RequirementsReport`, `Matrix`,
+`JustificationsFile`, `ResultsFile`, `FilterTags`, `Depth`, `ReportDepth`, `MatrixDepth`,
+`JustificationsDepth`, `ExitCode`).
+
+- *Type*: In-process .NET public API (read-only properties).
+- *Role*: Provider.
+- *Contract*: Each property reflects the parsed command-line state.
+- *Constraints*: Immutable after construction (except `_hasErrors` which is set by `WriteError`).
+
+### Design
+
+The `Cli` subsystem contains a single unit, `Context`, which is constructed by `Program.Main`
+via the static factory method `Context.Create(args)`. After construction, `Program` holds the
+`Context` and passes it to all subsystems that need to produce output. The subsystem has no
+internal unit-to-unit collaboration; its design is defined entirely by the `Context` unit.
+
+`Context` implements `IDisposable` so that the log-file `StreamWriter` is closed
+deterministically when `Program.Main`'s `using` block exits.
+
+**Depth inheritance rule**: When `--depth N` is specified on the command line, it sets the
+global default heading depth (`Depth = N`). Each per-report depth property (`ReportDepth`,
+`MatrixDepth`, `JustificationsDepth`) falls back to this default if its corresponding specific
+flag (`--report-depth`, `--matrix-depth`, `--justifications-depth`) is not supplied. In other
+words, omitting a specific depth flag causes that report to use the same depth as `--depth`. If
+neither `--depth` nor a specific depth flag is present, the value defaults to `1`.
 
 The `Cli` subsystem has no dependencies on other tool subsystems. It uses only .NET base
-class library types. The `Program` unit at system level creates the `Context` and passes it
-to all subsystems that need to produce output.
-
-### Error Handling
-
-`Context.Create` throws `ArgumentException` under the following conditions:
-
-- **Unknown argument** — An unrecognized flag is present in `args`.
-- **Missing argument value** — A flag that requires a value is the last argument (no value follows).
-- **Invalid depth value** — A `--depth`, `--report-depth`, `--matrix-depth`,
-  or `--justifications-depth` value is not a positive integer.
-- **Log file open failure** — The file path provided to `--log` cannot be opened for writing.
-
-### Depth Inheritance
-
-`Context.ReportDepth`, `Context.MatrixDepth`, and `Context.JustificationsDepth` all default
-to `Context.Depth` when not individually overridden by `--report-depth`, `--matrix-depth`, or
-`--justifications-depth` respectively. This means that `--depth 2` applies to all three reports
-unless a report-specific depth flag is also present.
+class library types and `GlobMatcher` from the Utilities subsystem for pattern expansion.

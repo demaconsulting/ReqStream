@@ -23,6 +23,13 @@ namespace DemaConsulting.ReqStream.Modeling;
 /// <summary>
 ///     Severity level for a lint issue.
 /// </summary>
+/// <remarks>
+///     The two-value classification exists because severity determines whether processing can
+///     continue: <see cref="Error"/> issues indicate a malformed or unloadable requirements
+///     file and prevent successful loading, while <see cref="Warning"/> issues allow processing
+///     to continue with the available data. Enum values are immutable constants and are safe
+///     for concurrent use without synchronization.
+/// </remarks>
 public enum LintSeverity
 {
     /// <summary>
@@ -39,14 +46,22 @@ public enum LintSeverity
 /// <summary>
 ///     Represents a single issue found during requirements linting or loading.
 /// </summary>
+/// <remarks>
+///     <c>LintIssue</c> is a structured, immutable value type designed to make lint diagnostics
+///     parseable by editors and CI tools via its <see cref="ToString"/> format. The immutability
+///     design decision — all properties are init-only — ensures that issues cannot be modified
+///     after construction, so that diagnostic collections remain trustworthy throughout the
+///     reporting pipeline. <c>LintIssue</c> is thread-safe for concurrent read access after
+///     construction; no synchronization is required to read its properties from multiple threads.
+/// </remarks>
 public sealed class LintIssue
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="LintIssue"/> class.
     /// </summary>
-    /// <param name="location">The location string (e.g. "file.yaml" or "file.yaml(3,5)").</param>
+    /// <param name="location">The location string (e.g. "file.yaml" or "file.yaml(3,5)"). Must not be null.</param>
     /// <param name="severity">The severity of the issue.</param>
-    /// <param name="description">A human-readable description of the issue.</param>
+    /// <param name="description">A human-readable description of the issue. Must not be null.</param>
     public LintIssue(string location, LintSeverity severity, string description)
     {
         Location = location;
@@ -73,6 +88,11 @@ public sealed class LintIssue
     ///     Returns the issue formatted as "location: severity: description".
     /// </summary>
     /// <returns>A formatted string representing the issue.</returns>
+    /// <remarks>
+    ///     The <c>"location: severity: description"</c> format was chosen for compatibility with
+    ///     editors and CI tools that parse diagnostic location and severity tokens from tool output,
+    ///     allowing them to navigate directly to the source of the issue.
+    /// </remarks>
     public override string ToString()
     {
         var severityText = Severity == LintSeverity.Error ? "error" : "warning";

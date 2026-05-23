@@ -1,14 +1,14 @@
 ---
-title: ReqStream Trace Matrix
-subtitle: Requirements Traceability Matrix for the ReqStream Tool
-author: DEMA Consulting
-description: Requirements Traceability Matrix for the ReqStream Tool
+title: "ReqStream Trace Matrix Report"
+subtitle: "Requirements Trace Matrix for the ReqStream Tool"
+author: "DEMA Consulting"
+description: "Requirements Traceability Report for ReqStream"
 lang: en-US
 keywords:
+  - Requirements
+  - Traceability
   - ReqStream
   - Trace Matrix
-  - Traceability
-  - Requirements
   - Testing
   - .NET
 ---

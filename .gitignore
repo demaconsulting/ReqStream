@@ -75,6 +75,7 @@ BenchmarkDotNet.Artifacts/
 project.lock.json
 project.fragment.lock.json
 artifacts/
+*.slnx.user
 
 # Node.js
 node_modules/
@@ -109,3 +110,7 @@ AGENT_REPORT_*.md
 
 # Agent log files
 .agent-logs/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,4 +1,4 @@
-## BuildMark Verification
+## BuildMark
 
 ### Required Functionality
 
@@ -8,16 +8,26 @@ them as a Markdown build-notes document included in the release artifacts.
 
 ### Verification Approach
 
-BuildMark is verified by CI pipeline step evidence. The tool runs as a named step in the
-GitHub Actions pipeline that produces the release artifacts. A successful pipeline run
-demonstrates that BuildMark executed without error and produced the required output.
+BuildMark is verified by a combination of self-validation and CI integration evidence.
 
-The test evidence name `BuildMark_MarkdownReportGeneration` is linked to the pipeline step
-that invokes BuildMark. A passing result confirms that the generated Markdown build-notes
-document was produced.
+BuildMark supports a `--validate` self-test command. The CI pipeline runs this step — "Run
+BuildMark self-validation" — using `dotnet buildmark --validate`, producing the TRX result file
+`artifacts/buildmark-self-validation.trx`. The `BuildMark_MarkdownReportGeneration` test result
+is produced by that self-validation run and constitutes the primary qualification evidence.
 
-### Coverage Summary
+The "Generate Build Notes" step provides complementary integration evidence: it invokes BuildMark
+to query the GitHub API and write the Markdown build-notes document, confirming end-to-end
+operation on the target platform. Structural correctness of the generated document is further
+validated by the subsequent FileAssert step.
 
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-OTS-BuildMark` | `BuildMark_MarkdownReportGeneration` |
+### Test Scenarios
+
+**Markdown Report Generation**: Verifies that BuildMark self-validates successfully and its internal
+report-generation test passes. This scenario is tested by `BuildMark_MarkdownReportGeneration`,
+produced by the `dotnet buildmark --validate` self-validation run in the CI pipeline.
+
+### Requirements Coverage
+
+| Requirement | Scenario | Test Method(s) |
+| --- | --- | --- |
+| ReqStream-OTS-BuildMark | Markdown Report Generation | `BuildMark_MarkdownReportGeneration` |

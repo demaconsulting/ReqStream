@@ -1,11 +1,13 @@
 ---
 resource-path:
   - docs/design
+  - docs/design/ots
   - docs/design/reqstream
   - docs/design/reqstream/cli
   - docs/design/reqstream/modeling
   - docs/design/reqstream/self-test
   - docs/design/reqstream/tracing
+  - docs/design/reqstream/utilities
   - docs/template
 
 input-files:
@@ -15,6 +17,9 @@ input-files:
   - docs/design/reqstream/program.md
   - docs/design/reqstream/cli.md
   - docs/design/reqstream/cli/context.md
+  - docs/design/reqstream/utilities.md
+  - docs/design/reqstream/utilities/glob-matcher.md
+  - docs/design/reqstream/utilities/path-helpers.md
   - docs/design/reqstream/modeling.md
   - docs/design/reqstream/modeling/lint-issue.md
   - docs/design/reqstream/modeling/load-result.md
@@ -26,6 +31,10 @@ input-files:
   - docs/design/reqstream/tracing/trace-matrix.md
   - docs/design/reqstream/self-test.md
   - docs/design/reqstream/self-test/validation.md
+  - docs/design/ots.md
+  - docs/design/ots/yamldotnet.md
+  - docs/design/ots/microsoft-extensions-file-system-globbing.md
+  - docs/design/ots/dema-consulting-test-results.md
 template: template.html
 
 table-of-contents: true

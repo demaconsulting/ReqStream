@@ -29,15 +29,15 @@ namespace DemaConsulting.ReqStream.Tests.Modeling;
 /// </summary>
 public sealed class RequirementTests : IDisposable
 {
-    private readonly string _testDirectory;
+    /// <summary>Temporary directory providing isolated file-system workspace for this test class instance.</summary>
+    private readonly TemporaryDirectory _testDirectory = new();
 
     /// <summary>
     /// Initialize test by creating a temporary test directory.
     /// </summary>
     public RequirementTests()
     {
-        _testDirectory = PathHelpers.SafePathCombine(Path.GetTempPath(), $"reqstream_requirement_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(_testDirectory);
+
     }
 
     /// <summary>
@@ -45,10 +45,7 @@ public sealed class RequirementTests : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (Directory.Exists(_testDirectory))
-        {
-            Directory.Delete(_testDirectory, recursive: true);
-        }
+        _testDirectory.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -56,7 +53,7 @@ public sealed class RequirementTests : IDisposable
     /// Test that a default Requirement instance has the expected default property values.
     /// </summary>
     [Fact]
-    public void Requirement_Properties_DefaultValues()
+    public void Requirement_Properties_NewInstance_HasDefaultValues()
     {
         // Arrange / Act:
         var requirement = new Requirement();
@@ -89,7 +86,7 @@ sections:
           - ""Credentials_Invalid_Refused""
           - ""Credentials_Missing_Refused""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -128,7 +125,7 @@ sections:
       - id: ""AUTH-002""
         title: ""The system shall reject invalid credentials.""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -162,7 +159,7 @@ sections:
           This requirement is necessary to ensure that only authorized users
           can access the system and to maintain data security and integrity.
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -197,7 +194,7 @@ sections:
           - ""security""
           - ""critical""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -230,7 +227,7 @@ sections:
       - id: ""SYS-SEC-001""
         title: ""Duplicate ID requirement.""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -259,7 +256,7 @@ sections:
       - id: ""SYS-SEC-001""
         title: ""Duplicate ID requirement.""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -287,7 +284,7 @@ sections:
       - id: """"
         title: ""The system shall support credentials authentication.""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -314,7 +311,7 @@ sections:
       - id: ""SYS-SEC-001""
         title: """"
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -345,7 +342,7 @@ sections:
           - """"
           - ""AnotherTest""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -378,7 +375,7 @@ mappings:
       - ""ValidTest""
       - """"
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -410,7 +407,7 @@ mappings:
     tests:
       - ""ValidTest""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -443,7 +440,7 @@ mappings:
       - ""Logging_ValidRequest_Logged""
       - ""Logging_InvalidRequest_Logged""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -461,10 +458,10 @@ mappings:
     }
 
     /// <summary>
-    ///     Test that circular requirements (A -> B -> A) throw an exception at read time.
+    ///     Test that circular requirements (A → B → A) are reported as a lint error with the cycle path.
     /// </summary>
     [Fact]
-    public void Requirements_Load_CircularRequirements_ThrowsInvalidOperationException()
+    public void Requirements_Load_CircularRequirements_ReportsCircularReferenceError()
     {
         // Arrange: create a YAML file with circular child references
         var yamlContent = @"---
@@ -480,7 +477,7 @@ sections:
         children:
           - ""REQ-A""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -510,7 +507,7 @@ sections:
         children:
           - ""REQ-A""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -544,8 +541,8 @@ sections:
       - id: ""SYS-SEC-001""
         title: ""Duplicate requirement with same ID.""
 ";
-        var file1Path = PathHelpers.SafePathCombine(_testDirectory, "file1.yaml");
-        var file2Path = PathHelpers.SafePathCombine(_testDirectory, "file2.yaml");
+        var file1Path = _testDirectory.GetFilePath("file1.yaml");
+        var file2Path = _testDirectory.GetFilePath("file2.yaml");
         File.WriteAllText(file1Path, file1Yaml);
         File.WriteAllText(file2Path, file2Yaml);
 
@@ -578,7 +575,7 @@ sections:
           - """"
           - ""critical""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file
@@ -610,7 +607,7 @@ sections:
       - id: ""AUTH-001""
         title: ""The system shall validate user credentials.""
 ";
-        var filePath = PathHelpers.SafePathCombine(_testDirectory, "requirements.yaml");
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
         File.WriteAllText(filePath, yamlContent);
 
         // Act: load the requirements file

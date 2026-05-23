@@ -1,63 +1,83 @@
-### Requirements Unit Design
+### Requirements
 
-#### Overview
+#### Purpose
 
 `Requirements` is the root of the requirements section tree and the public API entry point for
 the Modeling subsystem. It extends `Section` to inherit the container properties (title,
 requirements list, child sections list) and adds the `Load` static factory method and the
-`Export`/`ExportJustifications` report-generation methods.
+`Export`/`ExportJustifications` report-generation methods. `Requirements` has no knowledge of
+YAML parsing or lint validation; those responsibilities belong entirely to `RequirementsLoader`.
 
-`Requirements` has no knowledge of YAML parsing or lint validation; those responsibilities belong
-entirely to `RequirementsLoader`. Its role is to provide the public surface through which callers
-load and export requirements data.
+#### Data Model
 
-#### Factory Method
+`Requirements` extends `Section` and inherits its container properties (`Title`, `Requirements`,
+`Sections`). It adds no additional instance state; its role is to provide the public API surface
+(static `Load` factory and the two export methods) on top of the `Section` tree root.
 
-##### `Load(paths)`
+#### Key Methods
 
-`Load` is the single static factory method. It accepts one or more file paths, delegates to
-`RequirementsLoader.Load`, and returns the resulting `LoadResult` containing the populated
-`Requirements` tree (or `null` on error) and the complete list of `LintIssue` objects.
-Throws `ArgumentException` when no paths are provided.
+**Load(paths)**: Static factory method that loads and merges YAML requirement files.
 
-Callers that need to abort on errors check `result.HasErrors` or `result.Requirements == null`.
-Callers that need to surface issues to the user call `result.ReportIssues(context)`.
+- *Parameters*: `params string[] paths` — file paths to load.
+- *Returns*: `LoadResult` — contains the populated tree (or `null` on error) and lint issues.
+- *Preconditions*: At least one path must be provided (throws `ArgumentException` otherwise).
+- *Postconditions*: All files are processed; the returned `LoadResult` is consistent.
 
-#### Export Methods
+Delegates to `RequirementsLoader.Load` internally.
 
-| Method | Output | Notes |
-| ------ | ------ | ----- |
-| `Export(filePath, depth, filterTags)` | Requirements Markdown report | Recursive; applies `filterTags` |
-| `ExportJustifications(filePath, depth, filterTags)` | Justifications Markdown report | Recursive with tag filtering |
+**Export(filePath, depth, filterTags)**: Exports the requirement tree to a Markdown report.
 
-Both methods walk the section tree recursively, emitting Markdown headings at the configured
-`depth` and a requirements table for each section. When `filterTags` is non-`null`, only
-requirements whose `Tags` list contains at least one matching tag are included in the output.
+- *Parameters*: `string filePath` — output path; `int depth` — starting heading level;
+  `HashSet<string>? filterTags` — optional tag filter.
+- *Returns*: `void`.
+- *Preconditions*: `filePath` must not be null, empty, or whitespace-only; `depth` must be ≥ 1 (throws
+  `ArgumentOutOfRangeException` when `depth < 1`).
+- *Postconditions*: Markdown file written with one heading per section and a table per section's
+  requirements.
 
-**Error handling**: Both `Export` and `ExportJustifications` throw `ArgumentException` when
-`filePath` is `null` or empty. Both methods propagate any `IOException` or
-`UnauthorizedAccessException` thrown by the underlying file-write operations to the caller
-without wrapping. Callers are responsible for handling file-write failures; the methods do not
-catch or suppress I/O exceptions.
+Walks the section tree recursively, emitting headings at the configured depth. When `filterTags`
+is non-null, only requirements whose `Tags` list contains at least one matching tag are included.
 
-**Export output format**:
+**ExportJustifications(filePath, depth, filterTags)**: Exports justifications to Markdown.
 
-- Each `Section` produces a Markdown heading (`#` through `######` depending on `depth`) with
-  the section title.
-- Each `Section` produces a Markdown table with columns `ID` and `Title` for its requirements.
+- *Parameters*: Same as `Export`.
+- *Returns*: `void`.
+- *Preconditions*: `filePath` must not be null, empty, or whitespace-only; `depth` must be ≥ 1 (throws
+  `ArgumentOutOfRangeException` when `depth < 1`).
+- *Postconditions*: Each requirement produces a sub-heading with its ID and bold title;
+  justification text is included only when non-null and non-empty.
 
-**ExportJustifications output format**:
+#### Error Handling
 
-- Each `Section` produces a Markdown heading at the configured depth.
-- Each requirement with a non-null `Justification` produces a sub-heading and the justification
-  text.
+- `Load` throws `ArgumentException` when no paths are provided.
+- `Export` and `ExportJustifications` throw `ArgumentException` when `filePath` is null, empty, or whitespace-only.
+- `Export` and `ExportJustifications` throw `ArgumentOutOfRangeException` when `depth` is less
+  than 1; the CLI enforces `depth >= 1` before calling these methods.
+- Both export methods propagate `IOException` and `UnauthorizedAccessException` from file-write
+  operations without wrapping; callers are responsible for handling file-write failures.
 
-#### Interactions with Other Units
+#### Interactions
 
-| Unit | Nature of interaction |
-| ---- | --------------------- |
-| `RequirementsLoader` | Called by `Requirements.Load`; provides the shared `Requirements` tree |
-| `LoadResult` | Returned by `Requirements.Load`; holds the tree and lint issues |
-| `Section` | `Requirements` extends `Section` and inherits its container properties |
-| `Program` | Calls `Requirements.Load` to load requirements and calls `Export` / `ExportJustifications` |
-| `TraceMatrix` | Receives the populated `Requirements` root and iterates the section tree |
+##### Dependencies
+
+- **Section** — `Requirements` extends `Section` and inherits its container properties.
+- **RequirementsLoader** — delegated to by `Requirements.Load` to perform YAML parsing and
+  validation.
+- **LoadResult** — returned by `Requirements.Load`; holds the populated tree and the lint issue
+  list.
+
+##### Callers
+
+- **Program** — calls `Requirements.Load` to build the requirement tree; calls `Export` and
+  `ExportJustifications`.
+- **TraceMatrix** — receives the populated `Requirements` root from `Program` and iterates the
+  section tree.
+- **Validation** — exercises `Requirements.Load` with fixture YAML files during self-validation
+  tests.
+
+##### Test Dependencies
+
+The unit tests for `Requirements` use `PathHelpers.SafePathCombine` as a test-fixture path
+utility for constructing temporary file paths. This usage is a test-only convenience and is
+explicitly exempt from the production dependency boundary; `Requirements` itself has no
+dependency on `PathHelpers` in production code.
