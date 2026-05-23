@@ -1,6 +1,6 @@
 # Introduction
 
-This document provides the requirements traceability matrix for ReqStream,
+This document provides the requirements Trace Matrix for ReqStream,
 mapping each requirement to its corresponding test evidence.
 
 ## Purpose

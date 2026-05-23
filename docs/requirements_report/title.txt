@@ -1,6 +1,6 @@
 ---
-title: "ReqStream Requirements Traceability Report"
-subtitle: "Requirements Traceability Matrix for the ReqStream Tool"
+title: "ReqStream Trace Matrix Report"
+subtitle: "Requirements Trace Matrix for the ReqStream Tool"
 author: "DEMA Consulting"
 description: "Requirements Traceability Report for ReqStream"
 lang: en-US
