@@ -23,7 +23,7 @@ correctly. This scenario is tested by `Context_Create_NoArguments_ReturnsDefault
 This scenario is tested by `Section_Load_SimpleRequirement_ParsesCorrectly`.
 
 **Requirement Properties**: Verifies that xUnit discovers and executes Requirement unit tests
-correctly. This scenario is tested by `Requirement_Properties_DefaultValues`.
+correctly. This scenario is tested by `Requirement_Properties_NewInstance_HasDefaultValues`.
 
 **TraceMatrix Construction**: Verifies that xUnit discovers and executes TraceMatrix unit tests
 correctly. This scenario is tested by `TraceMatrix_Constructor_WithNoFiles_CreatesEmptyMatrix`.
@@ -40,7 +40,7 @@ correctly. This scenario is tested by `Validation_Run_WithSilentContext_Complete
 | --- | --- | --- |
 | ReqStream-OTS-XUnit-Execute | Context Argument Parsing | `Context_Create_NoArguments_ReturnsDefaultContext`, `Context_Create_VersionFlag_SetsVersionProperty`, `Context_Create_HelpFlags_SetsHelpProperty` |
 | ReqStream-OTS-XUnit-Execute | Section Parsing | `Section_Load_SimpleRequirement_ParsesCorrectly` |
-| ReqStream-OTS-XUnit-Execute | Requirement Properties | `Requirement_Properties_DefaultValues` |
+| ReqStream-OTS-XUnit-Execute | Requirement Properties | `Requirement_Properties_NewInstance_HasDefaultValues` |
 | ReqStream-OTS-XUnit-Execute | TraceMatrix Construction | `TraceMatrix_Constructor_WithNoFiles_CreatesEmptyMatrix` |
 | ReqStream-OTS-XUnit-Report | Program Execution | `Program_Run_WithVersionFlag_PrintsVersion` |
 | ReqStream-OTS-XUnit-Report | Validation Execution | `Validation_Run_WithSilentContext_CompletesSuccessfully` |

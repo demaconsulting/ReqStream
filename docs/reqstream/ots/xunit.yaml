@@ -21,7 +21,7 @@ sections:
               - Context_Create_VersionFlag_SetsVersionProperty
               - Context_Create_HelpFlags_SetsHelpProperty
               - Section_Load_SimpleRequirement_ParsesCorrectly
-              - Requirement_Properties_DefaultValues
+              - Requirement_Properties_NewInstance_HasDefaultValues
               - TraceMatrix_Constructor_WithNoFiles_CreatesEmptyMatrix
           - id: ReqStream-OTS-XUnit-Report
             title: xUnit shall report test results.
