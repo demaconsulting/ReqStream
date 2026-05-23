@@ -2,7 +2,7 @@
 title: "ReqStream Software Design Document"
 subtitle: "Detailed Design for the ReqStream Tool"
 author: "DEMA Consulting"
-description: "Software Design Document for ReqStream"
+description: "Detailed design document for ReqStream"
 lang: en-US
 keywords:
   - Design

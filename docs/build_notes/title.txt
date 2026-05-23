@@ -2,7 +2,7 @@
 title: ReqStream Build Notes
 subtitle: Build and Release Notes for the ReqStream Tool
 author: DEMA Consulting
-description: Build Notes for ReqStream
+description: Build notes for ReqStream
 lang: en-US
 keywords:
   - ReqStream
