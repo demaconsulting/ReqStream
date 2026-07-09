@@ -73,7 +73,6 @@ sections:
             children:
               - ReqStream-Requirements-Includes
               - ReqStream-Requirements-SectionMerging
-              - ReqStream-Utilities-SafePath
 
           - id: ReqStream-Modeling-Linting
             title: The Modeling subsystem shall perform requirements file linting.

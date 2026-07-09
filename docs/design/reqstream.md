@@ -73,10 +73,10 @@ to produce output.
 
 - *Type*: CLI.
 - *Role*: Consumer (the user provides arguments to the system).
-- *Contract*: Defined flag set (`--version`, `--help`, `--silent`, `--validate`, `--lint`,
-  `--enforce`, `--requirements`, `--tests`, `--report`, `--matrix`, `--justifications`,
+- *Contract*: Defined flag set (`--version`/`-v`, `--help`/`-h`/`-?`, `--silent`, `--validate`,
+  `--lint`, `--enforce`, `--requirements`, `--tests`, `--report`, `--matrix`, `--justifications`,
   `--filter`, `--depth`, `--report-depth`, `--matrix-depth`, `--justifications-depth`,
-  `--results`, `--log`); unknown flags cause `ArgumentException`.
+  `--results`/`--result`, `--log`); unknown flags cause `ArgumentException`.
 - *Constraints*: No interactive prompts; all information must be on the command line.
 
 **Standard output (stdout)**: Plain text lines via `Context.WriteLine`.
@@ -128,7 +128,7 @@ to produce output.
 
 - *Type*: File (XML).
 - *Role*: Provider.
-- *Contract*: Path from `--results`; written by `Validation.WriteResultsFile`.
+- *Contract*: Path from `--results`/`--result`; written by `Validation.WriteResultsFile`.
 - *Constraints*: Extension must be `.trx` or `.xml`.
 
 **Process exit code**: Integer signal to the calling process.

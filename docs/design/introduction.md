@@ -25,13 +25,17 @@ OTS items:
 - **YamlDotNet**: integration and usage design.
 - **Microsoft.Extensions.FileSystemGlobbing**: integration and usage design.
 - **DemaConsulting.TestResults**: integration and usage design.
-- **SysML2Tools**: integration and usage design.
 
 The following topics are out of scope:
 
 - Internal design of OTS items (YamlDotNet, Microsoft.Extensions.FileSystemGlobbing,
   DemaConsulting.TestResults)
-- Build pipeline configuration
+- Build pipeline configuration and the build/pipeline OTS tools that support it (for example
+  SysML2Tools, Pandoc, WeasyPrint, BuildMark, VersionMark, ReviewMark, SarifMark, SonarMark,
+  XUnit, and FileAssert). These pipeline tools are not modeled as SysML2 structural parts; each
+  still has its own requirements, design, and verification companion artifacts under
+  `docs/design/ots/`, `docs/reqstream/ots/`, and `docs/verification/ots/`, and is covered by its
+  own ReviewMark OTS review-set.
 - Deployment and packaging
 - Test projects, test classes, and test infrastructure
 

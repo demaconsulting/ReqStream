@@ -23,8 +23,8 @@ which are deleted on test completion.
 
 The Utilities subsystem verification is complete when all xUnit unit tests for `GlobMatcher`,
 `PathHelpers`, and `TemporaryDirectory` pass without uncaught exceptions and all assertions
-succeed. The subsystem is considered verified when every requirement in the Requirements
-Coverage is mapped to at least one passing test method.
+succeed. The subsystem is considered verified when every Utilities requirement is mapped to at
+least one passing test method in the ReqStream trace matrix.
 
 ### Test Scenarios
 
@@ -81,36 +81,3 @@ scenario is tested by `TemporaryDirectory_Constructor_Default_CreatesDirectory`,
 `TemporaryDirectory_GetFilePath_TraversalAttempt_ThrowsArgumentException`,
 `TemporaryDirectory_Dispose_PopulatedDirectory_DeletesDirectory`, and
 `TemporaryDirectory_Dispose_AlreadyDeleted_DoesNotThrow`.
-
-### Requirements Coverage
-
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles` |
-| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles` |
-| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_FindMatchingFiles_AbsolutePatternWithDoubleWildcard_MatchesFilesInSubdirectories` |
-| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_FindMatchingFiles_AbsoluteLiteralPath_MatchesSingleFile` |
-| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_SplitAbsolutePattern_WildcardAtTopLevel_SplitsAtRoot` |
-| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_SplitAbsolutePattern_LiteralPath_SplitsAtLastSeparator` |
-| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_SplitAbsolutePattern_DoubleStarWildcard_SplitsBeforeWildcard` |
-| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_FindMatchingFiles_MultiplePatterns_DeduplicatesResults` |
-| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_FindMatchingFiles_MultiplePatterns_CombinesFromDifferentSources` |
-| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_FindMatchingFiles_ReturnsAbsolutePaths` |
-| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty` |
-| `ReqStream-Utilities-GlobMatching` | `GlobMatcher_FindMatchingFiles_MultipleMatches_ReturnsSortedResults` |
-| `ReqStream-GlobMatcher-NullPatterns` | `GlobMatcher_FindMatchingFiles_NullPatterns_ThrowsArgumentNullException` |
-| `ReqStream-GlobMatcher-NullElement` | `GlobMatcher_FindMatchingFiles_NullElementInPatterns_SkipsElement` |
-| `ReqStream-Utilities-SafePath` | `PathHelpers_SafePathCombine_ValidRelativePath_ReturnsCombinedPath` |
-| `ReqStream-Utilities-SafePath` | `PathHelpers_SafePathCombine_ValidSubdirectory_ReturnsCombinedPath` |
-| `ReqStream-Utilities-SafePath` | `PathHelpers_SafePathCombine_DotDotPath_ThrowsArgumentException` |
-| `ReqStream-Utilities-SafePath` | `PathHelpers_SafePathCombine_DeepDotDotPath_ThrowsArgumentException` |
-| `ReqStream-Utilities-SafePath` | `PathHelpers_SafePathCombine_AbsoluteOverridePath_ThrowsArgumentException` |
-| `ReqStream-Utilities-SafePath` | `PathHelpers_SafePathCombine_NullBasePath_ThrowsArgumentNullException` |
-| `ReqStream-Utilities-SafePath` | `PathHelpers_SafePathCombine_NullRelativePath_ThrowsArgumentNullException` |
-| `ReqStream-Utilities-TemporaryDirectory` | `TemporaryDirectory_Constructor_Default_CreatesDirectory` |
-| `ReqStream-Utilities-TemporaryDirectory` | `TemporaryDirectory_Constructor_TwoInstances_CreateUniqueDirectories` |
-| `ReqStream-Utilities-TemporaryDirectory` | `TemporaryDirectory_GetFilePath_SimpleFile_ReturnsPathUnderDirectory` |
-| `ReqStream-Utilities-TemporaryDirectory` | `TemporaryDirectory_GetFilePath_NestedPath_CreatesIntermediateDirectories` |
-| `ReqStream-Utilities-TemporaryDirectory` | `TemporaryDirectory_GetFilePath_TraversalAttempt_ThrowsArgumentException` |
-| `ReqStream-Utilities-TemporaryDirectory` | `TemporaryDirectory_Dispose_PopulatedDirectory_DeletesDirectory` |
-| `ReqStream-Utilities-TemporaryDirectory` | `TemporaryDirectory_Dispose_AlreadyDeleted_DoesNotThrow` |

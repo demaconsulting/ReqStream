@@ -1,6 +1,6 @@
 ## SysML2Tools OTS Design
 
-DemaConsulting.SysML2Tools is a .NET dotnet global tool that lints a SysML2 architecture model
+DemaConsulting.SysML2Tools is a .NET dotnet local tool that lints a SysML2 architecture model
 and renders its declared views to SVG diagrams consumed by the design documentation.
 
 ### Purpose
@@ -36,16 +36,20 @@ package name `demaconsulting.sysml2tools.tool` and restored with `dotnet tool re
 directly on the SysML2 source files under `docs/sysml2/`; no separate configuration file is
 required.
 
-It is used in two places in the pipeline:
+It is used in three places in the pipeline:
 
-- **Lint** (`lint.ps1`, all CI jobs and local pre-PR checks): `dotnet sysml2tools lint
-  'docs/sysml2/**/*.sysml'` fails the build if the model contains syntax errors or unresolved
-  references.
-- **Render** (`build.yaml`, build-docs job): `dotnet sysml2tools render` renders each declared view
-  to an SVG file in `docs/design/generated/`, immediately before Pandoc compiles the Design
-  document. The rendered SVGs sit alongside the compiled `design.html`, so the design Markdown
-  sources embed bare filenames (for example `![Software Structure](SoftwareStructureView.svg)`)
-  that Pandoc and the browser resolve relative to that directory.
+- **Lint** (`lint.ps1`, run from the `build.yaml` `quality-checks` job and available for local
+  pre-PR checks): `dotnet sysml2tools lint 'docs/sysml2/**/*.sysml'` fails the build if the model
+  contains syntax errors or unresolved references.
+- **Self-validation** (`build.yaml` `build-docs` job, "Run SysML2Tools self-validation" step):
+  `dotnet sysml2tools --validate` runs the tool's own self-test suite and captures the results to
+  `artifacts/sysml2tools-self-validation.trx`, satisfying the OTS self-validation requirement.
+- **Render** (`build.yaml` `build-docs` job, "Render Software Structure diagrams with SysML2Tools"
+  step): `dotnet sysml2tools render` renders each declared view to an SVG file in
+  `docs/design/generated/`, immediately before Pandoc compiles the Design document. The rendered
+  SVGs sit alongside the compiled `design.html`, so the design Markdown sources embed bare
+  filenames (for example `![Software Structure](SoftwareStructureView.svg)`) that Pandoc and the
+  browser resolve relative to that directory.
 
 SysML2Tools reads only the local SysML2 model files and writes only local SVG output files; it
 requires no external service or network access, and it has no transitive NuGet dependencies that
