@@ -1,5 +1,7 @@
 ### TraceMatrix
 
+![Tracing Structure](TracingView.svg)
+
 #### Purpose
 
 `TraceMatrix` maps test execution results to requirements and calculates requirement-coverage

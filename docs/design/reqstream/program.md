@@ -1,5 +1,7 @@
 ## Program
 
+![ReqStream System Structure](ReqStreamView.svg)
+
 ### Purpose
 
 `Program` is the entry point of the ReqStream executable. It owns the top-level execution flow,

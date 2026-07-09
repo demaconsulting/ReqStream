@@ -1,5 +1,7 @@
 ### Context
 
+![Cli Structure](CliView.svg)
+
 #### Purpose
 
 `Context` is the command-line argument parser and I/O owner for ReqStream. It is the single

@@ -1,5 +1,7 @@
 ## Tracing
 
+![Tracing Structure](TracingView.svg)
+
 ### Overview
 
 The `Tracing` subsystem provides test result loading and requirement-to-test traceability

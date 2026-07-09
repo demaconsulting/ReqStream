@@ -1,5 +1,7 @@
 ### PathHelpers
 
+![Utilities Structure](UtilitiesView.svg)
+
 #### Purpose
 
 `PathHelpers` is a static utility class that provides safe path combination guarded against

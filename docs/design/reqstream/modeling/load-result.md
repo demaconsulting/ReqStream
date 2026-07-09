@@ -1,5 +1,7 @@
 ### LoadResult
 
+![Modeling Structure](ModelingView.svg)
+
 #### Purpose
 
 `LoadResult` encapsulates the combined outcome of a `Requirements.Load` call. It holds the

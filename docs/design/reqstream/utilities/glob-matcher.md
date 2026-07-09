@@ -1,5 +1,7 @@
 ### GlobMatcher
 
+![Utilities Structure](UtilitiesView.svg)
+
 #### Purpose
 
 `GlobMatcher` is a static utility class that resolves glob patterns to lists of absolute

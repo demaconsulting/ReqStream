@@ -1,5 +1,7 @@
 ## Utilities
 
+![Utilities Structure](UtilitiesView.svg)
+
 ### Overview
 
 The `Utilities` subsystem provides shared, general-purpose helper utilities for ReqStream. It

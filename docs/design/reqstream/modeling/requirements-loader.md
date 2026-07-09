@@ -1,5 +1,7 @@
 ### RequirementsLoader
 
+![Modeling Structure](ModelingView.svg)
+
 #### Purpose
 
 `RequirementsLoader` is the YAML deserializer and structural lint validator for requirements

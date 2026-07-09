@@ -1,5 +1,7 @@
 # ReqStream
 
+![ReqStream System Structure](ReqStreamView.svg)
+
 ## Architecture
 
 The ReqStream system is a single executable (.NET tool package) organized into the following

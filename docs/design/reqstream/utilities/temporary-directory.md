@@ -1,5 +1,7 @@
 ### TemporaryDirectory
 
+![Utilities Structure](UtilitiesView.svg)
+
 #### Purpose
 
 `TemporaryDirectory` is a disposable utility class that creates a uniquely named scratch

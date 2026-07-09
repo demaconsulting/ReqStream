@@ -1,5 +1,7 @@
 ### Requirement
 
+![Modeling Structure](ModelingView.svg)
+
 #### Purpose
 
 `Requirement` is the domain model for a single requirement entry. It is a simple mutable

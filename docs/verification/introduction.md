@@ -49,6 +49,7 @@ The following OTS items are also verified:
 - **WeasyPrint** — HTML to PDF converter
 - **YamlDotNet** — YAML parsing library
 - **Microsoft.Extensions.FileSystemGlobbing** — glob pattern matching library
+- **SysML2Tools** — architecture model validation and diagram rendering tool
 
 The following topics are out of scope:
 

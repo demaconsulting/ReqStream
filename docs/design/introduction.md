@@ -25,6 +25,7 @@ OTS items:
 - **YamlDotNet**: integration and usage design.
 - **Microsoft.Extensions.FileSystemGlobbing**: integration and usage design.
 - **DemaConsulting.TestResults**: integration and usage design.
+- **SysML2Tools**: integration and usage design.
 
 The following topics are out of scope:
 
@@ -36,32 +37,12 @@ The following topics are out of scope:
 
 ## Software Structure
 
-```text
-ReqStream (System)
-├── Program (Unit)
-├── Cli (Subsystem)
-│   └── Context (Unit)
-├── Utilities (Subsystem)
-│   ├── GlobMatcher (Unit)
-│   ├── PathHelpers (Unit)
-│   └── TemporaryDirectory (Unit)
-├── Modeling (Subsystem)
-│   ├── LintIssue (Unit)
-│   ├── LoadResult (Unit)
-│   ├── Requirement (Unit)
-│   ├── Requirements (Unit)
-│   ├── RequirementsLoader (Unit)
-│   └── Section (Unit)
-├── Tracing (Subsystem)
-│   └── TraceMatrix (Unit)
-└── SelfTest (Subsystem)
-    └── Validation (Unit)
+The software structure is modeled in SysML2 under `docs/sysml2/` and rendered to the
+diagram below by SysML2Tools as part of the build pipeline. AI agents should query the
+SysML2 model directly (see the `sysml2tools-query` skill) rather than parsing this
+diagram or the prose below.
 
-OTS Dependencies:
-├── YamlDotNet (OTS)
-├── Microsoft.Extensions.FileSystemGlobbing (OTS)
-└── DemaConsulting.TestResults (OTS)
-```
+![Software Structure](SoftwareStructureView.svg)
 
 ## Folder Layout
 
