@@ -1,6 +1,7 @@
 # Project Overview
 
-- **name**: ReqStream
+- **project-name**: ReqStream
+- **organization**: DEMA Consulting
 - **description**: A .NET command-line tool for managing software requirements in YAML format,
   providing validation, linting, traceability, and test-mapping capabilities
 - **languages**: C#
@@ -18,6 +19,7 @@
 │   ├── requirements_doc/
 │   ├── requirements_report/
 │   ├── reqstream/
+│   ├── sysml2/
 │   ├── user_guide/
 │   └── verification/
 ├── src/
@@ -35,16 +37,18 @@ commit messages, and reports).
 
 This repository follows a reference template for structure and file conventions.
 
-- **Template URL**: `https://github.com/demaconsulting/Agents/raw/refs/heads/template`
+- **template-url**: `https://github.com/demaconsulting/Agents/raw/refs/heads/template`
 - **Repository map**: `{template-url}/repository-map.md`
 - **Template files**: `{template-url}/{file-path}` for files described in the map
 
 # Codebase Navigation (ALL Agents)
 
-When working with source code, design, or requirements artifacts, read
-`docs/design/introduction.md` first. It provides the software structure,
-folder layout, and companion artifact locations. Use it as the primary map
-before searching the filesystem.
+When working with source code, design, or requirements artifacts, query the SysML2
+architecture model under `docs/sysml2/` first (see the `sysml2tools-query` skill) to
+understand software structure, purpose, and relationships. Fall back to
+`docs/design/introduction.md` for the human-facing narrative, folder layout, and
+companion artifact locations, and use it as the primary map when the model doesn't
+yet cover something.
 
 # Key Configuration Files
 
@@ -59,6 +63,7 @@ before searching the filesystem.
 - **`package.json`** - Node.js dependencies for formatting tools
 - **`requirements.yaml`** - Root requirements file with includes
 - **`pip-requirements.txt`** - Python dependencies for yamllint and yamlfix
+- **`docs/sysml2/`** - SysML2 architecture model; authoritative source for software structure
 - **`fix.ps1`** - Applies all auto-fixers silently (dotnet format, markdown, YAML). Always exits 0.
 - **`build.ps1`** - Builds the solution and runs all tests.
 
@@ -75,6 +80,7 @@ from `.github/standards/`. Use this matrix to determine which to load:
 - **Design docs**: `software-items.md`, `design-documentation.md`, `technical-documentation.md`
 - **Verification docs**: `software-items.md`, `verification-documentation.md`, `technical-documentation.md`
 - **Review configuration**: `software-items.md`, `reviewmark-usage.md`
+- **Software structure**: `sysml2-modeling.md`
 - **Any documentation**: `technical-documentation.md`
 
 Load only the standards relevant to your specific task scope.
@@ -85,12 +91,15 @@ The default agent should handle simple, straightforward tasks directly.
 Delegate to specialized agents only for specific scenarios:
 
 - **Pre-PR lint cleanup** (fix all lint issues before pull request) → Call the lint-fix agent
-- **Light development work** (small fixes, simple features) → Call the developer agent
+- **Scoped fixes with no new user-visible behavior** (PR review comments, doc
+  corrections, known bug fixes with defined root cause) → Call the developer agent
 - **Light quality checking** (basic validation) → Call the quality agent
-- **Formal feature implementation** (complex, multi-step) → Call the implementation agent
-- **Formal bug resolution** (complex debugging, systematic fixes) → Call the implementation agent
+- **Any change introducing new user-visible behavior** (features, enhancements,
+  new commands or options) → Call the implementation agent
+- **Formal bug resolution** (complex debugging, unknown root cause) → Call the implementation agent
 - **Formal reviews** (compliance verification, detailed analysis) → Call the formal-review agent
 - **Structural audit**: (repository layout vs. template) → Call the template-sync agent
+- **Implementation planning only** (review a plan before committing to implementation) → Call the planning agent
 
 # Agent Reporting (Specialized Agents Must Follow)
 
@@ -99,16 +108,16 @@ Specialized agents MUST generate a completion report:
 1. Save to `.agent-logs/{agent-name}-{subject}-{unique-id}.md`
    where `{subject}` is a kebab-case task summary (max 5 words) and
    `{unique-id}` is a short unique suffix (e.g., 8-char hex or timestamp)
-2. Start with `**Result**: (SUCCEEDED|FAILED)` as the first metadata field
+2. Start with `**Result**: (SUCCEEDED|FAILED|INCOMPLETE)` as the first metadata field
 3. Include the agent-specific report sections defined in each agent's prompt
 4. Return the summary to the caller
 
 Result semantics for orchestrator decision-making:
 
-- **SUCCEEDED**: Work completed and all applicable quality gates met
+- **SUCCEEDED**: Work completed and all quality gates applicable to that agent's scope met
 - **FAILED**: Work could not be completed or quality gates not met
 - **INCOMPLETE**: Work cannot proceed without information only the user can
-  provide (implementation agent only)
+  provide (implementation, planning, and template-sync agents)
 
 # Formatting (After Making Changes)
 
@@ -126,7 +135,7 @@ responsibility - invoke the lint-fix agent once before submitting a pull request
 ## CI Quality Tools
 
 CI runs `lint.ps1` which checks: markdownlint-cli2, cspell, yamllint, dotnet format,
-reqstream, versionmark, and reviewmark.
+reqstream, versionmark, reviewmark, and sysml2tools.
 
 # Scope Discipline (ALL Agents Must Follow)
 

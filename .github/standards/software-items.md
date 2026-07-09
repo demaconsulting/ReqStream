@@ -3,12 +3,6 @@ name: Software Items
 description: Follow these standards when categorizing software components.
 ---
 
-# Software Items Definition Standards
-
-This document defines standards for categorizing software items within
-Continuous Compliance environments because proper categorization determines
-requirements management approach, testing strategy, and review scope.
-
 # Software Item Categories
 
 Categorize all software into six primary groups:
@@ -40,17 +34,28 @@ Categorize all software into six primary groups:
 
 # Naming Conventions in File Path Patterns
 
-Two placeholder styles appear in path patterns across these standards:
+Three placeholder forms appear in path patterns across these standards:
 
-- **Kebab-case** (`{system-name}`, `{unit-name}`): always kebab-case -
-  used in documentation and requirements paths
-- **Cased** (`{SystemName}`, `{UnitName}`): follow your language's convention -
-  `PascalCase` for C#/Java, `snake_case` for C++/Python -
-  used in source and test file paths
+- **Kebab-case** (`{system-name}`, `{unit-name}`): always kebab-case —
+  documentation and requirements file paths
+- **PascalCase IDs** (`{SystemName}`, `{UnitName}`): always PascalCase —
+  requirements IDs, ReviewMark IDs, and other documentation identifiers
+- **Language-cased** (`{SystemName}` or `{system_name}`): follow your language's
+  convention — `PascalCase` for C#/Java, `snake_case` for C++/Python —
+  source and test file/folder names
+
+## Nesting Depth Notation
+
+Subsystems nest to any depth. Patterns use bracket-ellipsis to express this without
+enumerating levels — `[/{subsystem-name}...]` in paths, `[-{SubsystemName}...]` in
+dash-separated IDs. Examples covering all three forms:
+
+- `{SystemName}[-{SubsystemName}...]-{UnitName}-Feature` (PascalCase ID)
+- `docs/design/{system-name}[/{subsystem-name}...]/{unit-name}.md` (kebab-case doc path)
+- `src/{SystemName}[/{SubsystemName}...]/{UnitName}.cs` (C# source path)
+- `src/{system_name}[/{subsystem_name}...]/{unit_name}.cpp` (C++/Python source path)
 
 # Categorization Guidelines
-
-Choose the appropriate category based on scope and testability:
 
 ## Software Package
 
@@ -89,7 +94,7 @@ Choose the appropriate category based on scope and testability:
 - Examples: System.Text.Json, Entity Framework, third-party APIs
 - **Artifact locations** (OTS items have no internal design documentation):
   - Requirements: `docs/reqstream/ots/{ots-name}.yaml`
-  - Design: `docs/design/ots/{ots-name}.md` (integration/usage design - how the local system uses this item)
+  - Design: `docs/design/ots/{ots-name}.md` (integration/usage design)
   - Verification: `docs/verification/ots/{ots-name}.md`
   - These folders sit parallel to system folders (not inside any system folder)
 - System design documentation records which OTS items each system depends on
@@ -109,10 +114,9 @@ Choose the appropriate category based on scope and testability:
   downstream integration tests that transitively prove the advertised features are functional
 - **Artifact locations** (no internal design documentation in the consuming repository):
   - Requirements: `docs/reqstream/shared/{package-name}.yaml`
-  - Design: `docs/design/shared/{package-name}.md` (integration/usage design - which features are consumed and how)
+  - Design: `docs/design/shared/{package-name}.md` (integration/usage design)
   - Verification: `docs/verification/shared/{package-name}.md`
   - These folders sit parallel to system and OTS folders
-- System design documentation records which Shared Packages each system depends on
 
 # Software Item Artifact Model
 
@@ -126,3 +130,8 @@ the item is correct, well-designed, and proven to work:
 - **Verification Design** - HOW the requirements will be tested (applies to all item types)
 - **Source code** - The implementation of the design (local units only; not applicable to OTS or Shared Package)
 - **Tests** - PROOF the item does WHAT it is required to do (applies to all item types)
+
+Where the repository models its software structure in SysML2, each item's part def carries
+`comment` metadata pointing at these same artifact locations (`sourceRef`/`testRef`/
+`designRef`/`verificationRef`/`reqRef`) so agents can query them directly — see
+`sysml2-modeling.md`.

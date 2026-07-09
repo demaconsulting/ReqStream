@@ -25,8 +25,8 @@ docs/reqstream/
 │   ├── platform-requirements.yaml  # Platform support requirements
 │   ├── {subsystem-name}.yaml        # Subsystem requirements
 │   ├── {subsystem-name}/            # Subsystem folder (kebab-case); may nest recursively
-│   │   ├── {child-subsystem}.yaml   # Child subsystem requirements
-│   │   ├── {child-subsystem}/       # Child subsystem folder
+│   │   ├── {subsystem-name}.yaml    # Child subsystem requirements
+│   │   ├── {subsystem-name}/        # Child subsystem folder
 │   │   └── {unit-name}.yaml         # Unit requirements
 │   └── {unit-name}.yaml             # System-level unit requirements
 ├── ots/                             # OTS items appear as a distinct section in reports
@@ -35,7 +35,11 @@ docs/reqstream/
     └── {package-name}.yaml          # Requirements for Shared Package dependencies
 ```
 
-Local items have matching paths across `docs/reqstream/`, `docs/design/`, and `docs/verification/`.
+Local items have matching relative paths across `docs/reqstream/`, `docs/design/`, and `docs/verification/`:
+
+- Requirements: `{system-name}[/{subsystem-name}...]/{item-name}.yaml`
+- Design: `{system-name}[/{subsystem-name}...]/{item-name}.md`
+- Verification: `{system-name}[/{subsystem-name}...]/{item-name}.md`
 
 # Requirements File Format
 
@@ -48,12 +52,12 @@ folder depth does not determine whether an item is a subsystem or unit.
 Valid section nestings (names in `{braces}` are placeholders):
 
 ```text
-{System} Requirements              # system-level requirements
-├── {Subsystem} Requirements       # root subsystem requirements
-│   ├── {Subsystem} Requirements   # nested subsystem (may recurse)
-│   │   └── {Unit} Requirements    # unit under a nested subsystem
-│   └── {Unit} Requirements        # unit under a root subsystem
-└── {Unit} Requirements            # unit directly under the system
+{SystemName} Requirements              # system-level requirements
+├── {SubsystemName} Requirements       # root subsystem requirements
+│   ├── {SubsystemName} Requirements   # nested subsystem (may recurse)
+│   │   └── {UnitName} Requirements    # unit under a nested subsystem
+│   └── {UnitName} Requirements        # unit under a root subsystem
+└── {UnitName} Requirements            # unit directly under the system
 OTS Software Requirements          # OTS root section (fixed title)
 └── {OtsName} Requirements         # requirements for one OTS item
 Shared Package Requirements        # shared package root section (fixed title)
