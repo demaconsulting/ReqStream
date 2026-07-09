@@ -25,6 +25,7 @@ input-files:
   - docs/verification/ots/yamldotnet.md
   - docs/verification/ots/microsoft-extensions-file-system-globbing.md
   - docs/verification/ots/dema-consulting-test-results.md
+  - docs/verification/ots/sysml2tools.md
   - docs/verification/ots/xunit.md
   - docs/verification/ots/weasyprint.md
   - docs/verification/ots/versionmark.md

@@ -41,6 +41,7 @@ The following table lists all OTS items and their primary evidence type.
 | YamlDotNet | Integration test evidence |
 | Microsoft.Extensions.FileSystemGlobbing | Integration test evidence |
 | DemaConsulting.TestResults | Integration test evidence |
+| SysML2Tools | Self-validation report and CI pipeline step evidence |
 
 ## Regression Approach
 

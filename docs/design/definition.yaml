@@ -35,6 +35,7 @@ input-files:
   - docs/design/ots/yamldotnet.md
   - docs/design/ots/microsoft-extensions-file-system-globbing.md
   - docs/design/ots/dema-consulting-test-results.md
+  - docs/design/ots/sysml2tools.md
 template: template.html
 
 table-of-contents: true

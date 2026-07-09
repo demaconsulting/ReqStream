@@ -5,7 +5,10 @@ ReqStream. Each OTS item is accessed through a single dedicated wrapper or utili
 the system, ensuring minimal coupling and straightforward replacement. CI pipeline tools
 (BuildMark, FileAssert, xUnit, Pandoc, ReviewMark, SarifMark, SonarMark, VersionMark,
 WeasyPrint) are excluded from integration design documentation because they are not accessed
-through source code APIs; their integration is through the CI configuration files.
+through source code APIs; their integration is through the CI configuration files. SysML2Tools is
+a pipeline tool but is documented here as an intentional exception because it validates and
+renders the SysML2 architecture model that this chapter and `docs/design/introduction.md`
+describe; see _SysML2Tools OTS Design_ for its integration pattern.
 
 ## Selection Criteria
 
