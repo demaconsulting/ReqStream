@@ -1,5 +1,7 @@
 ### Section
 
+![Modeling Structure](ModelingView.svg)
+
 #### Purpose
 
 `Section` is the container node in the requirements tree. It groups a set of `Requirement`

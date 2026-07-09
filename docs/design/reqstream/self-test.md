@@ -1,5 +1,7 @@
 ## SelfTest
 
+![SelfTest Structure](SelfTestView.svg)
+
 ### Overview
 
 The `SelfTest` subsystem provides the self-validation framework for ReqStream. It is invoked

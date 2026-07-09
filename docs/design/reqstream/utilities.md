@@ -1,5 +1,7 @@
 ## Utilities
 
+![Utilities Structure](UtilitiesView.svg)
+
 ### Overview
 
 The `Utilities` subsystem provides shared, general-purpose helper utilities for ReqStream. It
@@ -24,7 +26,9 @@ matching any of the supplied glob patterns.
 - *Role*: Provider (Cli subsystem consumes this).
 - *Contract*: Accepts a collection of glob pattern strings; returns `List<string>` of absolute
   paths. Supports both relative patterns (resolved against the current working directory) and
-  absolute patterns (resolved from the rooted prefix of the pattern).
+  absolute patterns (resolved from the rooted prefix of the pattern). Throws
+  `ArgumentNullException` if `patterns` itself is null; individual null elements within
+  `patterns` are skipped silently so callers do not need to filter their collections.
 - *Constraints*: Never throws for non-matching patterns or non-existent directories.
 
 **PathHelpers.SafePathCombine**: Combines two paths and validates the result stays within the

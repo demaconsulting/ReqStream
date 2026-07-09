@@ -13,6 +13,7 @@ needs-review:
   - "docs/design/**/*.md"         # Design documentation files
   - "docs/verification/**/*.md"   # Verification documentation files
   - "docs/user_guide/**/*.md"     # User guide documentation
+  - "docs/sysml2/**/*.sysml"      # SysML2 architecture model
   - "!**/obj/**"                  # Exclude build output
   - "!**/bin/**"                  # Exclude build output
   - "!node_modules/**"            # Exclude npm dependencies
@@ -26,21 +27,38 @@ evidence-source:
   type: url
   location: https://raw.githubusercontent.com/demaconsulting/ReqStream/reviews/index.json
 
+# Global context shown to every reviewer for orientation (not fingerprinted).
+context:
+  - docs/design/introduction.md
+
 # Review sets following standardized patterns for hierarchical compliance coverage
 reviews:
   # Purpose Review (only one per repository)
   - id: Purpose
-    title: Review that Advertised Features Match System Design
+    title: Review that README and User Guide are Coherent and Complete
+    context:
+      - "!docs/design/introduction.md"                            # exclude design intro from user-facing review
     paths:
       - "README.md"                                               # user-facing documentation
       - "docs/user_guide/**/*.md"                                 # user guide
-      - "docs/reqstream/reqstream.yaml"                 # system requirements
+
+  # Decomposition Review (only one per repository)
+  - id: Decomposition
+    title: Review that ReqStream Decomposition Addresses the Stated Purpose
+    context:
+      - "README.md"
+      - "docs/user_guide/**/*.md"
+    paths:
+      - "requirements.yaml"                                       # root requirements file
       - "docs/design/introduction.md"                             # design introduction
-      - "docs/design/reqstream.md"                      # system design
+      - "docs/sysml2/**/*.sysml"                                  # SysML2 model (authoritative structure)
 
   # ReqStream - Specials
   - id: ReqStream-Architecture
     title: Review that ReqStream Architecture Satisfies Requirements
+    context:
+      - "README.md"
+      - "docs/user_guide/**/*.md"
     paths:
       - "docs/reqstream/reqstream.yaml"                 # system requirements
       - "docs/design/introduction.md"                             # design introduction
@@ -53,6 +71,8 @@ reviews:
 
   - id: ReqStream-Design
     title: Review that ReqStream Design is Consistent and Complete
+    context:
+      - "docs/reqstream/reqstream.yaml"
     paths:
       - "docs/reqstream/reqstream.yaml"                   # system requirements
       - "docs/reqstream/reqstream/platform-requirements.yaml"     # platform requirements
@@ -68,6 +88,9 @@ reviews:
 
   - id: ReqStream-AllRequirements
     title: Review that All ReqStream Requirements are Complete
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
     paths:
       - "requirements.yaml"                                       # root requirements file
       - "docs/reqstream/reqstream.yaml"                           # system requirements file
@@ -77,6 +100,9 @@ reviews:
   # ReqStream - Program
   - id: ReqStream-Program
     title: Review that ReqStream Program Implementation is Correct
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
     paths:
       - "docs/reqstream/reqstream/program.yaml"                   # unit requirements
       - "docs/design/reqstream/program.md"                        # unit design
@@ -87,6 +113,9 @@ reviews:
   # ReqStream - Cli
   - id: ReqStream-Cli
     title: Review that ReqStream Cli Satisfies Subsystem Requirements
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
     paths:
       - "docs/reqstream/reqstream/cli.yaml"                       # subsystem requirements
       - "docs/design/reqstream/cli.md"                            # subsystem design
@@ -95,6 +124,11 @@ reviews:
 
   - id: ReqStream-Cli-Context
     title: Review that ReqStream Cli Context Implementation is Correct
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
+      - "docs/design/reqstream/cli.md"
+      - "docs/reqstream/reqstream/cli.yaml"
     paths:
       - "docs/reqstream/reqstream/cli/context.yaml"               # unit requirements
       - "docs/design/reqstream/cli/context.md"                    # unit design
@@ -105,6 +139,9 @@ reviews:
   # ReqStream - Modeling
   - id: ReqStream-Modeling
     title: Review that ReqStream Modeling Satisfies Subsystem Requirements
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
     paths:
       - "docs/reqstream/reqstream/modeling.yaml"                  # subsystem requirements
       - "docs/design/reqstream/modeling.md"                       # subsystem design
@@ -113,6 +150,11 @@ reviews:
 
   - id: ReqStream-Modeling-LintIssue
     title: Review that ReqStream Modeling LintIssue Implementation is Correct
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
+      - "docs/design/reqstream/modeling.md"
+      - "docs/reqstream/reqstream/modeling.yaml"
     paths:
       - "docs/reqstream/reqstream/modeling/lint-issue.yaml"       # unit requirements
       - "docs/design/reqstream/modeling/lint-issue.md"            # unit design
@@ -122,6 +164,11 @@ reviews:
 
   - id: ReqStream-Modeling-LoadResult
     title: Review that ReqStream Modeling LoadResult Implementation is Correct
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
+      - "docs/design/reqstream/modeling.md"
+      - "docs/reqstream/reqstream/modeling.yaml"
     paths:
       - "docs/reqstream/reqstream/modeling/load-result.yaml"      # unit requirements
       - "docs/design/reqstream/modeling/load-result.md"           # unit design
@@ -132,6 +179,11 @@ reviews:
 
   - id: ReqStream-Modeling-Requirement
     title: Review that ReqStream Modeling Requirement Implementation is Correct
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
+      - "docs/design/reqstream/modeling.md"
+      - "docs/reqstream/reqstream/modeling.yaml"
     paths:
       - "docs/reqstream/reqstream/modeling/requirement.yaml"      # unit requirements
       - "docs/design/reqstream/modeling/requirement.md"           # unit design
@@ -141,6 +193,11 @@ reviews:
 
   - id: ReqStream-Modeling-Requirements
     title: Review that ReqStream Modeling Requirements Implementation is Correct
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
+      - "docs/design/reqstream/modeling.md"
+      - "docs/reqstream/reqstream/modeling.yaml"
     paths:
       - "docs/reqstream/reqstream/modeling/requirements.yaml"     # unit requirements
       - "docs/design/reqstream/modeling/requirements.md"          # unit design
@@ -152,6 +209,11 @@ reviews:
 
   - id: ReqStream-Modeling-RequirementsLoader
     title: Review that ReqStream Modeling RequirementsLoader Implementation is Correct
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
+      - "docs/design/reqstream/modeling.md"
+      - "docs/reqstream/reqstream/modeling.yaml"
     paths:
       - "docs/reqstream/reqstream/modeling/requirements-loader.yaml"   # unit requirements
       - "docs/design/reqstream/modeling/requirements-loader.md"        # unit design
@@ -161,6 +223,11 @@ reviews:
 
   - id: ReqStream-Modeling-Section
     title: Review that ReqStream Modeling Section Implementation is Correct
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
+      - "docs/design/reqstream/modeling.md"
+      - "docs/reqstream/reqstream/modeling.yaml"
     paths:
       - "docs/reqstream/reqstream/modeling/section.yaml"          # unit requirements
       - "docs/design/reqstream/modeling/section.md"               # unit design
@@ -173,6 +240,9 @@ reviews:
   # ReqStream - Tracing
   - id: ReqStream-Tracing
     title: Review that ReqStream Tracing Satisfies Subsystem Requirements
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
     paths:
       - "docs/reqstream/reqstream/tracing.yaml"                   # subsystem requirements
       - "docs/design/reqstream/tracing.md"                        # subsystem design
@@ -181,6 +251,11 @@ reviews:
 
   - id: ReqStream-Tracing-TraceMatrix
     title: Review that ReqStream Tracing TraceMatrix Implementation is Correct
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
+      - "docs/design/reqstream/tracing.md"
+      - "docs/reqstream/reqstream/tracing.yaml"
     paths:
       - "docs/reqstream/reqstream/tracing/trace-matrix.yaml"      # unit requirements
       - "docs/design/reqstream/tracing/trace-matrix.md"           # unit design
@@ -193,6 +268,9 @@ reviews:
   # ReqStream - SelfTest
   - id: ReqStream-SelfTest
     title: Review that ReqStream SelfTest Satisfies Subsystem Requirements
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
     paths:
       - "docs/reqstream/reqstream/self-test.yaml"                 # subsystem requirements
       - "docs/design/reqstream/self-test.md"                      # subsystem design
@@ -201,6 +279,11 @@ reviews:
 
   - id: ReqStream-SelfTest-Validation
     title: Review that ReqStream SelfTest Validation Implementation is Correct
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
+      - "docs/design/reqstream/self-test.md"
+      - "docs/reqstream/reqstream/self-test.yaml"
     paths:
       - "docs/reqstream/reqstream/self-test/validation.yaml"      # unit requirements
       - "docs/design/reqstream/self-test/validation.md"           # unit design
@@ -211,6 +294,9 @@ reviews:
   # ReqStream - Utilities
   - id: ReqStream-Utilities
     title: Review that ReqStream Utilities Satisfies Subsystem Requirements
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
     paths:
       - "docs/reqstream/reqstream/utilities.yaml"               # subsystem requirements
       - "docs/design/reqstream/utilities.md"                    # subsystem design
@@ -218,6 +304,11 @@ reviews:
 
   - id: ReqStream-Utilities-GlobMatcher
     title: Review that ReqStream Utilities GlobMatcher Implementation is Correct
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
+      - "docs/design/reqstream/utilities.md"
+      - "docs/reqstream/reqstream/utilities.yaml"
     paths:
       - "docs/reqstream/reqstream/utilities/glob-matcher.yaml"   # unit requirements
       - "docs/design/reqstream/utilities/glob-matcher.md"        # unit design
@@ -227,6 +318,11 @@ reviews:
 
   - id: ReqStream-Utilities-PathHelpers
     title: Review that ReqStream Utilities PathHelpers Implementation is Correct
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
+      - "docs/design/reqstream/utilities.md"
+      - "docs/reqstream/reqstream/utilities.yaml"
     paths:
       - "docs/reqstream/reqstream/utilities/path-helpers.yaml"   # unit requirements
       - "docs/design/reqstream/utilities/path-helpers.md"        # unit design
@@ -236,6 +332,11 @@ reviews:
 
   - id: ReqStream-Utilities-TemporaryDirectory
     title: Review that ReqStream Utilities TemporaryDirectory Implementation is Correct
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
+      - "docs/design/reqstream/utilities.md"
+      - "docs/reqstream/reqstream/utilities.yaml"
     paths:
       - "docs/reqstream/reqstream/utilities/temporary-directory.yaml"   # unit requirements
       - "docs/design/reqstream/utilities/temporary-directory.md"        # unit design
@@ -297,6 +398,13 @@ reviews:
     paths:
       - "docs/reqstream/ots/sonarmark.yaml"                       # OTS requirements
       - "docs/verification/ots/sonarmark.md"                      # OTS verification
+
+  - id: OTS-SysML2Tools
+    title: Review that SysML2Tools Provides Required Functionality
+    paths:
+      - "docs/reqstream/ots/sysml2tools.yaml"                     # OTS requirements
+      - "docs/design/ots/sysml2tools.md"                          # OTS design
+      - "docs/verification/ots/sysml2tools.md"                    # OTS verification
 
   - id: OTS-VersionMark
     title: Review that VersionMark Provides Required Functionality

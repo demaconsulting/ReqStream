@@ -1,5 +1,7 @@
 ## Cli
 
+![Cli Structure](CliView.svg)
+
 ### Overview
 
 The `Cli` subsystem provides the command-line interface for ReqStream. It acts as the primary

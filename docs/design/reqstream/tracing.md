@@ -1,5 +1,7 @@
 ## Tracing
 
+![Tracing Structure](TracingView.svg)
+
 ### Overview
 
 The `Tracing` subsystem provides test result loading and requirement-to-test traceability
@@ -30,10 +32,13 @@ The `Tracing` subsystem contains the following software unit:
 - *Type*: In-process .NET public API.
 - *Role*: Provider.
 - *Contract*: Accepts `filePath`, `depth`, and optional `filterTags`; writes a Markdown report
-  with Summary, Requirements, and Testing sections. The `depth` parameter controls the Markdown
-  heading level (valid range 1–6, matching ATX heading levels `#` through `######`); when omitted
-  the default is 1 (top-level `#` headings).
-- *Constraints*: Throws `ArgumentException` for null/empty path.
+  with Summary, Requirements, and Testing sections. The `depth` parameter sets the starting
+  Markdown heading level (ATX `#` count) for the report; when omitted the default is 1
+  (top-level `#` headings). Only a lower bound of 1 is enforced — nested requirement sections
+  increase the heading level further for each level of nesting and are not capped at the
+  Markdown `######` (level 6) maximum.
+- *Constraints*: Throws `ArgumentException` for null/empty path; throws
+  `ArgumentOutOfRangeException` when `depth` is less than 1.
 
 **TraceMatrix.CalculateSatisfiedRequirements**: Returns satisfied and total requirement counts.
 

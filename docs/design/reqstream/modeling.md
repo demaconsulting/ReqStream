@@ -1,5 +1,7 @@
 ## Modeling
 
+![Modeling Structure](ModelingView.svg)
+
 ### Overview
 
 The `Modeling` subsystem provides the data model and YAML parsing for ReqStream requirements

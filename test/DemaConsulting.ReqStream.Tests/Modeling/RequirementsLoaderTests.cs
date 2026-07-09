@@ -491,6 +491,82 @@ sections:
     }
 
     /// <summary>
+    /// Test that a mapping declared in a parent file targeting a requirement defined in a
+    /// file reached via that parent's includes resolves correctly, regardless of the order
+    /// the files are processed in.
+    /// </summary>
+    [Fact]
+    public void RequirementsLoader_Load_WithMappingToIncludedFile_ResolvesMapping()
+    {
+        // Arrange: create an included file defining the target requirement, and a root file
+        // that includes it and declares a mapping targeting that requirement
+        var includedFile = _testDirectory.GetFilePath("included.yaml");
+        File.WriteAllText(includedFile, @"sections:
+  - title: Included Section
+    requirements:
+      - id: INC-001
+        title: Included requirement
+");
+
+        var rootFile = _testDirectory.GetFilePath("root.yaml");
+        File.WriteAllText(rootFile, @"includes:
+  - included.yaml
+sections:
+  - title: Root Section
+    requirements:
+      - id: ROOT-001
+        title: Root requirement
+mappings:
+  - id: INC-001
+    tests:
+      - Included_Test
+");
+
+        // Act: load the root requirements file (which includes the other)
+        var result = Requirements.Load(rootFile);
+
+        // Assert: no errors, and the mapping's test resolved against the included requirement
+        Assert.False(result.HasErrors);
+        var requirements = result.Requirements;
+        Assert.NotNull(requirements);
+
+        var includedSection = requirements.Sections.Single(s => s.Title == "Included Section");
+        var includedReq = includedSection.Requirements.Single(r => r.Id == "INC-001");
+        Assert.Contains("Included_Test", includedReq.Tests);
+    }
+
+    /// <summary>
+    /// Test that a mapping referencing an id that does not exist anywhere in the full
+    /// requirements tree reports an error instead of being silently dropped.
+    /// </summary>
+    [Fact]
+    public void RequirementsLoader_Load_WithUnresolvableMappingId_ReportsError()
+    {
+        // Arrange: create a YAML file with a mapping block that targets a nonexistent id
+        var reqFile = _testDirectory.GetFilePath("unresolvable-mapping-id.yaml");
+        File.WriteAllText(reqFile, @"sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Test requirement
+mappings:
+  - id: DOES-NOT-EXIST
+    tests:
+      - SomeTest
+");
+
+        // Act: load the requirements file
+        var result = Requirements.Load(reqFile);
+
+        // Assert: exit code is 1 and error names the unresolved mapping id
+        Assert.True(result.HasErrors);
+        Assert.Null(result.Requirements);
+        Assert.Contains(result.Issues, i => i.Severity == LintSeverity.Error);
+        Assert.Contains(result.Issues,
+            i => i.Description.Contains("Mapping references unknown requirement id 'DOES-NOT-EXIST'"));
+    }
+
+    /// <summary>
     /// Test that a mapping with an unknown field reports an error.
     /// </summary>
     [Fact]

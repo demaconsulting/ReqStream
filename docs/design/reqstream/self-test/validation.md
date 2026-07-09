@@ -1,5 +1,7 @@
 ### Validation
 
+![SelfTest Structure](SelfTestView.svg)
+
 #### Purpose
 
 `Validation` is the self-validation test runner for ReqStream. It executes a suite of end-to-end

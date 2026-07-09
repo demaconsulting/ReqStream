@@ -30,38 +30,23 @@ The following topics are out of scope:
 
 - Internal design of OTS items (YamlDotNet, Microsoft.Extensions.FileSystemGlobbing,
   DemaConsulting.TestResults)
-- Build pipeline configuration
+- Build pipeline configuration and the build/pipeline OTS tools that support it (for example
+  SysML2Tools, Pandoc, WeasyPrint, BuildMark, VersionMark, ReviewMark, SarifMark, SonarMark,
+  XUnit, and FileAssert). These pipeline tools are not modeled as SysML2 structural parts; each
+  still has its own requirements, design, and verification companion artifacts under
+  `docs/design/ots/`, `docs/reqstream/ots/`, and `docs/verification/ots/`, and is covered by its
+  own ReviewMark OTS review-set.
 - Deployment and packaging
 - Test projects, test classes, and test infrastructure
 
 ## Software Structure
 
-```text
-ReqStream (System)
-├── Program (Unit)
-├── Cli (Subsystem)
-│   └── Context (Unit)
-├── Utilities (Subsystem)
-│   ├── GlobMatcher (Unit)
-│   ├── PathHelpers (Unit)
-│   └── TemporaryDirectory (Unit)
-├── Modeling (Subsystem)
-│   ├── LintIssue (Unit)
-│   ├── LoadResult (Unit)
-│   ├── Requirement (Unit)
-│   ├── Requirements (Unit)
-│   ├── RequirementsLoader (Unit)
-│   └── Section (Unit)
-├── Tracing (Subsystem)
-│   └── TraceMatrix (Unit)
-└── SelfTest (Subsystem)
-    └── Validation (Unit)
+The software structure is modeled in SysML2 under `docs/sysml2/` and rendered to the
+diagram below by SysML2Tools as part of the build pipeline. AI agents should query the
+SysML2 model directly (see the `sysml2tools-query` skill) rather than parsing this
+diagram or the prose below.
 
-OTS Dependencies:
-├── YamlDotNet (OTS)
-├── Microsoft.Extensions.FileSystemGlobbing (OTS)
-└── DemaConsulting.TestResults (OTS)
-```
+![Software Structure](SoftwareStructureView.svg)
 
 ## Folder Layout
 

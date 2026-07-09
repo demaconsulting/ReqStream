@@ -1,5 +1,7 @@
 ### Requirements
 
+![Modeling Structure](ModelingView.svg)
+
 #### Purpose
 
 `Requirements` is the root of the requirements section tree and the public API entry point for

@@ -18,6 +18,7 @@ words:
   - buildmark
   - DEMA
   - Dema
+  - demaconsulting
   - fileassert
   - hotspot
   - hotspots
@@ -30,6 +31,8 @@ words:
   - Sarif
   - sarifmark
   - sonarmark
+  - sysml
+  - sysml2tools
   - testname
   - testresults
   - tracematrix

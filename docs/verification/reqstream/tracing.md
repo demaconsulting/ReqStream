@@ -19,7 +19,8 @@ files in a per-test temporary directory that is deleted on disposal.
 
 The Tracing subsystem verification is complete when all xUnit tests in `TracingTests.cs` pass
 without uncaught exceptions and all assertions succeed. The subsystem is considered verified when
-every requirement in the Requirements Coverage table is mapped to at least one passing test method.
+every Tracing requirement is mapped to at least one passing test method in the ReqStream trace
+matrix.
 
 ### Test Scenarios
 
@@ -43,14 +44,3 @@ file produces `InvalidOperationException`.
 **Reporting**: Tests verify that a Markdown trace matrix report is generated. This scenario is
 tested by `Tracing_Reporting_SimpleMatrix_CreatesMarkdownFile`, which verifies a Markdown report
 is generated.
-
-### Requirements Coverage
-
-| Requirement ID | Scenario(s) | Test Method(s) |
-| --- | --- | --- |
-| `ReqStream-Tracing-TestResults` | Test Results Loading Scenario | `Tracing_TestResults_TrxFile_LoadsTestResults`, `Tracing_TestResults_JUnitFile_LoadsTestResults` |
-| `ReqStream-Tracing-Mapping` | Coverage Scenario | `Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied` |
-| `ReqStream-Tracing-Coverage` | Coverage Scenario | `Tracing_Coverage_WithPassingTests_AllRequirementsSatisfied`, `Tracing_Coverage_WithMissingTests_RequirementIsUnsatisfied` |
-| `ReqStream-Tracing-MissingFile` | Error Handling Scenario | `Tracing_FileLoading_NonExistentFile_ThrowsFileNotFoundException` |
-| `ReqStream-Tracing-MalformedFile` | Error Handling Scenario | `Tracing_FileLoading_MalformedFile_ThrowsInvalidOperationException` |
-| `ReqStream-Tracing-Reporting` | Reporting Scenario | `Tracing_Reporting_SimpleMatrix_CreatesMarkdownFile` |

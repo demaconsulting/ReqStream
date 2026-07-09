@@ -25,13 +25,15 @@ using YamlDotNet.RepresentationModel;
 namespace DemaConsulting.ReqStream.Modeling;
 
 /// <summary>
-///     Loads requirements from YAML files using a single DOM tree walk that simultaneously
-///     builds the requirements model and collects lint issues.
+///     Loads requirements from YAML files using a single DOM parse per file (each file's YAML is
+///     parsed exactly once), followed by two logical passes over the resulting DOM trees: a tree
+///     build pass that builds the requirements model, and a mapping resolution pass that applies
+///     test mappings once the full requirements tree (across all included files) is known.
 /// </summary>
 /// <remarks>
 ///     Internal static class that is the sole reader of YAML from disk for requirements data.
 ///     Isolated behind <see cref="Requirements.Load"/>. Not thread-safe; designed for
-///     single-threaded, single-pass loading.
+///     single-threaded loading.
 /// </remarks>
 internal static class RequirementsLoader
 {
@@ -72,8 +74,14 @@ internal static class RequirementsLoader
     /// <exception cref="ArgumentException">Thrown when no paths are provided.</exception>
     /// <remarks>
     ///     Initializes all shared state for one load session (requirements tree, seenIds,
-    ///     allRequirements, visitedFiles, activeFiles). Delegates file loading to
-    ///     <see cref="LoadFile"/> and cycle detection to <see cref="ValidateCycles"/>.
+    ///     allRequirements, visitedFiles, activeFiles, pendingMappings). Runs two passes:
+    ///     Pass 1 builds the full merged requirements tree across all files reachable via
+    ///     <c>includes:</c>, by delegating to <see cref="LoadFile"/>, while <c>mappings:</c>
+    ///     blocks are deferred (not yet resolved) into <c>pendingMappings</c>. Pass 2, run only
+    ///     after the entire tree (across all included files) has been built, resolves every
+    ///     deferred mapping via <see cref="LoadDocumentMappings"/> so that mappings may reference
+    ///     requirements defined in any file, regardless of include order. Cycle detection via
+    ///     <see cref="ValidateCycles"/> runs last, once mappings are resolved.
     ///     Returns null <see cref="Requirements"/> when any error-level issue is found,
     ///     allowing callers to detect failure without exception handling.
     /// </remarks>
@@ -99,10 +107,20 @@ internal static class RequirementsLoader
         // activeFiles tracks the current include call stack to detect circular includes
         var activeFiles = new HashSet<string>(StringComparer.Ordinal);
 
-        // Walk each file, building the model and collecting issues
+        // pendingMappings collects each file's 'mappings:' root, deferred until the full
+        // requirements tree (across all included files) has been built
+        var pendingMappings = new List<(string Path, YamlMappingNode Root)>();
+
+        // Pass 1: walk each file, building the model (deferring mapping resolution) and collecting issues
         foreach (var path in paths)
         {
-            LoadFile(requirements, issues, path, seenIds, allRequirements, visitedFiles, activeFiles);
+            LoadFile(requirements, issues, path, seenIds, allRequirements, visitedFiles, activeFiles, pendingMappings);
+        }
+
+        // Pass 2: now that the full requirements tree is built, resolve deferred test mappings
+        foreach (var (mappingPath, mappingRoot) in pendingMappings)
+        {
+            LoadDocumentMappings(issues, mappingPath, mappingRoot, allRequirements);
         }
 
         // Validate cycle-free requirement references on a best-effort basis, even if other errors exist
@@ -117,8 +135,10 @@ internal static class RequirementsLoader
     }
 
     /// <summary>
-    ///     Reads and processes a single YAML file, walking its DOM tree to build model objects
-    ///     and collect lint issues. Follows include directives recursively.
+    ///     Reads and processes a single YAML file (one DOM parse per file), walking its DOM tree
+    ///     to build model objects and collect lint issues, deferring mapping resolution. Follows
+    ///     include directives recursively so the tree-build pass covers the full include graph
+    ///     before any mapping is resolved.
     /// </summary>
     /// <param name="requirements">The requirements tree being built.</param>
     /// <param name="issues">The list to add lint issues to.</param>
@@ -127,11 +147,17 @@ internal static class RequirementsLoader
     /// <param name="allRequirements">Dictionary of all built requirement objects, keyed by ID.</param>
     /// <param name="visitedFiles">Set of fully-resolved file paths already processed.</param>
     /// <param name="activeFiles">Set of fully-resolved file paths in the current include call stack.</param>
+    /// <param name="pendingMappings">
+    ///     Collects each file's <c>mappings:</c> document root, deferred for resolution in the
+    ///     second pass (see <see cref="Load"/>) after the full requirements tree has been built.
+    /// </param>
     /// <remarks>
     ///     Handles file-not-found and I/O errors by recording them as <see cref="LintIssue"/> objects
     ///     and returning — never throws for domain errors. Uses <c>activeFiles</c> to detect circular
     ///     file includes before following include directives. Uses <c>visitedFiles</c> to skip files
-    ///     already processed (handles diamond-include patterns without re-processing).
+    ///     already processed (handles diamond-include patterns without re-processing). Mapping
+    ///     resolution is intentionally deferred (see <c>pendingMappings</c>) so that mappings may
+    ///     reference requirements defined in files not yet visited at this point in the recursion.
     /// </remarks>
     private static void LoadFile(
         Requirements requirements,
@@ -140,7 +166,8 @@ internal static class RequirementsLoader
         Dictionary<string, string> seenIds,
         Dictionary<string, Requirement> allRequirements,
         HashSet<string> visitedFiles,
-        HashSet<string> activeFiles)
+        HashSet<string> activeFiles,
+        List<(string Path, YamlMappingNode Root)> pendingMappings)
     {
         // Resolve to full path to detect duplicate includes
         string fullPath;
@@ -224,8 +251,8 @@ internal static class RequirementsLoader
             return;
         }
 
-        // Walk the document, building model objects and collecting issues
-        LoadDocument(requirements, issues, path, root, seenIds, allRequirements);
+        // Walk the document, building model objects and collecting issues (mapping resolution deferred)
+        LoadDocument(requirements, issues, path, root, seenIds, allRequirements, pendingMappings);
 
         // Track this file as active during recursive include processing
         activeFiles.Add(fullPath);
@@ -250,7 +277,7 @@ internal static class RequirementsLoader
                 continue;
             }
 
-            LoadFile(requirements, issues, includePath, seenIds, allRequirements, visitedFiles, activeFiles);
+            LoadFile(requirements, issues, includePath, seenIds, allRequirements, visitedFiles, activeFiles, pendingMappings);
         }
 
         // Remove from active set after this file's includes are fully processed
@@ -259,7 +286,7 @@ internal static class RequirementsLoader
 
     /// <summary>
     ///     Walks a document root mapping node, checking for unknown fields and loading
-    ///     sections and test mappings.
+    ///     sections; defers mapping resolution to the second pass (see <see cref="Load"/>).
     /// </summary>
     /// <param name="requirements">The requirements tree being built.</param>
     /// <param name="issues">The list to add lint issues to.</param>
@@ -267,13 +294,18 @@ internal static class RequirementsLoader
     /// <param name="root">The document root mapping node.</param>
     /// <param name="seenIds">Dictionary of requirement IDs already seen.</param>
     /// <param name="allRequirements">Dictionary of all built requirement objects.</param>
+    /// <param name="pendingMappings">
+    ///     Collects this document's <c>mappings:</c> root for deferred resolution once the full
+    ///     requirements tree (across all included files) has been built.
+    /// </param>
     private static void LoadDocument(
         Requirements requirements,
         List<LintIssue> issues,
         string path,
         YamlMappingNode root,
         Dictionary<string, string> seenIds,
-        Dictionary<string, Requirement> allRequirements)
+        Dictionary<string, Requirement> allRequirements,
+        List<(string Path, YamlMappingNode Root)> pendingMappings)
     {
         // Report unknown fields at document root
         foreach (var key in root.Children.Keys.OfType<YamlScalarNode>())
@@ -291,8 +323,9 @@ internal static class RequirementsLoader
         // Load top-level sections into the requirements tree
         LoadDocumentSections(requirements, issues, path, root, seenIds, allRequirements);
 
-        // Apply test mappings to already-loaded requirements
-        LoadDocumentMappings(issues, path, root, allRequirements);
+        // Defer test mapping resolution to the second pass, once the full requirements tree
+        // (across all included files) has been built
+        pendingMappings.Add((path, root));
     }
 
     /// <summary>
@@ -614,12 +647,17 @@ internal static class RequirementsLoader
     }
 
     /// <summary>
-    ///     Loads test mappings from the document root and applies them to already-built requirements.
+    ///     Loads test mappings from a document root and applies them to already-built requirements.
     /// </summary>
     /// <param name="issues">The list to add lint issues to.</param>
     /// <param name="path">The file path for error locations.</param>
     /// <param name="root">The document root mapping node.</param>
     /// <param name="allRequirements">Dictionary of all built requirement objects.</param>
+    /// <remarks>
+    ///     Called during the second pass (see <see cref="Load"/>), once the full requirements tree
+    ///     across all included files has been built, so mappings may reference requirements defined
+    ///     in any file regardless of include order.
+    /// </remarks>
     private static void LoadDocumentMappings(
         List<LintIssue> issues,
         string path,
@@ -695,8 +733,14 @@ internal static class RequirementsLoader
             return;
         }
 
-        // Resolve the referenced requirement (silently skip mappings to unknown IDs)
-        allRequirements.TryGetValue(idNode.Value, out var requirement);
+        // Resolve the referenced requirement, reporting an error for unknown mapping IDs
+        if (!allRequirements.TryGetValue(idNode.Value, out var requirement))
+        {
+            issues.Add(new LintIssue(
+                $"{path}({idNode.Start.Line},{idNode.Start.Column})",
+                LintSeverity.Error,
+                $"Mapping references unknown requirement id '{idNode.Value}'"));
+        }
 
         // Extract and validate 'tests', then apply to the requirement
         var tests = GetValidatedStringList(

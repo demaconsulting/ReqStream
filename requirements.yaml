@@ -16,3 +16,4 @@ includes:
   - docs/reqstream/ots/yamldotnet.yaml
   - docs/reqstream/ots/microsoft-extensions-file-system-globbing.yaml
   - docs/reqstream/ots/dema-consulting-test-results.yaml
+  - docs/reqstream/ots/sysml2tools.yaml

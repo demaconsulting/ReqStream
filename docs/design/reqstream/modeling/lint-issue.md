@@ -1,5 +1,7 @@
 ### LintIssue
 
+![Modeling Structure](ModelingView.svg)
+
 #### Purpose
 
 `LintIssue` and its companion enum `LintSeverity` represent a single structural issue discovered

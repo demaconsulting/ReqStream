@@ -17,7 +17,8 @@ completion.
 
 The Modeling subsystem verification is complete when all xUnit tests in `ModelingTests.cs` pass
 without uncaught exceptions and all assertions succeed. The subsystem is considered verified when
-every requirement in the Requirements Coverage is mapped to at least one passing test method.
+every Modeling requirement is mapped to at least one passing test method in the ReqStream trace
+matrix.
 
 ### Test Scenarios
 
@@ -41,14 +42,3 @@ malformed YAML produces an error with null requirements;
 `Modeling_Linting_ValidFile_ReturnsNoIssues`, which verifies a valid file returns no issues; and
 `Modeling_LintingReporting_MultipleConditions_ReportsAllIssues`, which verifies all issues are
 reported at once.
-
-### Requirements Coverage
-
-| Requirement ID | Scenario(s) | Test Method(s) |
-| --- | --- | --- |
-| `ReqStream-Modeling-YamlParsing` | YAML Parsing Scenario | `Modeling_YamlParsing_ValidFile_LoadsRequirements`, `Modeling_YamlParsing_ValidFile_ReturnsNoLintIssues`, `Modeling_YamlParsing_DuplicateIds_DetectsLintError`, `Modeling_YamlParsing_NoPaths_ThrowsArgumentException` |
-| `ReqStream-Modeling-Export` | Export Scenario | `Modeling_Export_Requirements_GeneratesMarkdownFile`, `Modeling_Export_Justifications_GeneratesMarkdownFile` |
-| `ReqStream-Modeling-MultiFileLoading` | YAML Parsing Scenario | `Modeling_YamlParsing_ValidFile_LoadsRequirements`, `Modeling_MultiFileLoading_WithIncludes_LoadsRequirementsFromAllFiles` |
-| `ReqStream-Modeling-Linting` | Linting Scenario | `Modeling_YamlParsing_DuplicateIds_DetectsLintError`, `Modeling_Linting_MalformedYaml_DetectsError`, `Modeling_Linting_ValidFile_ReturnsNoIssues` |
-| `ReqStream-Modeling-LintingValidation` | Linting Scenario | `Modeling_Linting_MalformedYaml_DetectsError`, `Modeling_Linting_ValidFile_ReturnsNoIssues` |
-| `ReqStream-Modeling-LintingReporting` | Linting Scenario | `Modeling_YamlParsing_DuplicateIds_DetectsLintError`, `Modeling_LintingReporting_MultipleConditions_ReportsAllIssues` |
