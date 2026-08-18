@@ -18,7 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Xunit.Sdk;
+using Xunit.v3;
+
 // Configure test parallelization for the test assembly.
 // Tests are configured to run sequentially to avoid resource contention on shared process state
 // (file handles, process limits, and current working directory mutations in self-test validation).
-[assembly: Xunit.CollectionBehavior(DisableTestParallelization = true)]
+[assembly: Parallelization(Mode = ParallelMode.None)]
