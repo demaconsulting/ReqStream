@@ -30,6 +30,9 @@ ReqStream offers the following capabilities:
   one pass
 - **Validation** — run a built-in self-test suite to qualify the tool in its deployment environment
 - **Tag Filtering** — categorize and filter requirements using tags for focused reporting
+- **Orphan Detection** — report requirements that are not reachable from any requirement tagged as a
+  "root" (via `--root-tags`/`root-tags:`), catching low-level requirements disconnected from real
+  product or quality needs
 - **Configurable Report Depth** — control Markdown heading levels via `--depth`, `--report-depth`,
   `--matrix-depth`, and `--justifications-depth` flags
 - **Export Capabilities** — generate Markdown reports for requirements, justifications, and test trace matrices
@@ -546,6 +549,7 @@ ReqStream supports the following command-line options:
 | `--report <file>` | Export requirements to markdown file |
 | `--report-depth <depth>` | Starting header depth for requirements report (overrides `--depth`) |
 | `--filter <tags>` | Comma-separated list of tags to filter requirements by |
+| `--root-tags <tags>` | Comma-separated tags marking root requirements for orphan detection |
 | `--tests <pattern>` | Glob pattern for test result files (TRX or JUnit format) |
 | `--matrix <file>` | Export trace matrix to markdown file |
 | `--matrix-depth <depth>` | Starting header depth for trace matrix (overrides `--depth`) |
@@ -598,10 +602,11 @@ Example validation report:
 ✓ ReqStream_ReportExport - Passed
 ✓ ReqStream_TagsFiltering - Passed
 ✓ ReqStream_EnforcementMode - Passed
+✓ ReqStream_OrphanDetection - Passed
 ✓ ReqStream_Lint - Passed
 
-Total Tests: 6
-Passed: 6
+Total Tests: 7
+Passed: 7
 Failed: 0
 ```
 
@@ -614,6 +619,9 @@ Each test proves specific functionality works correctly:
 - **`ReqStream_ReportExport`** - requirements report is correctly exported to a markdown file.
 - **`ReqStream_TagsFiltering`** - requirements are correctly filtered by tags.
 - **`ReqStream_EnforcementMode`** - enforcement mode correctly validates requirement test coverage.
+- **`ReqStream_OrphanDetection`** - orphan detection correctly warns without failing when
+  `--enforce` is not active, enforces (non-zero exit code) when `--enforce` is active and orphans
+  exist, and succeeds when `--enforce` is active and no orphans exist.
 - **`ReqStream_Lint`** - lint mode correctly identifies and reports issues in requirements files.
 
 ### Linting Requirements Files
@@ -1204,17 +1212,22 @@ requirements:
 
 ## Troubleshooting Enforcement
 
-### Error: Cannot enforce requirements without test results
+### Error: Cannot enforce requirements without test results or root tags
 
-This error occurs when `--enforce` is used without the `--tests` option. You must provide test result files to
-validate coverage:
+This error occurs when `--enforce` is used with neither `--tests` (or existing test evidence) nor
+`--root-tags`/a `root-tags:` YAML declaration configured — there is genuinely nothing for `--enforce`
+to check. Test-coverage enforcement and orphan-freedom enforcement are independent: supplying either
+one is enough to satisfy this check.
 
 ```bash
-# Wrong - no test results
+# Wrong - neither test results nor root tags
 reqstream --requirements "**/*.yaml" --enforce
 
-# Correct - with test results
+# Correct - with test results (checks test coverage)
 reqstream --requirements "**/*.yaml" --tests "**/*.trx" --enforce
+
+# Correct - with root tags (checks orphan-freedom, even without --tests)
+reqstream --requirements "**/*.yaml" --root-tags product --enforce
 ```
 
 ### All requirements show as unsatisfied
@@ -1398,8 +1411,21 @@ detailed information about which requirements are not satisfied, making it easie
 
 **Q: Why does --enforce require test results?**
 
-A: Enforcement validates that requirements have passing tests, which requires test result files. If you use `--enforce`
-without `--tests`, the tool will report an error asking you to specify test result files.
+A: Enforcement checks two independent things: test coverage and orphan-freedom (see below). Test-coverage
+enforcement requires test result files (`--tests`); orphan-freedom enforcement requires root tags
+(`--root-tags`/`root-tags:`). Supplying either one is enough for `--enforce` to have something to check —
+it only reports an error if neither is configured.
+
+**Q: What does --root-tags do, and how does it relate to --enforce?**
+
+A: `--root-tags <tags>` (or a `root-tags:` key in a requirements YAML file) declares which tags mark a
+"root"/product-level requirement. ReqStream then reports any requirement not reachable — via `children`
+links — from a root-tagged requirement as "orphaned." Without `--enforce`, orphans print as a warning
+only; with `--enforce`, orphans become a build-breaking error, independent of whether `--tests` was
+supplied. If no root tags are configured, orphan-checking is skipped entirely. This behavior is
+covered by the `ReqStream_OrphanDetection` self-validation test (see the "Running Validation" section),
+so `--validate` provides qualification evidence for orphan detection alongside the tool's other
+core capabilities.
 
 ## Export Questions
 

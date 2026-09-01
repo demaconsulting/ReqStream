@@ -67,12 +67,26 @@ non-lint) run.
   `context.Matrix` is set.
 - If `context.Matrix` is set and `context.TestFiles` is empty, writes an error via
   `context.WriteError` and returns without constructing a `TraceMatrix`.
-- If `--enforce` is set but `context.TestFiles` is empty (so no `TraceMatrix` was constructed),
-  an error is reported via `context.WriteError` and the method returns without enforcing coverage.
-- Enforces coverage if `--enforce` is set, via `EnforceRequirementsCoverage`.
+- Computes the merged root-tag set (`requirements.RootTags` combined with `context.RootTags`).
+  When non-empty, calls `requirements.FindOrphans` against the fully-loaded, unfiltered tree
+  (independent of `context.FilterTags` and of whether a `TraceMatrix` was constructed). When
+  orphans are found and `--enforce` is not set, prints a warning via the new `ReportOrphans`
+  helper (which calls `context.WriteWarning`); the warning has no effect on `context.ExitCode`.
+- Enforces coverage if `--enforce` is set, via `EnforceRequirementsCoverage`, passing both the
+  `TraceMatrix` (if any) and the orphan-detection result/root-tag set.
 
-**EnforceRequirementsCoverage** (private): Evaluates whether all requirements are covered by
-passing tests. Never throws; all failure signalling goes through `context.WriteError`.
+**EnforceRequirementsCoverage** (private): Evaluates two independent compliance checks and
+never throws; all failure signalling goes through `context.WriteError`.
+
+- *Phase 1 — test coverage*: unchanged from prior behavior. Applies only when a `TraceMatrix`
+  was constructed (i.e. `context.TestFiles` is non-empty); reports each unsatisfied requirement.
+- *Phase 2 — orphan-freedom*: new. Applies only when the merged root-tag set is non-empty;
+  reports each orphaned requirement via `ReportOrphans` at `Error` severity (instead of the
+  `Warning` severity used outside `--enforce`).
+- *Phase 0 — nothing-to-enforce guard*: the existing "Nothing to enforce" error is reported only
+  when **neither** Phase 1 nor Phase 2 applies (no `--tests` and no root tags configured
+  anywhere). If either applies, the corresponding phase(s) run instead, and both sets of failures
+  are reported together when both apply.
 
 ### Error Handling
 

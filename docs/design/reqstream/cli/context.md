@@ -91,6 +91,16 @@ it.
 - *Preconditions*: None.
 - *Postconditions*: `_hasErrors` is `true`; message is written.
 
+**WriteWarning(message)**: Writes a non-fatal advisory message to the console in yellow (unless
+`Silent` is `true`) and to `_logWriter` if a log file is open, without affecting `ExitCode`. Used
+for non-fatal, advisory output such as orphan-detection warnings when `--enforce` is not active.
+
+- *Parameters*: `string message` — warning text.
+- *Returns*: `void`.
+- *Preconditions*: None.
+- *Postconditions*: Message is written; unlike `WriteError`, `_hasErrors`/`ExitCode` is
+  unaffected.
+
 **Dispose()**: Flushes and closes `_logWriter` if it is not `null`, then sets it to `null`.
 
 - *Parameters*: None.
@@ -110,7 +120,7 @@ it.
   `--justifications-depth` value is not a positive integer.
 - **Log file open failure** — the file path provided to `--log` cannot be opened for writing.
 
-All other `Context` methods (`WriteLine`, `WriteError`, `Dispose`) do not throw.
+All other `Context` methods (`WriteLine`, `WriteError`, `WriteWarning`, `Dispose`) do not throw.
 
 #### Interactions
 
@@ -121,8 +131,8 @@ All other `Context` methods (`WriteLine`, `WriteError`, `Dispose`) do not throw.
 
 ##### Callers
 
-- **Program** — creates `Context` via `Create`; calls `WriteLine` and `WriteError`; reads
-  `ExitCode`.
+- **Program** — creates `Context` via `Create`; calls `WriteLine`, `WriteError`, and
+  `WriteWarning`; reads `ExitCode`.
 - **Validation** — calls `context.WriteLine`, `context.WriteError`; reads `ResultsFile` and
   `Silent`.
 - **LoadResult** — calls `context.WriteError` via `ReportIssues` to route lint issues.

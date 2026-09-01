@@ -22,6 +22,8 @@ providing validation, linting, traceability, and test-mapping capabilities.
 - 🚦 **Enforcement Mode** - Fail CI/CD builds when any requirement lacks passing test evidence
 - 🔍 **Linting** - Validate requirements YAML structure and references, reporting all issues in one pass
 - 🏷️ **Tag Filtering** - Categorize and filter requirements using tags
+- 🧩 **Orphan Detection** - Detect requirements not reachable from any root-tagged requirement, catching
+  disconnected/scope-creep requirements
 - 📤 **Export Capabilities** - Generate markdown reports for requirements, trace matrices, and justifications
 - 🔒 **Continuous Compliance** - Compliance evidence generated automatically on every CI run, following
   the [Continuous Compliance][link-continuous-compliance] methodology
@@ -104,6 +106,7 @@ Options:
   --justifications <file>          Export requirement justifications to markdown file
   --justifications-depth <depth>   Markdown header depth for justifications (overrides --depth)
   --filter <tags>                  Comma-separated list of tags to filter requirements
+  --root-tags <tags>               Comma-separated tags marking root requirements for orphan detection
   --enforce                        Fail if requirements are not fully tested
 ```
 
@@ -127,10 +130,11 @@ Running self-validation produces a report containing the following information:
 ✓ ReqStream_ReportExport - Passed
 ✓ ReqStream_TagsFiltering - Passed
 ✓ ReqStream_EnforcementMode - Passed
+✓ ReqStream_OrphanDetection - Passed
 ✓ ReqStream_Lint - Passed
 
-Total Tests: 6
-Passed: 6
+Total Tests: 7
+Passed: 7
 Failed: 0
 ```
 
@@ -141,6 +145,8 @@ Each test in the report proves:
 - **`ReqStream_ReportExport`** - requirements report is correctly exported to a markdown file.
 - **`ReqStream_TagsFiltering`** - requirements are correctly filtered by tags.
 - **`ReqStream_EnforcementMode`** - enforcement mode correctly validates requirement test coverage.
+- **`ReqStream_OrphanDetection`** - orphan detection correctly warns without failing, enforces
+  when `--enforce` is active, and succeeds when no orphans exist.
 - **`ReqStream_Lint`** - lint mode correctly identifies and reports issues in requirements files.
 
 See the [User Guide][link-guide] for more details on the self-validation tests.
@@ -380,6 +386,43 @@ When enforcement mode is enabled:
 - All mapped tests must be present in the test results
 - All mapped tests must pass
 - If any requirement is not satisfied, an error is reported and the exit code is non-zero
+
+### Orphan Detection (Root Tags)
+
+ReqStream can detect requirements that are structurally disconnected from any legitimate product or
+quality need — "orphaned" requirements that trace to nothing a real root requirement decomposes into.
+This helps catch scope creep (e.g. low-level requirements, designs, or tests added without a genuine
+connection to product functionality).
+
+Use `--root-tags <tags>` to declare which requirement tags mark a "root" (e.g. a top-level product or
+quality requirement). Any requirement not reachable — via `children` links, directly or transitively —
+from a requirement carrying one of these tags is reported as orphaned:
+
+```bash
+reqstream --requirements "**/*.yaml" --root-tags product,quality
+```
+
+- Simply supplying `--root-tags` (or declaring a `root-tags:` key in a requirements YAML file) is enough
+  to enable the check — no separate flag is needed
+- Without `--enforce`, orphans are printed as a warning and do not affect the exit code
+- With `--enforce`, orphans become a build-breaking error — independent of whether `--tests` was supplied
+- If no root tags are configured (from either source), orphan-checking is skipped entirely (fully
+  backward compatible)
+
+```text
+Warning: 2 of 47 requirements are orphaned (not reachable from any requirement tagged: product, quality).
+  - Example-Unit-UnusedHelper
+  - Example-Unit-UnreferencedValidator
+```
+
+A `root-tags:` key can also be declared directly in a requirements YAML file (at the document root,
+alongside `includes:`), and combines (unions) with any `--root-tags` supplied on the command line:
+
+```yaml
+root-tags: [product, quality]
+includes:
+  - requirements/product.yaml
+```
 
 ### CI/CD Integration
 

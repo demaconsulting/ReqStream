@@ -70,6 +70,30 @@ reporting. This scenario is tested by
 `Requirements_Load_WithIncludes_LintsIncludedFiles`, and
 `Requirements_Load_WithLintError_IssueIncludesLocation`.
 
+**Root Tags Parsing**: Tests verify that `root-tags:` is parsed from a single file, combined
+across multiple included files, is a no-op when absent, and is validated with the same
+non-scalar/blank-entry checks applied to other list fields. This scenario is tested by
+`Requirements_Load_WithRootTagsInSingleFile_PopulatesRootTags`,
+`Requirements_Load_WithRootTagsAcrossIncludedFiles_UnionsAllValues`,
+`Requirements_Load_WithNoRootTagsDeclared_RootTagsIsEmpty`,
+`Requirements_Load_WithNonScalarRootTagEntry_ReportsError`,
+`Requirements_Load_WithBlankRootTagEntry_ReportsError`, and
+`Requirements_Load_WithRootTagsKey_DoesNotReportUnknownField`.
+
+**Orphan Detection (`FindOrphans`)**: Tests verify the downward-reachability flood-fill
+algorithm: an empty root-tag set is a no-op, a root-tagged requirement is never orphaned
+regardless of children, a simple parent/child pair is fully reachable, a diamond-shaped
+multi-parent DAG is visited exactly once per node with no infinite loop, a fully isolated
+requirement is reported as orphaned, an entire unreachable subtree is reported as orphaned, and
+orphan IDs are returned in declaration order. This scenario is tested by
+`Requirements_FindOrphans_EmptyRootTags_ReturnsNoOrphans`,
+`Requirements_FindOrphans_RequirementTaggedRoot_IsNeverOrphaned`,
+`Requirements_FindOrphans_ChildReachableFromRoot_IsNotOrphaned`,
+`Requirements_FindOrphans_DiamondMultiParentChild_VisitedOnce_NotOrphaned`,
+`Requirements_FindOrphans_IsolatedRequirement_NoTagsNoParentNoChildren_IsOrphaned`,
+`Requirements_FindOrphans_UnreachableSubtree_AllMembersOrphaned`, and
+`Requirements_FindOrphans_ResultOrder_MatchesDeclarationOrder`.
+
 #### Requirements Coverage
 
 | Requirement ID | Scenario(s) | Test Method(s) |
@@ -95,3 +119,11 @@ reporting. This scenario is tested by
 | `ReqStream-Report-TagFilterExport` | Export Scenario | `Requirements_Export_WithFilterTags_ExportsOnlyMatchingRequirements` |
 | `ReqStream-Report-TagFilterExport` | Export Scenario | `Requirements_Export_WithMultipleFilterTags_ExportsRequirementsMatchingAnyTag` |
 | `ReqStream-Report-TagFilterExport` | Export Scenario | `Requirements_ExportJustifications_WithFilterTags_ExportsOnlyMatchingRequirements` |
+| `ReqStream-Requirements-RootTags` | Root Tags Parsing Scenario | `Requirements_Load_WithRootTagsInSingleFile_PopulatesRootTags` |
+| `ReqStream-Requirements-RootTags` | Root Tags Parsing Scenario | `Requirements_Load_WithRootTagsAcrossIncludedFiles_UnionsAllValues` |
+| `ReqStream-Requirements-OrphanReachability` | Orphan Detection Scenario | `Requirements_FindOrphans_ChildReachableFromRoot_IsNotOrphaned` |
+| `ReqStream-Requirements-OrphanReachability` | Orphan Detection Scenario | `Requirements_FindOrphans_DiamondMultiParentChild_VisitedOnce_NotOrphaned` |
+| `ReqStream-Requirements-OrphanRootExemption` | Orphan Detection Scenario | `Requirements_FindOrphans_RequirementTaggedRoot_IsNeverOrphaned` |
+| `ReqStream-Requirements-OrphanIsolated` | Orphan Detection Scenario | `Requirements_FindOrphans_IsolatedRequirement_NoTagsNoParentNoChildren_IsOrphaned` |
+| `ReqStream-Requirements-OrphanIsolated` | Orphan Detection Scenario | `Requirements_FindOrphans_UnreachableSubtree_AllMembersOrphaned` |
+| `ReqStream-Requirements-OrphanNoRootTags` | Orphan Detection Scenario | `Requirements_FindOrphans_EmptyRootTags_ReturnsNoOrphans` |

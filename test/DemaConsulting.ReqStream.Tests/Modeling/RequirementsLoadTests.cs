@@ -244,4 +244,219 @@ sections:
         Assert.Contains(result.Issues, i => i.Description.Contains("Unknown field 'unknown_field'"));
     }
 
+    /// <summary>
+    ///     Test that FindOrphans returns no orphans when the root-tag set is empty, regardless
+    ///     of tree shape (the backward-compatibility no-op path).
+    /// </summary>
+    [Fact]
+    public void Requirements_FindOrphans_EmptyRootTags_ReturnsNoOrphans()
+    {
+        // Arrange: a fully isolated requirement with no tags, no parents, no children
+        var yamlContent = @"---
+sections:
+  - title: ""Section""
+    requirements:
+      - id: ""ISOLATED-001""
+        title: ""Isolated requirement.""
+";
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+        var requirements = Requirements.Load(filePath).Requirements!;
+
+        // Act: find orphans with an empty root-tag set
+        var result = requirements.FindOrphans(new HashSet<string>());
+
+        // Assert: no orphans are ever reported when root tags are not configured
+        Assert.Empty(result.OrphanIds);
+        Assert.Equal(0, result.TotalRequirements);
+    }
+
+    /// <summary>
+    ///     Test that a root-tagged requirement with no children is never reported as orphaned.
+    /// </summary>
+    [Fact]
+    public void Requirements_FindOrphans_RequirementTaggedRoot_IsNeverOrphaned()
+    {
+        // Arrange: a single requirement tagged as a root, with no children
+        var yamlContent = @"---
+sections:
+  - title: ""Section""
+    requirements:
+      - id: ""ROOT-001""
+        title: ""Root requirement.""
+        tags: [""product""]
+";
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+        var requirements = Requirements.Load(filePath).Requirements!;
+
+        // Act: find orphans using the "product" root tag
+        var result = requirements.FindOrphans(new HashSet<string> { "product" });
+
+        // Assert: the root-tagged requirement is exempt from being orphaned
+        Assert.Empty(result.OrphanIds);
+        Assert.Equal(1, result.TotalRequirements);
+    }
+
+    /// <summary>
+    ///     Test that a child reachable from a root via a single parent link is not orphaned.
+    /// </summary>
+    [Fact]
+    public void Requirements_FindOrphans_ChildReachableFromRoot_IsNotOrphaned()
+    {
+        // Arrange: a root-tagged requirement with one child
+        var yamlContent = @"---
+sections:
+  - title: ""Section""
+    requirements:
+      - id: ""ROOT-001""
+        title: ""Root requirement.""
+        tags: [""product""]
+        children: [""CHILD-001""]
+      - id: ""CHILD-001""
+        title: ""Child requirement.""
+";
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+        var requirements = Requirements.Load(filePath).Requirements!;
+
+        // Act: find orphans using the "product" root tag
+        var result = requirements.FindOrphans(new HashSet<string> { "product" });
+
+        // Assert: the child requirement is reachable from the root and not orphaned
+        Assert.Empty(result.OrphanIds);
+        Assert.Equal(2, result.TotalRequirements);
+    }
+
+    /// <summary>
+    ///     Test that a requirement referenced as a children entry from two different
+    ///     root-reachable parents (a DAG diamond) is visited exactly once - no double
+    ///     traversal, no infinite loop.
+    /// </summary>
+    [Fact]
+    public void Requirements_FindOrphans_DiamondMultiParentChild_VisitedOnce_NotOrphaned()
+    {
+        // Arrange: two root-tagged requirements both referencing the same child
+        var yamlContent = @"---
+sections:
+  - title: ""Section""
+    requirements:
+      - id: ""ROOT-001""
+        title: ""First root.""
+        tags: [""product""]
+        children: [""SHARED-001""]
+      - id: ""ROOT-002""
+        title: ""Second root.""
+        tags: [""product""]
+        children: [""SHARED-001""]
+      - id: ""SHARED-001""
+        title: ""Shared child requirement.""
+";
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+        var requirements = Requirements.Load(filePath).Requirements!;
+
+        // Act: find orphans using the "product" root tag
+        var result = requirements.FindOrphans(new HashSet<string> { "product" });
+
+        // Assert: the shared child is reachable and not double-counted; no orphans
+        Assert.Empty(result.OrphanIds);
+        Assert.Equal(3, result.TotalRequirements);
+    }
+
+    /// <summary>
+    ///     Test that a requirement with no tags, no parent references, and no children is
+    ///     reported as orphaned when root tags are configured.
+    /// </summary>
+    [Fact]
+    public void Requirements_FindOrphans_IsolatedRequirement_NoTagsNoParentNoChildren_IsOrphaned()
+    {
+        // Arrange: a root-tagged requirement and a fully-isolated requirement
+        var yamlContent = @"---
+sections:
+  - title: ""Section""
+    requirements:
+      - id: ""ROOT-001""
+        title: ""Root requirement.""
+        tags: [""product""]
+      - id: ""ISOLATED-001""
+        title: ""Isolated requirement.""
+";
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+        var requirements = Requirements.Load(filePath).Requirements!;
+
+        // Act: find orphans using the "product" root tag
+        var result = requirements.FindOrphans(new HashSet<string> { "product" });
+
+        // Assert: only the isolated requirement is reported as orphaned
+        Assert.Equal(2, result.TotalRequirements);
+        Assert.Single(result.OrphanIds);
+        Assert.Equal("ISOLATED-001", result.OrphanIds[0]);
+    }
+
+    /// <summary>
+    ///     Test that every member of a subtree rooted away from any root-tagged requirement is
+    ///     reported as orphaned, not just the top of the unreachable subtree.
+    /// </summary>
+    [Fact]
+    public void Requirements_FindOrphans_UnreachableSubtree_AllMembersOrphaned()
+    {
+        // Arrange: a root-tagged requirement, plus an unreachable parent->child chain
+        var yamlContent = @"---
+sections:
+  - title: ""Section""
+    requirements:
+      - id: ""ROOT-001""
+        title: ""Root requirement.""
+        tags: [""product""]
+      - id: ""UNREACHED-PARENT""
+        title: ""Unreached parent requirement.""
+        children: [""UNREACHED-CHILD""]
+      - id: ""UNREACHED-CHILD""
+        title: ""Unreached child requirement.""
+";
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+        var requirements = Requirements.Load(filePath).Requirements!;
+
+        // Act: find orphans using the "product" root tag
+        var result = requirements.FindOrphans(new HashSet<string> { "product" });
+
+        // Assert: both members of the unreachable subtree are reported as orphaned
+        Assert.Equal(3, result.TotalRequirements);
+        Assert.Equal(2, result.OrphanIds.Count);
+        Assert.Contains("UNREACHED-PARENT", result.OrphanIds);
+        Assert.Contains("UNREACHED-CHILD", result.OrphanIds);
+    }
+
+    /// <summary>
+    ///     Test that orphan ids are returned in tree declaration order.
+    /// </summary>
+    [Fact]
+    public void Requirements_FindOrphans_ResultOrder_MatchesDeclarationOrder()
+    {
+        // Arrange: two orphaned requirements declared in a specific order
+        var yamlContent = @"---
+sections:
+  - title: ""Section""
+    requirements:
+      - id: ""ROOT-001""
+        title: ""Root requirement.""
+        tags: [""product""]
+      - id: ""ORPHAN-B""
+        title: ""Second declared orphan.""
+      - id: ""ORPHAN-A""
+        title: ""First declared orphan.""
+";
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+        var requirements = Requirements.Load(filePath).Requirements!;
+
+        // Act: find orphans using the "product" root tag
+        var result = requirements.FindOrphans(new HashSet<string> { "product" });
+
+        // Assert: orphan ids appear in the same order as declared in the YAML
+        Assert.Equal(["ORPHAN-B", "ORPHAN-A"], result.OrphanIds);
+    }
 }

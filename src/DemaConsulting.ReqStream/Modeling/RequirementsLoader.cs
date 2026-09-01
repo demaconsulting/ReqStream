@@ -41,7 +41,7 @@ internal static class RequirementsLoader
     ///     Known fields at the document root level.
     /// </summary>
     private static readonly HashSet<string> KnownDocumentFields =
-        new(StringComparer.Ordinal) { "sections", "mappings", "includes" };
+        new(StringComparer.Ordinal) { "sections", "mappings", "includes", "root-tags" };
 
     /// <summary>
     ///     Known fields within a section.
@@ -322,6 +322,15 @@ internal static class RequirementsLoader
 
         // Load top-level sections into the requirements tree
         LoadDocumentSections(requirements, issues, path, root, seenIds, allRequirements);
+
+        // Parse this document's root-tags and union them into the shared requirements tree,
+        // accumulating across every included file (never overwriting a prior file's values)
+        var rootTags = GetValidatedStringList(
+            issues, path, root,
+            "root-tags",
+            "Each 'root-tags' entry must be a scalar string",
+            "Each 'root-tags' entry cannot be blank");
+        requirements.RootTags.UnionWith(rootTags);
 
         // Defer test mapping resolution to the second pass, once the full requirements tree
         // (across all included files) has been built

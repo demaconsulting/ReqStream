@@ -1,6 +1,6 @@
 package ReqStream {
     part def Requirements {
-        doc /* Parsed requirements document with section tree. */
+        doc /* Parsed requirements document with section tree, root-tag set, and orphan detection. */
 
         comment sourceRef /* Source: src/DemaConsulting.ReqStream/Modeling/Requirements.cs */
         comment testRef /* Test: test/DemaConsulting.ReqStream.Tests/Modeling/RequirementsLoadTests.cs */

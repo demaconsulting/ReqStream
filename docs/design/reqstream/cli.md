@@ -23,22 +23,26 @@ The `Cli` subsystem contains the following software unit:
   initialized `Context`. Throws `ArgumentException` for invalid arguments.
 - *Constraints*: Must not write to console output channels (`Console.Out` / `Console.Error`); read-only filesystem access for glob pattern expansion is permitted.
 
-**Context output channels**: `WriteLine` and `WriteError` methods.
+**Context output channels**: `WriteLine`, `WriteError`, and `WriteWarning` methods.
 
 - *Type*: In-process .NET public API.
 - *Role*: Provider (all subsystems write output through these methods).
 - *Contract*: `WriteLine` writes to stdout and optional log; `WriteError` writes to stderr,
-  sets the error flag, and optionally logs.
+  sets the error flag, and optionally logs; `WriteWarning` writes a warning-level message to
+  stdout and optional log without setting the error flag or affecting the exit code.
 - *Constraints*: Suppressed when `--silent` is active.
 
 **Context properties**: Parsed flags and file lists (`Version`, `Help`, `Silent`, `Validate`,
 `Lint`, `Enforce`, `RequirementsFiles`, `TestFiles`, `RequirementsReport`, `Matrix`,
-`JustificationsFile`, `ResultsFile`, `FilterTags`, `Depth`, `ReportDepth`, `MatrixDepth`,
-`JustificationsDepth`, `ExitCode`).
+`JustificationsFile`, `ResultsFile`, `FilterTags`, `RootTags`, `Depth`, `ReportDepth`,
+`MatrixDepth`, `JustificationsDepth`, `ExitCode`).
 
 - *Type*: In-process .NET public API (read-only properties).
 - *Role*: Provider.
-- *Contract*: Each property reflects the parsed command-line state.
+- *Contract*: Each property reflects the parsed command-line state. `RootTags` is `null` when
+  `--root-tags` was not supplied, and a merged `HashSet<string>` (comma-split, trimmed, combined
+  across repeated occurrences of the flag — matching the `--filter`/`FilterTags` parsing
+  convention exactly) otherwise.
 - *Constraints*: Immutable after construction (except `_hasErrors` which is set by `WriteError`).
 
 ### Design

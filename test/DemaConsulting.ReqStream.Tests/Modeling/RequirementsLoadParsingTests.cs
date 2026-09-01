@@ -461,4 +461,195 @@ sections:
         var ex = Assert.Throws<ArgumentException>(() => Requirements.Load(null!));
         Assert.Contains("At least one file path must be provided", ex.Message);
     }
+
+    /// <summary>
+    ///     Test that a single file declaring root-tags populates RootTags.
+    /// </summary>
+    [Fact]
+    public void Requirements_Load_WithRootTagsInSingleFile_PopulatesRootTags()
+    {
+        // Arrange: create a YAML file declaring root-tags
+        var yamlContent = @"---
+root-tags:
+  - product
+sections:
+  - title: ""System""
+    requirements:
+      - id: ""SYS-001""
+        title: ""A requirement.""
+        tags: [""product""]
+";
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        // Act: load the requirements file
+        var result = Requirements.Load(filePath);
+        Assert.False(result.HasErrors);
+        var requirements = result.Requirements;
+
+        // Assert: RootTags contains the declared tag
+        Assert.NotNull(requirements);
+        Assert.Single(requirements.RootTags);
+        Assert.Contains("product", requirements.RootTags);
+    }
+
+    /// <summary>
+    ///     Test that root-tags declared across multiple included files are combined, with
+    ///     neither file's declaration overwriting the other.
+    /// </summary>
+    [Fact]
+    public void Requirements_Load_WithRootTagsAcrossIncludedFiles_UnionsAllValues()
+    {
+        // Arrange: root file declares one root tag, an included file declares another
+        var includedYaml = @"---
+root-tags:
+  - safety
+sections:
+  - title: ""Included""
+    requirements:
+      - id: ""INC-001""
+        title: ""Included requirement.""
+";
+        var rootYaml = @"---
+root-tags:
+  - product
+includes:
+  - ""included.yaml""
+sections:
+  - title: ""Root""
+    requirements:
+      - id: ""ROOT-001""
+        title: ""Root requirement.""
+";
+        var includedPath = _testDirectory.GetFilePath("included.yaml");
+        var rootPath = _testDirectory.GetFilePath("root.yaml");
+        File.WriteAllText(includedPath, includedYaml);
+        File.WriteAllText(rootPath, rootYaml);
+
+        // Act: load the root file
+        var result = Requirements.Load(rootPath);
+        Assert.False(result.HasErrors);
+        var requirements = result.Requirements;
+
+        // Assert: RootTags is the union of both files' declarations
+        Assert.NotNull(requirements);
+        Assert.Equal(2, requirements.RootTags.Count);
+        Assert.Contains("product", requirements.RootTags);
+        Assert.Contains("safety", requirements.RootTags);
+    }
+
+    /// <summary>
+    ///     Test that a file with no root-tags key produces an empty (never-null) RootTags set.
+    /// </summary>
+    [Fact]
+    public void Requirements_Load_WithNoRootTagsDeclared_RootTagsIsEmpty()
+    {
+        // Arrange: create a YAML file with no root-tags key
+        var yamlContent = @"---
+sections:
+  - title: ""System""
+    requirements:
+      - id: ""SYS-001""
+        title: ""A requirement.""
+";
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        // Act: load the requirements file
+        var result = Requirements.Load(filePath);
+        Assert.False(result.HasErrors);
+        var requirements = result.Requirements;
+
+        // Assert: RootTags is empty, never null
+        Assert.NotNull(requirements);
+        Assert.NotNull(requirements.RootTags);
+        Assert.Empty(requirements.RootTags);
+    }
+
+    /// <summary>
+    ///     Test that a root-tags list containing a non-scalar entry reports an error.
+    /// </summary>
+    [Fact]
+    public void Requirements_Load_WithNonScalarRootTagEntry_ReportsError()
+    {
+        // Arrange: create a YAML file with a nested mapping entry in root-tags
+        var yamlContent = @"---
+root-tags:
+  - product
+  - nested: value
+sections:
+  - title: ""System""
+    requirements:
+      - id: ""SYS-001""
+        title: ""A requirement.""
+";
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        // Act: load the requirements file
+        var result = Requirements.Load(filePath);
+
+        // Assert: an Error-severity issue is reported for the non-scalar entry
+        Assert.True(result.HasErrors);
+        Assert.Contains(result.Issues, i => i.Severity == LintSeverity.Error
+            && i.Description.Contains("Each 'root-tags' entry must be a scalar string"));
+    }
+
+    /// <summary>
+    ///     Test that a root-tags list containing a blank entry reports an error.
+    /// </summary>
+    [Fact]
+    public void Requirements_Load_WithBlankRootTagEntry_ReportsError()
+    {
+        // Arrange: create a YAML file with a blank root-tags entry
+        var yamlContent = @"---
+root-tags:
+  - product
+  - ""   ""
+sections:
+  - title: ""System""
+    requirements:
+      - id: ""SYS-001""
+        title: ""A requirement.""
+";
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        // Act: load the requirements file
+        var result = Requirements.Load(filePath);
+
+        // Assert: an Error-severity issue is reported for the blank entry
+        Assert.True(result.HasErrors);
+        Assert.Contains(result.Issues, i => i.Severity == LintSeverity.Error
+            && i.Description.Contains("Each 'root-tags' entry cannot be blank"));
+    }
+
+    /// <summary>
+    ///     Test that root-tags is a recognized document field and does not itself trigger an
+    ///     unknown-field error alongside sections/mappings/includes.
+    /// </summary>
+    [Fact]
+    public void Requirements_Load_WithRootTagsKey_DoesNotReportUnknownField()
+    {
+        // Arrange: create a YAML file declaring root-tags alongside other known fields
+        var yamlContent = @"---
+root-tags:
+  - product
+includes: []
+sections:
+  - title: ""System""
+    requirements:
+      - id: ""SYS-001""
+        title: ""A requirement.""
+";
+        var filePath = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(filePath, yamlContent);
+
+        // Act: load the requirements file
+        var result = Requirements.Load(filePath);
+
+        // Assert: no "Unknown field" issue is reported
+        Assert.False(result.HasErrors);
+        Assert.DoesNotContain(result.Issues, i => i.Description.Contains("Unknown field 'root-tags'"));
+    }
 }

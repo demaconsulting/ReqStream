@@ -59,8 +59,21 @@ merges multiple filter arguments. This scenario is tested by
 `Context_Create_FilterSingleTag_ParsesCorrectly`, and
 `Context_Create_MultipleFilterArguments_MergesIntoSingleSet`.
 
+**Root Tags**: Tests verify that `--root-tags` parses comma-separated tags, trims whitespace,
+merges multiple `--root-tags` arguments, rejects a missing value, and defaults to `null` when
+absent — mirroring the `--filter`/`FilterTags` behavior exactly. This scenario is tested by
+`Context_Create_RootTagsFlag_ParsesTagsCorrectly`,
+`Context_Create_RootTagsFlagWithSpaces_TrimsAndParsesTagsCorrectly`,
+`Context_Create_MultipleRootTagsArguments_MergesIntoSingleSet`,
+`Context_Create_RootTagsArgumentMissingValue_ThrowsException`, and
+`Context_Create_NoRootTagsFlag_RootTagsIsNull`.
+
 **Output Channel**: Tests verify that output and error output are correctly routed in silent and
-normal modes, and that WriteError sets the exit code to 1. This scenario is tested by
+normal modes, and that WriteError sets the exit code to 1. `WriteWarning` (used for non-fatal
+orphan-detection warnings) shares the same silent-mode routing as `WriteLine`/`WriteError` but,
+unlike `WriteError`, never affects `ExitCode`; it is exercised indirectly via the system-level
+orphan-checking integration test rather than a dedicated `Context`-level test. This scenario is
+tested by
 `Context_WriteLine_SilentMode_WritesToLogFile`, `Context_WriteError_SilentMode_WritesToLogFile`,
 `Context_WriteError_NormalMode_WritesToLogFile`, `Context_WriteError_NormalMode_WritesToStderr`,
 and `Context_ExitCode_AfterWriteError_ReturnsOne`.
@@ -134,3 +147,8 @@ coverage:
 | `ReqStream-Command-LogFileOutput` | Log File Scenario | `Context_Create_WithLogFileAndSilent_WritesToLogOnly` |
 | `ReqStream-Command-LogFileOutput` | Log File Scenario | `Context_Dispose_WithLogFile_ClosesLogFile` |
 | `ReqStream-Command-LogFileOutput` | Log File Scenario | `Context_Create_InvalidLogPath_ThrowsException` |
+| `ReqStream-Command-RootTags` | Root Tags Scenario | `Context_Create_RootTagsFlag_ParsesTagsCorrectly` |
+| `ReqStream-Command-RootTags` | Root Tags Scenario | `Context_Create_RootTagsFlagWithSpaces_TrimsAndParsesTagsCorrectly` |
+| `ReqStream-Command-RootTags` | Root Tags Scenario | `Context_Create_MultipleRootTagsArguments_MergesIntoSingleSet` |
+| `ReqStream-Command-RootTags` | Root Tags Scenario | `Context_Create_RootTagsArgumentMissingValue_ThrowsException` |
+| `ReqStream-Command-RootTags` | Root Tags Scenario | `Context_Create_NoRootTagsFlag_RootTagsIsNull` |

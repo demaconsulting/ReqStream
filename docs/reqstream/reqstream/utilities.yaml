@@ -33,6 +33,10 @@ sections:
               - ReqStream-GlobMatcher-AbsolutePaths
               - ReqStream-GlobMatcher-EmptyResult
               - ReqStream-GlobMatcher-SortOrder
+              - ReqStream-GlobMatcher-NullPatterns
+              - ReqStream-GlobMatcher-NullElement
+              - ReqStream-Utilities-SafePath
+              - ReqStream-OTS-FileSystemGlobbing
 
           - id: ReqStream-Utilities-SafePath
             title: >-

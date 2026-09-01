@@ -59,6 +59,8 @@ sections:
                   - Requirements_Load_WithIncludes_MergesFilesCorrectly
                   - Requirements_Load_MultipleFiles_MergesAllFiles
                   - Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop
+                children:
+                  - ReqStream-Utilities-SafePath
 
               - id: ReqStream-Requirements-CircularInclude
                 title: >-
@@ -133,3 +135,83 @@ sections:
                   - Requirements_Export_WithFilterTags_ExportsOnlyMatchingRequirements
                   - Requirements_Export_WithMultipleFilterTags_ExportsRequirementsMatchingAnyTag
                   - Requirements_ExportJustifications_WithFilterTags_ExportsOnlyMatchingRequirements
+
+              - id: ReqStream-Requirements-RootTags
+                title: >-
+                  The tool shall support declaring root tags at the document level via
+                  `root-tags`, combining values declared across all included files.
+                justification: |
+                  Root tags identify which requirements are trusted starting points ("roots") for
+                  orphan detection. Because requirements are commonly split across multiple
+                  included files, root tags declared in any file must accumulate into one
+                  effective set rather than the last-loaded file silently overwriting an
+                  earlier declaration. This behavior is additionally exercised end-to-end by the
+                  tool's self-validation suite (`ReqStream_OrphanDetection` in `Validation.cs`),
+                  providing qualification evidence for downstream deployment environments
+                  independent of the xUnit test suite.
+                tags: [requirements]
+                tests:
+                  - Requirements_Load_WithRootTagsInSingleFile_PopulatesRootTags
+                  - Requirements_Load_WithRootTagsAcrossIncludedFiles_UnionsAllValues
+                  - Requirements_Load_WithNoRootTagsDeclared_RootTagsIsEmpty
+                  - Requirements_Load_WithNonScalarRootTagEntry_ReportsError
+                  - Requirements_Load_WithBlankRootTagEntry_ReportsError
+                  - Requirements_Load_WithRootTagsKey_DoesNotReportUnknownField
+
+              - id: ReqStream-Requirements-OrphanReachability
+                title: >-
+                  The tool shall determine reachability from root-tagged requirements by
+                  traversing child requirement references without revisiting a requirement
+                  reachable via multiple parents.
+                justification: |
+                  Requirements form a DAG, not a tree: a single requirement's children may be
+                  referenced from multiple parents. A visited-set-guarded breadth-first traversal
+                  from every root guarantees each requirement is evaluated at most once, avoiding
+                  both double-counting and non-termination on any child-reference graph shape.
+                  This behavior is additionally exercised end-to-end by the tool's self-validation
+                  suite (`ReqStream_OrphanDetection` in `Validation.cs`), providing qualification
+                  evidence for downstream deployment environments independent of the xUnit test
+                  suite.
+                tags: [requirements]
+                tests:
+                  - Requirements_FindOrphans_ChildReachableFromRoot_IsNotOrphaned
+                  - Requirements_FindOrphans_DiamondMultiParentChild_VisitedOnce_NotOrphaned
+                  - Requirements_FindOrphans_UnreachableSubtree_AllMembersOrphaned
+                  - Requirements_FindOrphans_ResultOrder_MatchesDeclarationOrder
+
+              - id: ReqStream-Requirements-OrphanRootExemption
+                title: >-
+                  A requirement tagged with a configured root tag shall never be reported as
+                  orphaned, even when it has no children.
+                justification: |
+                  A root-tagged requirement is by definition a trusted starting point; requiring
+                  it to also have children before being considered "rooted" would incorrectly
+                  flag legitimate childless root requirements (e.g. a leaf-level product need) as
+                  orphaned.
+                tags: [requirements]
+                tests:
+                  - Requirements_FindOrphans_RequirementTaggedRoot_IsNeverOrphaned
+
+              - id: ReqStream-Requirements-OrphanIsolated
+                title: >-
+                  The tool shall report a requirement with no tags, no parent references, and no
+                  children as orphaned when root tags are configured.
+                justification: |
+                  A requirement with no path back to any root-tagged requirement, and no root tag
+                  of its own, represents exactly the "orphaned" defect this feature exists to
+                  catch: well-formed content that does not trace to any real need.
+                tags: [requirements]
+                tests:
+                  - Requirements_FindOrphans_IsolatedRequirement_NoTagsNoParentNoChildren_IsOrphaned
+
+              - id: ReqStream-Requirements-OrphanNoRootTags
+                title: >-
+                  The tool shall report no orphans when the effective root-tag set is empty.
+                justification: |
+                  When no root tags are declared in YAML and none are supplied via
+                  `--root-tags`, orphan checking has no defined notion of "root" to measure
+                  reachability from. Skipping the check entirely in this case preserves full
+                  backward compatibility with requirements files that predate this feature.
+                tags: [requirements]
+                tests:
+                  - Requirements_FindOrphans_EmptyRootTags_ReturnsNoOrphans

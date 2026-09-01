@@ -62,6 +62,7 @@ sections:
               - ReqStream-Tracing-Reporting
               - ReqStream-Tracing-Coverage
               - ReqStream-Cli-MissingArgumentValue
+              - ReqStream-Program-Banner
 
           - id: ReqStream-System-SourceFilter
             title: >-
@@ -339,17 +340,43 @@ sections:
 
           - id: ReqStream-System-EnforceNoTests
             title: >-
-              The system shall report an error when enforcement is requested but no test result
-              files are provided.
+              The system shall report an error when enforcement is requested but neither test
+              result files nor root tags are configured, since there is nothing for enforcement
+              to check.
             justification: |
-              Enforcement without test results is a configuration error analogous to
-              requesting a trace matrix without test results. The user should be informed
-              explicitly rather than silently succeeding or failing.
+              Enforcement without anything to enforce (no test results and no configured root
+              tags) is a configuration error analogous to requesting a trace matrix without test
+              results. The user should be informed explicitly rather than silently succeeding or
+              failing. When either test results or root tags are configured, enforcement instead
+              performs the corresponding check(s) independently.
             tags: [system]
             tests:
               - ReqStream_System_EnforceNoTests_EnforceWithoutTests_ReportsError
             children:
               - ReqStream-Program-Enforce
+
+          - id: ReqStream-System-OrphanChecking
+            title: >-
+              The system shall identify requirements not reachable from any root-tagged
+              requirement, warning about them by default and treating them as a build-breaking
+              error under enforcement, independent of whether test result files are provided.
+            justification: |
+              AI coding agents and contributors can add well-formed but "orphaned" low-level
+              requirements, design, code, and tests that do not trace up to any real product or
+              quality need. Declaring a set of "root" tags and automatically detecting anything
+              not reachable from a root via child requirement references catches this class of
+              defect structurally, without relying on manual review to notice a missing link.
+              Because orphan-freedom is a distinct compliance property from test coverage, it is
+              enforced independently: --enforce fails on orphans even when no --tests were
+              supplied at all.
+            tags: [system]
+            tests:
+              - ReqStream_System_OrphanChecking_RootTagsWithOrphan_EnforceReportsError
+            children:
+              - ReqStream-Modeling-OrphanDetection
+              - ReqStream-Cli-RootTags
+              - ReqStream-Program-OrphanWarning
+              - ReqStream-Program-OrphanEnforcement
 
           - id: ReqStream-System-CyclicChildDetection
             title: >-

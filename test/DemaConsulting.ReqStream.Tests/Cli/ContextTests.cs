@@ -65,6 +65,7 @@ public sealed class ContextTests : IDisposable
         Assert.Empty(context.RequirementsFiles);
         Assert.Empty(context.TestFiles);
         Assert.Null(context.FilterTags);
+        Assert.Null(context.RootTags);
         Assert.Null(context.ResultsFile);
         Assert.False(context.Enforce);
         Assert.Null(context.RequirementsReport);
@@ -816,6 +817,85 @@ public sealed class ContextTests : IDisposable
         Assert.Equal(2, context.FilterTags.Count);
         Assert.Contains("tag1", context.FilterTags);
         Assert.Contains("tag2", context.FilterTags);
+        Assert.Equal(0, context.ExitCode);
+    }
+
+    /// <summary>
+    /// Test creating a context with --root-tags parses tags correctly.
+    /// </summary>
+    [Fact]
+    public void Context_Create_RootTagsFlag_ParsesTagsCorrectly()
+    {
+        // Act: create context with a comma-separated root-tags value
+        using var context = Context.Create(["--root-tags", "product,safety"]);
+
+        // Assert: RootTags contains both parsed tags
+        Assert.NotNull(context.RootTags);
+        Assert.Equal(2, context.RootTags.Count);
+        Assert.Contains("product", context.RootTags);
+        Assert.Contains("safety", context.RootTags);
+        Assert.Equal(0, context.ExitCode);
+    }
+
+    /// <summary>
+    /// Test creating a context with --root-tags argument with spaces.
+    /// </summary>
+    [Fact]
+    public void Context_Create_RootTagsFlagWithSpaces_TrimsAndParsesTagsCorrectly()
+    {
+        // Act: create context with a comma-separated root-tags value containing spaces
+        using var context = Context.Create(["--root-tags", "product, safety, top-level"]);
+
+        // Assert: RootTags contains all three tags with whitespace trimmed
+        Assert.NotNull(context.RootTags);
+        Assert.Equal(3, context.RootTags.Count);
+        Assert.Contains("product", context.RootTags);
+        Assert.Contains("safety", context.RootTags);
+        Assert.Contains("top-level", context.RootTags);
+        Assert.Equal(0, context.ExitCode);
+    }
+
+    /// <summary>
+    /// Test creating a context with multiple --root-tags arguments merges into one set.
+    /// </summary>
+    [Fact]
+    public void Context_Create_MultipleRootTagsArguments_MergesIntoSingleSet()
+    {
+        // Act: create context with two separate --root-tags arguments
+        using var context = Context.Create(["--root-tags", "tag1", "--root-tags", "tag2"]);
+
+        // Assert: both tags are merged into a single RootTags set
+        Assert.NotNull(context.RootTags);
+        Assert.Equal(2, context.RootTags.Count);
+        Assert.Contains("tag1", context.RootTags);
+        Assert.Contains("tag2", context.RootTags);
+        Assert.Equal(0, context.ExitCode);
+    }
+
+    /// <summary>
+    /// Test creating a context with --root-tags argument missing value.
+    /// </summary>
+    [Fact]
+    public void Context_Create_RootTagsArgumentMissingValue_ThrowsException()
+    {
+        // Act: create context with --root-tags and no following value (combined with assertion)
+        var ex = Assert.Throws<ArgumentException>(() => Context.Create(["--root-tags"]));
+
+        // Assert: exception message identifies the missing tag list
+        Assert.Contains("--root-tags requires a comma-separated list of tags", ex.Message);
+    }
+
+    /// <summary>
+    /// Test creating a context without --root-tags leaves RootTags null.
+    /// </summary>
+    [Fact]
+    public void Context_Create_NoRootTagsFlag_RootTagsIsNull()
+    {
+        // Act: create context without a --root-tags argument
+        using var context = Context.Create(["--filter", "security"]);
+
+        // Assert: RootTags remains null when --root-tags was not supplied
+        Assert.Null(context.RootTags);
         Assert.Equal(0, context.ExitCode);
     }
 

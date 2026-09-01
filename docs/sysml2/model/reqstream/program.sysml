@@ -1,6 +1,6 @@
 package ReqStream {
     part def Program {
-        doc /* Entry point and execution orchestrator. */
+        doc /* Entry point, execution orchestrator, and orphan-check reporting/enforcement. */
 
         comment sourceRef /* Source: src/DemaConsulting.ReqStream/Program.cs */
         comment testRef /* Test: test/DemaConsulting.ReqStream.Tests/ProgramTests.cs */

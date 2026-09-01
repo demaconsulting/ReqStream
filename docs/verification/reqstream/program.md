@@ -67,6 +67,30 @@ tested by `Program_Run_WithLintFlag_RunsLinter`, which asserts lint runs;
 `Program_Run_WithLintAndNoRequirements_PrintsInformationalMessage`, which asserts an
 informational message.
 
+**Orphan Warning**: Tests verify that orphan checking runs whenever the merged root-tag set
+(YAML and/or CLI) is non-empty, prints a non-fatal warning listing orphaned requirements when
+`--enforce` is not set, produces no warning text when there are no orphans, and is skipped
+entirely (no orphan-related text at all) when no root tags are configured anywhere — preserving
+full backward compatibility. This scenario is tested by
+`Program_Run_WithRootTagsAndOrphans_PrintsWarningWithoutFailing`,
+`Program_Run_WithRootTagsNoOrphans_NoWarningPrinted`,
+`Program_Run_WithRootTagsDeclaredOnlyInYaml_NoCliFlag_StillChecksOrphans`,
+`Program_Run_WithCliRootTagsFlagOnly_NoYamlDeclaration_StillChecksOrphans`, and
+`Program_Run_WithNoRootTagsAnywhere_SkipsOrphanCheckEntirely`.
+
+**Orphan Enforcement**: Tests verify that `--enforce` reports orphans as a build-breaking error
+independently of test-coverage enforcement — even when no `--tests` were supplied — reports both
+orphan and missing-coverage failures together when both apply, still reports the pre-existing
+"nothing to enforce" error only when neither check applies, that orphan checking runs against
+the full tree regardless of `--filter`, and that orphan-freedom enforcement still runs when
+`--matrix` is requested with a `--tests` pattern that matches no files (a combined-guard
+regression). This scenario is tested by
+`Program_Run_WithEnforcementRootTagsAndOrphansNoTests_FailsEvenWithoutTests`,
+`Program_Run_WithEnforcementOrphansAndMissingCoverage_ReportsBothErrorBlocks`,
+`Program_Run_WithEnforcementNoTestsNoRootTags_ReportsNothingToEnforceError`,
+`Program_Run_WithFilterAndRootTagsOrphans_OrphanCheckIgnoresFilter`, and
+`Program_Run_WithMatrixNoMatchAndEnforceRootTagsOrphan_ReportsBothMatrixAndOrphanErrors`.
+
 ### Requirements Coverage
 
 | Requirement ID | Test Method(s) |
@@ -82,3 +106,5 @@ informational message.
 | `ReqStream-Program-LintVerbosity` | `Program_Run_WithLintFlag_RunsLinter`, `Program_Run_WithLintFlag_SuppressesBanner` |
 | `ReqStream-Program-LintFailure` | `Program_Run_WithLintFlag_OnlyOutputsIssues` |
 | `ReqStream-Program-LintNoFiles` | `Program_Run_WithLintAndNoRequirements_PrintsInformationalMessage` |
+| `ReqStream-Program-OrphanWarning` | `Program_Run_WithRootTagsAndOrphans_PrintsWarningWithoutFailing`, `Program_Run_WithRootTagsNoOrphans_NoWarningPrinted`, `Program_Run_WithRootTagsDeclaredOnlyInYaml_NoCliFlag_StillChecksOrphans`, `Program_Run_WithCliRootTagsFlagOnly_NoYamlDeclaration_StillChecksOrphans`, `Program_Run_WithNoRootTagsAnywhere_SkipsOrphanCheckEntirely` |
+| `ReqStream-Program-OrphanEnforcement` | `Program_Run_WithEnforcementRootTagsAndOrphansNoTests_FailsEvenWithoutTests`, `Program_Run_WithEnforcementOrphansAndMissingCoverage_ReportsBothErrorBlocks`, `Program_Run_WithEnforcementNoTestsNoRootTags_ReportsNothingToEnforceError`, `Program_Run_WithFilterAndRootTagsOrphans_OrphanCheckIgnoresFilter`, `Program_Run_WithMatrixNoMatchAndEnforceRootTagsOrphan_ReportsBothMatrixAndOrphanErrors` |

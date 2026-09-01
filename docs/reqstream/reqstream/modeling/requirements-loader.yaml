@@ -224,21 +224,25 @@ sections:
                 title: The requirements loader shall report an error when a tag name in a requirement is blank.
                 justification: |
                   Blank tag names cannot be used for filtering and would silently produce incorrect filtered
-                  exports.
+                  exports. Blank entries in `root-tags:` represent the same class of defect and are detected
+                  and reported identically.
                 tags: [lint]
                 tests:
                   - RequirementsLoader_Load_WithBlankTagName_ReportsError
+                  - Requirements_Load_WithBlankRootTagEntry_ReportsError
 
               - id: ReqStream-Lint-NonScalarListEntries
                 title: >-
                   The requirements loader shall report an error when a list field contains a non-scalar entry.
                 justification: |
-                  List fields such as tests, children, tags, and includes must contain scalar string values.
+                  List fields such as tests, children, tags, includes, and root-tags must contain scalar
+                  string values.
                   Non-scalar entries (e.g. nested mappings) would be silently ignored without this check,
                   leading to missing coverage or include entries.
-                  All list field types (tests, children, tags, includes, and mapping tests) represent the
-                  same class of defect — an unusable non-scalar list entry — and are detected and reported
-                  identically; distinguishing between the source list provides no value to the tool user.
+                  All list field types (tests, children, tags, includes, root-tags, and mapping tests)
+                  represent the same class of defect — an unusable non-scalar list entry — and are
+                  detected and reported identically; distinguishing between the source list provides no
+                  value to the tool user.
                 tags: [lint]
                 tests:
                   - RequirementsLoader_Load_WithNonScalarTestEntry_ReportsError
@@ -246,6 +250,7 @@ sections:
                   - RequirementsLoader_Load_WithNonScalarTagEntry_ReportsError
                   - RequirementsLoader_Load_WithNonScalarMappingTestEntry_ReportsError
                   - RequirementsLoader_Load_WithNonScalarIncludeEntry_ReportsError
+                  - Requirements_Load_WithNonScalarRootTagEntry_ReportsError
 
               - id: ReqStream-Lint-CircularReferences
                 title: >-

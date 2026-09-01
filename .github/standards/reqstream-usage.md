@@ -97,6 +97,83 @@ dotnet reqstream --requirements requirements.yaml \
   --report docs/requirements_doc/generated/security_requirements.md
 ```
 
+# Root Tags and Orphan Checking (OPTIONAL)
+
+ReqStream can detect "orphaned" requirements - well-formed requirements that do not trace
+downward from any recognized product/quality need - because AI coding agents and human
+contributors can otherwise add plausible-looking, well-justified, fully-tested requirements
+that are disconnected from any real requirement, feeding CI green without adding real value.
+
+Declare which tag(s) mark trusted starting points ("roots") using the document-level
+`root-tags:` key, a peer of `includes:`/`sections:`/`mappings:`:
+
+```yaml
+root-tags:
+  - product
+```
+
+- **Root-ness** is determined purely by whether a requirement's `tags:` intersects the
+  configured `root-tags` set - no other property makes a requirement a root.
+- `root-tags:` declared in any included file accumulates: the effective root-tag set is the
+  UNION across every loaded file, not just the top-level file.
+- A matching CLI flag `--root-tags <tag1,tag2,...>` (same comma-separated parsing convention as
+  `--filter`) UNIONS with (never replaces) any YAML-declared root tags, letting root tags be
+  extended at invocation time without editing YAML.
+- If the final merged root-tag set is empty (no CLI flag, no YAML anywhere), orphan checking is
+  skipped entirely - this feature is fully backward compatible with requirements files that
+  predate it.
+
+**How orphan checking works**: every requirement whose `tags:` intersects the root-tag set is a
+root. ReqStream performs a downward graph traversal from every root via each requirement's
+`children:` links (the requirement graph is a DAG, not a tree, so a requirement reachable via
+multiple parents is only ever visited once). Any requirement reachable from a root - or that is
+itself a root - is "rooted"; everything else in the fully-loaded requirement set is "orphaned".
+This check always runs against the complete loaded requirement graph and is **independent of
+`--filter`**, which only narrows report/matrix output elsewhere in the same invocation.
+
+Orphan checking triggers automatically whenever the merged root-tag set is non-empty - there is
+no separate `--orphans` flag:
+
+- **Without `--enforce`**: orphans are reported as a non-fatal warning (does not affect the exit
+  code), e.g.:
+
+  ```text
+  Warning: 2 of 47 requirements are orphaned (not reachable from any requirement tagged: product).
+    - ReqStream-Unit-JsonEscapeHelper
+    - ReqStream-Unit-RetryBackoffCalculator
+  ```
+
+- **With `--enforce`**: orphans found becomes a build-breaking error at the same severity tier as
+  missing test coverage, regardless of whether `--tests` was supplied. `--enforce` independently
+  enforces (a) test coverage if a trace matrix was built and (b) orphan-freedom if root tags are
+  configured; the pre-existing "nothing to enforce" error is reported only when **neither**
+  applies.
+
+```bash
+dotnet reqstream --requirements requirements.yaml \
+  --root-tags product \
+  --enforce
+```
+
+## Do Not Create Unauthorized New Roots (MANDATORY when root-tags is configured)
+
+AI coding agents and contributors **must not** create a new root-tagged requirement, or retag an
+existing requirement to add a root tag, without explicit task authorization. New work must attach
+as `children:` under an **existing, human-approved** root wherever a suitable one exists.
+Introducing a new root is a deliberate, reviewable action with its own justification for why the
+existing root set does not already cover the need - it must never be a side effect of routine
+feature work.
+
+This mirrors the "how vs what" convention used for Off-The-Shelf (OTS) dependencies: a dependency
+or tool requirement is never itself a root - it is a `children:` entry under a requirement that
+states the actual outcome/capability needed. See `docs/reqstream/reqstream/modeling.yaml` for a
+worked example of this pattern: the requirement `ReqStream-Modeling-YamlParsing` describes *what*
+capability is needed (parsing requirement YAML files into a structured data model), and lists the
+specific OTS tool requirement `ReqStream-OTS-YamlDotNet` (defined in
+`docs/reqstream/ots/yamldotnet.yaml`) only as a `children:` entry, never as an independent
+root-level requirement. New low-level requirements/design/code/tests should follow the same
+discipline - describe the *what*, and link *how* underneath an approved root.
+
 # Semantic IDs (MANDATORY)
 
 Use the `System-Component-Feature` pattern because ReqStream uses IDs as-is in

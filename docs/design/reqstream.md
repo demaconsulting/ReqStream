@@ -15,6 +15,7 @@ flowchart TD
     subgraph Utilities
         GlobMatcher
         PathHelpers
+        TemporaryDirectory
     end
     subgraph Modeling
         LintIssue
@@ -38,6 +39,7 @@ flowchart TD
     RequirementsLoader --> PathHelpers
     TraceMatrix --> Requirements
     Validation --> Program
+    Validation --> TemporaryDirectory
 ```
 
 The collaboration model is strictly hierarchical: `Program` is the only unit that calls into
@@ -55,6 +57,7 @@ to produce output.
 | `Utilities` | Subsystem | Shared low-level file-system helpers |
 | `GlobMatcher` | Unit | Glob pattern expansion to file paths |
 | `PathHelpers` | Unit | Path combination with traversal protection |
+| `TemporaryDirectory` | Unit | Disposable isolated temporary directory workspace |
 | `Modeling` | Subsystem | YAML requirements data model and parsing |
 | `LintIssue` | Unit | Lint issue severity and data model |
 | `LoadResult` | Unit | Combined load outcome (tree and issues) |
@@ -75,8 +78,9 @@ to produce output.
 - *Role*: Consumer (the user provides arguments to the system).
 - *Contract*: Defined flag set (`--version`/`-v`, `--help`/`-h`/`-?`, `--silent`, `--validate`,
   `--lint`, `--enforce`, `--requirements`, `--tests`, `--report`, `--matrix`, `--justifications`,
-  `--filter`, `--depth`, `--report-depth`, `--matrix-depth`, `--justifications-depth`,
-  `--results`/`--result`, `--log`); unknown flags cause `ArgumentException`.
+  `--filter`, `--root-tags`, `--depth`, `--report-depth`, `--matrix-depth`,
+  `--justifications-depth`, `--results`/`--result`, `--log`); unknown flags cause
+  `ArgumentException`.
 - *Constraints*: No interactive prompts; all information must be on the command line.
 
 **Standard output (stdout)**: Plain text lines via `Context.WriteLine`.
@@ -196,14 +200,23 @@ flowchart LR
    matrix report is exported. If `--matrix` is set but no `--tests` were provided (so no
    `TraceMatrix` was constructed), an error is reported via `Context.WriteError` and the tool exits
    with a non-zero exit code.
-6. **Enforcement** — if `--enforce` is set and a `TraceMatrix` was constructed,
-   `EnforceRequirementsCoverage` verifies all requirements are covered by passing tests. If
-   `--enforce` is set but no `--tests` were provided (so no `TraceMatrix` was constructed), the
-   tool reports an error via `Context.WriteError` and exits with a non-zero exit code.
-7. **Tag filtering** — if `--filter` is set, `Context.FilterTags` restricts which requirements
-   appear in reports and enforcement. Filtering is applied transparently at each operation rather
-   than as a separate pipeline stage.
-8. **Report depth** — the `--depth` flag sets a default heading level for all reports.
+6. **Enforcement** — if `--enforce` is set, `EnforceRequirementsCoverage` performs two
+   independent checks: (a) test-coverage enforcement, unchanged, applies if a `TraceMatrix` was
+   constructed (i.e. `--tests` was provided); (b) orphan-freedom enforcement, new, applies if the
+   merged root-tag set (YAML `root-tags:` combined with CLI `--root-tags`) is non-empty. Either
+   check independently reports failures via `Context.WriteError`. Only when **neither** check
+   applies (no `--tests` and no root tags configured) is the existing "nothing to enforce" error
+   reported.
+7. **Orphan checking** — whenever the merged root-tag set is non-empty, `Requirements.FindOrphans`
+   is run against the fully-loaded, unfiltered requirement tree (independent of `--filter`). If
+   orphans are found and `--enforce` is not set, a warning is printed via the new
+   `Context.WriteWarning` channel (visible, but does not affect the exit code). If `--enforce` is
+   set, the same condition is reported as an error instead (see step 6b).
+8. **Tag filtering** — if `--filter` is set, `Context.FilterTags` restricts which requirements
+   appear in reports and test-coverage enforcement. Filtering is applied transparently at each
+   operation rather than as a separate pipeline stage, and never narrows the set of requirements
+   considered by orphan checking.
+9. **Report depth** — the `--depth` flag sets a default heading level for all reports.
    Per-report overrides (`--report-depth`, `--matrix-depth`, `--justifications-depth`) take
    precedence.
 

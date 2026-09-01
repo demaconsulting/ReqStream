@@ -136,3 +136,46 @@ sections:
             tags: [cli, requirements]
             tests:
               - Program_Run_WithLintAndNoRequirements_PrintsInformationalMessage
+
+          - id: ReqStream-Program-OrphanWarning
+            title: >-
+              The tool shall print a warning listing orphaned requirements, without affecting
+              the exit code, when root tags are configured, orphans are found, and enforcement
+              is not active.
+            justification: |
+              Orphaned requirements are a quality signal, not by themselves a build-breaking
+              condition, when enforcement has not been explicitly requested. A visible warning
+              lets authors notice and fix disconnected requirements during normal development
+              without unexpectedly failing builds that have not opted into enforcement. This
+              behavior is additionally exercised end-to-end by the tool's self-validation suite
+              (`ReqStream_OrphanDetection` in `Validation.cs`), providing qualification evidence
+              for downstream deployment environments independent of the xUnit test suite.
+            tags: [requirements]
+            tests:
+              - Program_Run_WithRootTagsAndOrphans_PrintsWarningWithoutFailing
+              - Program_Run_WithRootTagsNoOrphans_NoWarningPrinted
+              - Program_Run_WithRootTagsDeclaredOnlyInYaml_NoCliFlag_StillChecksOrphans
+              - Program_Run_WithCliRootTagsFlagOnly_NoYamlDeclaration_StillChecksOrphans
+              - Program_Run_WithNoRootTagsAnywhere_SkipsOrphanCheckEntirely
+
+          - id: ReqStream-Program-OrphanEnforcement
+            title: >-
+              The tool shall report an error and exit with a non-zero code when enforcement is
+              active, root tags are configured, and orphaned requirements are found, regardless
+              of whether test result files were supplied.
+            justification: |
+              Orphan-freedom is a distinct compliance property from test coverage: a requirement
+              can be fully tested and still be structurally disconnected from any real product
+              need. Enforcing orphan-freedom independently of test-coverage enforcement ensures
+              --enforce catches this defect class even in invocations that supply no --tests at
+              all, and reports both failure classes together when both apply. This behavior is
+              additionally exercised end-to-end by the tool's self-validation suite
+              (`ReqStream_OrphanDetection` in `Validation.cs`), providing qualification evidence
+              for downstream deployment environments independent of the xUnit test suite.
+            tags: [requirements]
+            tests:
+              - Program_Run_WithEnforcementRootTagsAndOrphansNoTests_FailsEvenWithoutTests
+              - Program_Run_WithEnforcementOrphansAndMissingCoverage_ReportsBothErrorBlocks
+              - Program_Run_WithEnforcementNoTestsNoRootTags_ReportsNothingToEnforceError
+              - Program_Run_WithFilterAndRootTagsOrphans_OrphanCheckIgnoresFilter
+              - Program_Run_WithMatrixNoMatchAndEnforceRootTagsOrphan_ReportsBothMatrixAndOrphanErrors

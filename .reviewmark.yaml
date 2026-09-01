@@ -75,6 +75,7 @@ reviews:
       - "docs/reqstream/reqstream.yaml"
     paths:
       - "docs/reqstream/reqstream.yaml"                   # system requirements
+      - "docs/reqstream/quality.yaml"                             # quality root requirements
       - "docs/reqstream/reqstream/platform-requirements.yaml"     # platform requirements
       - "docs/design/introduction.md"                             # design introduction
       - "docs/design/reqstream.md"                               # system design
@@ -94,6 +95,7 @@ reviews:
     paths:
       - "requirements.yaml"                                       # root requirements file
       - "docs/reqstream/reqstream.yaml"                           # system requirements file
+      - "docs/reqstream/quality.yaml"                             # quality root requirements
       - "docs/reqstream/reqstream/**/*.yaml"                      # all subsystem requirements files
       - "docs/reqstream/ots/**/*.yaml"                            # OTS requirements files
 
