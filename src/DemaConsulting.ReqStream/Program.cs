@@ -324,7 +324,9 @@ internal static class Program
         string severity)
     {
         var tagList = string.Join(", ", rootTags.OrderBy(tag => tag, StringComparer.Ordinal));
-        write($"{severity}: {orphanResult.OrphanIds.Count} of {orphanResult.TotalRequirements} requirements are orphaned " +
+        var requirementNoun = orphanResult.TotalRequirements == 1 ? "requirement" : "requirements";
+        var orphanVerb = orphanResult.OrphanIds.Count == 1 ? "is" : "are";
+        write($"{severity}: {orphanResult.OrphanIds.Count} of {orphanResult.TotalRequirements} {requirementNoun} {orphanVerb} orphaned " +
               $"(not reachable from any requirement tagged: {tagList}).");
         foreach (var orphanId in orphanResult.OrphanIds)
         {
