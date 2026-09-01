@@ -1,5 +1,8 @@
 ---
 # cspell:ignore yamldotnet testresults
+root-tags:
+  - system
+  - quality
 includes:
   # System requirements (includes all subsystems)
   - docs/reqstream/reqstream.yaml
