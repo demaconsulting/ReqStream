@@ -43,6 +43,12 @@ output to a file; `Cli_Output_WriteError_WritesToErrorChannel`, which verifies `
 writes to stderr; and `Cli_Output_WriteError_SetsExitCodeToOne`, which verifies `WriteError`
 sets `ExitCode` to 1.
 
+**Root Tags**: Tests verify that `--root-tags` is parsed and combined the same way `--filter` is.
+This scenario is tested by `Context_Create_RootTagsFlag_ParsesTagsCorrectly`, which verifies a
+comma-separated list is parsed into `RootTags`, and
+`Context_Create_MultipleRootTagsArguments_MergesIntoSingleSet`, which verifies repeated
+`--root-tags` occurrences union into a single set.
+
 ### Requirements Coverage
 
 | Requirement ID | Scenario(s) | Test Method(s) |
@@ -55,3 +61,4 @@ sets `ExitCode` to 1.
 | `ReqStream-Cli-InvalidDepthValue` | Interface Scenario | `Cli_Interface_InvalidDepthValue_ThrowsArgumentException` |
 | `ReqStream-Cli-LogFileOpenFailure` | Interface Scenario | `Cli_Interface_LogFileOpenFailure_ThrowsArgumentException` |
 | `ReqStream-Cli-DepthInheritance` | Interface Scenario | `Cli_Interface_DepthFlag_SetsDefaultForAllReportDepths` |
+| `ReqStream-Cli-RootTags` | Root Tags Scenario | `Context_Create_RootTagsFlag_ParsesTagsCorrectly`, `Context_Create_MultipleRootTagsArguments_MergesIntoSingleSet` |

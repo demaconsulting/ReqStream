@@ -132,9 +132,10 @@ public sealed class ProgramTests : IDisposable
         Assert.Contains("ReqStream_ReportExport - Passed", logContent);
         Assert.Contains("ReqStream_TagsFiltering - Passed", logContent);
         Assert.Contains("ReqStream_EnforcementMode - Passed", logContent);
+        Assert.Contains("ReqStream_OrphanDetection - Passed", logContent);
         Assert.Contains("ReqStream_Lint - Passed", logContent);
-        Assert.Contains("Total Tests: 6", logContent);
-        Assert.Contains("Passed: 6", logContent);
+        Assert.Contains("Total Tests: 7", logContent);
+        Assert.Contains("Passed: 7", logContent);
         Assert.Contains("Failed: 0", logContent);
     }
 
@@ -570,6 +571,473 @@ sections:
     }
 
     /// <summary>
+    /// Test that orphaned requirements produce a non-fatal warning (not an error) when
+    /// --enforce is not active.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithRootTagsAndOrphans_PrintsWarningWithoutFailing()
+    {
+        // Arrange: a root-tagged requirement and an unreachable orphan requirement
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqFile, @"
+root-tags: [product]
+sections:
+  - title: Test Section
+    requirements:
+      - id: ROOT-001
+        title: Root Requirement
+        tags: [product]
+      - id: ORPHAN-001
+        title: Orphaned Requirement
+");
+
+        var originalDir = Directory.GetCurrentDirectory();
+        var logFile = _testDirectory.GetFilePath("orphan-warning.log");
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
+
+            // Act: run with requirements only, no --enforce
+            int exitCode;
+            using (var context = Context.Create([
+                "--requirements", "*.yaml",
+                "--silent",
+                "--log", logFile
+            ]))
+            {
+                Program.Run(context);
+                exitCode = context.ExitCode;
+            }
+
+            // Assert: exit code unaffected, warning text (not error text) printed with the orphan id
+            Assert.Equal(0, exitCode);
+            var logContent = File.ReadAllText(logFile);
+            Assert.Contains("Warning: 1 of 2 requirements is orphaned", logContent);
+            Assert.Contains("ORPHAN-001", logContent);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+    }
+
+    /// <summary>
+    /// Test that no warning is printed when root tags are configured but the tree is fully
+    /// reachable (no orphans).
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithRootTagsNoOrphans_NoWarningPrinted()
+    {
+        // Arrange: a root-tagged requirement whose only child is reachable
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqFile, @"
+root-tags: [product]
+sections:
+  - title: Test Section
+    requirements:
+      - id: ROOT-001
+        title: Root Requirement
+        tags: [product]
+        children: [CHILD-001]
+      - id: CHILD-001
+        title: Child Requirement
+");
+
+        var originalDir = Directory.GetCurrentDirectory();
+        var logFile = _testDirectory.GetFilePath("orphan-no-warning.log");
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
+
+            // Act: run with requirements only, no --enforce
+            using (var context = Context.Create([
+                "--requirements", "*.yaml",
+                "--silent",
+                "--log", logFile
+            ]))
+            {
+                Program.Run(context);
+                Assert.Equal(0, context.ExitCode);
+            }
+
+            // Assert: no orphan warning text appears anywhere in the output
+            var logContent = File.ReadAllText(logFile);
+            Assert.DoesNotContain("orphaned", logContent);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+    }
+
+    /// <summary>
+    /// Test that --enforce reports orphans as a build-breaking error even when no --tests
+    /// were supplied at all, proving orphan enforcement is independent of test-coverage
+    /// enforcement.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithEnforcementRootTagsAndOrphansNoTests_FailsEvenWithoutTests()
+    {
+        // Arrange: a root-tagged requirement and an orphan, with no test files
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqFile, @"
+root-tags: [product]
+sections:
+  - title: Test Section
+    requirements:
+      - id: ROOT-001
+        title: Root Requirement
+        tags: [product]
+      - id: ORPHAN-001
+        title: Orphaned Requirement
+");
+
+        var originalDir = Directory.GetCurrentDirectory();
+        var logFile = _testDirectory.GetFilePath("orphan-enforce.log");
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
+
+            // Act: run with requirements and --enforce, no --tests at all
+            int exitCode;
+            using (var context = Context.Create([
+                "--requirements", "*.yaml",
+                "--enforce",
+                "--silent",
+                "--log", logFile
+            ]))
+            {
+                Program.Run(context);
+                exitCode = context.ExitCode;
+            }
+
+            // Assert: non-zero exit code with the orphan Error: block, despite no --tests
+            Assert.Equal(1, exitCode);
+            var logContent = File.ReadAllText(logFile);
+            Assert.Contains("Error: 1 of 2 requirements is orphaned", logContent);
+            Assert.Contains("ORPHAN-001", logContent);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+    }
+
+    /// <summary>
+    /// Test that --enforce reports both the missing-test-coverage error block and the
+    /// orphan error block together in the same invocation, when both conditions apply.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithEnforcementOrphansAndMissingCoverage_ReportsBothErrorBlocks()
+    {
+        // Arrange: a root-tagged tested requirement, an untested reachable requirement,
+        // plus one orphaned requirement
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqFile, @"
+root-tags: [product]
+sections:
+  - title: Test Section
+    requirements:
+      - id: ROOT-001
+        title: Root Requirement
+        tags: [product]
+        children: [CHILD-001]
+        tests:
+          - TestMethod1
+      - id: CHILD-001
+        title: Untested Child Requirement
+      - id: ORPHAN-001
+        title: Orphaned Requirement
+");
+
+        var testResults = new DemaConsulting.TestResults.TestResults { Name = "TestRun" };
+        testResults.Results.Add(new DemaConsulting.TestResults.TestResult
+        {
+            Name = "TestMethod1",
+            ClassName = "TestClass",
+            CodeBase = "Tests.dll",
+            Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+
+        var trxFile = _testDirectory.GetFilePath("tests.trx");
+        File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
+
+        var originalDir = Directory.GetCurrentDirectory();
+        var logFile = _testDirectory.GetFilePath("orphan-and-coverage.log");
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
+
+            // Act: run with requirements, tests, and --enforce
+            int exitCode;
+            using (var context = Context.Create([
+                "--requirements", "*.yaml",
+                "--tests", "*.trx",
+                "--enforce",
+                "--silent",
+                "--log", logFile
+            ]))
+            {
+                Program.Run(context);
+                exitCode = context.ExitCode;
+            }
+
+            // Assert: both the coverage-failure block and the orphan-failure block are present
+            Assert.Equal(1, exitCode);
+            var logContent = File.ReadAllText(logFile);
+            Assert.Contains("Only 1 of 3 requirements are satisfied", logContent);
+            Assert.Contains("CHILD-001", logContent);
+            Assert.Contains("Error: 1 of 3 requirements is orphaned", logContent);
+            Assert.Contains("ORPHAN-001", logContent);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+    }
+
+    /// <summary>
+    /// Regression test: --enforce with neither test files nor root tags configured still
+    /// reports the original "nothing to enforce" error.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithEnforcementNoTestsNoRootTags_ReportsNothingToEnforceError()
+    {
+        // Arrange: a requirements file with no root-tags and no test files
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqFile, @"
+sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Test Requirement
+");
+
+        var originalDir = Directory.GetCurrentDirectory();
+        var logFile = _testDirectory.GetFilePath("nothing-to-enforce.log");
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
+
+            // Act: run with requirements and --enforce, no --tests, no root-tags
+            int exitCode;
+            using (var context = Context.Create([
+                "--requirements", "*.yaml",
+                "--enforce",
+                "--silent",
+                "--log", logFile
+            ]))
+            {
+                Program.Run(context);
+                exitCode = context.ExitCode;
+            }
+
+            // Assert: the original "nothing to enforce" error still fires
+            Assert.Equal(1, exitCode);
+            var logContent = File.ReadAllText(logFile);
+            Assert.Contains("Cannot enforce requirements without test results or root tags", logContent);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+    }
+
+    /// <summary>
+    /// Test that orphan-checking runs against the full, unfiltered requirement graph and is
+    /// unaffected by a --filter argument that would exclude the orphan from filtered reports.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithFilterAndRootTagsOrphans_OrphanCheckIgnoresFilter()
+    {
+        // Arrange: a root-tagged requirement and an orphan tagged with a tag excluded by --filter
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqFile, @"
+root-tags: [product]
+sections:
+  - title: Test Section
+    requirements:
+      - id: ROOT-001
+        title: Root Requirement
+        tags: [product]
+      - id: ORPHAN-001
+        title: Orphaned Requirement
+        tags: [excluded]
+");
+
+        var originalDir = Directory.GetCurrentDirectory();
+        var logFile = _testDirectory.GetFilePath("filter-independence.log");
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
+
+            // Act: run with a --filter that would exclude ORPHAN-001 from filtered report output
+            using (var context = Context.Create([
+                "--requirements", "*.yaml",
+                "--filter", "product",
+                "--enforce",
+                "--silent",
+                "--log", logFile
+            ]))
+            {
+                Program.Run(context);
+                Assert.Equal(1, context.ExitCode);
+            }
+
+            // Assert: the orphan is still detected and reported despite the --filter
+            var logContent = File.ReadAllText(logFile);
+            Assert.Contains("Error: 1 of 2 requirements is orphaned", logContent);
+            Assert.Contains("ORPHAN-001", logContent);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+    }
+
+    /// <summary>
+    /// Test that a YAML-only root-tags declaration (no --root-tags CLI flag) is sufficient to
+    /// trigger orphan checking.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithRootTagsDeclaredOnlyInYaml_NoCliFlag_StillChecksOrphans()
+    {
+        // Arrange: root-tags declared only in YAML
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqFile, @"
+root-tags: [product]
+sections:
+  - title: Test Section
+    requirements:
+      - id: ROOT-001
+        title: Root Requirement
+        tags: [product]
+      - id: ORPHAN-001
+        title: Orphaned Requirement
+");
+
+        var originalDir = Directory.GetCurrentDirectory();
+        var logFile = _testDirectory.GetFilePath("yaml-only-root-tags.log");
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
+
+            // Act: run without any --root-tags CLI flag
+            using (var context = Context.Create([
+                "--requirements", "*.yaml",
+                "--silent",
+                "--log", logFile
+            ]))
+            {
+                Program.Run(context);
+                Assert.Equal(0, context.ExitCode);
+            }
+
+            // Assert: the orphan warning still appears, driven solely by the YAML declaration
+            var logContent = File.ReadAllText(logFile);
+            Assert.Contains("Warning: 1 of 2 requirements is orphaned", logContent);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+    }
+
+    /// <summary>
+    /// Test that a CLI-only --root-tags flag (no YAML root-tags: declaration) is sufficient to
+    /// trigger orphan checking.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithCliRootTagsFlagOnly_NoYamlDeclaration_StillChecksOrphans()
+    {
+        // Arrange: no root-tags: key in YAML at all
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqFile, @"
+sections:
+  - title: Test Section
+    requirements:
+      - id: ROOT-001
+        title: Root Requirement
+        tags: [product]
+      - id: ORPHAN-001
+        title: Orphaned Requirement
+");
+
+        var originalDir = Directory.GetCurrentDirectory();
+        var logFile = _testDirectory.GetFilePath("cli-only-root-tags.log");
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
+
+            // Act: run with --root-tags on the CLI only
+            using (var context = Context.Create([
+                "--requirements", "*.yaml",
+                "--root-tags", "product",
+                "--silent",
+                "--log", logFile
+            ]))
+            {
+                Program.Run(context);
+                Assert.Equal(0, context.ExitCode);
+            }
+
+            // Assert: the orphan warning still appears, driven solely by the CLI flag
+            var logContent = File.ReadAllText(logFile);
+            Assert.Contains("Warning: 1 of 2 requirements is orphaned", logContent);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+    }
+
+    /// <summary>
+    /// Test that with no root tags configured anywhere (neither YAML nor CLI), orphan checking
+    /// is skipped entirely - no warning/error text related to orphans appears, confirming full
+    /// backward compatibility.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithNoRootTagsAnywhere_SkipsOrphanCheckEntirely()
+    {
+        // Arrange: a requirements file with an otherwise-orphan-shaped tree, but no root-tags
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqFile, @"
+sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Standalone Requirement
+");
+
+        var originalDir = Directory.GetCurrentDirectory();
+        var logFile = _testDirectory.GetFilePath("no-root-tags.log");
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
+
+            // Act: run with no root-tags configured anywhere
+            using (var context = Context.Create([
+                "--requirements", "*.yaml",
+                "--silent",
+                "--log", logFile
+            ]))
+            {
+                Program.Run(context);
+                Assert.Equal(0, context.ExitCode);
+            }
+
+            // Assert: no orphan-related text appears at all
+            var logContent = File.ReadAllText(logFile);
+            Assert.DoesNotContain("orphaned", logContent);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+    }
+
+    /// <summary>
     /// Test Run with lint flag lints requirements files.
     /// </summary>
     [Fact]
@@ -926,6 +1394,70 @@ sections:
             var logContent = File.ReadAllText(logFile);
             Assert.Contains("No test result files were provided or matched", logContent);
             Assert.Contains("--tests", logContent);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+    }
+
+    /// <summary>
+    /// Regression test for a bug where the "--matrix requested but no test files matched" guard
+    /// used to <c>return;</c> before reaching the <c>--enforce</c> check, silently skipping
+    /// orphan-freedom enforcement in a combined <c>--matrix</c>+<c>--enforce</c> invocation even
+    /// when root tags were configured. Verifies that both the matrix "no test files" error and
+    /// the orphan-enforcement error are reported together, with a single non-zero exit code.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithMatrixNoMatchAndEnforceRootTagsOrphan_ReportsBothMatrixAndOrphanErrors()
+    {
+        // Arrange: root-tagged requirement plus an orphan, and a --tests pattern matching nothing
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqFile, @"
+root-tags: [product]
+sections:
+  - title: Test Section
+    requirements:
+      - id: ROOT-001
+        title: Root Requirement
+        tags: [product]
+      - id: ORPHAN-001
+        title: Orphaned Requirement
+");
+
+        var matrixFile = _testDirectory.GetFilePath("matrix.md");
+        var logFile = _testDirectory.GetFilePath("matrix-enforce-orphan.log");
+
+        var originalDir = Directory.GetCurrentDirectory();
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
+
+            // Act: run with --matrix, a --tests pattern matching no files, --enforce, and root tags
+            int exitCode;
+            using (var context = Context.Create([
+                "--requirements", "*.yaml",
+                "--matrix", matrixFile,
+                "--tests", "nonexistent-*.xml",
+                "--enforce",
+                "--silent",
+                "--log", logFile
+            ]))
+            {
+                Program.Run(context);
+                exitCode = context.ExitCode;
+            }
+
+            // Assert: single non-zero exit code, matrix file not created
+            Assert.Equal(1, exitCode);
+            Assert.False(File.Exists(matrixFile));
+
+            // Assert: both the matrix "no test files" error AND the orphan-enforcement error
+            // are reported - before the fix, the orphan block was silently skipped
+            var logContent = File.ReadAllText(logFile);
+            Assert.Contains("No test result files were provided or matched", logContent);
+            Assert.Contains("Error: 1 of 2 requirements is orphaned", logContent);
+            Assert.Contains("ORPHAN-001", logContent);
         }
         finally
         {

@@ -192,13 +192,14 @@ internal static class Program
         context.WriteLine("  --report <file>            Export requirements to markdown file");
         context.WriteLine("  --report-depth <depth>     Markdown header depth for requirements report (overrides --depth)");
         context.WriteLine("  --filter <tags>            Filter requirements by comma-separated tags");
+        context.WriteLine("  --root-tags <tags>         Comma-separated tags marking root requirements for orphan detection");
         context.WriteLine("  --justifications <file>    Export justifications to markdown file");
         context.WriteLine("  --justifications-depth <depth>");
         context.WriteLine("                             Markdown header depth for justifications (overrides --depth)");
         context.WriteLine("  --tests <pattern>          Test result files glob pattern (TRX or JUnit)");
         context.WriteLine("  --matrix <file>            Export trace matrix to markdown file");
         context.WriteLine("  --matrix-depth <depth>     Markdown header depth for trace matrix (overrides --depth)");
-        context.WriteLine("  --enforce                  Fail if requirements are not fully tested");
+        context.WriteLine("  --enforce                  Fail if requirements are not fully tested or are orphaned (when root tags are configured)");
     }
 
     /// <summary>
@@ -234,6 +235,25 @@ internal static class Program
         var requirements = result.Requirements;
 
         context.WriteLine("Requirements loaded successfully.");
+
+        // Compute the effective (merged) root-tag set: YAML-declared root-tags (combined across
+        // every loaded/included file) union any CLI --root-tags flag(s). Orphan-checking runs
+        // against the full, unfiltered requirement graph — independent of --filter, which only
+        // narrows report/matrix output below.
+        var mergedRootTags = new HashSet<string>(requirements.RootTags, StringComparer.Ordinal);
+        if (context.RootTags != null)
+        {
+            mergedRootTags.UnionWith(context.RootTags);
+        }
+
+        var orphanResult = requirements.FindOrphans(mergedRootTags);
+
+        // Warn (non-fatal) about orphaned requirements when enforcement is not active; when
+        // enforcement is active, orphan-freedom is instead enforced as an error below.
+        if (orphanResult.OrphanIds.Count > 0 && !context.Enforce)
+        {
+            ReportOrphans(orphanResult, mergedRootTags, context.WriteWarning, "Warning");
+        }
 
         // Export requirements report if requested
         if (context.RequirementsReport != null)
@@ -272,45 +292,100 @@ internal static class Program
         if (context.Matrix != null && traceMatrix == null)
         {
             context.WriteError("Error: No test result files were provided or matched. Ensure the --tests pattern matches at least one file.");
-            return;
         }
 
-        // Enforce requirements coverage if requested
+        // Enforce requirements coverage if requested. This must run even when the --matrix
+        // guard above reported an error, because orphan-freedom enforcement is independent of
+        // the trace matrix (see EnforceRequirementsCoverage remarks) and must still be evaluated
+        // when root tags are configured, regardless of the --matrix outcome.
         if (context.Enforce)
         {
-            EnforceRequirementsCoverage(context, traceMatrix);
+            EnforceRequirementsCoverage(context, traceMatrix, orphanResult, mergedRootTags);
+        }
+    }
+
+    /// <summary>
+    ///     Formats and writes the orphan summary line and per-requirement listing, shared by
+    ///     the non-fatal warning path and the <c>--enforce</c> error path so both stay in sync.
+    /// </summary>
+    /// <remarks>
+    ///     Extracted so the warning (<see cref="ProcessRequirements"/>) and error
+    ///     (<see cref="EnforceRequirementsCoverage"/>) call sites produce byte-for-byte
+    ///     identical formatting aside from severity label and write method.
+    /// </remarks>
+    /// <param name="orphanResult">The orphan-detection result to report.</param>
+    /// <param name="rootTags">The effective root-tag set used for the scan.</param>
+    /// <param name="write">The write method to use (<see cref="Cli.Context.WriteWarning"/> or <see cref="Cli.Context.WriteError"/>).</param>
+    /// <param name="severity">The severity label to prefix the summary line with ("Warning" or "Error").</param>
+    private static void ReportOrphans(
+        OrphanResult orphanResult,
+        HashSet<string> rootTags,
+        Action<string> write,
+        string severity)
+    {
+        var tagList = string.Join(", ", rootTags.OrderBy(tag => tag, StringComparer.Ordinal));
+        var requirementNoun = orphanResult.TotalRequirements == 1 ? "requirement" : "requirements";
+        var orphanVerb = orphanResult.OrphanIds.Count == 1 ? "is" : "are";
+        write($"{severity}: {orphanResult.OrphanIds.Count} of {orphanResult.TotalRequirements} {requirementNoun} {orphanVerb} orphaned " +
+              $"(not reachable from any requirement tagged: {tagList}).");
+        foreach (var orphanId in orphanResult.OrphanIds)
+        {
+            write($"  - {orphanId}");
         }
     }
 
     /// <summary>
     ///     Enforces the compliance contract that every requirement must be backed by at least one
-    ///     passing test. Separated from <see cref="ProcessRequirements"/> to keep enforcement
+    ///     passing test, and (independently) that no requirement is orphaned when root tags are
+    ///     configured. Separated from <see cref="ProcessRequirements"/> to keep enforcement
     ///     logic isolated and to allow all reports to be generated before a coverage failure
     ///     is signalled.
     /// </summary>
     /// <param name="context">The context for output.</param>
     /// <param name="traceMatrix">The trace matrix containing test results, or null if no tests were provided.</param>
-    private static void EnforceRequirementsCoverage(Context context, TraceMatrix? traceMatrix)
+    /// <param name="orphanResult">The orphan-detection result computed against the full requirement graph.</param>
+    /// <param name="rootTags">The effective root-tag set used to compute <paramref name="orphanResult"/>.</param>
+    /// <remarks>
+    ///     Test-coverage enforcement and orphan-freedom enforcement are independent of one
+    ///     another: either, both, or neither may apply on a given invocation. The
+    ///     "nothing to enforce" error is only reported when neither a trace matrix exists
+    ///     (no <c>--tests</c> supplied) nor root tags are configured (no <c>root-tags:</c>/
+    ///     <c>--root-tags</c>) — i.e. there is genuinely nothing for <c>--enforce</c> to check.
+    /// </remarks>
+    private static void EnforceRequirementsCoverage(
+        Context context,
+        TraceMatrix? traceMatrix,
+        OrphanResult orphanResult,
+        HashSet<string> rootTags)
     {
-        // Phase 1: Guard — enforcement requires a trace matrix; report error if none was constructed
-        if (traceMatrix == null)
+        // Phase 0: Guard - enforcement requires either a trace matrix or configured root tags
+        // (report error only when neither check has anything to enforce)
+        if (traceMatrix == null && rootTags.Count == 0)
         {
-            context.WriteError("Error: Cannot enforce requirements without test results. Use --tests to specify test result files.");
+            context.WriteError("Error: Cannot enforce requirements without test results or root tags. Use --tests to specify test result files or --root-tags/root-tags: to configure orphan checking.");
             return;
         }
 
-        // Phase 2: Coverage calculation — determine how many requirements are satisfied
-        var (satisfied, total) = traceMatrix.CalculateSatisfiedRequirements(context.FilterTags);
-        if (satisfied < total)
+        // Phase 1: Test coverage enforcement (unchanged), only when a trace matrix exists
+        if (traceMatrix != null)
         {
-            // Phase 3: Unsatisfied requirement enumeration — report each failing requirement
-            var unsatisfied = traceMatrix.GetUnsatisfiedRequirements(context.FilterTags);
-            context.WriteError($"Error: Only {satisfied} of {total} requirements are satisfied with tests.");
-            context.WriteError("Unsatisfied requirements:");
-            foreach (var reqId in unsatisfied)
+            var (satisfied, total) = traceMatrix.CalculateSatisfiedRequirements(context.FilterTags);
+            if (satisfied < total)
             {
-                context.WriteError($"  - {reqId}");
+                var unsatisfied = traceMatrix.GetUnsatisfiedRequirements(context.FilterTags);
+                context.WriteError($"Error: Only {satisfied} of {total} requirements are satisfied with tests.");
+                context.WriteError("Unsatisfied requirements:");
+                foreach (var reqId in unsatisfied)
+                {
+                    context.WriteError($"  - {reqId}");
+                }
             }
+        }
+
+        // Phase 2: Orphan-freedom enforcement (new), independent of test coverage enforcement
+        if (rootTags.Count > 0 && orphanResult.OrphanIds.Count > 0)
+        {
+            ReportOrphans(orphanResult, rootTags, context.WriteError, "Error");
         }
     }
 }

@@ -17,6 +17,7 @@ sections:
               - "windows@ReqStream_ReportExport"
               - "windows@ReqStream_TagsFiltering"
               - "windows@ReqStream_EnforcementMode"
+              - "windows@ReqStream_OrphanDetection"
               - "windows@ReqStream_Lint"
 
           - id: ReqStream-Platform-Linux
@@ -31,6 +32,7 @@ sections:
               - "ubuntu@ReqStream_ReportExport"
               - "ubuntu@ReqStream_TagsFiltering"
               - "ubuntu@ReqStream_EnforcementMode"
+              - "ubuntu@ReqStream_OrphanDetection"
               - "ubuntu@ReqStream_Lint"
 
           - id: ReqStream-Platform-MacOS
@@ -45,6 +47,7 @@ sections:
               - "macos@ReqStream_ReportExport"
               - "macos@ReqStream_TagsFiltering"
               - "macos@ReqStream_EnforcementMode"
+              - "macos@ReqStream_OrphanDetection"
               - "macos@ReqStream_Lint"
 
           - id: ReqStream-Platform-Net8
@@ -58,6 +61,7 @@ sections:
               - "dotnet8.x@ReqStream_ReportExport"
               - "dotnet8.x@ReqStream_TagsFiltering"
               - "dotnet8.x@ReqStream_EnforcementMode"
+              - "dotnet8.x@ReqStream_OrphanDetection"
               - "dotnet8.x@ReqStream_Lint"
 
           - id: ReqStream-Platform-Net9
@@ -72,6 +76,7 @@ sections:
               - "dotnet9.x@ReqStream_ReportExport"
               - "dotnet9.x@ReqStream_TagsFiltering"
               - "dotnet9.x@ReqStream_EnforcementMode"
+              - "dotnet9.x@ReqStream_OrphanDetection"
               - "dotnet9.x@ReqStream_Lint"
 
           - id: ReqStream-Platform-Net10
@@ -86,4 +91,5 @@ sections:
               - "dotnet10.x@ReqStream_ReportExport"
               - "dotnet10.x@ReqStream_TagsFiltering"
               - "dotnet10.x@ReqStream_EnforcementMode"
+              - "dotnet10.x@ReqStream_OrphanDetection"
               - "dotnet10.x@ReqStream_Lint"

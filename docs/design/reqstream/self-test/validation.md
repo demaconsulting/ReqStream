@@ -29,15 +29,17 @@ directory on construction and restores the original on disposal.
 - *Preconditions*: Must not be called concurrently (mutates process working directory).
 - *Postconditions*: Summary printed; results file written if `context.ResultsFile` is set.
 
-Prints a header block (version, machine name, OS, .NET runtime, UTC timestamp), executes six
-tests sequentially, and prints a multi-line summary. The six tests:
+Prints a header block (version, machine name, OS, .NET runtime, UTC timestamp), executes seven
+tests sequentially, and prints a multi-line summary. The seven tests:
 
 1. `RunRequirementsProcessingTest` — verifies YAML files are read, merged, and exported.
 2. `RunTraceMatrixTest` — verifies test results are loaded and mapped to requirements.
 3. `RunReportExportTest` — verifies requirements and justifications reports are written.
 4. `RunTagsFilteringTest` — verifies tag-based filtering restricts output and coverage.
 5. `RunEnforcementModeTest` — verifies `--enforce` produces non-zero exit code on failure.
-6. `RunLintTest` — verifies the linter detects and reports structural issues.
+6. `RunOrphanDetectionTest` — verifies a requirement unreachable from any root-tagged
+   requirement is detected as an orphan.
+7. `RunLintTest` — verifies the linter detects and reports structural issues.
 
 **WriteResultsFile(context, testResults)**: Serializes test results to a structured file.
 

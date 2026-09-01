@@ -89,6 +89,7 @@ public sealed class ValidationTests : IDisposable
         Assert.Contains("ReqStream_ReportExport - Passed", logContent);
         Assert.Contains("ReqStream_TagsFiltering - Passed", logContent);
         Assert.Contains("ReqStream_EnforcementMode - Passed", logContent);
+        Assert.Contains("ReqStream_OrphanDetection - Passed", logContent);
         Assert.Contains("ReqStream_Lint - Passed", logContent);
         Assert.Contains("Failed: 0", logContent);
     }

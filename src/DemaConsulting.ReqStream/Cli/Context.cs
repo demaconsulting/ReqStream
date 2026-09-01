@@ -109,6 +109,13 @@ public sealed class Context : IDisposable
     public HashSet<string>? FilterTags { get; private init; }
 
     /// <summary>
+    ///     Gets the set of root tags for orphan detection, supplied via the CLI. Combined with
+    ///     any <c>root-tags:</c> declared in loaded YAML files to form the effective root-tag
+    ///     set. Returns null if <c>--root-tags</c> was not specified.
+    /// </summary>
+    public HashSet<string>? RootTags { get; private init; }
+
+    /// <summary>
     ///     Gets the list of requirements files found from the --requirements glob pattern.
     /// </summary>
     public List<string> RequirementsFiles { get; private init; } = [];
@@ -208,6 +215,7 @@ public sealed class Context : IDisposable
         var requirementsPatterns = new List<string>();
         var testPatterns = new List<string>();
         HashSet<string>? filterTags = null;
+        HashSet<string>? rootTags = null;
 
         // Initialize optional parameters
         string? requirementsReport = null;
@@ -295,6 +303,23 @@ public sealed class Context : IDisposable
                     foreach (var tag in tags)
                     {
                         filterTags.Add(tag);
+                    }
+
+                    break;
+
+                case "--root-tags":
+                    // Ensure argument has a value
+                    if (i >= args.Length)
+                    {
+                        throw new ArgumentException($"{arg} requires a comma-separated list of tags", nameof(args));
+                    }
+
+                    // Split comma-separated tags and add to the root-tag set
+                    var rootTagValues = args[i++].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    rootTags ??= [];
+                    foreach (var rootTag in rootTagValues)
+                    {
+                        rootTags.Add(rootTag);
                     }
 
                     break;
@@ -423,6 +448,7 @@ public sealed class Context : IDisposable
             ResultsFile = resultsFile,
             Enforce = enforce,
             FilterTags = filterTags,
+            RootTags = rootTags,
             RequirementsFiles = GlobMatcher.FindMatchingFiles(requirementsPatterns),
             TestFiles = GlobMatcher.FindMatchingFiles(testPatterns),
             RequirementsReport = requirementsReport,
@@ -464,6 +490,36 @@ public sealed class Context : IDisposable
         if (!Silent)
         {
             Console.WriteLine(message);
+        }
+
+        // Write to log file if logging is enabled
+        _logWriter?.WriteLine(message);
+    }
+
+    /// <summary>
+    ///     Writes a warning message to the console and log file (if logging is enabled).
+    /// </summary>
+    /// <param name="message">The warning message to write.</param>
+    /// <remarks>
+    ///     Unlike <see cref="WriteError"/>, this method never affects <see cref="ExitCode"/> —
+    ///     it is for non-fatal, advisory output only (e.g. orphan-detection warnings when
+    ///     <c>--enforce</c> is not active).
+    /// </remarks>
+    public void WriteWarning(string message)
+    {
+        // Write to console unless silent mode is enabled
+        if (!Silent)
+        {
+            var previousColor = Console.ForegroundColor;
+            try
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(message);
+            }
+            finally
+            {
+                Console.ForegroundColor = previousColor;
+            }
         }
 
         // Write to log file if logging is enabled

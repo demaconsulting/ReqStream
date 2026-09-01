@@ -970,4 +970,41 @@ public sealed class IntegrationTests : IDisposable
             output.Contains("test") || output.Contains("Test") || output.Contains("enforce") || output.Contains("Enforce") || output.Contains("error") || output.Contains("Error"),
             $"Expected error output about missing test files for enforcement. Output: {output}");
     }
+
+    /// <summary>
+    /// Integration test verifying that a requirement not reachable from any root-tagged
+    /// requirement is reported as an orphan, and that --enforce turns the orphan report into a
+    /// build-breaking error, exercising the full YAML-to-CLI orphan-checking pipeline.
+    /// </summary>
+    [Fact]
+    public void ReqStream_System_OrphanChecking_RootTagsWithOrphan_EnforceReportsError()
+    {
+        // Arrange: a root-tagged requirement and an unreachable orphan requirement
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqFile, """
+            root-tags: [product]
+            sections:
+              - title: System Requirements
+                requirements:
+                  - id: Integration-System-OrphanRoot
+                    title: The system shall do the root thing.
+                    tags: [product]
+                  - id: Integration-System-Orphan
+                    title: The system shall do the orphaned thing.
+            """);
+
+        // Act: run with --enforce and root-tags configured via YAML, no --tests
+        var exitCode = Runner.RunInDirectory(
+            out var output,
+            _testDirectory.DirectoryPath,
+            "dotnet",
+            _dllPath,
+            "--requirements", "requirements.yaml",
+            "--enforce");
+
+        // Assert: tool exits with a non-zero code, reporting the orphan as an error
+        Assert.NotEqual(0, exitCode);
+        Assert.Contains("orphaned", output, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Integration-System-Orphan", output);
+    }
 }

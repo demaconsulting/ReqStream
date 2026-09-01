@@ -52,6 +52,11 @@ tests from named result files. This scenario is tested by
 active and a requirement lacks passing test evidence. This scenario is tested by
 `ReqStream_EnforcementMode_RequirementLacksTestEvidence_FailsWithNonZeroExitCode`.
 
+**Orphan Checking**: Verifies that the tool identifies requirements not reachable from any
+root-tagged requirement, warning about them by default and reporting them as a build-breaking
+error when `--enforce` is active, independent of whether test result files are provided. This
+scenario is tested by `ReqStream_System_OrphanChecking_RootTagsWithOrphan_EnforceReportsError`.
+
 **Lint**: Verifies that the tool identifies and reports all structural issues in a single linting
 invocation and exits silently when no issues are found. This scenario is tested by
 `ReqStream_System_Lint_Flag_ReportsLintIssues` and
@@ -160,6 +165,7 @@ macOS in the CI pipeline. This scenario is tested by `macos@ReqStream_VersionDis
 | `ReqStream-System-FullPipeline` | `ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces` |
 | `ReqStream-System-SourceFilter` | `ReqStream_SourceFilter_NamedSourceInRequirement_MatchesTestsBySourceFile` |
 | `ReqStream-System-EnforceMode` | `ReqStream_EnforcementMode_RequirementLacksTestEvidence_FailsWithNonZeroExitCode` |
+| `ReqStream-System-OrphanChecking` | `ReqStream_System_OrphanChecking_RootTagsWithOrphan_EnforceReportsError` |
 | `ReqStream-System-Lint` | `ReqStream_System_Lint_Flag_ReportsLintIssues`, `ReqStream_System_Lint_ValidRequirementsFile_ExitsSilentlyWithZero` |
 | `ReqStream-System-Validate` | `ReqStream_System_Validate_Flag_RunsSelfValidation` |
 | `ReqStream-System-ValidateResultsOutput` | `ReqStream_System_ValidateResultsOutput_ResultsFlag_WritesResultsFile` |

@@ -40,6 +40,17 @@ namespace DemaConsulting.ReqStream.Modeling;
 public class Requirements : Section
 {
     /// <summary>
+    ///     Gets the set of tags that mark a requirement as a "root" for orphan detection.
+    /// </summary>
+    /// <remarks>
+    ///     Pre-initialized to an empty set (never <c>null</c>). Populated by
+    ///     <see cref="RequirementsLoader"/> from each loaded document's <c>root-tags:</c> key,
+    ///     combining values declared across every included file - no single file's declaration
+    ///     overwrites another's.
+    /// </remarks>
+    public HashSet<string> RootTags { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>
     ///     Provides the single public entry point for loading YAML requirements files,
     ///     insulating callers from the loader and lint pipeline.
     /// </summary>
@@ -250,6 +261,99 @@ public class Requirements : Section
     }
 
     /// <summary>
+    ///     Finds requirements that are not reachable, via <see cref="Requirement.Children"/>
+    ///     references, from any requirement tagged with one of the given root tags.
+    /// </summary>
+    /// <param name="rootTags">
+    ///     The effective (merged) set of root tags. When empty, no requirement can ever be
+    ///     orphaned and this method returns an empty result immediately (backward-compatible
+    ///     no-op path).
+    /// </param>
+    /// <returns>
+    ///     An <see cref="OrphanResult"/> containing the orphaned requirement ids (in tree
+    ///     declaration order) and the total number of requirements considered.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         <b>Why downward flood-fill, not upward ancestor-walk:</b> requirements form a DAG
+    ///         (a requirement's <see cref="Requirement.Children"/> may be referenced from
+    ///         multiple parents), not a tree. Walking upward would require a reverse-children
+    ///         (parent) index that does not otherwise exist in this model. Instead, this method
+    ///         seeds a breadth-first search from every root-tagged requirement and floods
+    ///         downward through <see cref="Requirement.Children"/>, using a visited set to
+    ///         guarantee each requirement is processed at most once - O(V+E) regardless of how
+    ///         many parents reference a given child.
+    ///     </para>
+    ///     <para>
+    ///         <b>Side-effect-free:</b> this method never mutates the requirements tree; it only
+    ///         reads <see cref="Requirement.Tags"/> and <see cref="Requirement.Children"/>.
+    ///     </para>
+    /// </remarks>
+    public OrphanResult FindOrphans(IReadOnlySet<string> rootTags)
+    {
+        // Backward-compatible no-op: with no root tags configured, nothing can be orphaned
+        if (rootTags.Count == 0)
+        {
+            return new OrphanResult([], 0);
+        }
+
+        // Flatten the full tree into declaration order, keyed by id for child-reference lookup
+        var flattened = new List<Requirement>();
+        FlattenRequirements(this, flattened);
+        var byId = flattened.ToDictionary(r => r.Id, StringComparer.Ordinal);
+
+        // Seed the visited set and BFS queue with every root-tagged requirement
+        var visited = new HashSet<string>(StringComparer.Ordinal);
+        var queue = new Queue<string>();
+        foreach (var requirement in flattened.Where(r => r.Tags.Any(rootTags.Contains) && visited.Add(r.Id)))
+        {
+            queue.Enqueue(requirement.Id);
+        }
+
+        // BFS-flood downward through child references, guarded by the visited set
+        while (queue.Count > 0)
+        {
+            var id = queue.Dequeue();
+            if (!byId.TryGetValue(id, out var requirement))
+            {
+                continue;
+            }
+
+            foreach (var childId in requirement.Children.Where(visited.Add))
+            {
+                queue.Enqueue(childId);
+            }
+        }
+
+        // Orphans are every flattened requirement not reached, preserving declaration order
+        var orphanIds = flattened
+            .Where(r => !visited.Contains(r.Id))
+            .Select(r => r.Id)
+            .ToList();
+
+        return new OrphanResult(orphanIds, flattened.Count);
+    }
+
+    /// <summary>
+    ///     Recursively flattens a section's requirements (and its child sections' requirements)
+    ///     into a single ordered list.
+    /// </summary>
+    /// <remarks>
+    ///     Extracted so <see cref="FindOrphans"/> can build a single declaration-ordered,
+    ///     id-lookup-ready view of the whole tree without duplicating the recursive walk.
+    /// </remarks>
+    /// <param name="section">The section to flatten.</param>
+    /// <param name="result">The list to append flattened requirements to.</param>
+    private static void FlattenRequirements(Section section, List<Requirement> result)
+    {
+        result.AddRange(section.Requirements);
+        foreach (var childSection in section.Sections)
+        {
+            FlattenRequirements(childSection, result);
+        }
+    }
+
+    /// <summary>
     ///     Filters requirements based on tags.
     /// </summary>
     /// <remarks>
@@ -300,3 +404,13 @@ public class Requirements : Section
         return false;
     }
 }
+
+/// <summary>
+///     Represents the result of an orphan-detection scan via <see cref="Requirements.FindOrphans"/>.
+/// </summary>
+/// <param name="OrphanIds">
+///     The ids of every requirement not reachable from any root-tagged requirement, in tree
+///     declaration order.
+/// </param>
+/// <param name="TotalRequirements">The total number of requirements considered by the scan.</param>
+public sealed record OrphanResult(IReadOnlyList<string> OrphanIds, int TotalRequirements);

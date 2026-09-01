@@ -263,3 +263,19 @@ sections:
                   - Context_Create_WithLogFileAndSilent_WritesToLogOnly
                   - Context_Dispose_WithLogFile_ClosesLogFile
                   - Context_Create_InvalidLogPath_ThrowsException
+
+              - id: ReqStream-Command-RootTags
+                title: >-
+                  The tool shall accept a `--root-tags` flag specifying a comma-separated list
+                  of tags to union into the effective root-tag set.
+                justification: |
+                  A `--root-tags` flag lets root tags be configured or extended at invocation
+                  time, mirroring the existing `--filter` flag's parsing convention (comma-split,
+                  whitespace-trimmed, and accumulated across repeated occurrences of the flag).
+                tags: [cli]
+                tests:
+                  - Context_Create_RootTagsFlag_ParsesTagsCorrectly
+                  - Context_Create_RootTagsFlagWithSpaces_TrimsAndParsesTagsCorrectly
+                  - Context_Create_MultipleRootTagsArguments_MergesIntoSingleSet
+                  - Context_Create_RootTagsArgumentMissingValue_ThrowsException
+                  - Context_Create_NoRootTagsFlag_RootTagsIsNull

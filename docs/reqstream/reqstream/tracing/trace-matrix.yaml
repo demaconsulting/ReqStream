@@ -42,6 +42,8 @@ sections:
                 tests:
                   - TraceMatrix_Constructor_WithTrxFile_ParsesCorrectly
                   - TraceMatrix_Constructor_WithFailedTests_TracksFailures
+                children:
+                  - ReqStream-OTS-TestResults-Trx
 
               - id: ReqStream-Test-JUnitFormat
                 title: The tool shall support JUnit format test results.
@@ -52,6 +54,8 @@ sections:
                 tests:
                   - TraceMatrix_Constructor_WithJUnitFile_ParsesCorrectly
                   - TraceMatrix_Constructor_WithJUnitFailedTests_TracksFailures
+                children:
+                  - ReqStream-OTS-TestResults-JUnit
 
               - id: ReqStream-Test-MixedFormats
                 title: The tool shall support processing mixed-format test result files.

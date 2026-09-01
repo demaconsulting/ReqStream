@@ -37,6 +37,8 @@ sections:
               - ReqStream-Requirements-Tags
               - ReqStream-Requirements-BlankTagName
               - ReqStream-Requirements-Justification
+              - ReqStream-Requirements-RootTags
+              - ReqStream-OTS-YamlDotNet
 
           - id: ReqStream-Modeling-Export
             title: The Modeling subsystem shall generate Markdown reports from requirements data.
@@ -122,6 +124,7 @@ sections:
               - ReqStream-Lint-NonMappingRoot
               - ReqStream-Lint-SeverityString
               - ReqStream-LoadResult-HasErrors
+              - ReqStream-Requirement-Location
 
           - id: ReqStream-Modeling-LintingValidation
             title: The Modeling subsystem shall validate requirements file structure.
@@ -145,3 +148,26 @@ sections:
             tests:
               - Modeling_YamlParsing_DuplicateIds_DetectsLintError
               - Modeling_LintingReporting_MultipleConditions_ReportsAllIssues
+
+          - id: ReqStream-Modeling-OrphanDetection
+            title: >-
+              The Modeling subsystem shall identify every requirement that is not reachable, via
+              child requirement references, from any requirement tagged with a configured root
+              tag.
+            justification: |
+              Declaring which requirements are "roots" and structurally detecting anything not
+              reachable from a root catches orphaned, well-formed-but-disconnected requirements
+              that manual review can easily miss - particularly ones added by automated
+              contributors. Traversal downward from roots (rather than an upward ancestor walk)
+              correctly handles the multi-parent DAG shape of the child-requirement graph without
+              needing a reverse-children index.
+            tags: [modeling]
+            tests:
+              - Requirements_FindOrphans_EmptyRootTags_ReturnsNoOrphans
+              - Requirements_FindOrphans_IsolatedRequirement_NoTagsNoParentNoChildren_IsOrphaned
+            children:
+              - ReqStream-Requirements-RootTags
+              - ReqStream-Requirements-OrphanReachability
+              - ReqStream-Requirements-OrphanRootExemption
+              - ReqStream-Requirements-OrphanIsolated
+              - ReqStream-Requirements-OrphanNoRootTags

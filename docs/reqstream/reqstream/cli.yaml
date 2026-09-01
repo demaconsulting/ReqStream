@@ -115,3 +115,20 @@ sections:
             tags: [cli]
             tests:
               - Cli_Interface_DepthFlag_SetsDefaultForAllReportDepths
+
+          - id: ReqStream-Cli-RootTags
+            title: >-
+              The Cli subsystem shall accept a `--root-tags` flag containing a comma-separated
+              list of tags, combining them into the effective root-tag set used for orphan
+              checking.
+            justification: |
+              A CLI flag allows root tags to be configured (or extended) at invocation time
+              without editing YAML files, matching the existing `--filter` flag's convention for
+              specifying comma-separated tags. Combining with any YAML-declared root-tags (rather
+              than replacing them) keeps the CLI additive and non-destructive.
+              This requirement is satisfied by its child: it is a non-requirement grouping node,
+              and verification evidence is carried by the atomic child requirement's unit-level
+              tests (this subsystem requirement delegates the flag's parsing entirely to Context).
+            tags: [cli]
+            children:
+              - ReqStream-Command-RootTags

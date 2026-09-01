@@ -42,3 +42,10 @@ malformed YAML produces an error with null requirements;
 `Modeling_Linting_ValidFile_ReturnsNoIssues`, which verifies a valid file returns no issues; and
 `Modeling_LintingReporting_MultipleConditions_ReportsAllIssues`, which verifies all issues are
 reported at once.
+
+**Orphan Detection**: Tests verify that the subsystem identifies every requirement not reachable,
+via child requirement references, from any requirement tagged with a configured root tag. This
+scenario is tested by `Requirements_FindOrphans_EmptyRootTags_ReturnsNoOrphans`, which verifies
+an empty root-tag set is a no-op, and
+`Requirements_FindOrphans_IsolatedRequirement_NoTagsNoParentNoChildren_IsOrphaned`, which
+verifies a fully isolated requirement is reported as orphaned.

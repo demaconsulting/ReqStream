@@ -19,8 +19,8 @@ The `Modeling` subsystem contains the following software units:
   associated lint issues.
 - **Requirement** (`Modeling/Requirement.cs`) — Single requirement with ID, title, tags, and
   test links.
-- **Requirements** (`Modeling/Requirements.cs`) — YAML parsing, section merging, and requirements
-  document root.
+- **Requirements** (`Modeling/Requirements.cs`) — YAML parsing, section merging, requirements
+  document root, root-tag storage, and orphan detection.
 - **RequirementsLoader** (`Modeling/RequirementsLoader.cs`) — YAML deserializer and lint validator
   for individual requirements files.
 - **Section** (`Modeling/Section.cs`) — Named group of requirements within a requirements
@@ -57,6 +57,18 @@ The `Modeling` subsystem contains the following software units:
 - *Contract*: Routes warnings to `context.WriteLine` and errors to `context.WriteError`.
 - *Constraints*: None.
 
+**Requirements.FindOrphans**: Identifies requirements unreachable from any root-tagged requirement.
+
+- *Type*: In-process .NET public API.
+- *Role*: Provider.
+- *Contract*: Accepts the merged root-tag set (`IReadOnlySet<string>`); flattens the tree, seeds a
+  visited-set with every requirement whose `Tags` intersects the root-tag set, then performs a
+  breadth-first flood-fill via each requirement's `Children` list. Returns an `OrphanResult`
+  containing the ordered list of unreached requirement IDs and the total requirement count.
+- *Constraints*: Returns an empty `OrphanResult` (no-op) when `rootTags` is empty. Operates on
+  the full tree, independent of any `--filter` narrowing applied elsewhere. Runs in `O(V+E)` via
+  a visited-set, correctly handling DAG requirement graphs with multiple parents per child.
+
 ### Design
 
 The `Modeling` subsystem units collaborate in a directed chain during a `Requirements.Load` call:
@@ -70,6 +82,14 @@ The `Modeling` subsystem units collaborate in a directed chain during a `Require
 4. `RequirementsLoader.Load` assembles and returns a `LoadResult` containing the (possibly null)
    `Requirements` tree and the complete `LintIssue` list.
 5. `Requirements.Load` returns the `LoadResult` to the caller (`Program`).
+
+For orphan detection, `Program` computes the merged root-tag set (YAML-declared `Requirements
+.RootTags` combined with any CLI `--root-tags` values) and, when non-empty, calls
+`Requirements.FindOrphans` on the fully-loaded, unfiltered tree. `FindOrphans` flattens the tree
+once, seeds the BFS frontier with every requirement whose `Tags` intersects the root-tag set, and
+flood-fills outward via `Children`, so a requirement that is itself root-tagged is never orphaned
+regardless of its children or test coverage. This check has no dependency on the trace matrix or
+`--tests`, and is unaffected by `--filter`.
 
 For export paths, `Requirements.Export` and `Requirements.ExportJustifications` walk the
 `Section` tree recursively, emitting Markdown at the caller-specified heading depth. Neither
@@ -113,6 +133,8 @@ currently detected by `RequirementsLoader` use `Error` severity; no conditions c
 | Invalid `includes` path | `Error` |
 | Non-scalar entry in `includes`, `tests`, `children`, or `tags` sequence | `Error` |
 | Blank entry in `includes`, `tests`, `children`, or `tags` sequence | `Error` |
+| Non-scalar entry in `root-tags` sequence | `Error` |
+| Blank entry in `root-tags` sequence | `Error` |
 | Field expected to be a sequence but is not | `Error` |
 | Mapping missing required field `id` | `Error` |
 | Mapping `id` is blank | `Error` |

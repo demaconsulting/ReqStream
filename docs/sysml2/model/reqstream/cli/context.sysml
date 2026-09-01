@@ -1,6 +1,6 @@
 package ReqStream {
     part def Context {
-        doc /* Command-line argument parser and I/O owner. */
+        doc /* Command-line argument parser, root-tag configuration, and I/O owner. */
 
         comment sourceRef /* Source: src/DemaConsulting.ReqStream/Cli/Context.cs */
         comment testRef /* Test: test/DemaConsulting.ReqStream.Tests/Cli/ContextTests.cs */

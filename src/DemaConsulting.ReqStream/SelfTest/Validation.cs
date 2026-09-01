@@ -58,7 +58,7 @@ public static class Validation
     ///     </para>
     ///     <para>
     ///         <strong>Non-reentrant:</strong> This method must not be called concurrently. Each
-    ///         of the six validation tests calls <see cref="DirectorySwitch"/>, which mutates the
+    ///         of the seven validation tests calls <see cref="DirectorySwitch"/>, which mutates the
     ///         process-wide current working directory (<see cref="Directory.SetCurrentDirectory"/>).
     ///         Concurrent calls will race on this shared global state, causing tests to resolve
     ///         relative paths against the wrong directory.
@@ -84,6 +84,7 @@ public static class Validation
         RunReportExportTest(context, testResults);
         RunTagsFilteringTest(context, testResults);
         RunEnforcementModeTest(context, testResults);
+        RunOrphanDetectionTest(context, testResults);
         RunLintTest(context, testResults);
 
         // Print summary and set exit code
@@ -584,6 +585,136 @@ public static class Validation
     }
 
     /// <summary>
+    ///     Runs a test for orphan-detection functionality (the <c>--root-tags</c> feature).
+    /// </summary>
+    /// <remarks>
+    ///     Self-hosting pattern: the tool validates its own orphan-detection reachability check by
+    ///     verifying three related behaviors in sequence: (1) an orphaned requirement produces only
+    ///     a warning and exit code 0 when <c>--enforce</c> is not supplied, (2) the same orphaned
+    ///     tree causes <c>--enforce</c> to fail with a non-zero exit code, and (3) a fully-reachable
+    ///     tree (no orphans) allows <c>--enforce</c> to succeed via the orphan-check path alone, with
+    ///     no <c>--tests</c>/trace matrix supplied. A passing result is evidence that the
+    ///     <c>--root-tags</c> reachability check and its decoupled enforcement semantics are upheld
+    ///     on the current platform.
+    /// </remarks>
+    /// <param name="context">The context for output.</param>
+    /// <param name="testResults">The test results collection.</param>
+    private static void RunOrphanDetectionTest(Context context, DemaConsulting.TestResults.TestResults testResults)
+    {
+        var startTime = DateTime.UtcNow;
+        var test = CreateTestResult("ReqStream_OrphanDetection");
+
+        try
+        {
+            using var tempDir = new TemporaryDirectory();
+
+            // Create a requirements file where ORPHAN-001 is not reachable from the root-tagged
+            // ROOT-001 requirement (CHILD-001 is reachable via the children link; ORPHAN-001 is
+            // not referenced from anywhere, so it is orphaned)
+            var orphanReqFile = PathHelpers.SafePathCombine(tempDir.DirectoryPath, "orphan-requirements.yaml");
+            var orphanReqYaml = @"sections:
+  - title: Orphan Test
+    requirements:
+      - id: ROOT-001
+        title: Root requirement
+        tags:
+          - root-tag
+        children:
+          - CHILD-001
+      - id: CHILD-001
+        title: Child requirement
+      - id: ORPHAN-001
+        title: Orphan requirement
+";
+            File.WriteAllText(orphanReqFile, orphanReqYaml);
+
+            // Create a requirements file where every requirement is reachable from the
+            // root-tagged ROOT-001 requirement (no orphans)
+            var cleanReqFile = PathHelpers.SafePathCombine(tempDir.DirectoryPath, "clean-requirements.yaml");
+            var cleanReqYaml = @"sections:
+  - title: Clean Test
+    requirements:
+      - id: ROOT-001
+        title: Root requirement
+        tags:
+          - root-tag
+        children:
+          - CHILD-001
+      - id: CHILD-001
+        title: Child requirement
+";
+            File.WriteAllText(cleanReqFile, cleanReqYaml);
+
+            using (new DirectorySwitch(tempDir.DirectoryPath))
+            {
+                // Sub-case (a): orphan warning path - no --enforce, so the orphan is reported as
+                // a warning only and the exit code must remain 0
+                int exitCode;
+                using (var testContext = Context.Create(
+                    ["--silent", "--requirements", "orphan-requirements.yaml", "--root-tags", "root-tag"]))
+                {
+                    Program.Run(testContext);
+                    exitCode = testContext.ExitCode;
+                }
+
+                if (exitCode != 0)
+                {
+                    test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
+                    test.ErrorMessage = $"Orphan warning path should exit 0, but exited with code {exitCode}";
+                    context.WriteError($"✗ ReqStream_OrphanDetection - Failed: {test.ErrorMessage}");
+                    FinalizeTestResult(test, startTime, testResults);
+                    return;
+                }
+
+                // Sub-case (b): orphan enforcement path - the same orphaned tree, but with
+                // --enforce, must exit with a non-zero code
+                using (var testContext = Context.Create(
+                    ["--silent", "--requirements", "orphan-requirements.yaml", "--root-tags", "root-tag", "--enforce"]))
+                {
+                    Program.Run(testContext);
+                    exitCode = testContext.ExitCode;
+                }
+
+                if (exitCode == 0)
+                {
+                    test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
+                    test.ErrorMessage = "Enforcement with orphaned requirements should fail, but succeeded";
+                    context.WriteError($"✗ ReqStream_OrphanDetection - Failed: {test.ErrorMessage}");
+                    FinalizeTestResult(test, startTime, testResults);
+                    return;
+                }
+
+                // Sub-case (c): clean/no-orphans positive case - proves --enforce succeeds via
+                // the orphan-check path alone, with no --tests/trace matrix supplied
+                using (var testContext = Context.Create(
+                    ["--silent", "--requirements", "clean-requirements.yaml", "--root-tags", "root-tag", "--enforce"]))
+                {
+                    Program.Run(testContext);
+                    exitCode = testContext.ExitCode;
+                }
+
+                if (exitCode != 0)
+                {
+                    test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
+                    test.ErrorMessage = $"Enforcement with no orphans should succeed, but exited with code {exitCode}";
+                    context.WriteError($"✗ ReqStream_OrphanDetection - Failed: {test.ErrorMessage}");
+                }
+                else
+                {
+                    test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
+                    context.WriteLine("✓ ReqStream_OrphanDetection - Passed");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            HandleTestException(test, context, "ReqStream_OrphanDetection", ex);
+        }
+
+        FinalizeTestResult(test, startTime, testResults);
+    }
+
+    /// <summary>
     ///     Runs a test for lint functionality.
     /// </summary>
     /// <remarks>
@@ -688,7 +819,7 @@ public static class Validation
     /// <remarks>
     ///     The results file is written atomically at the end of the validation run (not during
     ///     individual tests). This ensures that the output file either contains the complete
-    ///     evidence for all six tests or does not exist; a partial file would be misleading audit
+    ///     evidence for all seven tests or does not exist; a partial file would be misleading audit
     ///     evidence that could overstate or understate coverage. Writing at the end also avoids
     ///     partial-write corruption if a test throws unexpectedly.
     /// </remarks>
@@ -787,7 +918,7 @@ public static class Validation
     ///     recorded as structured evidence in the results collection. If exceptions propagated
     ///     out of a test method they would abort the entire run, leaving subsequent tests
     ///     unexecuted and their requirements without coverage evidence. Catching here ensures
-    ///     all six tests always run and that the final summary reflects the complete picture.
+    ///     all seven tests always run and that the final summary reflects the complete picture.
     /// </remarks>
     /// <param name="test">The test result to update.</param>
     /// <param name="context">The context for output.</param>
