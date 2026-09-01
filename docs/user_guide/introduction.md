@@ -555,7 +555,7 @@ ReqStream supports the following command-line options:
 | `--matrix-depth <depth>` | Starting header depth for trace matrix (overrides `--depth`) |
 | `--justifications <file>` | Export justifications to markdown file |
 | `--justifications-depth <depth>` | Starting header depth for justifications (overrides `--depth`) |
-| `--enforce` | Fail if requirements are not fully tested |
+| `--enforce` | Fail if requirements are not fully tested or are orphaned (when root tags are configured) |
 
 ## Examples
 

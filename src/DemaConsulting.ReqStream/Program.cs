@@ -199,7 +199,7 @@ internal static class Program
         context.WriteLine("  --tests <pattern>          Test result files glob pattern (TRX or JUnit)");
         context.WriteLine("  --matrix <file>            Export trace matrix to markdown file");
         context.WriteLine("  --matrix-depth <depth>     Markdown header depth for trace matrix (overrides --depth)");
-        context.WriteLine("  --enforce                  Fail if requirements are not fully tested");
+        context.WriteLine("  --enforce                  Fail if requirements are not fully tested or are orphaned (when root tags are configured)");
     }
 
     /// <summary>

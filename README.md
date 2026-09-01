@@ -107,7 +107,7 @@ Options:
   --justifications-depth <depth>   Markdown header depth for justifications (overrides --depth)
   --filter <tags>                  Comma-separated list of tags to filter requirements
   --root-tags <tags>               Comma-separated tags marking root requirements for orphan detection
-  --enforce                        Fail if requirements are not fully tested
+  --enforce                        Fail if requirements are not fully tested or are orphaned (when root tags are configured)
 ```
 
 ## Self Validation
