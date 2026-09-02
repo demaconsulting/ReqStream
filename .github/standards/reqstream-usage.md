@@ -132,7 +132,9 @@ This check always runs against the complete loaded requirement graph and is **in
 `--filter`**, which only narrows report/matrix output elsewhere in the same invocation.
 
 Orphan checking triggers automatically whenever the merged root-tag set is non-empty - there is
-no separate `--orphans` flag:
+no separate `--orphans` flag, and it runs alongside `--lint` as well as full requirements
+processing, so agents do not need to remember two separate invocations to see both structural
+lint issues and orphaned requirements:
 
 - **Without `--enforce`**: orphans are reported as a non-fatal warning (does not affect the exit
   code), e.g.:
@@ -147,7 +149,8 @@ no separate `--orphans` flag:
   missing test coverage, regardless of whether `--tests` was supplied. `--enforce` independently
   enforces (a) test coverage if a trace matrix was built and (b) orphan-freedom if root tags are
   configured; the pre-existing "nothing to enforce" error is reported only when **neither**
-  applies.
+  applies. `--lint --enforce` enforces orphan-freedom the same way, without requiring a full
+  `--requirements`/`--report`/`--matrix` invocation.
 
 ```bash
 dotnet reqstream --requirements requirements.yaml \

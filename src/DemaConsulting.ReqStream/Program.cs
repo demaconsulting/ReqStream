@@ -148,6 +148,34 @@ internal static class Program
         {
             var result = Requirements.Load(context.RequirementsFiles.ToArray());
             result.ReportIssues(context);
+
+            // Orphan detection is itself a structural lint concern - an orphaned requirement
+            // is just as much a shape problem with the requirements tree as a duplicate id or
+            // a dangling children reference - so run it alongside the other lint checks
+            // whenever loading succeeded and root tags are configured. This reuses the exact
+            // same detection ProcessRequirements uses below, so --lint and full requirements
+            // processing never disagree about which requirements are orphaned, and agents do
+            // not need to run a separate invocation to see orphan issues.
+            if (result.Requirements != null)
+            {
+                var mergedRootTags = new HashSet<string>(result.Requirements.RootTags, StringComparer.Ordinal);
+                if (context.RootTags != null)
+                {
+                    mergedRootTags.UnionWith(context.RootTags);
+                }
+
+                var orphanResult = result.Requirements.FindOrphans(mergedRootTags);
+                if (orphanResult.OrphanIds.Count > 0)
+                {
+                    // Non-fatal warning by default, matching --requirements' behavior; escalate
+                    // to a fatal error when --enforce is also supplied, so "--lint --enforce"
+                    // fails the same way "--requirements ... --enforce" does.
+                    Action<string> write = context.Enforce ? context.WriteError : context.WriteWarning;
+                    var severity = context.Enforce ? "Error" : "Warning";
+                    ReportOrphans(orphanResult, mergedRootTags, write, severity);
+                }
+            }
+
             return;
         }
 
@@ -185,7 +213,7 @@ internal static class Program
         context.WriteLine("  --silent                   Suppress console output");
         context.WriteLine("  --validate                 Run self-validation");
         context.WriteLine("  --results <file>           Write validation results to file (.trx or .xml extension required)");
-        context.WriteLine("  --lint                     Lint requirements files for issues");
+        context.WriteLine("  --lint                     Lint requirements files for issues (including orphaned requirements when root tags are configured; combine with --enforce to fail on them)");
         context.WriteLine("  --log <file>               Write output to log file");
         context.WriteLine("  --depth <depth>            Default markdown header depth for all reports (default: 1)");
         context.WriteLine("  --requirements <pattern>   Requirements files glob pattern");

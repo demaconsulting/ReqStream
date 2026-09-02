@@ -1180,6 +1180,139 @@ sections:
     }
 
     /// <summary>
+    /// Test Run with lint flag and root tags configured reports orphans as a non-fatal
+    /// warning, so --lint alone surfaces orphan-shaped requirements without needing a
+    /// separate --requirements invocation.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithLintFlagAndRootTags_ReportsOrphansAsWarning()
+    {
+        // Arrange: a root-tagged requirement and an unreachable orphan requirement
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqFile, @"
+root-tags: [product]
+sections:
+  - title: Test Section
+    requirements:
+      - id: ROOT-001
+        title: Root Requirement
+        tags: [product]
+      - id: ORPHAN-001
+        title: Orphaned Requirement
+");
+
+        var logFile = _testDirectory.GetFilePath("lint-orphan-warning.log");
+
+        var originalDir = Directory.GetCurrentDirectory();
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
+
+            // Act: run with --lint only, no --enforce
+            using var context = Context.Create(["--lint", "--requirements", "*.yaml", "--silent", "--log", logFile]);
+            Program.Run(context);
+
+            // Assert: exit code unaffected, warning text (not error text) printed with the orphan id
+            Assert.Equal(0, context.ExitCode);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+
+        var logContent = File.ReadAllText(logFile);
+        Assert.Contains("Warning: 1 of 2 requirements is orphaned", logContent);
+        Assert.Contains("ORPHAN-001", logContent);
+    }
+
+    /// <summary>
+    /// Test Run with lint flag combined with --enforce fails when root tags are configured
+    /// and orphans are present, matching the failure behavior of --requirements --enforce.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithLintFlagAndEnforce_FailsOnOrphans()
+    {
+        // Arrange: a root-tagged requirement and an unreachable orphan requirement
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqFile, @"
+root-tags: [product]
+sections:
+  - title: Test Section
+    requirements:
+      - id: ROOT-001
+        title: Root Requirement
+        tags: [product]
+      - id: ORPHAN-001
+        title: Orphaned Requirement
+");
+
+        var logFile = _testDirectory.GetFilePath("lint-orphan-error.log");
+
+        var originalDir = Directory.GetCurrentDirectory();
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
+
+            // Act: run with --lint and --enforce together
+            using var context = Context.Create(["--lint", "--enforce", "--requirements", "*.yaml", "--silent", "--log", logFile]);
+            Program.Run(context);
+
+            // Assert: exit code reflects failure, error text (not warning text) printed with the orphan id
+            Assert.Equal(1, context.ExitCode);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+
+        var logContent = File.ReadAllText(logFile);
+        Assert.Contains("Error: 1 of 2 requirements is orphaned", logContent);
+        Assert.Contains("ORPHAN-001", logContent);
+    }
+
+    /// <summary>
+    /// Test Run with lint flag and root tags configured but no orphans present produces no
+    /// orphan-related output.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithLintFlagAndRootTagsNoOrphans_ProducesNoOrphanOutput()
+    {
+        // Arrange: a root-tagged requirement with no orphans
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqFile, @"
+root-tags: [product]
+sections:
+  - title: Test Section
+    requirements:
+      - id: ROOT-001
+        title: Root Requirement
+        tags: [product]
+");
+
+        var logFile = _testDirectory.GetFilePath("lint-no-orphans.log");
+
+        var originalDir = Directory.GetCurrentDirectory();
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
+
+            // Act: run with --lint only, root tags configured, no orphans
+            using var context = Context.Create(["--lint", "--requirements", "*.yaml", "--silent", "--log", logFile]);
+            Program.Run(context);
+
+            // Assert: lint succeeds with no orphan-related output
+            Assert.Equal(0, context.ExitCode);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+
+        var logContent = File.ReadAllText(logFile);
+        Assert.DoesNotContain("orphaned", logContent);
+    }
+
+    /// <summary>
     /// Test Run with enforcement mode and failed tests fails.
     /// </summary>
     [Fact]

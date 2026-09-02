@@ -95,7 +95,7 @@ Options:
   --validate                       Run self-validation
   --results <file>                 Write validation results to file (TRX or JUnit format; use .trx or .xml extension)
   --log <file>                     Write output to log file
-  --lint                           Lint requirements files for structural issues
+  --lint                            Lint requirements files for structural issues (including orphaned requirements when root tags are configured; combine with --enforce to fail on them)
   --depth <depth>                  Default markdown header depth for all reports (default: 1)
   --requirements <pattern>         Requirements files glob pattern
   --report <file>                  Export requirements to markdown file
@@ -404,8 +404,11 @@ reqstream --requirements "**/*.yaml" --root-tags product,quality
 
 - Simply supplying `--root-tags` (or declaring a `root-tags:` key in a requirements YAML file) is enough
   to enable the check — no separate flag is needed
+- `--lint` also performs orphan detection when root tags are configured, so agents running `--lint` see
+  both structural lint issues and orphaned requirements in a single invocation
 - Without `--enforce`, orphans are printed as a warning and do not affect the exit code
-- With `--enforce`, orphans become a build-breaking error — independent of whether `--tests` was supplied
+- With `--enforce` (whether combined with `--lint` or full requirements processing), orphans become a
+  build-breaking error — independent of whether `--tests` was supplied
 - If no root tags are configured (from either source), orphan-checking is skipped entirely (fully
   backward compatible)
 
