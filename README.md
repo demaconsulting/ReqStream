@@ -95,7 +95,7 @@ Options:
   --validate                       Run self-validation
   --results <file>                 Write validation results to file (TRX or JUnit format; use .trx or .xml extension)
   --log <file>                     Write output to log file
-  --lint                            Lint requirements files for structural issues (including orphaned requirements when root tags are configured; combine with --enforce to fail on them)
+  --lint                           Lint requirements files for issues (including orphaned requirements when root tags are configured; combine with --enforce to fail on them)
   --depth <depth>                  Default markdown header depth for all reports (default: 1)
   --requirements <pattern>         Requirements files glob pattern
   --report <file>                  Export requirements to markdown file
