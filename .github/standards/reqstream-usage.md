@@ -138,7 +138,7 @@ no separate `--orphans` flag:
   code), e.g.:
 
   ```text
-  Warning: 2 of 47 requirements are orphaned (not reachable from any requirement tagged: product).
+  Warning: 2 of 47 requirements orphaned (not reachable from any requirement tagged: product).
     - ReqStream-Unit-JsonEscapeHelper
     - ReqStream-Unit-RetryBackoffCalculator
   ```

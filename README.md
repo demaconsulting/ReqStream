@@ -410,7 +410,7 @@ reqstream --requirements "**/*.yaml" --root-tags product,quality
   backward compatible)
 
 ```text
-Warning: 2 of 47 requirements are orphaned (not reachable from any requirement tagged: product, quality).
+Warning: 2 of 47 requirements orphaned (not reachable from any requirement tagged: product, quality).
   - Example-Unit-UnusedHelper
   - Example-Unit-UnreferencedValidator
 ```
