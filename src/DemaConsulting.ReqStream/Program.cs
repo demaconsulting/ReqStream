@@ -213,7 +213,7 @@ internal static class Program
         context.WriteLine("  --silent                   Suppress console output");
         context.WriteLine("  --validate                 Run self-validation");
         context.WriteLine("  --results <file>           Write validation results to file (.trx or .xml extension required)");
-        context.WriteLine("  --lint                     Lint requirements files for issues (including orphaned requirements when root tags are configured; combine with --enforce to fail on them)");
+        context.WriteLine("  --lint                     Lint requirements files for issues (including orphans)");
         context.WriteLine("  --log <file>               Write output to log file");
         context.WriteLine("  --depth <depth>            Default markdown header depth for all reports (default: 1)");
         context.WriteLine("  --requirements <pattern>   Requirements files glob pattern");

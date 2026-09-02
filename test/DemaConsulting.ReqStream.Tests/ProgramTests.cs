@@ -1182,7 +1182,7 @@ sections:
     /// <summary>
     /// Test Run with lint flag and root tags configured reports orphans as a non-fatal
     /// warning, so --lint alone surfaces orphan-shaped requirements without needing a
-    /// separate --requirements invocation.
+    /// separate full requirements-processing invocation (e.g. --report/--matrix).
     /// </summary>
     [Fact]
     public void Program_Run_WithLintFlagAndRootTags_ReportsOrphansAsWarning()
