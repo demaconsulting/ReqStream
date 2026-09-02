@@ -612,7 +612,7 @@ sections:
             // Assert: exit code unaffected, warning text (not error text) printed with the orphan id
             Assert.Equal(0, exitCode);
             var logContent = File.ReadAllText(logFile);
-            Assert.Contains("Warning: 1 of 2 requirements is orphaned", logContent);
+            Assert.Contains("Warning: 1 of 2 requirements orphaned", logContent);
             Assert.Contains("ORPHAN-001", logContent);
         }
         finally
@@ -714,7 +714,7 @@ sections:
             // Assert: non-zero exit code with the orphan Error: block, despite no --tests
             Assert.Equal(1, exitCode);
             var logContent = File.ReadAllText(logFile);
-            Assert.Contains("Error: 1 of 2 requirements is orphaned", logContent);
+            Assert.Contains("Error: 1 of 2 requirements orphaned", logContent);
             Assert.Contains("ORPHAN-001", logContent);
         }
         finally
@@ -788,7 +788,7 @@ sections:
             var logContent = File.ReadAllText(logFile);
             Assert.Contains("Only 1 of 3 requirements are satisfied", logContent);
             Assert.Contains("CHILD-001", logContent);
-            Assert.Contains("Error: 1 of 3 requirements is orphaned", logContent);
+            Assert.Contains("Error: 1 of 3 requirements orphaned", logContent);
             Assert.Contains("ORPHAN-001", logContent);
         }
         finally
@@ -887,7 +887,7 @@ sections:
 
             // Assert: the orphan is still detected and reported despite the --filter
             var logContent = File.ReadAllText(logFile);
-            Assert.Contains("Error: 1 of 2 requirements is orphaned", logContent);
+            Assert.Contains("Error: 1 of 2 requirements orphaned", logContent);
             Assert.Contains("ORPHAN-001", logContent);
         }
         finally
@@ -936,7 +936,7 @@ sections:
 
             // Assert: the orphan warning still appears, driven solely by the YAML declaration
             var logContent = File.ReadAllText(logFile);
-            Assert.Contains("Warning: 1 of 2 requirements is orphaned", logContent);
+            Assert.Contains("Warning: 1 of 2 requirements orphaned", logContent);
         }
         finally
         {
@@ -984,7 +984,7 @@ sections:
 
             // Assert: the orphan warning still appears, driven solely by the CLI flag
             var logContent = File.ReadAllText(logFile);
-            Assert.Contains("Warning: 1 of 2 requirements is orphaned", logContent);
+            Assert.Contains("Warning: 1 of 2 requirements orphaned", logContent);
         }
         finally
         {
@@ -1456,7 +1456,7 @@ sections:
             // are reported - before the fix, the orphan block was silently skipped
             var logContent = File.ReadAllText(logFile);
             Assert.Contains("No test result files were provided or matched", logContent);
-            Assert.Contains("Error: 1 of 2 requirements is orphaned", logContent);
+            Assert.Contains("Error: 1 of 2 requirements orphaned", logContent);
             Assert.Contains("ORPHAN-001", logContent);
         }
         finally
