@@ -1221,7 +1221,7 @@ sections:
         }
 
         var logContent = File.ReadAllText(logFile);
-        Assert.Contains("Warning: 1 of 2 requirements is orphaned", logContent);
+        Assert.Contains("Warning: 1 of 2 requirements orphaned", logContent);
         Assert.Contains("ORPHAN-001", logContent);
     }
 
@@ -1266,7 +1266,7 @@ sections:
         }
 
         var logContent = File.ReadAllText(logFile);
-        Assert.Contains("Error: 1 of 2 requirements is orphaned", logContent);
+        Assert.Contains("Error: 1 of 2 requirements orphaned", logContent);
         Assert.Contains("ORPHAN-001", logContent);
     }
 
