@@ -73,6 +73,7 @@ public sealed class ContextTests : IDisposable
         Assert.Equal(1, context.ReportDepth);
         Assert.Null(context.Matrix);
         Assert.Equal(1, context.MatrixDepth);
+        Assert.False(context.MatrixTitles);
         Assert.Null(context.JustificationsFile);
         Assert.Equal(1, context.JustificationsDepth);
         Assert.Equal(0, context.ExitCode);
@@ -248,6 +249,20 @@ public sealed class ContextTests : IDisposable
 
         // Assert: MatrixDepth property is set to 2
         Assert.Equal(2, context.MatrixDepth);
+        Assert.Equal(0, context.ExitCode);
+    }
+
+    /// <summary>
+    /// Test creating a context with matrix titles flag.
+    /// </summary>
+    [Fact]
+    public void Context_Create_MatrixTitlesFlag_SetsMatrixTitlesProperty()
+    {
+        // Act: create context with matrix-titles flag
+        using var context = Context.Create(["--matrix-titles"]);
+
+        // Assert: MatrixTitles property is true
+        Assert.True(context.MatrixTitles);
         Assert.Equal(0, context.ExitCode);
     }
 

@@ -35,7 +35,7 @@ The `Cli` subsystem contains the following software unit:
 **Context properties**: Parsed flags and file lists (`Version`, `Help`, `Silent`, `Validate`,
 `Lint`, `Enforce`, `RequirementsFiles`, `TestFiles`, `RequirementsReport`, `Matrix`,
 `JustificationsFile`, `ResultsFile`, `FilterTags`, `RootTags`, `Depth`, `ReportDepth`,
-`MatrixDepth`, `JustificationsDepth`, `ExitCode`).
+`MatrixDepth`, `MatrixTitles`, `JustificationsDepth`, `ExitCode`).
 
 - *Type*: In-process .NET public API (read-only properties).
 - *Role*: Provider.

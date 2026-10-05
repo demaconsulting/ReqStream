@@ -102,6 +102,7 @@ public sealed class ProgramTests : IDisposable
         Assert.Contains("Copyright", outputText);
         Assert.Contains("Usage:", outputText);
         Assert.Contains("Options:", outputText);
+        Assert.Contains("--matrix-titles", outputText);
     }
 
     /// <summary>
@@ -358,7 +359,70 @@ sections:
 
             var matrixContent = File.ReadAllText(matrixFile);
             Assert.Contains("Summary", matrixContent);
-            Assert.Contains("REQ-001", matrixContent);
+            Assert.Contains("REQ-\u200B001", matrixContent);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalDir);
+        }
+    }
+
+    /// <summary>
+    /// Test Run with the --matrix-titles flag includes a Title column in the generated matrix,
+    /// verifying the full CLI flag through Context.MatrixTitles through Program through
+    /// TraceMatrix.Export(..., includeTitles: true) wiring end-to-end.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithMatrixTitlesFlag_IncludesTitleColumn()
+    {
+        // Arrange: create requirements file and TRX test results file
+        var reqFile = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqFile, @"
+sections:
+  - title: Test Section
+    requirements:
+      - id: REQ-001
+        title: Test Requirement
+        tests:
+          - TestMethod1
+");
+
+        // Create a test TRX file using TestResults library
+        var testResults = new DemaConsulting.TestResults.TestResults { Name = "TestRun" };
+        testResults.Results.Add(new DemaConsulting.TestResults.TestResult
+        {
+            Name = "TestMethod1",
+            ClassName = "TestClass",
+            CodeBase = "Tests.dll",
+            Outcome = DemaConsulting.TestResults.TestOutcome.Passed,
+            Duration = TimeSpan.FromSeconds(1)
+        });
+        var trxFile = _testDirectory.GetFilePath("tests.trx");
+        File.WriteAllText(trxFile, DemaConsulting.TestResults.IO.TrxSerializer.Serialize(testResults));
+
+        var matrixFile = _testDirectory.GetFilePath("matrix.md");
+
+        var originalDir = Directory.GetCurrentDirectory();
+        try
+        {
+            Directory.SetCurrentDirectory(_testDirectory.DirectoryPath);
+
+            // Act: run with requirements, tests, matrix, and matrix-titles flags
+            using var context = Context.Create([
+                "--requirements", "*.yaml",
+                "--tests", "*.trx",
+                "--matrix", matrixFile,
+                "--matrix-titles"
+            ]);
+            Program.Run(context);
+
+            // Assert: matrix file was generated with a Title column and the requirement's title text
+            Assert.Equal(0, context.ExitCode);
+            Assert.True(File.Exists(matrixFile));
+
+            var matrixContent = File.ReadAllText(matrixFile);
+            Assert.Contains("| ID | Title |", matrixContent);
+            Assert.Contains("Test Requirement", matrixContent);
         }
         finally
         {

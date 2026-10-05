@@ -292,7 +292,12 @@ public static class Validation
                 if (exitCode == 0 && File.Exists(matrixFile))
                 {
                     var matrixContent = File.ReadAllText(matrixFile);
-                    if (matrixContent.Contains("MTX-001") && matrixContent.Contains("Test_Matrix_Validation"))
+
+                    // TraceMatrix.Export inserts U+200B (zero-width space) after hyphens/underscores
+                    // in IDs and test names so Markdown/PDF renderers can wrap long values. Strip it
+                    // here so this content comparison isn't coupled to that cosmetic detail.
+                    var normalizedMatrixContent = matrixContent.Replace("\u200B", string.Empty);
+                    if (normalizedMatrixContent.Contains("MTX-001") && normalizedMatrixContent.Contains("Test_Matrix_Validation"))
                     {
                         test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
                         context.WriteLine("✓ ReqStream_TraceMatrix - Passed");

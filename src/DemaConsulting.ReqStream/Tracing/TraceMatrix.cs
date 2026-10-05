@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Text;
 using DemaConsulting.ReqStream.Modeling;
 using DemaConsulting.TestResults;
 using DemaConsulting.TestResults.IO;
@@ -96,7 +97,7 @@ public record TestExecution(string FileBaseName, string Name, TestMetrics Metric
 ///         and populates <c>_testExecutions</c>. Once the constructor returns, the instance is
 ///         effectively frozen — all public query methods (<see cref="GetTestResult"/>,
 ///         <see cref="GetAllTestResults"/>, <see cref="CalculateSatisfiedRequirements(System.Collections.Generic.HashSet{string}?)"/>,
-///         <see cref="GetUnsatisfiedRequirements"/>, and <see cref="Export"/>) are read-only and
+///         <see cref="GetUnsatisfiedRequirements"/>, and <see cref="Export(string,int,HashSet{string}?,bool)"/>) are read-only and
 ///         do not modify any state.
 ///     </para>
 ///     <para>
@@ -258,6 +259,28 @@ public class TraceMatrix
     ///     Exports the trace matrix to a Markdown file.
     /// </summary>
     /// <remarks>
+    ///     This overload preserves the original three-parameter signature for binary
+    ///     compatibility with existing callers compiled against earlier versions of this type.
+    ///     It delegates to <see cref="Export(string,int,HashSet{string}?,bool)"/> with
+    ///     <c>includeTitles: false</c>, which reproduces the exact behavior of the original
+    ///     method (no "Title" column in the Requirements table).
+    /// </remarks>
+    /// <param name="filePath">The path to the output Markdown file.</param>
+    /// <param name="depth">
+    ///     The starting depth for Markdown headers (default: 1). Must be at least 1; a value
+    ///     less than 1 produces malformed Markdown headers.
+    /// </param>
+    /// <param name="filterTags">Optional set of tags to filter requirements. If provided, only requirements with matching tags are included.</param>
+    /// <exception cref="ArgumentException">Thrown when filePath is null or empty.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="depth"/> is less than 1.</exception>
+    /// <exception cref="System.IO.IOException">Thrown when the output file cannot be written.</exception>
+    public void Export(string filePath, int depth = 1, HashSet<string>? filterTags = null) =>
+        Export(filePath, depth, filterTags, includeTitles: false);
+
+    /// <summary>
+    ///     Exports the trace matrix to a Markdown file, optionally including requirement titles.
+    /// </summary>
+    /// <remarks>
     ///     <para>
     ///         The output is structured in three sections written in order by
     ///         <c>ExportSummary</c>, <c>ExportRequirements</c>, and <c>ExportTesting</c>.
@@ -274,17 +297,31 @@ public class TraceMatrix
     ///         subtree. This gives the Summary an accurate compliance verdict while keeping the
     ///         Requirements table rows concise.
     ///     </para>
+    ///     <para>
+    ///         <see cref="InsertSoftBreaks"/> is applied <strong>unconditionally</strong> to
+    ///         requirement IDs and test names in the Requirements and Testing tables, regardless
+    ///         of the <paramref name="includeTitles"/> value. This is intentional, not a bug: long
+    ///         underscore-joined test names and hyphenated requirement IDs can overflow the
+    ///         rendered table width in generated PDFs even when no Title column is present, and
+    ///         the inserted zero-width space gives PDF renderers a valid line-break point without
+    ///         altering the visible text. Do not gate this behavior behind
+    ///         <paramref name="includeTitles"/>.
+    ///     </para>
     /// </remarks>
     /// <param name="filePath">The path to the output Markdown file.</param>
     /// <param name="depth">
-    ///     The starting depth for Markdown headers (default: 1). Must be at least 1; a value
+    ///     The starting depth for Markdown headers. Must be at least 1; a value
     ///     less than 1 produces malformed Markdown headers.
     /// </param>
     /// <param name="filterTags">Optional set of tags to filter requirements. If provided, only requirements with matching tags are included.</param>
+    /// <param name="includeTitles">
+    ///     When <c>true</c>, includes an additional "Title" column in the Requirements table showing
+    ///     each requirement's title text (<c>false</c> preserves the original table structure).
+    /// </param>
     /// <exception cref="ArgumentException">Thrown when filePath is null or empty.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="depth"/> is less than 1.</exception>
     /// <exception cref="System.IO.IOException">Thrown when the output file cannot be written.</exception>
-    public void Export(string filePath, int depth = 1, HashSet<string>? filterTags = null)
+    public void Export(string filePath, int depth, HashSet<string>? filterTags, bool includeTitles)
     {
         // Validate file path
         if (string.IsNullOrWhiteSpace(filePath))
@@ -302,7 +339,7 @@ public class TraceMatrix
         ExportSummary(writer, depth, filterTags);
 
         // Export Requirements section
-        ExportRequirements(writer, depth, filterTags);
+        ExportRequirements(writer, depth, filterTags, includeTitles);
 
         // Export Testing section
         ExportTesting(writer, depth, filterTags);
@@ -511,7 +548,8 @@ public class TraceMatrix
     /// <param name="writer">The text writer to write to.</param>
     /// <param name="depth">The current depth for Markdown headers.</param>
     /// <param name="filterTags">Optional set of tags to filter requirements.</param>
-    private void ExportRequirements(TextWriter writer, int depth, HashSet<string>? filterTags)
+    /// <param name="includeTitles">When <c>true</c>, includes a "Title" column in the Requirements table.</param>
+    private void ExportRequirements(TextWriter writer, int depth, HashSet<string>? filterTags, bool includeTitles = false)
     {
         var headerPrefix = new string('#', depth);
         writer.WriteLine($"{headerPrefix} Requirements");
@@ -520,7 +558,7 @@ public class TraceMatrix
         // Export all sections
         foreach (var section in _requirements.Sections)
         {
-            ExportRequirementSection(writer, section, depth + 1, filterTags);
+            ExportRequirementSection(writer, section, depth + 1, filterTags, includeTitles);
         }
     }
 
@@ -531,7 +569,8 @@ public class TraceMatrix
     /// <param name="section">The section to export.</param>
     /// <param name="depth">The current depth for Markdown headers.</param>
     /// <param name="filterTags">Optional set of tags to filter requirements.</param>
-    private void ExportRequirementSection(TextWriter writer, Section section, int depth, HashSet<string>? filterTags)
+    /// <param name="includeTitles">When <c>true</c>, includes a "Title" column in the Requirements table.</param>
+    private void ExportRequirementSection(TextWriter writer, Section section, int depth, HashSet<string>? filterTags, bool includeTitles = false)
     {
         // Filter requirements if tags are specified
         var requirementsToExport = section.Requirements;
@@ -564,15 +603,26 @@ public class TraceMatrix
         // If there are requirements, write them as a table
         if (requirementsToExport.Count > 0)
         {
-            // Write table header
-            writer.WriteLine("| ID | Tests Linked | Passed | Failed | Not Executed |");
-            writer.WriteLine("| :- | -----------: | :-: | :-: | :-: |");
+            if (includeTitles)
+            {
+                // Write table header with Title column
+                writer.WriteLine("| ID | Title | Tests Linked | Passed | Failed | Not Executed |");
+                writer.WriteLine("| :------- | :--------------------------------------- | -----------: | :-: | :-: | :-: |");
+            }
+            else
+            {
+                // Write table header
+                writer.WriteLine("| ID | Tests Linked | Passed | Failed | Not Executed |");
+                writer.WriteLine("| :- | -----------: | :-: | :-: | :-: |");
+            }
 
             // Write each requirement
             foreach (var requirement in requirementsToExport)
             {
                 var (testsLinked, passed, failed, notExecuted) = GetRequirementTestStats(requirement);
-                writer.WriteLine($"| {requirement.Id} | {testsLinked} | {passed} | {failed} | {notExecuted} |");
+                var id = InsertSoftBreaks(requirement.Id);
+                var titleCell = includeTitles ? $"{InsertSoftBreaks(EscapeTableCell(requirement.Title))} | " : string.Empty;
+                writer.WriteLine($"| {id} | {titleCell}{testsLinked} | {passed} | {failed} | {notExecuted} |");
             }
 
             writer.WriteLine();
@@ -581,8 +631,87 @@ public class TraceMatrix
         // Recursively export child sections
         foreach (var childSection in section.Sections)
         {
-            ExportRequirementSection(writer, childSection, depth + 1, filterTags);
+            ExportRequirementSection(writer, childSection, depth + 1, filterTags, includeTitles);
         }
+    }
+
+    /// <summary>
+    ///     Inserts a zero-width-space (U+200B) immediately after every hyphen (<c>-</c>) and
+    ///     underscore (<c>_</c>) character in the given text.
+    /// </summary>
+    /// <remarks>
+    ///     Markdown table cells do not wrap long identifier-like values (requirement IDs, test
+    ///     names) that lack natural break points, which can cause the rendered table to overflow
+    ///     the page width. Inserting a zero-width space after each hyphen/underscore gives the
+    ///     renderer a valid line-break opportunity without altering the visible text.
+    /// </remarks>
+    /// <param name="text">The text to process. May be <c>null</c> or empty.</param>
+    /// <returns>The text with zero-width spaces inserted, or <see cref="string.Empty"/> if <paramref name="text"/> is <c>null</c> or empty.</returns>
+    private static string InsertSoftBreaks(string? text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return string.Empty;
+        }
+
+        var builder = new StringBuilder(text.Length);
+        foreach (var c in text)
+        {
+            builder.Append(c);
+            if (c is '-' or '_')
+            {
+                builder.Append('\u200B');
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    /// <summary>
+    ///     Escapes literal backslash (<c>\</c>) and pipe (<c>|</c>) characters, and normalizes
+    ///     embedded line breaks, in free-form text so it can be safely embedded in a single-line
+    ///     Markdown pipe-table cell.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Unlike requirement IDs and test names (which are identifier-like and never contain
+    ///         pipes), requirement titles are free-form human-authored text and may legitimately
+    ///         contain a <c>|</c> character, a literal <c>\</c> character, or embedded line breaks
+    ///         (for example from a YAML block-scalar title). An unescaped pipe would be
+    ///         interpreted as a column separator by Pandoc/Markdown renderers, and an unescaped
+    ///         line break would split the cell across multiple lines, both corrupting the table.
+    ///     </para>
+    ///     <para>
+    ///         Backslashes are escaped (<c>\</c> &#8594; <c>\\</c>) <strong>before</strong> pipes
+    ///         are escaped (<c>|</c> &#8594; <c>\|</c>). This order is mandatory: escaping pipes
+    ///         first would cause a pre-existing literal <c>\|</c> sequence in the source text to be
+    ///         corrupted, because the backslash introduced by the pipe-escaping step would then
+    ///         itself be doubled by the backslash-escaping step, producing an incorrect result. By
+    ///         escaping backslashes first, a literal <c>\|</c> correctly round-trips as <c>\\\|</c>.
+    ///     </para>
+    ///     <para>
+    ///         Embedded <c>\r\n</c>, <c>\r</c>, and <c>\n</c> sequences are each normalized to a
+    ///         single space so that multi-line titles cannot break a Markdown table row.
+    ///     </para>
+    /// </remarks>
+    /// <param name="text">The text to process. May be <c>null</c> or empty.</param>
+    /// <returns>
+    ///     The text with backslash and pipe characters escaped (backslash before pipe) and
+    ///     embedded line breaks normalized to single spaces.
+    /// </returns>
+    private static string EscapeTableCell(string? text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return string.Empty;
+        }
+
+        return text
+            .Replace("\\", "\\\\")
+            .Replace("|", "\\|")
+            .Replace("\r\n", " ")
+            .Replace("\r", " ")
+            .Replace("\n", " ");
     }
 
     /// <summary>
@@ -671,9 +800,10 @@ public class TraceMatrix
             var passed = result.Passes;
             var failed = result.Fails;
 
+            var softBrokenTestName = InsertSoftBreaks(testName);
             foreach (var reqId in requirementIds.OrderBy(id => id))
             {
-                writer.WriteLine($"| {testName} | {reqId} | {passed} | {failed} |");
+                writer.WriteLine($"| {softBrokenTestName} | {InsertSoftBreaks(reqId)} | {passed} | {failed} |");
             }
         }
 

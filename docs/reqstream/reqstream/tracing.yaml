@@ -81,4 +81,5 @@ sections:
             children:
               - ReqStream-Report-TraceMatrix
               - ReqStream-Report-TraceMatrixDepth
+              - ReqStream-Report-TraceMatrixTitles
               - ReqStream-Report-TagFiltering

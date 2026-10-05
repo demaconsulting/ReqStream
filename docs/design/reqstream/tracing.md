@@ -31,8 +31,10 @@ The `Tracing` subsystem contains the following software unit:
 
 - *Type*: In-process .NET public API.
 - *Role*: Provider.
-- *Contract*: Accepts `filePath`, `depth`, and optional `filterTags`; writes a Markdown report
-  with Summary, Requirements, and Testing sections. The `depth` parameter sets the starting
+- *Contract*: Accepts `filePath`, `depth`, optional `filterTags`, and an optional
+  `includeTitles` flag (default `false`); writes a Markdown report with Summary, Requirements,
+  and Testing sections. When `includeTitles` is `true`, the Requirements table includes an
+  additional "Title" column. The `depth` parameter sets the starting
   Markdown heading level (ATX `#` count) for the report; when omitted the default is 1
   (top-level `#` headings). Only a lower bound of 1 is enforced — nested requirement sections
   increase the heading level further for each level of nesting and are not capped at the

@@ -553,6 +553,7 @@ ReqStream supports the following command-line options:
 | `--tests <pattern>` | Glob pattern for test result files (TRX or JUnit format) |
 | `--matrix <file>` | Export trace matrix to markdown file |
 | `--matrix-depth <depth>` | Starting header depth for trace matrix (overrides `--depth`) |
+| `--matrix-titles` | Include requirement titles as a column in the trace matrix |
 | `--justifications <file>` | Export justifications to markdown file |
 | `--justifications-depth <depth>` | Starting header depth for justifications (overrides `--depth`) |
 | `--enforce` | Fail if requirements are not fully tested or are orphaned (when root tags are configured) |
@@ -834,6 +835,10 @@ The trace matrix includes:
 - List of test cases mapped to that requirement
 - Test status (Passed, Failed, Skipped) from test results
 - Coverage analysis
+
+By default, the Requirements table lists each requirement's ID alongside its test statistics. Pass
+`--matrix-titles` to add an additional "Title" column showing each requirement's title text
+directly in the table, without needing to cross-reference a separate requirements report.
 
 **Example trace matrix output:**
 

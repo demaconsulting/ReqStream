@@ -49,7 +49,8 @@ mixed filter and plain references. This scenario is tested by
 
 **Export**: Tests verify Markdown trace matrix export for simple matrices, matrices with failed
 tests, matrices with no tests, matrices with not-executed tests, custom heading depth, tag
-filtering, child requirements, and tag-filtered counts and unsatisfied requirement retrieval.
+filtering, child requirements, tag-filtered counts and unsatisfied requirement retrieval, the
+optional Title column, and zero-width-space soft-break insertion for identifier-like values.
 This scenario is tested by `TraceMatrix_Export_SimpleTraceMatrix_CreatesMarkdownFile`,
 `TraceMatrix_Export_WithFailedTests_ShowsFailures`,
 `TraceMatrix_Export_WithNoTests_ShowsNotSatisfied`,
@@ -57,8 +58,20 @@ This scenario is tested by `TraceMatrix_Export_SimpleTraceMatrix_CreatesMarkdown
 `TraceMatrix_Export_WithCustomDepth_UsesCorrectHeaderLevel`,
 `TraceMatrix_Export_WithFilterTags_ExportsOnlyMatchingRequirements`,
 `TraceMatrix_Export_WithChildRequirements_ConsidersChildTests`,
-`TraceMatrix_CalculateSatisfiedRequirements_WithFilterTags_CountsOnlyMatchingRequirements`, and
-`TraceMatrix_GetUnsatisfiedRequirements_WithFilterTags_ReturnsOnlyMatchingRequirements`.
+`TraceMatrix_CalculateSatisfiedRequirements_WithFilterTags_CountsOnlyMatchingRequirements`,
+`TraceMatrix_GetUnsatisfiedRequirements_WithFilterTags_ReturnsOnlyMatchingRequirements`,
+`TraceMatrix_Export_WithIncludeTitlesFalse_OmitsTitleColumn`,
+`TraceMatrix_Export_WithIncludeTitlesTrue_AddsTitleColumn`,
+`TraceMatrix_Export_IdentifierWithHyphensAndUnderscores_InsertsSoftBreaks`,
+`TraceMatrix_Export_TitleWithHyphensAndUnderscores_InsertsSoftBreaksInTitleColumn`,
+`TraceMatrix_Export_TitleWithPipeCharacter_EscapesPipeInTitleColumn`, which asserts a literal
+pipe character in a requirement title is escaped so it does not corrupt the Title column;
+`TraceMatrix_Export_TitleWithEmbeddedLineBreaks_NormalizesToSingleLineCell`, which asserts an
+embedded line break in a requirement title is normalized to a single space so the Markdown
+table row is not split across multiple lines; and
+`TraceMatrix_Export_TitleWithLiteralBackslashPipe_EscapesBackslashBeforePipe`, which asserts a
+literal backslash-then-pipe sequence in a requirement title is escaped with the backslash
+doubled before the pipe is escaped, so the original sequence round-trips correctly.
 
 #### Requirements Coverage
 
@@ -89,3 +102,5 @@ This scenario is tested by `TraceMatrix_Export_SimpleTraceMatrix_CreatesMarkdown
 | `ReqStream-Report-TagFiltering` | Export Scenario | `TraceMatrix_Export_WithFilterTags_ExportsOnlyMatchingRequirements` |
 | `ReqStream-Report-TagFiltering` | Export Scenario | `TraceMatrix_CalculateSatisfiedRequirements_WithFilterTags_CountsOnlyMatchingRequirements` |
 | `ReqStream-Report-TagFiltering` | Export Scenario | `TraceMatrix_GetUnsatisfiedRequirements_WithFilterTags_ReturnsOnlyMatchingRequirements` |
+| `ReqStream-Report-TraceMatrixTitles` | Export Scenario | `TraceMatrix_Export_WithIncludeTitlesTrue_AddsTitleColumn` |
+| `ReqStream-Report-TraceMatrixTitles` | Export Scenario | `TraceMatrix_Export_WithIncludeTitlesFalse_OmitsTitleColumn` |

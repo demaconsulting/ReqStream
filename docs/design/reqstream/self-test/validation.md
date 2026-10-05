@@ -33,7 +33,10 @@ Prints a header block (version, machine name, OS, .NET runtime, UTC timestamp), 
 tests sequentially, and prints a multi-line summary. The seven tests:
 
 1. `RunRequirementsProcessingTest` — verifies YAML files are read, merged, and exported.
-2. `RunTraceMatrixTest` — verifies test results are loaded and mapped to requirements.
+2. `RunTraceMatrixTest` — verifies test results are loaded and mapped to requirements. Before
+   comparing content, the generated matrix is normalized by stripping U+200B (zero-width space)
+   characters that `TraceMatrix.Export` inserts after hyphens/underscores for PDF/Markdown line
+   wrapping, so the test isn't coupled to that cosmetic detail.
 3. `RunReportExportTest` — verifies requirements and justifications reports are written.
 4. `RunTagsFilteringTest` — verifies tag-based filtering restricts output and coverage.
 5. `RunEnforcementModeTest` — verifies `--enforce` produces non-zero exit code on failure.

@@ -764,4 +764,37 @@ sections:
         Assert.Equal(0, satisfied);
         Assert.Equal(1, total);
     }
+
+    /// <summary>
+    ///     Test that a hyphenated/underscored Title value receives zero-width-space soft
+    ///     breaks when exported with includeTitles: true (defense-in-depth against the same
+    ///     table-overflow issue affecting IDs and test names).
+    /// </summary>
+    [Fact]
+    public void TraceMatrix_Export_TitleWithHyphensAndUnderscores_InsertsSoftBreaksInTitleColumn()
+    {
+        // Arrange:
+        var reqYaml = @"---
+sections:
+  - title: ""Test Requirements""
+    requirements:
+      - id: ""REQ-001""
+        title: ""Validate user-supplied_input values""
+";
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var loadResult = Requirements.Load(reqPath);
+        Assert.NotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
+
+        // Act:
+        var matrix = new TraceMatrix(requirements);
+        var mdPath = _testDirectory.GetFilePath("tracematrix.md");
+        matrix.Export(mdPath, 1, null, includeTitles: true);
+
+        // Assert: zero-width space (U+200B) inserted after every hyphen/underscore in the Title column
+        var content = File.ReadAllText(mdPath);
+        Assert.Contains("| ID | Title |", content);
+        Assert.Contains("Validate user-\u200B" + "supplied_\u200B" + "input values", content);
+    }
 }

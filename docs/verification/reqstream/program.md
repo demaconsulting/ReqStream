@@ -41,8 +41,10 @@ which asserts an informational message when no files are provided;
 `Program_Run_WithRequirementsFiles_ProcessesSuccessfully`, which asserts processing succeeds;
 `Program_Run_WithRequirementsExport_GeneratesReport`, which asserts a requirements report is
 generated; `Program_Run_WithTraceMatrixExport_GeneratesMatrix`, which asserts a trace matrix is
-generated; and `Program_Run_WithJustificationsExport_GeneratesJustificationsReport`, which
-asserts a justifications report.
+generated; `Program_Run_WithMatrixTitlesFlag_IncludesTitleColumn`, which asserts the
+`--matrix-titles` flag produces a Title column in the generated trace matrix end-to-end; and
+`Program_Run_WithJustificationsExport_GeneratesJustificationsReport`, which asserts a
+justifications report.
 
 **Matrix Without Tests**: Tests verify that requesting `--matrix` without providing test files
 produces an error. This scenario is tested by
@@ -98,7 +100,7 @@ regression). This scenario is tested by
 | `ReqStream-Program-Version` | `Program_Run_WithVersionFlag_PrintsVersion` |
 | `ReqStream-Program-Help` | `Program_Run_WithHelpFlag_PrintsHelp` |
 | `ReqStream-Program-Validate` | `Program_Run_WithValidateFlag_RunsValidation`, `Program_Run_WithValidateAndResults_WritesResultsFile` |
-| `ReqStream-Program-Requirements` | `Program_Run_WithNoRequirementsFiles_ShowsMessage`, `Program_Run_WithRequirementsFiles_ProcessesSuccessfully`, `Program_Run_WithRequirementsExport_GeneratesReport`, `Program_Run_WithTraceMatrixExport_GeneratesMatrix`, `Program_Run_WithJustificationsExport_GeneratesJustificationsReport` |
+| `ReqStream-Program-Requirements` | `Program_Run_WithNoRequirementsFiles_ShowsMessage`, `Program_Run_WithRequirementsFiles_ProcessesSuccessfully`, `Program_Run_WithRequirementsExport_GeneratesReport`, `Program_Run_WithTraceMatrixExport_GeneratesMatrix`, `Program_Run_WithMatrixTitlesFlag_IncludesTitleColumn`, `Program_Run_WithJustificationsExport_GeneratesJustificationsReport` |
 | `ReqStream-Program-MatrixNoTests` | `Program_Run_WithMatrixButNoTestFiles_ReportsError`, `Program_Run_WithMatrixAndUnmatchedTestsPattern_ReportsError` |
 | `ReqStream-Program-Enforce` | `Program_Run_WithEnforcementAndFullySatisfiedRequirements_Succeeds`, `Program_Run_WithEnforcementAndUnsatisfiedRequirements_Fails`, `Program_Run_WithEnforcementAndNoTests_Fails`, `Program_Run_WithEnforcementAndFailedTests_Fails` |
 | `ReqStream-Program-Lint` | `Program_Run_WithLintFlag_RunsLinter` |
