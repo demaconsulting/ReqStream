@@ -118,7 +118,8 @@ public sealed class IntegrationTests : IDisposable
 
         // Assert: trace matrix contains the satisfied requirement and its covering test
         var matrixContent = File.ReadAllText(matrixFile);
-        Assert.Contains("Integration-System-DoSomethingUseful", matrixContent);
+        var normalizedMatrixContent = matrixContent.Replace("\u200B", string.Empty);
+        Assert.Contains("Integration-System-DoSomethingUseful", normalizedMatrixContent);
         Assert.Contains("IntegrationTest1", matrixContent);
     }
 

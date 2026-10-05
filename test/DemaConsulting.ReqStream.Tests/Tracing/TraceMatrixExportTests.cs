@@ -33,7 +33,7 @@ namespace DemaConsulting.ReqStream.Tests.Tracing;
 public sealed class TraceMatrixExportTests : IDisposable
 {
     /// <summary>Delimiter string used to split export output lines for assertion.</summary>
-    private static readonly string[] SplitDelimiter = ["| Test_Credentials |"];
+    private static readonly string[] SplitDelimiter = ["| Test_\u200BCredentials |"];
 
     /// <summary>Temporary directory providing isolated file-system workspace for this test class instance.</summary>
     private readonly TemporaryDirectory _testDirectory = new();
@@ -116,11 +116,11 @@ sections:
         Assert.Contains("# Requirements", content);
         Assert.Contains("## User Authentication", content);
         Assert.Contains("| ID | Tests Linked | Passed | Failed | Not Executed |", content);
-        Assert.Contains("| AUTH-001 | 2 | 2 | 0 | 0 |", content);
+        Assert.Contains("| AUTH-\u200B001 | 2 | 2 | 0 | 0 |", content);
         Assert.Contains("# Testing", content);
         Assert.Contains("| Test | Requirement | Passed | Failed |", content);
-        Assert.Contains("| Test_Credentials_Invalid | AUTH-001 | 1 | 0 |", content);
-        Assert.Contains("| Test_Credentials_Valid | AUTH-001 | 1 | 0 |", content);
+        Assert.Contains("| Test_\u200BCredentials_\u200BInvalid | AUTH-\u200B001 | 1 | 0 |", content);
+        Assert.Contains("| Test_\u200BCredentials_\u200BValid | AUTH-\u200B001 | 1 | 0 |", content);
     }
 
     /// <summary>
@@ -232,9 +232,9 @@ sections:
         // Assert:
         var content = File.ReadAllText(mdPath);
         Assert.Contains("0 of 1 requirements are satisfied with tests.", content);
-        Assert.Contains("| AUTH-001 | 2 | 1 | 1 | 0 |", content);
-        Assert.Contains("| Test_Credentials_Invalid | AUTH-001 | 0 | 1 |", content);
-        Assert.Contains("| Test_Credentials_Valid | AUTH-001 | 1 | 0 |", content);
+        Assert.Contains("| AUTH-\u200B001 | 2 | 1 | 1 | 0 |", content);
+        Assert.Contains("| Test_\u200BCredentials_\u200BInvalid | AUTH-\u200B001 | 0 | 1 |", content);
+        Assert.Contains("| Test_\u200BCredentials_\u200BValid | AUTH-\u200B001 | 1 | 0 |", content);
     }
 
     /// <summary>
@@ -285,8 +285,8 @@ sections:
         // Assert:
         var content = File.ReadAllText(mdPath);
         Assert.Contains("0 of 1 requirements are satisfied with tests.", content);
-        Assert.Contains("| AUTH-001 | 2 | 1 | 0 | 1 |", content);
-        Assert.Contains("| Test_Credentials_Invalid | AUTH-001 | 0 | 0 |", content);
+        Assert.Contains("| AUTH-\u200B001 | 2 | 1 | 0 | 1 |", content);
+        Assert.Contains("| Test_\u200BCredentials_\u200BInvalid | AUTH-\u200B001 | 0 | 0 |", content);
     }
 
     /// <summary>
@@ -355,8 +355,8 @@ sections:
         Assert.Contains("## Data Management", content);
         Assert.Contains("### User Authentication", content);
         Assert.Contains("### Logging", content);
-        Assert.Contains("| AUTH-001 | 1 | 1 | 0 | 0 |", content);
-        Assert.Contains("| LOG-001 | 1 | 1 | 0 | 0 |", content);
+        Assert.Contains("| AUTH-\u200B001 | 1 | 1 | 0 | 0 |", content);
+        Assert.Contains("| LOG-\u200B001 | 1 | 1 | 0 | 0 |", content);
     }
 
     /// <summary>
@@ -475,8 +475,8 @@ sections:
         var content = File.ReadAllText(mdPath);
         // Both requirements should be satisfied because SYS-SEC-001 has child AUTH-001 which has passing tests
         Assert.Contains("2 of 2 requirements are satisfied with tests.", content);
-        Assert.Contains("| SYS-SEC-001 | 0 | 0 | 0 | 0 |", content);
-        Assert.Contains("| AUTH-001 | 1 | 1 | 0 | 0 |", content);
+        Assert.Contains("| SYS-\u200B" + "SEC-\u200B001 | 0 | 0 | 0 | 0 |", content);
+        Assert.Contains("| AUTH-\u200B001 | 1 | 1 | 0 | 0 |", content);
     }
 
     /// <summary>
@@ -510,7 +510,7 @@ sections:
         // Assert:
         var content = File.ReadAllText(mdPath);
         Assert.Contains("0 of 1 requirements are satisfied with tests.", content);
-        Assert.Contains("| AUTH-001 | 0 | 0 | 0 | 0 |", content);
+        Assert.Contains("| AUTH-\u200B001 | 0 | 0 | 0 | 0 |", content);
     }
 
     /// <summary>
@@ -634,9 +634,9 @@ sections:
         Assert.Contains("1 of 1 requirements are satisfied with tests.", content);
 
         // Should contain security requirement but not performance requirement
-        Assert.Contains("REQ-001", content);
+        Assert.Contains("REQ-\u200B001", content);
         Assert.DoesNotContain("REQ-002", content);
-        Assert.Contains("Test_Security", content);
+        Assert.Contains("Test_\u200BSecurity", content);
         Assert.DoesNotContain("Test_Performance", content);
     }
 
@@ -752,5 +752,108 @@ sections:
         Assert.Single(unsatisfiedFiltered);
         Assert.Contains("REQ-001", unsatisfiedFiltered);
         Assert.DoesNotContain("REQ-002", unsatisfiedFiltered);
+    }
+
+    /// <summary>
+    ///     Test that exporting without the includeTitles argument preserves the existing
+    ///     Requirements table structure (no Title column).
+    /// </summary>
+    [Fact]
+    public void TraceMatrix_Export_WithIncludeTitlesFalse_OmitsTitleColumn()
+    {
+        // Arrange:
+        var reqYaml = @"---
+sections:
+  - title: ""User Authentication""
+    requirements:
+      - id: ""AUTH-001""
+        title: ""Validate user credentials""
+        tests:
+          - ""Test_Credentials_Valid""
+";
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var loadResult = Requirements.Load(reqPath);
+        Assert.NotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
+
+        // Act:
+        var matrix = new TraceMatrix(requirements);
+        var mdPath = _testDirectory.GetFilePath("tracematrix.md");
+        matrix.Export(mdPath);
+
+        // Assert:
+        var content = File.ReadAllText(mdPath);
+        Assert.Contains("| ID | Tests Linked | Passed | Failed | Not Executed |", content);
+        Assert.DoesNotContain("Title", content);
+    }
+
+    /// <summary>
+    ///     Test that exporting with includeTitles: true adds a Title column with the
+    ///     requirement's title text.
+    /// </summary>
+    [Fact]
+    public void TraceMatrix_Export_WithIncludeTitlesTrue_AddsTitleColumn()
+    {
+        // Arrange:
+        var reqYaml = @"---
+sections:
+  - title: ""User Authentication""
+    requirements:
+      - id: ""AUTH-001""
+        title: ""Validate user credentials""
+        tests:
+          - ""Test_Credentials_Valid""
+";
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var loadResult = Requirements.Load(reqPath);
+        Assert.NotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
+
+        // Act:
+        var matrix = new TraceMatrix(requirements);
+        var mdPath = _testDirectory.GetFilePath("tracematrix.md");
+        matrix.Export(mdPath, includeTitles: true);
+
+        // Assert:
+        var content = File.ReadAllText(mdPath);
+        Assert.Contains("| ID | Title |", content);
+        Assert.Contains("Validate user credentials", content);
+    }
+
+    /// <summary>
+    ///     Test that identifier-like values (hyphenated requirement IDs, underscored test
+    ///     names) receive zero-width-space soft breaks in both the Requirements and Testing
+    ///     tables, regardless of the includeTitles flag.
+    /// </summary>
+    [Fact]
+    public void TraceMatrix_Export_IdentifierWithHyphensAndUnderscores_InsertsSoftBreaks()
+    {
+        // Arrange:
+        var reqYaml = @"---
+sections:
+  - title: ""User Authentication""
+    requirements:
+      - id: ""AUTH-001""
+        title: ""Validate user credentials""
+        tests:
+          - ""Test_Credentials_Invalid""
+";
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var loadResult = Requirements.Load(reqPath);
+        Assert.NotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
+
+        // Act:
+        var matrix = new TraceMatrix(requirements);
+        var mdPath = _testDirectory.GetFilePath("tracematrix.md");
+        matrix.Export(mdPath);
+
+        // Assert: zero-width space (U+200B) inserted after every hyphen/underscore in ID and test name
+        var content = File.ReadAllText(mdPath);
+        Assert.Contains("| AUTH-\u200B001 |", content);
+        Assert.Contains("Test_\u200BCredentials_\u200BInvalid", content);
     }
 }

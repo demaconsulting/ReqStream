@@ -151,6 +151,12 @@ public sealed class Context : IDisposable
     public int MatrixDepth { get; private init; } = 1;
 
     /// <summary>
+    ///     Gets a value indicating whether the trace matrix Requirements table should include a
+    ///     "Title" column showing each requirement's title text.
+    /// </summary>
+    public bool MatrixTitles { get; private init; }
+
+    /// <summary>
     ///     Gets the justifications export output file path.
     /// </summary>
     public string? JustificationsFile { get; private init; }
@@ -210,6 +216,7 @@ public sealed class Context : IDisposable
         var validate = false;
         var lint = false;
         var enforce = false;
+        var matrixTitles = false;
 
         // Initialize collection variables
         var requirementsPatterns = new List<string>();
@@ -406,6 +413,10 @@ public sealed class Context : IDisposable
                     matrixDepth = parsedMatrixDepth;
                     break;
 
+                case "--matrix-titles":
+                    matrixTitles = true;
+                    break;
+
                 case "--justifications":
                     // Ensure argument has a value
                     if (i >= args.Length)
@@ -456,6 +467,7 @@ public sealed class Context : IDisposable
             ReportDepth = reportDepth ?? depth,
             Matrix = matrix,
             MatrixDepth = matrixDepth ?? depth,
+            MatrixTitles = matrixTitles,
             JustificationsFile = justificationsFile,
             JustificationsDepth = justificationsDepth ?? depth
         };

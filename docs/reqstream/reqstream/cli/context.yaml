@@ -166,6 +166,16 @@ sections:
                 tests:
                   - Context_Create_MatrixDepth_SetsMatrixDepthProperty
 
+              - id: ReqStream-Command-MatrixTitles
+                title: The tool shall accept a `--matrix-titles` flag to include requirement titles as a column in the trace
+                  matrix.
+                justification: |
+                  An opt-in title column lets readers identify requirements by their title text directly
+                  from the trace matrix without cross-referencing the requirements report.
+                tags: [cli]
+                tests:
+                  - Context_Create_MatrixTitlesFlag_SetsMatrixTitlesProperty
+
               - id: ReqStream-Command-Depth
                 title: The tool shall support a default markdown header depth that applies to all reports.
                 justification: |

@@ -292,7 +292,8 @@ public static class Validation
                 if (exitCode == 0 && File.Exists(matrixFile))
                 {
                     var matrixContent = File.ReadAllText(matrixFile);
-                    if (matrixContent.Contains("MTX-001") && matrixContent.Contains("Test_Matrix_Validation"))
+                    var normalizedMatrixContent = matrixContent.Replace("\u200B", string.Empty);
+                    if (normalizedMatrixContent.Contains("MTX-001") && normalizedMatrixContent.Contains("Test_Matrix_Validation"))
                     {
                         test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
                         context.WriteLine("✓ ReqStream_TraceMatrix - Passed");

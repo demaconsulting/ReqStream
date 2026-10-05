@@ -149,6 +149,17 @@ sections:
                 tests:
                   - TraceMatrix_Export_WithCustomDepth_UsesCorrectHeaderLevel
 
+              - id: ReqStream-Report-TraceMatrixTitles
+                title: The tool shall support including requirement titles as an optional column in the trace matrix Requirements
+                  table.
+                justification: |
+                  An opt-in title column lets readers identify requirements by their title text directly
+                  from the trace matrix without cross-referencing the requirements report.
+                tags: [reporting]
+                tests:
+                  - TraceMatrix_Export_WithIncludeTitlesTrue_AddsTitleColumn
+                  - TraceMatrix_Export_WithIncludeTitlesFalse_OmitsTitleColumn
+
               - id: ReqStream-Report-TagFiltering
                 title: The tool shall support filtering trace matrix output by requirement tags.
                 justification: |

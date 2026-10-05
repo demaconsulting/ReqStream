@@ -52,6 +52,9 @@ not specified.
 
 **`MatrixDepth`**: `int` — Heading depth for trace matrix report; defaults to `Depth`.
 
+**`MatrixTitles`**: `bool` — `true` when `--matrix-titles` was specified; when `true`, the trace
+matrix Requirements table includes an additional "Title" column.
+
 **`JustificationsFile`**: `string?` — Destination path for justifications report
 (`--justifications`).
 

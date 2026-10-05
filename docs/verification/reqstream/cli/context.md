@@ -40,6 +40,7 @@ flags set the corresponding properties. This scenario is tested by
 `Context_Create_ResultsFlag_SetsResultsFileProperty`, `Context_Create_ResultFlag_SetsResultsFileProperty`,
 `Context_Create_ReportFile_SetsReportProperty`, `Context_Create_MissingReportFilename_ThrowsException`,
 `Context_Create_MatrixFile_SetsMatrixProperty`, `Context_Create_MissingMatrixFilename_ThrowsException`,
+`Context_Create_MatrixTitlesFlag_SetsMatrixTitlesProperty`,
 `Context_Create_JustificationsFile_SetsJustificationsFileProperty`, and
 `Context_Create_MissingJustificationsFilename_ThrowsException`.
 
@@ -138,6 +139,7 @@ coverage:
 | `ReqStream-Command-Report` | Results and Report Flags Scenario | `Context_Create_MissingReportFilename_ThrowsException` |
 | `ReqStream-Command-Matrix` | Results and Report Flags Scenario | `Context_Create_MatrixFile_SetsMatrixProperty` |
 | `ReqStream-Command-Matrix` | Results and Report Flags Scenario | `Context_Create_MissingMatrixFilename_ThrowsException` |
+| `ReqStream-Command-MatrixTitles` | Results and Report Flags Scenario | `Context_Create_MatrixTitlesFlag_SetsMatrixTitlesProperty` |
 | `ReqStream-Command-Justifications` | Results and Report Flags Scenario | `Context_Create_JustificationsFile_SetsJustificationsFileProperty` |
 | `ReqStream-Command-Justifications` | Results and Report Flags Scenario | `Context_Create_MissingJustificationsFilename_ThrowsException` |
 | `ReqStream-Command-JustificationsDepth` | Depth Flags Scenario | `Context_Create_JustificationsDepth_SetsJustificationsDepthProperty` |

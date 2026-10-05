@@ -78,13 +78,25 @@ case-insensitively against each `TestExecution.FileBaseName` for source-specific
 - *Preconditions*: None.
 - *Postconditions*: None (read-only).
 
-**Export(filePath, depth, filterTags)**: Writes the trace matrix to a Markdown file with three
-sections: Summary, Requirements, and Testing.
+**Export(filePath, depth, filterTags, includeTitles)**: Writes the trace matrix to a Markdown
+file with three sections: Summary, Requirements, and Testing.
 
-- *Parameters*: `string filePath`; `int depth` (minimum value: 1); `HashSet<string>? filterTags`.
+- *Parameters*: `string filePath`; `int depth` (minimum value: 1); `HashSet<string>? filterTags`;
+  `bool includeTitles` (default: `false`).
 - *Returns*: `void`.
 - *Preconditions*: `filePath` must not be null or empty; `depth` must be at least 1.
 - *Postconditions*: Markdown file written.
+- *Note — Title column*: When `includeTitles` is `true`, the Requirements table gains an
+  additional "Title" column (between ID and Tests Linked) showing each requirement's
+  `Title` value. When `false` (the default), the table is emitted with its original column
+  structure unchanged.
+- *Note — soft-break insertion*: `Export` applies the private `InsertSoftBreaks` helper, which
+  inserts a zero-width space (`'\u200B'`) immediately after every `-` and `_` character, to
+  `requirement.Id` in the Requirements table and to `testName`/`reqId` in the Testing table
+  unconditionally (regardless of `includeTitles`), and to `requirement.Title` only when
+  `includeTitles` is `true`. This gives Markdown renderers a valid line-break opportunity for
+  long identifier-like values that would otherwise cause the rendered table to overflow the
+  page width, without altering the visible text.
 - *Note — Summary vs. Requirements asymmetry*: The **Summary** section counts satisfied
   requirements by calling `CalculateSatisfiedRequirements`, which delegates to
   `IsRequirementSatisfied`. That method recurses through the full descendant subtree via

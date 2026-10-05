@@ -102,6 +102,7 @@ public sealed class ProgramTests : IDisposable
         Assert.Contains("Copyright", outputText);
         Assert.Contains("Usage:", outputText);
         Assert.Contains("Options:", outputText);
+        Assert.Contains("--matrix-titles", outputText);
     }
 
     /// <summary>
@@ -358,7 +359,7 @@ sections:
 
             var matrixContent = File.ReadAllText(matrixFile);
             Assert.Contains("Summary", matrixContent);
-            Assert.Contains("REQ-001", matrixContent);
+            Assert.Contains("REQ-\u200B001", matrixContent);
         }
         finally
         {

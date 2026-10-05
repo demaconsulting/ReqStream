@@ -33,6 +33,7 @@ sections:
               - ReqStream-Command-ReportDepth
               - ReqStream-Command-Matrix
               - ReqStream-Command-MatrixDepth
+              - ReqStream-Command-MatrixTitles
               - ReqStream-Command-Justifications
               - ReqStream-Command-JustificationsDepth
               - ReqStream-Command-Depth
