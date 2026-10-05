@@ -856,4 +856,39 @@ sections:
         Assert.Contains("| AUTH-\u200B001 |", content);
         Assert.Contains("Test_\u200BCredentials_\u200BInvalid", content);
     }
+
+    /// <summary>
+    ///     Test that a requirement title containing a literal pipe (<c>|</c>) character is
+    ///     escaped as <c>\|</c> in the exported Title column, so it does not corrupt the
+    ///     Markdown pipe-table structure.
+    /// </summary>
+    [Fact]
+    public void TraceMatrix_Export_TitleWithPipeCharacter_EscapesPipeInTitleColumn()
+    {
+        // Arrange:
+        var reqYaml = @"---
+sections:
+  - title: ""User Authentication""
+    requirements:
+      - id: ""AUTH-001""
+        title: ""Validate user credentials | check password strength""
+        tests:
+          - ""Test_Credentials_Valid""
+";
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var loadResult = Requirements.Load(reqPath);
+        Assert.NotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
+
+        // Act:
+        var matrix = new TraceMatrix(requirements);
+        var mdPath = _testDirectory.GetFilePath("tracematrix.md");
+        matrix.Export(mdPath, includeTitles: true);
+
+        // Assert: literal pipe escaped so the row still has exactly the expected number of columns
+        var content = File.ReadAllText(mdPath);
+        Assert.Contains("Validate user credentials \\| check password strength", content);
+        Assert.DoesNotContain("Validate user credentials | check password strength", content);
+    }
 }

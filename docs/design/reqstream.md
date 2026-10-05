@@ -78,7 +78,7 @@ to produce output.
 - *Role*: Consumer (the user provides arguments to the system).
 - *Contract*: Defined flag set (`--version`/`-v`, `--help`/`-h`/`-?`, `--silent`, `--validate`,
   `--lint`, `--enforce`, `--requirements`, `--tests`, `--report`, `--matrix`, `--justifications`,
-  `--filter`, `--root-tags`, `--depth`, `--report-depth`, `--matrix-depth`,
+  `--filter`, `--root-tags`, `--depth`, `--report-depth`, `--matrix-depth`, `--matrix-titles`,
   `--justifications-depth`, `--results`/`--result`, `--log`); unknown flags cause
   `ArgumentException`.
 - *Constraints*: No interactive prompts; all information must be on the command line.

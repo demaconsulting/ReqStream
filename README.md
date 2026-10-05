@@ -103,6 +103,7 @@ Options:
   --tests <pattern>                Test result files glob pattern (TRX or JUnit)
   --matrix <file>                  Export trace matrix to markdown file
   --matrix-depth <depth>           Markdown header depth for trace matrix (overrides --depth)
+  --matrix-titles                  Include requirement titles as a column in the trace matrix
   --justifications <file>          Export requirement justifications to markdown file
   --justifications-depth <depth>   Markdown header depth for justifications (overrides --depth)
   --filter <tags>                  Comma-separated list of tags to filter requirements

@@ -64,7 +64,8 @@ non-lint) run.
 - If `context.JustificationsFile` is set, `requirements.ExportJustifications` is called to
   produce the justifications report before the trace matrix is constructed.
 - Constructs a `TraceMatrix` if `context.TestFiles` is non-empty; exports the matrix if
-  `context.Matrix` is set.
+  `context.Matrix` is set, passing `context.MatrixTitles` through to `TraceMatrix.Export` so the
+  requirement-title column is included when `--matrix-titles` was specified.
 - If `context.Matrix` is set and `context.TestFiles` is empty, writes an error via
   `context.WriteError` and returns without constructing a `TraceMatrix`.
 - Computes the merged root-tag set (`requirements.RootTags` combined with `context.RootTags`).

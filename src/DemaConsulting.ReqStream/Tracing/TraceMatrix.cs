@@ -589,7 +589,7 @@ public class TraceMatrix
             {
                 var (testsLinked, passed, failed, notExecuted) = GetRequirementTestStats(requirement);
                 var id = InsertSoftBreaks(requirement.Id);
-                var titleCell = includeTitles ? $"{InsertSoftBreaks(requirement.Title)} | " : string.Empty;
+                var titleCell = includeTitles ? $"{InsertSoftBreaks(EscapeTableCell(requirement.Title))} | " : string.Empty;
                 writer.WriteLine($"| {id} | {titleCell}{testsLinked} | {passed} | {failed} | {notExecuted} |");
             }
 
@@ -633,6 +633,24 @@ public class TraceMatrix
         }
 
         return builder.ToString();
+    }
+
+    /// <summary>
+    ///     Escapes literal pipe (<c>|</c>) characters in free-form text so it can be safely
+    ///     embedded in a Markdown pipe-table cell.
+    /// </summary>
+    /// <remarks>
+    ///     Unlike requirement IDs and test names (which are identifier-like and never contain
+    ///     pipes), requirement titles are free-form human-authored text and may legitimately
+    ///     contain a <c>|</c> character. An unescaped pipe would be interpreted as a column
+    ///     separator by Pandoc/Markdown renderers, corrupting the table. Escaping as <c>\|</c>
+    ///     is the standard Markdown pipe-table escape sequence.
+    /// </remarks>
+    /// <param name="text">The text to process. May be <c>null</c> or empty.</param>
+    /// <returns>The text with literal pipe characters escaped as <c>\|</c>.</returns>
+    private static string EscapeTableCell(string? text)
+    {
+        return string.IsNullOrEmpty(text) ? string.Empty : text.Replace("|", "\\|");
     }
 
     /// <summary>
