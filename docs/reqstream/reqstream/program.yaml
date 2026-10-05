@@ -57,6 +57,7 @@ sections:
               - Program_Run_WithRequirementsFiles_ProcessesSuccessfully
               - Program_Run_WithRequirementsExport_GeneratesReport
               - Program_Run_WithTraceMatrixExport_GeneratesMatrix
+              - Program_Run_WithMatrixTitlesFlag_IncludesTitleColumn
               - Program_Run_WithJustificationsExport_GeneratesJustificationsReport
 
           - id: ReqStream-Program-Enforce

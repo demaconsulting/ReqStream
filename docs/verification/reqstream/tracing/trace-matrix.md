@@ -62,8 +62,16 @@ This scenario is tested by `TraceMatrix_Export_SimpleTraceMatrix_CreatesMarkdown
 `TraceMatrix_GetUnsatisfiedRequirements_WithFilterTags_ReturnsOnlyMatchingRequirements`,
 `TraceMatrix_Export_WithIncludeTitlesFalse_OmitsTitleColumn`,
 `TraceMatrix_Export_WithIncludeTitlesTrue_AddsTitleColumn`,
-`TraceMatrix_Export_IdentifierWithHyphensAndUnderscores_InsertsSoftBreaks`, and
-`TraceMatrix_Export_TitleWithHyphensAndUnderscores_InsertsSoftBreaksInTitleColumn`.
+`TraceMatrix_Export_IdentifierWithHyphensAndUnderscores_InsertsSoftBreaks`,
+`TraceMatrix_Export_TitleWithHyphensAndUnderscores_InsertsSoftBreaksInTitleColumn`,
+`TraceMatrix_Export_TitleWithPipeCharacter_EscapesPipeInTitleColumn`, which asserts a literal
+pipe character in a requirement title is escaped so it does not corrupt the Title column;
+`TraceMatrix_Export_TitleWithEmbeddedLineBreaks_NormalizesToSingleLineCell`, which asserts an
+embedded line break in a requirement title is normalized to a single space so the Markdown
+table row is not split across multiple lines; and
+`TraceMatrix_Export_TitleWithLiteralBackslashPipe_EscapesBackslashBeforePipe`, which asserts a
+literal backslash-then-pipe sequence in a requirement title is escaped with the backslash
+doubled before the pipe is escaped, so the original sequence round-trips correctly.
 
 #### Requirements Coverage
 

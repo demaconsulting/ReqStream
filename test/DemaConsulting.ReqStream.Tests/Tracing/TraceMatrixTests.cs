@@ -790,7 +790,7 @@ sections:
         // Act:
         var matrix = new TraceMatrix(requirements);
         var mdPath = _testDirectory.GetFilePath("tracematrix.md");
-        matrix.Export(mdPath, includeTitles: true);
+        matrix.Export(mdPath, 1, null, includeTitles: true);
 
         // Assert: zero-width space (U+200B) inserted after every hyphen/underscore in the Title column
         var content = File.ReadAllText(mdPath);

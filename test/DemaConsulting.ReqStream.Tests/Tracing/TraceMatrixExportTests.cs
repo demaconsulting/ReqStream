@@ -814,7 +814,7 @@ sections:
         // Act:
         var matrix = new TraceMatrix(requirements);
         var mdPath = _testDirectory.GetFilePath("tracematrix.md");
-        matrix.Export(mdPath, includeTitles: true);
+        matrix.Export(mdPath, 1, null, includeTitles: true);
 
         // Assert:
         var content = File.ReadAllText(mdPath);
@@ -884,11 +884,84 @@ sections:
         // Act:
         var matrix = new TraceMatrix(requirements);
         var mdPath = _testDirectory.GetFilePath("tracematrix.md");
-        matrix.Export(mdPath, includeTitles: true);
+        matrix.Export(mdPath, 1, null, includeTitles: true);
 
         // Assert: literal pipe escaped so the row still has exactly the expected number of columns
         var content = File.ReadAllText(mdPath);
         Assert.Contains("Validate user credentials \\| check password strength", content);
         Assert.DoesNotContain("Validate user credentials | check password strength", content);
+    }
+
+    /// <summary>
+    ///     Test that a requirement title containing embedded line breaks (for example from a
+    ///     YAML block-scalar) is normalized to a single line in the exported Title column, so
+    ///     it does not split the Markdown table row across multiple lines.
+    /// </summary>
+    [Fact]
+    public void TraceMatrix_Export_TitleWithEmbeddedLineBreaks_NormalizesToSingleLineCell()
+    {
+        // Arrange:
+        var reqYaml = "---\n" +
+                      "sections:\n" +
+                      "  - title: \"User Authentication\"\n" +
+                      "    requirements:\n" +
+                      "      - id: \"AUTH-001\"\n" +
+                      "        title: |\n" +
+                      "          Line one\n" +
+                      "          Line two\n" +
+                      "        tests:\n" +
+                      "          - \"Test_Credentials_Valid\"\n";
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var loadResult = Requirements.Load(reqPath);
+        Assert.NotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
+
+        // Act:
+        var matrix = new TraceMatrix(requirements);
+        var mdPath = _testDirectory.GetFilePath("tracematrix.md");
+        matrix.Export(mdPath, 1, null, includeTitles: true);
+
+        // Assert: embedded line break normalized to a single space, keeping the row on one line
+        var content = File.ReadAllText(mdPath);
+        Assert.DoesNotContain("\n  Line two", content);
+        var lines = content.Replace("\r\n", "\n").Split('\n');
+        Assert.Contains(lines, line => line.Contains("Line one") && line.Contains("Line two"));
+    }
+
+    /// <summary>
+    ///     Test that a requirement title containing a literal backslash-then-pipe (<c>\|</c>)
+    ///     sequence is escaped with the backslash doubled before the pipe is escaped, so the
+    ///     original literal sequence round-trips correctly as <c>\\\|</c>.
+    /// </summary>
+    [Fact]
+    public void TraceMatrix_Export_TitleWithLiteralBackslashPipe_EscapesBackslashBeforePipe()
+    {
+        // Arrange:
+        var reqYaml = @"---
+sections:
+  - title: ""User Authentication""
+    requirements:
+      - id: ""AUTH-001""
+        title: ""Escape sequence \\| literal""
+        tests:
+          - ""Test_Credentials_Valid""
+";
+        var reqPath = _testDirectory.GetFilePath("requirements.yaml");
+        File.WriteAllText(reqPath, reqYaml);
+        var loadResult = Requirements.Load(reqPath);
+        Assert.NotNull(loadResult.Requirements);
+        var requirements = loadResult.Requirements;
+
+        // Act:
+        var matrix = new TraceMatrix(requirements);
+        var mdPath = _testDirectory.GetFilePath("tracematrix.md");
+        matrix.Export(mdPath, 1, null, includeTitles: true);
+
+        // Assert: backslash doubled before pipe escaping yields the correct round-trip
+        // (3 backslashes + pipe), not the incorrect pipe-escaped-only form (2 backslashes + pipe)
+        var content = File.ReadAllText(mdPath);
+        Assert.Contains("Escape sequence \\\\\\| literal", content);
+        Assert.DoesNotContain("Escape sequence \\\\| literal", content);
     }
 }
