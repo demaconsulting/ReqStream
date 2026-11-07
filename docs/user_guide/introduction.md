@@ -12,7 +12,7 @@ generate compliance evidence automatically on every CI run as part of the
 
 The following diagram shows how ReqStream turns requirements and test results into reports:
 
-![ReqStream architecture: the Cli subsystem drives Utilities, SelfTest, Modeling and Tracing, turning requirements
+![ReqStream architecture: the Program entry point uses Cli, Utilities, SelfTest, Modeling and Tracing to turn requirements
 YAML and test results into reports, a trace matrix and an enforcement exit code.](architecture.svg)
 
 ReqStream offers the following capabilities:

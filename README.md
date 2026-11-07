@@ -14,7 +14,7 @@
 ReqStream is a .NET command-line tool for managing software requirements in YAML format,
 providing validation, linting, traceability, and test-mapping capabilities.
 
-![ReqStream architecture: requirements YAML and test results flow through Cli, Modeling and Tracing into reports][architecture]
+![ReqStream architecture: requirements YAML and test results flow through Program, Modeling and Tracing into reports][architecture]
 
 ## Features
 
