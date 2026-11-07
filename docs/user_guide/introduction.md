@@ -10,6 +10,11 @@ version control. It provides validation, linting, traceability, and test-mapping
 generate compliance evidence automatically on every CI run as part of the
 [Continuous Compliance][continuous-compliance] methodology by DEMA Consulting.
 
+The following diagram shows how ReqStream turns requirements and test results into reports:
+
+![ReqStream architecture: the Program entry point uses Cli, Utilities, SelfTest, Modeling and Tracing to turn requirements
+YAML and test results into reports, a trace matrix and an enforcement exit code.](architecture.svg)
+
 ReqStream offers the following capabilities:
 
 - **YAML Format** — manage requirements in human-readable YAML format that integrates with source control and

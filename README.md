@@ -14,6 +14,8 @@
 ReqStream is a .NET command-line tool for managing software requirements in YAML format,
 providing validation, linting, traceability, and test-mapping capabilities.
 
+![ReqStream architecture: requirements YAML and test results flow through Program, Modeling and Tracing into reports][architecture]
+
 ## Features
 
 - 📝 **YAML Format** - Manage requirements in human-readable YAML format
@@ -600,5 +602,6 @@ For information about reporting security vulnerabilities, please see our [Securi
 [mstest]: https://github.com/microsoft/testfx
 [github-actions]: https://github.com/features/actions
 [sonarcloud]: https://sonarcloud.io
+[architecture]: https://raw.githubusercontent.com/demaconsulting/ReqStream/main/docs/images/architecture.png
 [link-guide]: https://github.com/demaconsulting/ReqStream/releases
 [link-continuous-compliance]: https://github.com/demaconsulting/ContinuousCompliance
