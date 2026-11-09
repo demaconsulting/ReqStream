@@ -560,7 +560,7 @@ By contributing to this project, you agree that your contributions will be licen
 - [Report a bug or request a feature][issues]
 - [Ask a question or start a discussion][discussions]
 
-## Acknowledgements
+## Acknowledgments
 
 ReqStream is built with the help of these amazing open-source projects:
 

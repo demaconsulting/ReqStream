@@ -366,7 +366,7 @@ internal static class Program
     ///     passing test, and (independently) that no requirement is orphaned when root tags are
     ///     configured. Separated from <see cref="ProcessRequirements"/> to keep enforcement
     ///     logic isolated and to allow all reports to be generated before a coverage failure
-    ///     is signalled.
+    ///     is signaled.
     /// </summary>
     /// <param name="context">The context for output.</param>
     /// <param name="traceMatrix">The trace matrix containing test results, or null if no tests were provided.</param>

@@ -1,11 +1,16 @@
 package ReqStream {
+    private import SoftwareItemMetadata::*;
+
     part def TemporaryDirectory {
         doc /* Disposable temporary directory for isolated file-system workspaces. */
 
-        comment sourceRef /* Source: src/DemaConsulting.ReqStream/Utilities/TemporaryDirectory.cs */
-        comment testRef /* Test: test/DemaConsulting.ReqStream.Tests/Utilities/TemporaryDirectoryTests.cs */
-        comment designRef /* Design: docs/design/reqstream/utilities/temporary-directory.md */
-        comment verificationRef /* Verification: docs/verification/reqstream/utilities/temporary-directory.md */
-        comment reqRef /* Requirements: docs/reqstream/reqstream/utilities/temporary-directory.yaml */
+        metadata info : SoftwareInfo {
+            description = "Disposable temporary directory for isolated file-system workspaces.";
+            sourceFiles = ("src/DemaConsulting.ReqStream/Utilities/TemporaryDirectory.cs");
+            testFiles = ("test/DemaConsulting.ReqStream.Tests/Utilities/TemporaryDirectoryTests.cs");
+            designFiles = ("docs/design/reqstream/utilities/temporary-directory.md");
+            verificationFiles = ("docs/verification/reqstream/utilities/temporary-directory.md");
+            requirementFiles = ("docs/reqstream/reqstream/utilities/temporary-directory.yaml");
+        }
     }
 }

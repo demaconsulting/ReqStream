@@ -77,7 +77,7 @@ non-lint) run.
   `TraceMatrix` (if any) and the orphan-detection result/root-tag set.
 
 **EnforceRequirementsCoverage** (private): Evaluates two independent compliance checks and
-never throws; all failure signalling goes through `context.WriteError`.
+never throws; all failure signaling goes through `context.WriteError`.
 
 - *Phase 1 — test coverage*: unchanged from prior behavior. Applies only when a `TraceMatrix`
   was constructed (i.e. `context.TestFiles` is non-empty); reports each unsatisfied requirement.
