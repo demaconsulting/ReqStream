@@ -6,7 +6,8 @@ and renders its declared views to SVG diagrams consumed by the design documentat
 ### Purpose
 
 SysML2Tools provides the toolchain that keeps ReqStream's architecture model
-(`docs/sysml2/model/**/*.sysml`) and its declared views (`docs/sysml2/views/design-views.sysml`)
+(`docs/sysml2/model/**/*.sysml`, plus the shared metadata definitions in
+`docs/sysml2/common/**/*.sysml`) and its declared views (`docs/sysml2/views/design-views.sysml`)
 consistent with the design documentation. It validates the model for syntax and reference errors,
 and renders each declared view to an SVG diagram embedded directly in the corresponding design
 document (for example `docs/design/introduction.md` embeds `SoftwareStructureView.svg`). AI agents
