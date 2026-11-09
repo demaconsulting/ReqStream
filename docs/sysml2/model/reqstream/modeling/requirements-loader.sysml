@@ -1,11 +1,16 @@
 package ReqStream {
+    private import SoftwareItemMetadata::*;
+
     part def RequirementsLoader {
         doc /* YAML deserializer and lint validator for requirements files. */
 
-        comment sourceRef /* Source: src/DemaConsulting.ReqStream/Modeling/RequirementsLoader.cs */
-        comment testRef /* Test: test/DemaConsulting.ReqStream.Tests/Modeling/RequirementsLoaderTests.cs */
-        comment designRef /* Design: docs/design/reqstream/modeling/requirements-loader.md */
-        comment verificationRef /* Verification: docs/verification/reqstream/modeling/requirements-loader.md */
-        comment reqRef /* Requirements: docs/reqstream/reqstream/modeling/requirements-loader.yaml */
+        metadata info : SoftwareInfo {
+            description = "YAML deserializer and lint validator for requirements files.";
+            sourceFiles = ("src/DemaConsulting.ReqStream/Modeling/RequirementsLoader.cs");
+            testFiles = ("test/DemaConsulting.ReqStream.Tests/Modeling/RequirementsLoaderTests.cs");
+            designFiles = ("docs/design/reqstream/modeling/requirements-loader.md");
+            verificationFiles = ("docs/verification/reqstream/modeling/requirements-loader.md");
+            requirementFiles = ("docs/reqstream/reqstream/modeling/requirements-loader.yaml");
+        }
     }
 }

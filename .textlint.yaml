@@ -1,5 +1,5 @@
 ---
-# Spell-Checking
+# Spell-Checking with TextLint
 #
 # PURPOSE:
 # - Maintain professional documentation and code quality
@@ -13,46 +13,43 @@ version: '0.2'
 
 language: en
 
+# The files to spell-check
+files:
+  - "**/*.{md,yaml,yml,json,cs,cpp,hpp,h,txt}"
+# Matches the previous spell checker, which also checks hidden paths such as .github/
+enableGlobDot: true
+
 # Project-specific technical terms and tool names
 words:
-  - buildmark
-  - canvasnet
-  - DEMA
-  - Dema
-  - demaconsulting
-  - fileassert
-  - hotspot
-  - hotspots
-  - mstest
-  - pandoc
-  - Pandoc
-  - reqstream
-  - reviewmark
-  - SARIF
-  - Sarif
-  - sarifmark
-  - sonarmark
-  - sysml
-  - sysml2tools
-  - testname
-  - testresults
-  - tracematrix
-  - xunit
-  - Xunit
   - APFS
   - callees
-  - NTFS
-  - Postconditions
+  - consoleloggerparameters
+  - dema
+  - Dema
+  - DEMA
+  - demaconsulting
+  - DEMACONSULTINGNUGETKEY
+  - ncipollo
+  - nestings
+  - netstandard
   - RAII
+  - retag
+  - SARIF
+  - sarif
+  - Sarif
+  - shopt
+  - slnx
+  - snupkg
+  - sonarscanner
+  - testname
+  - thirdparty
+  - tracematrix
+  - unidirectionality
   - unloadable
   - unparseable
-  - Unwritable
   - venv
-  - versionmark
-  - Weasy
-  - weasyprint
-  - yamlfix
   - yamldotnet
+  - yamlfix
 
 ignorePaths:
   - '**/.git/**'
@@ -61,8 +58,8 @@ ignorePaths:
   - '**/thirdparty/**'
   - '**/third-party/**'
   - '**/3rd-party/**'
+  - '**/generated/**'
   - '**/.agent-logs/**'
   - '**/bin/**'
   - '**/obj/**'
-  - '**/generated/**'
   - package-lock.json

@@ -1,11 +1,16 @@
 package ReqStream {
+    private import SoftwareItemMetadata::*;
+
     part def Program {
         doc /* Entry point, execution orchestrator, and orphan-check reporting/enforcement. */
 
-        comment sourceRef /* Source: src/DemaConsulting.ReqStream/Program.cs */
-        comment testRef /* Test: test/DemaConsulting.ReqStream.Tests/ProgramTests.cs */
-        comment designRef /* Design: docs/design/reqstream/program.md */
-        comment verificationRef /* Verification: docs/verification/reqstream/program.md */
-        comment reqRef /* Requirements: docs/reqstream/reqstream/program.yaml */
+        metadata info : SoftwareInfo {
+            description = "Entry point, execution orchestrator, and orphan-check reporting/enforcement.";
+            sourceFiles = ("src/DemaConsulting.ReqStream/Program.cs");
+            testFiles = ("test/DemaConsulting.ReqStream.Tests/ProgramTests.cs");
+            designFiles = ("docs/design/reqstream/program.md");
+            verificationFiles = ("docs/verification/reqstream/program.md");
+            requirementFiles = ("docs/reqstream/reqstream/program.yaml");
+        }
     }
 }

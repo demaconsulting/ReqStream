@@ -1,11 +1,16 @@
 package ReqStream {
+    private import SoftwareItemMetadata::*;
+
     part def Context {
         doc /* Command-line argument parser, root-tag configuration, and I/O owner. */
 
-        comment sourceRef /* Source: src/DemaConsulting.ReqStream/Cli/Context.cs */
-        comment testRef /* Test: test/DemaConsulting.ReqStream.Tests/Cli/ContextTests.cs */
-        comment designRef /* Design: docs/design/reqstream/cli/context.md */
-        comment verificationRef /* Verification: docs/verification/reqstream/cli/context.md */
-        comment reqRef /* Requirements: docs/reqstream/reqstream/cli/context.yaml */
+        metadata info : SoftwareInfo {
+            description = "Command-line argument parser, root-tag configuration, and I/O owner.";
+            sourceFiles = ("src/DemaConsulting.ReqStream/Cli/Context.cs");
+            testFiles = ("test/DemaConsulting.ReqStream.Tests/Cli/ContextTests.cs");
+            designFiles = ("docs/design/reqstream/cli/context.md");
+            verificationFiles = ("docs/verification/reqstream/cli/context.md");
+            requirementFiles = ("docs/reqstream/reqstream/cli/context.yaml");
+        }
     }
 }

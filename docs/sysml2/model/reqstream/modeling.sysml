@@ -1,11 +1,16 @@
 package ReqStream {
+    private import SoftwareItemMetadata::*;
+
     part def ModelingSubsystem {
         doc /* Requirements data model, section tree, and YAML load/lint pipeline. */
 
-        comment testRef /* Test: test/DemaConsulting.ReqStream.Tests/Modeling/ModelingTests.cs */
-        comment designRef /* Design: docs/design/reqstream/modeling.md */
-        comment verificationRef /* Verification: docs/verification/reqstream/modeling.md */
-        comment reqRef /* Requirements: docs/reqstream/reqstream/modeling.yaml */
+        metadata info : SoftwareInfo {
+            description = "Requirements data model, section tree, and YAML load/lint pipeline.";
+            testFiles = ("test/DemaConsulting.ReqStream.Tests/Modeling/ModelingTests.cs");
+            designFiles = ("docs/design/reqstream/modeling.md");
+            verificationFiles = ("docs/verification/reqstream/modeling.md");
+            requirementFiles = ("docs/reqstream/reqstream/modeling.yaml");
+        }
 
         part lintIssue : LintIssue;
         part loadResult : LoadResult;

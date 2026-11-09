@@ -1,4 +1,6 @@
 package ReqStream {
+    private import SoftwareItemMetadata::*;
+
     import OtsDependencies::*;
 
     doc
@@ -10,10 +12,13 @@ package ReqStream {
     part def ReqStreamSystem {
         doc /* The ReqStream system as a whole. */
 
-        comment testRef /* Test: test/DemaConsulting.ReqStream.Tests/IntegrationTests.cs */
-        comment designRef /* Design: docs/design/reqstream.md */
-        comment verificationRef /* Verification: docs/verification/reqstream.md */
-        comment reqRef /* Requirements: docs/reqstream/reqstream.yaml */
+        metadata info : SoftwareInfo {
+            description = "The ReqStream system as a whole.";
+            testFiles = ("test/DemaConsulting.ReqStream.Tests/IntegrationTests.cs");
+            designFiles = ("docs/design/reqstream.md");
+            verificationFiles = ("docs/verification/reqstream.md");
+            requirementFiles = ("docs/reqstream/reqstream.yaml");
+        }
 
         part program : Program;
         part cli : CliSubsystem;

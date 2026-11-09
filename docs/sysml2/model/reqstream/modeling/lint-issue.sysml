@@ -1,11 +1,16 @@
 package ReqStream {
+    private import SoftwareItemMetadata::*;
+
     part def LintIssue {
         doc /* Lint issue severity and data model. */
 
-        comment sourceRef /* Source: src/DemaConsulting.ReqStream/Modeling/LintIssue.cs */
-        comment testRef /* Test: test/DemaConsulting.ReqStream.Tests/Modeling/LintIssueTests.cs */
-        comment designRef /* Design: docs/design/reqstream/modeling/lint-issue.md */
-        comment verificationRef /* Verification: docs/verification/reqstream/modeling/lint-issue.md */
-        comment reqRef /* Requirements: docs/reqstream/reqstream/modeling/lint-issue.yaml */
+        metadata info : SoftwareInfo {
+            description = "Lint issue severity and data model.";
+            sourceFiles = ("src/DemaConsulting.ReqStream/Modeling/LintIssue.cs");
+            testFiles = ("test/DemaConsulting.ReqStream.Tests/Modeling/LintIssueTests.cs");
+            designFiles = ("docs/design/reqstream/modeling/lint-issue.md");
+            verificationFiles = ("docs/verification/reqstream/modeling/lint-issue.md");
+            requirementFiles = ("docs/reqstream/reqstream/modeling/lint-issue.yaml");
+        }
     }
 }

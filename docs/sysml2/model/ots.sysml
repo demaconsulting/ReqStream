@@ -1,27 +1,38 @@
 package OtsDependencies {
+    private import SoftwareItemMetadata::*;
+
     doc /* Off-the-shelf (OTS) dependencies used by ReqStream. */
 
     part def YamlDotNet {
         doc /* OTS: YamlDotNet. */
 
-        comment designRef /* Design: docs/design/ots/yamldotnet.md */
-        comment verificationRef /* Verification: docs/verification/ots/yamldotnet.md */
-        comment reqRef /* Requirements: docs/reqstream/ots/yamldotnet.yaml */
+        metadata info : SoftwareInfo {
+            description = "OTS: YamlDotNet.";
+            designFiles = ("docs/design/ots/yamldotnet.md");
+            verificationFiles = ("docs/verification/ots/yamldotnet.md");
+            requirementFiles = ("docs/reqstream/ots/yamldotnet.yaml");
+        }
     }
 
     part def FileSystemGlobbing {
         doc /* OTS: Microsoft.Extensions.FileSystemGlobbing. */
 
-        comment designRef /* Design: docs/design/ots/microsoft-extensions-file-system-globbing.md */
-        comment verificationRef /* Verification: docs/verification/ots/microsoft-extensions-file-system-globbing.md */
-        comment reqRef /* Requirements: docs/reqstream/ots/microsoft-extensions-file-system-globbing.yaml */
+        metadata info : SoftwareInfo {
+            description = "OTS: Microsoft.Extensions.FileSystemGlobbing.";
+            designFiles = ("docs/design/ots/microsoft-extensions-file-system-globbing.md");
+            verificationFiles = ("docs/verification/ots/microsoft-extensions-file-system-globbing.md");
+            requirementFiles = ("docs/reqstream/ots/microsoft-extensions-file-system-globbing.yaml");
+        }
     }
 
     part def TestResults {
         doc /* OTS: DemaConsulting.TestResults. */
 
-        comment designRef /* Design: docs/design/ots/dema-consulting-test-results.md */
-        comment verificationRef /* Verification: docs/verification/ots/dema-consulting-test-results.md */
-        comment reqRef /* Requirements: docs/reqstream/ots/dema-consulting-test-results.yaml */
+        metadata info : SoftwareInfo {
+            description = "OTS: DemaConsulting.TestResults.";
+            designFiles = ("docs/design/ots/dema-consulting-test-results.md");
+            verificationFiles = ("docs/verification/ots/dema-consulting-test-results.md");
+            requirementFiles = ("docs/reqstream/ots/dema-consulting-test-results.yaml");
+        }
     }
 }
