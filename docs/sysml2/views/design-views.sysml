@@ -5,7 +5,8 @@
 // 'render' - is what scopes the rendered diagram content.
 package ReqStream {
     view SoftwareStructureView {
-        expose ReqStream;
+        expose ReqStream::**;
+        render asInterconnectionDiagram;
     }
 
     view ReqStreamView {
