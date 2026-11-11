@@ -5,7 +5,6 @@ package ReqStream {
         doc /* Command-line argument parsing and I/O ownership. */
 
         metadata info : SoftwareInfo {
-            description = "Command-line argument parsing and I/O ownership.";
             testFiles = ("test/DemaConsulting.ReqStream.Tests/Cli/CliTests.cs");
             designFiles = ("docs/design/reqstream/cli.md");
             verificationFiles = ("docs/verification/reqstream/cli.md");

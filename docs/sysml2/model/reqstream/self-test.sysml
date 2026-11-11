@@ -5,7 +5,6 @@ package ReqStream {
         doc /* Self-validation test runner exercised at startup for OTS/BuildMark self-check evidence. */
 
         metadata info : SoftwareInfo {
-            description = "Self-validation test runner exercised at startup for OTS/BuildMark self-check evidence.";
             testFiles = ("test/DemaConsulting.ReqStream.Tests/SelfTest/SelfTestTests.cs");
             designFiles = ("docs/design/reqstream/self-test.md");
             verificationFiles = ("docs/verification/reqstream/self-test.md");

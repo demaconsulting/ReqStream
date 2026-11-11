@@ -5,7 +5,6 @@ package ReqStream {
         doc /* Self-validation test runner. */
 
         metadata info : SoftwareInfo {
-            description = "Self-validation test runner.";
             sourceFiles = ("src/DemaConsulting.ReqStream/SelfTest/Validation.cs");
             testFiles = ("test/DemaConsulting.ReqStream.Tests/SelfTest/ValidationTests.cs");
             designFiles = ("docs/design/reqstream/self-test/validation.md");

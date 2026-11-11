@@ -5,7 +5,6 @@ package ReqStream {
         doc /* Safe path-combination utility with traversal protection. */
 
         metadata info : SoftwareInfo {
-            description = "Safe path-combination utility with traversal protection.";
             sourceFiles = ("src/DemaConsulting.ReqStream/Utilities/PathHelpers.cs");
             testFiles = ("test/DemaConsulting.ReqStream.Tests/Utilities/PathHelpersTests.cs");
             designFiles = ("docs/design/reqstream/utilities/path-helpers.md");
