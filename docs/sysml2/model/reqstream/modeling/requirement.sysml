@@ -5,7 +5,6 @@ package ReqStream {
         doc /* Single requirement with ID, title, and test links. */
 
         metadata info : SoftwareInfo {
-            description = "Single requirement with ID, title, and test links.";
             sourceFiles = ("src/DemaConsulting.ReqStream/Modeling/Requirement.cs");
             testFiles = ("test/DemaConsulting.ReqStream.Tests/Modeling/RequirementTests.cs");
             designFiles = ("docs/design/reqstream/modeling/requirement.md");

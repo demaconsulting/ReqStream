@@ -5,7 +5,6 @@ package ReqStream {
         doc /* Parsed requirements document with section tree, root-tag set, and orphan detection. */
 
         metadata info : SoftwareInfo {
-            description = "Parsed requirements document with section tree, root-tag set, and orphan detection.";
             sourceFiles = ("src/DemaConsulting.ReqStream/Modeling/Requirements.cs");
             testFiles = ("test/DemaConsulting.ReqStream.Tests/Modeling/RequirementsLoadTests.cs");
             designFiles = ("docs/design/reqstream/modeling/requirements.md");

@@ -5,7 +5,6 @@ package ReqStream {
         doc /* Glob-pattern file matching utility. */
 
         metadata info : SoftwareInfo {
-            description = "Glob-pattern file matching utility.";
             sourceFiles = ("src/DemaConsulting.ReqStream/Utilities/GlobMatcher.cs");
             testFiles = ("test/DemaConsulting.ReqStream.Tests/Utilities/GlobMatcherTests.cs");
             designFiles = ("docs/design/reqstream/utilities/glob-matcher.md");

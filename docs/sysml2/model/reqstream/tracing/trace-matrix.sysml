@@ -5,7 +5,6 @@ package ReqStream {
         doc /* Test result loader and requirement-coverage analyzer. */
 
         metadata info : SoftwareInfo {
-            description = "Test result loader and requirement-coverage analyzer.";
             sourceFiles = ("src/DemaConsulting.ReqStream/Tracing/TraceMatrix.cs");
             testFiles = ("test/DemaConsulting.ReqStream.Tests/Tracing/TraceMatrixTests.cs");
             designFiles = ("docs/design/reqstream/tracing/trace-matrix.md");

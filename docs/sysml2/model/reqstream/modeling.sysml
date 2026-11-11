@@ -5,7 +5,6 @@ package ReqStream {
         doc /* Requirements data model, section tree, and YAML load/lint pipeline. */
 
         metadata info : SoftwareInfo {
-            description = "Requirements data model, section tree, and YAML load/lint pipeline.";
             testFiles = ("test/DemaConsulting.ReqStream.Tests/Modeling/ModelingTests.cs");
             designFiles = ("docs/design/reqstream/modeling.md");
             verificationFiles = ("docs/verification/reqstream/modeling.md");

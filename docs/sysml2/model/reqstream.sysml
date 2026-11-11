@@ -13,7 +13,6 @@ package ReqStream {
         doc /* The ReqStream system as a whole. */
 
         metadata info : SoftwareInfo {
-            description = "The ReqStream system as a whole.";
             testFiles = ("test/DemaConsulting.ReqStream.Tests/IntegrationTests.cs");
             designFiles = ("docs/design/reqstream.md");
             verificationFiles = ("docs/verification/reqstream.md");
