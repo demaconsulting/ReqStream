@@ -8,6 +8,7 @@ resource-path:
   - docs/design/reqstream/self-test
   - docs/design/reqstream/tracing
   - docs/design/reqstream/utilities
+  - docs/images
   - docs/template
 
 input-files:

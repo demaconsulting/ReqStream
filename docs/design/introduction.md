@@ -48,6 +48,15 @@ diagram or the prose below.
 
 ![Software Structure](SoftwareStructureView.svg)
 
+The diagram below complements the structure view by showing how data flows at run time:
+requirements YAML and test results pass through the Cli, Modeling, and Tracing subsystems,
+supported by Utilities and SelfTest, to produce the requirements report, justifications,
+trace matrix, and the lint and enforcement exit code.
+
+![ReqStream architecture: requirements YAML and test results flow through the Cli, Modeling,
+and Tracing subsystems, supported by Utilities and SelfTest, into reports, a trace matrix,
+and an exit code](architecture.svg)
+
 ## Folder Layout
 
 ```text

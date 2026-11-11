@@ -32,15 +32,16 @@
 
     <rect x="170" y="318" width="200" height="100" rx="12" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
     <text x="270" y="344" font-size="16" font-weight="600" fill="#4c1d95" text-anchor="middle">Modeling</text>
-    <text x="270" y="366" font-size="12" fill="#5b21b6" text-anchor="middle">Loads and lints YAML,</text>
-    <text x="270" y="382" font-size="12" fill="#5b21b6" text-anchor="middle">merges includes, and</text>
-    <text x="270" y="398" font-size="12" fill="#5b21b6" text-anchor="middle">finds orphans</text>
+    <text x="270" y="366" font-size="12" fill="#5b21b6" text-anchor="middle">Loads and lints YAML, finds</text>
+    <text x="270" y="382" font-size="12" fill="#5b21b6" text-anchor="middle">orphans, writes the report</text>
+    <text x="270" y="398" font-size="12" fill="#5b21b6" text-anchor="middle">and justifications</text>
     <rect x="390" y="318" width="200" height="100" rx="12" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
     <text x="490" y="344" font-size="16" font-weight="600" fill="#4c1d95" text-anchor="middle">Tracing</text>
-    <text x="490" y="366" font-size="12" fill="#5b21b6" text-anchor="middle">Maps TRX and JUnit</text>
-    <text x="490" y="382" font-size="12" fill="#5b21b6" text-anchor="middle">results to requirements</text>
-    <text x="490" y="398" font-size="12" fill="#5b21b6" text-anchor="middle">and checks coverage</text>
+    <text x="490" y="366" font-size="12" fill="#5b21b6" text-anchor="middle">Maps TRX and JUnit results</text>
+    <text x="490" y="382" font-size="12" fill="#5b21b6" text-anchor="middle">to requirements, checks</text>
+    <text x="490" y="398" font-size="12" fill="#5b21b6" text-anchor="middle">coverage, writes the matrix</text>
     <line x1="374" y1="368" x2="386" y2="368" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+    <path d="M270,422 V436 H646" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
 
 
     <text x="60" y="274" font-size="13" font-weight="600" fill="#475569" text-anchor="middle">Inputs</text>

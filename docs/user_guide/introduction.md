@@ -10,10 +10,14 @@ version control. It provides validation, linting, traceability, and test-mapping
 generate compliance evidence automatically on every CI run as part of the
 [Continuous Compliance][continuous-compliance] methodology by DEMA Consulting.
 
-The following diagram shows how ReqStream turns requirements and test results into reports:
+The workflow below shows how ReqStream is used: author requirements YAML with linked tests and root
+tags, run the `reqstream` command locally or in a CI pipeline against your test results, and use the
+resulting requirements report, trace matrix, justifications, and exit code as a CI quality gate,
+compliance evidence, and release documentation.
 
-![ReqStream architecture: the Program entry point uses Cli, Utilities, SelfTest, Modeling and Tracing to turn requirements
-YAML and test results into reports, a trace matrix and an enforcement exit code.](architecture.svg)
+![ReqStream workflow: author requirements YAML with linked tests, run reqstream from the command line or a CI
+pipeline, get a requirements report, trace matrix, justifications, and a pass/fail exit code, then use them as a
+CI quality gate, compliance evidence, release documents, or focused audits](workflow.svg)
 
 ReqStream offers the following capabilities:
 
@@ -21,7 +25,7 @@ ReqStream offers the following capabilities:
   code review workflows
 - **Command-Line Interface** — automate requirement management with CLI tools for use in build systems and
   CI/CD pipelines
-- **Multi-Platform** — works on Windows, Linux, and macOS with .NET 8, 9, and 10
+- **Multi-Platform** — works on Windows, Linux, and macOS with .NET 10 and 11
 - **Hierarchical Structure** — organize requirements with sections and subsections for better organization
 - **Test Mapping** — link requirements to test cases for traceability and verification
 - **Source-Specific Test Matching** — restrict coverage evidence to named result files using `filepart@testname`
@@ -58,7 +62,7 @@ This guide covers the following topics:
 - Requirements enforcement in CI/CD pipelines
 - Frequently asked questions and troubleshooting
 
-Prerequisites: a .NET SDK version 8.0, 9.0, or 10.0 is required. Basic familiarity with command-line tools and
+Prerequisites: a .NET SDK version 10.0 or 11.0 is required. Basic familiarity with command-line tools and
 YAML syntax is helpful.
 
 This guide does not cover the internal implementation of ReqStream or advanced customization beyond the documented
@@ -90,7 +94,7 @@ which ensures compliance evidence is generated automatically on every CI run.
 
 To use ReqStream, you need:
 
-- **[.NET SDK][dotnet-sdk]** version 8.0, 9.0, or 10.0
+- **[.NET SDK][dotnet-sdk]** version 10.0 or 11.0
 - A text editor for creating YAML files (any editor will work, but syntax highlighting for YAML is helpful)
 - Basic familiarity with command-line tools
 - Understanding of YAML syntax (or willingness to learn from examples)
@@ -101,7 +105,7 @@ To verify your .NET installation:
 dotnet --version
 ```
 
-This should display 8.0.x, 9.0.x, or 10.0.x.
+This should display 10.0.x or 11.0.x.
 
 # Installation
 

@@ -231,8 +231,8 @@ Alternative flows:
 
 - **Platform portability** — no platform-specific APIs are used. All runtime dependencies ship as
   portable NuGet packages. The tool functions identically on Windows, Linux, and macOS.
-- **Multi-framework targeting** — the project targets `net8.0`, `net9.0`, and `net10.0`.
-  All language and library features must be available on all three target frameworks.
+- **Multi-framework targeting** — the project targets `net10.0` and `net11.0`.
+  All language and library features must be available on both target frameworks.
 - **Nullable reference types enabled** — the compiler is configured with
   `<Nullable>enable</Nullable>`. All APIs handle null inputs explicitly.
 - **Zero compiler warnings** — the project uses `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>`.

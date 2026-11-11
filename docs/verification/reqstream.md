@@ -11,7 +11,7 @@ tests exercise the actual binary on the actual file system.
 ## Test Environment
 
 System integration tests run in the CI/CD pipeline on all three supported platforms (Windows,
-Linux, and macOS) under all three supported .NET runtimes (.NET 8, .NET 9, .NET 10). Each test
+Linux, and macOS) under both supported .NET runtimes (.NET 10, .NET 11). Each test
 creates a temporary working directory, writes fixture YAML requirements files and TRX/JUnit test
 result files, invokes the tool, and asserts on the exit code, console output, and generated
 report files as appropriate.
@@ -24,8 +24,8 @@ exit with code 0; for scenarios that exercise failure paths, the tool must exit 
 code. Console output and generated file content must match expected patterns where asserted.
 
 The system verification as a whole is complete when every scenario in this chapter passes on all
-three supported platforms (Windows, Linux, macOS) and all three supported .NET runtimes (.NET 8,
-.NET 9, .NET 10), and the Requirements Coverage table shows every system requirement mapped to at
+three supported platforms (Windows, Linux, macOS) and both supported .NET runtimes (.NET 10,
+.NET 11), and the Requirements Coverage table shows every system requirement mapped to at
 least one passing test method.
 
 ## Test Scenarios
@@ -144,17 +144,13 @@ and `ubuntu@ReqStream_HelpDisplay`.
 macOS in the CI pipeline. This scenario is tested by `macos@ReqStream_VersionDisplay` and
 `macos@ReqStream_HelpDisplay`.
 
-**.NET 8 Runtime**: Runtime requirements are verified by running the self-validation tests under
-.NET 8 in the CI pipeline. This scenario is tested by `dotnet8.x@ReqStream_VersionDisplay` and
-`dotnet8.x@ReqStream_HelpDisplay`.
-
-**.NET 9 Runtime**: Runtime requirements are verified by running the self-validation tests under
-.NET 9 in the CI pipeline. This scenario is tested by `dotnet9.x@ReqStream_VersionDisplay` and
-`dotnet9.x@ReqStream_HelpDisplay`.
-
 **.NET 10 Runtime**: Runtime requirements are verified by running the self-validation tests under
 .NET 10 in the CI pipeline. This scenario is tested by `dotnet10.x@ReqStream_VersionDisplay` and
 `dotnet10.x@ReqStream_HelpDisplay`.
+
+**.NET 11 Runtime**: Runtime requirements are verified by running the self-validation tests under
+.NET 11 in the CI pipeline. This scenario is tested by `dotnet11.x@ReqStream_VersionDisplay` and
+`dotnet11.x@ReqStream_HelpDisplay`.
 
 ## Requirements Coverage
 
@@ -176,7 +172,7 @@ macOS in the CI pipeline. This scenario is tested by `macos@ReqStream_VersionDis
 | `ReqStream-System-LogFileOutput` | `ReqStream_System_OutputControl_LogFlag_WritesOutputToFile`, `ReqStream_System_OutputControl_LogFlag_WithoutSilent_WritesOutputToFileAndConsole` |
 | `ReqStream-System-SilentMode` | `ReqStream_System_OutputControl_SilentFlag_SuppressesConsoleOutput` |
 | `ReqStream-System-ReportDepth` | `ReqStream_System_ReportDepth_DepthFlag_GeneratesReportWithCorrectHeadingLevel` |
-| `ReqStream-System-CrossPlatform` | Satisfied by children: `ReqStream-Platform-Windows`, `ReqStream-Platform-Linux`, `ReqStream-Platform-MacOS`, `ReqStream-Platform-Net8`, `ReqStream-Platform-Net9`, `ReqStream-Platform-Net10` |
+| `ReqStream-System-CrossPlatform` | Satisfied by children: `ReqStream-Platform-Windows`, `ReqStream-Platform-Linux`, `ReqStream-Platform-MacOS`, `ReqStream-Platform-Net10`, `ReqStream-Platform-Net11` |
 | `ReqStream-System-FileIncludes` | `ReqStream_System_FileIncludes_RequirementsWithIncludes_LoadsAllRequirements` |
 | `ReqStream-System-SectionMerging` | `ReqStream_System_SectionMerging_TwoFilesWithSameSection_ProducesSingleMergedSection` |
 | `ReqStream-System-CircularIncludeDetection` | `ReqStream_System_CircularIncludeDetection_CircularInclude_ReportsError` |
@@ -187,6 +183,5 @@ macOS in the CI pipeline. This scenario is tested by `macos@ReqStream_VersionDis
 | `ReqStream-Platform-Windows` | `windows@ReqStream_VersionDisplay`, `windows@ReqStream_HelpDisplay` |
 | `ReqStream-Platform-Linux` | `ubuntu@ReqStream_VersionDisplay`, `ubuntu@ReqStream_HelpDisplay` |
 | `ReqStream-Platform-MacOS` | `macos@ReqStream_VersionDisplay`, `macos@ReqStream_HelpDisplay` |
-| `ReqStream-Platform-Net8` | `dotnet8.x@ReqStream_VersionDisplay`, `dotnet8.x@ReqStream_HelpDisplay` |
-| `ReqStream-Platform-Net9` | `dotnet9.x@ReqStream_VersionDisplay`, `dotnet9.x@ReqStream_HelpDisplay` |
 | `ReqStream-Platform-Net10` | `dotnet10.x@ReqStream_VersionDisplay`, `dotnet10.x@ReqStream_HelpDisplay` |
+| `ReqStream-Platform-Net11` | `dotnet11.x@ReqStream_VersionDisplay`, `dotnet11.x@ReqStream_HelpDisplay` |
