@@ -50,40 +50,11 @@ sections:
               - "macos@ReqStream_OrphanDetection"
               - "macos@ReqStream_Lint"
 
-          - id: ReqStream-Platform-Net8
-            title: The tool shall support .NET 8.0 runtime.
-            justification: |
-              .NET 8.0 is an LTS release, providing long-term stability and support for enterprise users.
-            tags: [platform]
-            tests:
-              - "dotnet8.x@ReqStream_RequirementsProcessing"
-              - "dotnet8.x@ReqStream_TraceMatrix"
-              - "dotnet8.x@ReqStream_ReportExport"
-              - "dotnet8.x@ReqStream_TagsFiltering"
-              - "dotnet8.x@ReqStream_EnforcementMode"
-              - "dotnet8.x@ReqStream_OrphanDetection"
-              - "dotnet8.x@ReqStream_Lint"
-
-          - id: ReqStream-Platform-Net9
-            title: The tool shall support .NET 9.0 runtime.
-            justification: |
-              .NET 9.0 support enables users to leverage the latest .NET features and performance
-              improvements.
-            tags: [platform]
-            tests:
-              - "dotnet9.x@ReqStream_RequirementsProcessing"
-              - "dotnet9.x@ReqStream_TraceMatrix"
-              - "dotnet9.x@ReqStream_ReportExport"
-              - "dotnet9.x@ReqStream_TagsFiltering"
-              - "dotnet9.x@ReqStream_EnforcementMode"
-              - "dotnet9.x@ReqStream_OrphanDetection"
-              - "dotnet9.x@ReqStream_Lint"
-
           - id: ReqStream-Platform-Net10
             title: The tool shall support .NET 10.0 runtime.
             justification: |
-              .NET 10.0 support ensures the tool remains compatible with the latest .NET ecosystem and
-              future-proofs the project.
+              .NET 10.0 is a Long-Term Support (LTS) release and the oldest supported .NET runtime,
+              providing long-term stability and support for enterprise users.
             tags: [platform]
             tests:
               - "dotnet10.x@ReqStream_RequirementsProcessing"
@@ -93,3 +64,18 @@ sections:
               - "dotnet10.x@ReqStream_EnforcementMode"
               - "dotnet10.x@ReqStream_OrphanDetection"
               - "dotnet10.x@ReqStream_Lint"
+
+          - id: ReqStream-Platform-Net11
+            title: The tool shall support .NET 11.0 runtime.
+            justification: |
+              .NET 11.0 support enables users to leverage the latest .NET features and performance
+              improvements.
+            tags: [platform]
+            tests:
+              - "dotnet11.x@ReqStream_RequirementsProcessing"
+              - "dotnet11.x@ReqStream_TraceMatrix"
+              - "dotnet11.x@ReqStream_ReportExport"
+              - "dotnet11.x@ReqStream_TagsFiltering"
+              - "dotnet11.x@ReqStream_EnforcementMode"
+              - "dotnet11.x@ReqStream_OrphanDetection"
+              - "dotnet11.x@ReqStream_Lint"

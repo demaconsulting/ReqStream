@@ -5,7 +5,7 @@
 - **description**: A .NET command-line tool for managing software requirements in YAML format,
   providing validation, linting, traceability, and test-mapping capabilities
 - **languages**: C#
-- **technologies**: .NET 8/9/10, YamlDotNet, MSBuild, NuGet
+- **technologies**: .NET 10/11, YamlDotNet, MSBuild, NuGet
 
 # Project Structure
 

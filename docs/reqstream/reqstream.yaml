@@ -255,9 +255,8 @@ sections:
               - ReqStream-Platform-Windows
               - ReqStream-Platform-Linux
               - ReqStream-Platform-MacOS
-              - ReqStream-Platform-Net8
-              - ReqStream-Platform-Net9
               - ReqStream-Platform-Net10
+              - ReqStream-Platform-Net11
 
           - id: ReqStream-System-FileIncludes
             title: >-
