@@ -23,6 +23,7 @@ input-files:
   - docs/design/reqstream/utilities.md
   - docs/design/reqstream/utilities/glob-matcher.md
   - docs/design/reqstream/utilities/path-helpers.md
+  - docs/design/reqstream/utilities/temporary-directory.md
   - docs/design/reqstream/modeling.md
   - docs/design/reqstream/modeling/lint-issue.md
   - docs/design/reqstream/modeling/load-result.md

@@ -10,6 +10,7 @@ input-files:
   - docs/verification/reqstream/utilities.md
   - docs/verification/reqstream/utilities/glob-matcher.md
   - docs/verification/reqstream/utilities/path-helpers.md
+  - docs/verification/reqstream/utilities/temporary-directory.md
   - docs/verification/reqstream/modeling.md
   - docs/verification/reqstream/modeling/lint-issue.md
   - docs/verification/reqstream/modeling/load-result.md
