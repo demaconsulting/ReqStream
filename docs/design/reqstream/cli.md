@@ -21,7 +21,8 @@ The `Cli` subsystem contains the following software unit:
 - *Role*: Provider (other units consume the returned `Context`).
 - *Contract*: Parses CLI flags; expands glob patterns via `GlobMatcher`; returns a fully
   initialized `Context`. Throws `ArgumentException` for invalid arguments.
-- *Constraints*: Must not write to console output channels (`Console.Out` / `Console.Error`); read-only filesystem access for glob pattern expansion is permitted.
+- *Constraints*: Must not write to console output channels (`Console.Out` / `Console.Error`); read-only filesystem
+  access for glob pattern expansion is permitted.
 
 **Context output channels**: `WriteLine`, `WriteError`, and `WriteWarning` methods.
 

@@ -17,7 +17,7 @@ traversal is rejected by the same mechanism used elsewhere in the assembly.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `DirectoryPath` | `string` (read-only property) | Full absolute path to the temporary directory created in the constructor. |
+| `DirectoryPath` | `string` (read-only property) | Absolute path of the temporary directory the constructor creates. |
 
 #### Key Methods
 

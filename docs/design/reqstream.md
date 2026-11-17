@@ -50,7 +50,7 @@ pipeline as part of self-testing; this is the only feedback cycle in the archite
 to produce output.
 
 | Item | Type | Responsibility |
-| ---- | ---- | -------------- |
+| --- | --- | --- |
 | `Program` | Unit | Entry point and top-level dispatch orchestrator |
 | `Cli` | Subsystem | Command-line argument parsing and I/O ownership |
 | `Context` | Unit | Argument parser, output channels, and exit code |

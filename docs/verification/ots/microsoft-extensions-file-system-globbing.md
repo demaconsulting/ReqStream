@@ -29,8 +29,11 @@ returns an empty result rather than throwing an exception. This scenario is test
 
 ### Requirements Coverage
 
-| Requirement | Scenario | Test Method(s) |
-| --- | --- | --- |
-| ReqStream-OTS-FileSystemGlobbing | Absolute Pattern Matching | `GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles` |
-| ReqStream-OTS-FileSystemGlobbing | Relative Pattern Matching | `GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles` |
-| ReqStream-OTS-FileSystemGlobbing | Non-Existent Directory Handling | `GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty` |
+Each entry gives the requirement, its scenario in parentheses, and the test methods that verify it.
+
+- ReqStream-OTS-FileSystemGlobbing (Absolute Pattern Matching):
+  `GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles`
+- ReqStream-OTS-FileSystemGlobbing (Relative Pattern Matching):
+  `GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles`
+- ReqStream-OTS-FileSystemGlobbing (Non-Existent Directory Handling):
+  `GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty`

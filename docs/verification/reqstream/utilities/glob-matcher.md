@@ -67,19 +67,20 @@ silently skipped and non-null patterns are still processed. This scenario is tes
 
 #### Requirements Coverage
 
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-GlobMatcher-RelativePatterns` | `GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles` |
-| `ReqStream-GlobMatcher-AbsolutePatterns` | `GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles` |
-| `ReqStream-GlobMatcher-AbsolutePatterns` | `GlobMatcher_FindMatchingFiles_AbsolutePatternWithDoubleWildcard_MatchesFilesInSubdirectories` |
-| `ReqStream-GlobMatcher-AbsolutePatterns` | `GlobMatcher_FindMatchingFiles_AbsoluteLiteralPath_MatchesSingleFile` |
-| `ReqStream-GlobMatcher-AbsolutePatterns` | `GlobMatcher_SplitAbsolutePattern_WildcardAtTopLevel_SplitsAtRoot` |
-| `ReqStream-GlobMatcher-AbsolutePatterns` | `GlobMatcher_SplitAbsolutePattern_LiteralPath_SplitsAtLastSeparator` |
-| `ReqStream-GlobMatcher-AbsolutePatterns` | `GlobMatcher_SplitAbsolutePattern_DoubleStarWildcard_SplitsBeforeWildcard` |
-| `ReqStream-GlobMatcher-Deduplication` | `GlobMatcher_FindMatchingFiles_MultiplePatterns_DeduplicatesResults` |
-| `ReqStream-GlobMatcher-Deduplication` | `GlobMatcher_FindMatchingFiles_MultiplePatterns_CombinesFromDifferentSources` |
-| `ReqStream-GlobMatcher-AbsolutePaths` | `GlobMatcher_FindMatchingFiles_ReturnsAbsolutePaths` |
-| `ReqStream-GlobMatcher-EmptyResult` | `GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty` |
-| `ReqStream-GlobMatcher-SortOrder` | `GlobMatcher_FindMatchingFiles_MultipleMatches_ReturnsSortedResults` |
-| `ReqStream-GlobMatcher-NullPatterns` | `GlobMatcher_FindMatchingFiles_NullPatterns_ThrowsArgumentNullException` |
-| `ReqStream-GlobMatcher-NullElement` | `GlobMatcher_FindMatchingFiles_NullElementInPatterns_SkipsElement` |
+Each entry gives the requirement and the test methods that verify it.
+
+- `ReqStream-GlobMatcher-RelativePatterns`: `GlobMatcher_FindMatchingFiles_RelativePattern_MatchesFiles`
+- `ReqStream-GlobMatcher-AbsolutePatterns`: `GlobMatcher_FindMatchingFiles_AbsolutePatternWithWildcard_MatchesFiles`
+- `ReqStream-GlobMatcher-AbsolutePatterns`:
+  `GlobMatcher_FindMatchingFiles_AbsolutePatternWithDoubleWildcard_MatchesFilesInSubdirectories`
+- `ReqStream-GlobMatcher-AbsolutePatterns`: `GlobMatcher_FindMatchingFiles_AbsoluteLiteralPath_MatchesSingleFile`
+- `ReqStream-GlobMatcher-AbsolutePatterns`: `GlobMatcher_SplitAbsolutePattern_WildcardAtTopLevel_SplitsAtRoot`
+- `ReqStream-GlobMatcher-AbsolutePatterns`: `GlobMatcher_SplitAbsolutePattern_LiteralPath_SplitsAtLastSeparator`
+- `ReqStream-GlobMatcher-AbsolutePatterns`: `GlobMatcher_SplitAbsolutePattern_DoubleStarWildcard_SplitsBeforeWildcard`
+- `ReqStream-GlobMatcher-Deduplication`: `GlobMatcher_FindMatchingFiles_MultiplePatterns_DeduplicatesResults`
+- `ReqStream-GlobMatcher-Deduplication`: `GlobMatcher_FindMatchingFiles_MultiplePatterns_CombinesFromDifferentSources`
+- `ReqStream-GlobMatcher-AbsolutePaths`: `GlobMatcher_FindMatchingFiles_ReturnsAbsolutePaths`
+- `ReqStream-GlobMatcher-EmptyResult`: `GlobMatcher_FindMatchingFiles_AbsolutePatternNonExistentDirectory_ReturnsEmpty`
+- `ReqStream-GlobMatcher-SortOrder`: `GlobMatcher_FindMatchingFiles_MultipleMatches_ReturnsSortedResults`
+- `ReqStream-GlobMatcher-NullPatterns`: `GlobMatcher_FindMatchingFiles_NullPatterns_ThrowsArgumentNullException`
+- `ReqStream-GlobMatcher-NullElement`: `GlobMatcher_FindMatchingFiles_NullElementInPatterns_SkipsElement`

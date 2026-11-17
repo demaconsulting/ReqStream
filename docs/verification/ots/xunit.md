@@ -36,11 +36,12 @@ correctly. This scenario is tested by `Validation_Run_WithSilentContext_Complete
 
 ### Requirements Coverage
 
-| Requirement | Scenario | Test Method(s) |
-| --- | --- | --- |
-| ReqStream-OTS-XUnit-Execute | Context Argument Parsing | `Context_Create_NoArguments_ReturnsDefaultContext`, `Context_Create_VersionFlag_SetsVersionProperty`, `Context_Create_HelpFlags_SetsHelpProperty` |
-| ReqStream-OTS-XUnit-Execute | Section Parsing | `Section_Load_SimpleRequirement_ParsesCorrectly` |
-| ReqStream-OTS-XUnit-Execute | Requirement Properties | `Requirement_Properties_NewInstance_HasDefaultValues` |
-| ReqStream-OTS-XUnit-Execute | TraceMatrix Construction | `TraceMatrix_Constructor_WithNoFiles_CreatesEmptyMatrix` |
-| ReqStream-OTS-XUnit-Report | Program Execution | `Program_Run_WithVersionFlag_PrintsVersion` |
-| ReqStream-OTS-XUnit-Report | Validation Execution | `Validation_Run_WithSilentContext_CompletesSuccessfully` |
+Each entry gives the requirement, its scenario in parentheses, and the test methods that verify it.
+
+- ReqStream-OTS-XUnit-Execute (Context Argument Parsing): `Context_Create_NoArguments_ReturnsDefaultContext`,
+  `Context_Create_VersionFlag_SetsVersionProperty`, `Context_Create_HelpFlags_SetsHelpProperty`
+- ReqStream-OTS-XUnit-Execute (Section Parsing): `Section_Load_SimpleRequirement_ParsesCorrectly`
+- ReqStream-OTS-XUnit-Execute (Requirement Properties): `Requirement_Properties_NewInstance_HasDefaultValues`
+- ReqStream-OTS-XUnit-Execute (TraceMatrix Construction): `TraceMatrix_Constructor_WithNoFiles_CreatesEmptyMatrix`
+- ReqStream-OTS-XUnit-Report (Program Execution): `Program_Run_WithVersionFlag_PrintsVersion`
+- ReqStream-OTS-XUnit-Report (Validation Execution): `Validation_Run_WithSilentContext_CompletesSuccessfully`

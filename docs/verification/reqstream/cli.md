@@ -51,14 +51,18 @@ comma-separated list is parsed into `RootTags`, and
 
 ### Requirements Coverage
 
-| Requirement ID | Scenario(s) | Test Method(s) |
-| --- | --- | --- |
-| `ReqStream-Cli-Interface` | Interface Scenario | `Cli_Interface_VersionFlag_SetsVersionProperty`, `Cli_Interface_HelpFlag_SetsHelpProperty`, `Cli_Interface_UnknownArgument_ThrowsArgumentException` |
-| `ReqStream-Cli-Output` | Output Scenario | `Cli_Output_SilentFlag_SetsSilentProperty`, `Cli_Output_LogFlag_WritesOutputToLogFile` |
-| `ReqStream-Cli-StderrRouting` | Output Scenario | `Cli_Output_WriteError_WritesToErrorChannel` |
-| `ReqStream-Cli-ExitCodeSignaling` | Output Scenario | `Cli_Output_WriteError_SetsExitCodeToOne` |
-| `ReqStream-Cli-MissingArgumentValue` | Interface Scenario | `Cli_Interface_MissingArgumentValue_ThrowsArgumentException` |
-| `ReqStream-Cli-InvalidDepthValue` | Interface Scenario | `Cli_Interface_InvalidDepthValue_ThrowsArgumentException` |
-| `ReqStream-Cli-LogFileOpenFailure` | Interface Scenario | `Cli_Interface_LogFileOpenFailure_ThrowsArgumentException` |
-| `ReqStream-Cli-DepthInheritance` | Interface Scenario | `Cli_Interface_DepthFlag_SetsDefaultForAllReportDepths` |
-| `ReqStream-Cli-RootTags` | Root Tags Scenario | `Context_Create_RootTagsFlag_ParsesTagsCorrectly`, `Context_Create_MultipleRootTagsArguments_MergesIntoSingleSet` |
+Each entry gives the requirement, its scenario in parentheses, and the test methods that verify it.
+
+- `ReqStream-Cli-Interface` (Interface Scenario): `Cli_Interface_VersionFlag_SetsVersionProperty`,
+  `Cli_Interface_HelpFlag_SetsHelpProperty`, `Cli_Interface_UnknownArgument_ThrowsArgumentException`
+- `ReqStream-Cli-Output` (Output Scenario): `Cli_Output_SilentFlag_SetsSilentProperty`,
+  `Cli_Output_LogFlag_WritesOutputToLogFile`
+- `ReqStream-Cli-StderrRouting` (Output Scenario): `Cli_Output_WriteError_WritesToErrorChannel`
+- `ReqStream-Cli-ExitCodeSignaling` (Output Scenario): `Cli_Output_WriteError_SetsExitCodeToOne`
+- `ReqStream-Cli-MissingArgumentValue` (Interface Scenario):
+  `Cli_Interface_MissingArgumentValue_ThrowsArgumentException`
+- `ReqStream-Cli-InvalidDepthValue` (Interface Scenario): `Cli_Interface_InvalidDepthValue_ThrowsArgumentException`
+- `ReqStream-Cli-LogFileOpenFailure` (Interface Scenario): `Cli_Interface_LogFileOpenFailure_ThrowsArgumentException`
+- `ReqStream-Cli-DepthInheritance` (Interface Scenario): `Cli_Interface_DepthFlag_SetsDefaultForAllReportDepths`
+- `ReqStream-Cli-RootTags` (Root Tags Scenario): `Context_Create_RootTagsFlag_ParsesTagsCorrectly`,
+  `Context_Create_MultipleRootTagsArguments_MergesIntoSingleSet`

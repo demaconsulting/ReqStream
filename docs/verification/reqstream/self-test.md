@@ -37,9 +37,12 @@ internal self-validation test failures occur.
 
 ### Requirements Coverage
 
-| Requirement ID | Scenario(s) | Test Method(s) |
-| --- | --- | --- |
-| `ReqStream-SelfTest-Qualification` | Qualification Scenario | `SelfTest_Qualification_Run_PassesAllTests` |
-| `ReqStream-SelfTest-ResultsOutput` | Results Output Scenario | `SelfTest_ResultsOutput_TrxResultsPath_WritesTrxFile`, `SelfTest_ResultsOutput_XmlResultsPath_WritesJUnitFile` |
-| `ReqStream-SelfTest-FailureReporting-Error` | Failure Reporting Scenario | `SelfTest_FailureReporting_GenuineFailure_SetsExitCode1`, `SelfTest_FailureReporting_WithErrors_SetsExitCode1` |
-| `ReqStream-SelfTest-FailureReporting-ExitCode` | Failure Reporting Scenario | `SelfTest_FailureReporting_GenuineFailure_SetsExitCode1`, `SelfTest_FailureReporting_WithErrors_SetsExitCode1` |
+Each entry gives the requirement, its scenario in parentheses, and the test methods that verify it.
+
+- `ReqStream-SelfTest-Qualification` (Qualification Scenario): `SelfTest_Qualification_Run_PassesAllTests`
+- `ReqStream-SelfTest-ResultsOutput` (Results Output Scenario): `SelfTest_ResultsOutput_TrxResultsPath_WritesTrxFile`,
+  `SelfTest_ResultsOutput_XmlResultsPath_WritesJUnitFile`
+- `ReqStream-SelfTest-FailureReporting-Error` (Failure Reporting Scenario):
+  `SelfTest_FailureReporting_GenuineFailure_SetsExitCode1`, `SelfTest_FailureReporting_WithErrors_SetsExitCode1`
+- `ReqStream-SelfTest-FailureReporting-ExitCode` (Failure Reporting Scenario):
+  `SelfTest_FailureReporting_GenuineFailure_SetsExitCode1`, `SelfTest_FailureReporting_WithErrors_SetsExitCode1`

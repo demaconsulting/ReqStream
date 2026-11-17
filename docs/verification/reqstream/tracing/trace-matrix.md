@@ -75,32 +75,42 @@ doubled before the pipe is escaped, so the original sequence round-trips correct
 
 #### Requirements Coverage
 
-| Requirement ID | Scenario(s) | Test Method(s) |
-| --- | --- | --- |
-| `ReqStream-Test-ResultFiles` | Constructor Scenario | `TraceMatrix_Constructor_WithNoFiles_CreatesEmptyMatrix` |
-| `ReqStream-Test-ResultFiles` | Constructor Scenario | `TraceMatrix_Constructor_MissingFile_ThrowsFileNotFoundException` |
-| `ReqStream-Test-ResultFiles` | Constructor Scenario | `TraceMatrix_Constructor_WithMultipleFiles_AggregatesResults` |
-| `ReqStream-Test-ChildRequirements` | Export Scenario | `TraceMatrix_Export_WithChildRequirements_ConsidersChildTests` |
-| `ReqStream-Test-TrxFormat` | Constructor Scenario | `TraceMatrix_Constructor_WithTrxFile_ParsesCorrectly` |
-| `ReqStream-Test-TrxFormat` | Constructor Scenario | `TraceMatrix_Constructor_WithFailedTests_TracksFailures` |
-| `ReqStream-Test-JUnitFormat` | Constructor Scenario | `TraceMatrix_Constructor_WithJUnitFile_ParsesCorrectly` |
-| `ReqStream-Test-JUnitFormat` | Constructor Scenario | `TraceMatrix_Constructor_WithJUnitFailedTests_TracksFailures` |
-| `ReqStream-Test-MixedFormats` | Constructor Scenario | `TraceMatrix_Constructor_WithMixedFormats_ProcessesBoth` |
-| `ReqStream-Test-SourceFiltering` | Test Result Retrieval Scenario | `TraceMatrix_GetTestResult_WithSourceSpecificTests_MatchesCorrectly` |
-| `ReqStream-Test-SourceFiltering` | Test Result Retrieval Scenario | `TraceMatrix_GetTestResult_WithSourceSpecificTests_DoesNotMatchOtherSources` |
-| `ReqStream-Test-SourceFiltering` | Test Result Retrieval Scenario | `TraceMatrix_GetTestResult_WithMultipleSourceSpecifiers_MatchesAllRequirements` |
-| `ReqStream-Test-CaseInsensitive` | Test Result Retrieval Scenario | `TraceMatrix_GetTestResult_WithSourceSpecificTests_IsCaseInsensitive` |
-| `ReqStream-Test-PartialFilenames` | Test Result Retrieval Scenario | `TraceMatrix_GetTestResult_WithSourceSpecificTests_MatchesPartialFilename` |
-| `ReqStream-Test-PlainTestNames` | Test Result Retrieval Scenario | `TraceMatrix_GetTestResult_WithPlainTestNames_MatchesAllSources` |
-| `ReqStream-Test-MixedTestNames` | Test Result Retrieval Scenario | `TraceMatrix_GetTestResult_WithMixedTestNames_MatchesAppropriately` |
-| `ReqStream-Test-MultipleRequirements` | Test Result Retrieval Scenario | `TraceMatrix_GetTestResult_WithMixedFilterAndPlainReferences_MatchesBoth` |
-| `ReqStream-Report-TraceMatrix` | Export Scenario | `TraceMatrix_Export_SimpleTraceMatrix_CreatesMarkdownFile` |
-| `ReqStream-Report-TraceMatrix` | Export Scenario | `TraceMatrix_Export_WithFailedTests_ShowsFailures` |
-| `ReqStream-Report-TraceMatrix` | Export Scenario | `TraceMatrix_Export_WithNoTests_ShowsNotSatisfied` |
-| `ReqStream-Report-TraceMatrix` | Export Scenario | `TraceMatrix_Export_WithNotExecutedTests_ShowsNotExecuted` |
-| `ReqStream-Report-TraceMatrixDepth` | Export Scenario | `TraceMatrix_Export_WithCustomDepth_UsesCorrectHeaderLevel` |
-| `ReqStream-Report-TagFiltering` | Export Scenario | `TraceMatrix_Export_WithFilterTags_ExportsOnlyMatchingRequirements` |
-| `ReqStream-Report-TagFiltering` | Export Scenario | `TraceMatrix_CalculateSatisfiedRequirements_WithFilterTags_CountsOnlyMatchingRequirements` |
-| `ReqStream-Report-TagFiltering` | Export Scenario | `TraceMatrix_GetUnsatisfiedRequirements_WithFilterTags_ReturnsOnlyMatchingRequirements` |
-| `ReqStream-Report-TraceMatrixTitles` | Export Scenario | `TraceMatrix_Export_WithIncludeTitlesTrue_AddsTitleColumn` |
-| `ReqStream-Report-TraceMatrixTitles` | Export Scenario | `TraceMatrix_Export_WithIncludeTitlesFalse_OmitsTitleColumn` |
+Each entry gives the requirement, its scenario in parentheses, and the test methods that verify it.
+
+- `ReqStream-Test-ResultFiles` (Constructor Scenario): `TraceMatrix_Constructor_WithNoFiles_CreatesEmptyMatrix`
+- `ReqStream-Test-ResultFiles` (Constructor Scenario): `TraceMatrix_Constructor_MissingFile_ThrowsFileNotFoundException`
+- `ReqStream-Test-ResultFiles` (Constructor Scenario): `TraceMatrix_Constructor_WithMultipleFiles_AggregatesResults`
+- `ReqStream-Test-ChildRequirements` (Export Scenario): `TraceMatrix_Export_WithChildRequirements_ConsidersChildTests`
+- `ReqStream-Test-TrxFormat` (Constructor Scenario): `TraceMatrix_Constructor_WithTrxFile_ParsesCorrectly`
+- `ReqStream-Test-TrxFormat` (Constructor Scenario): `TraceMatrix_Constructor_WithFailedTests_TracksFailures`
+- `ReqStream-Test-JUnitFormat` (Constructor Scenario): `TraceMatrix_Constructor_WithJUnitFile_ParsesCorrectly`
+- `ReqStream-Test-JUnitFormat` (Constructor Scenario): `TraceMatrix_Constructor_WithJUnitFailedTests_TracksFailures`
+- `ReqStream-Test-MixedFormats` (Constructor Scenario): `TraceMatrix_Constructor_WithMixedFormats_ProcessesBoth`
+- `ReqStream-Test-SourceFiltering` (Test Result Retrieval Scenario):
+  `TraceMatrix_GetTestResult_WithSourceSpecificTests_MatchesCorrectly`
+- `ReqStream-Test-SourceFiltering` (Test Result Retrieval Scenario):
+  `TraceMatrix_GetTestResult_WithSourceSpecificTests_DoesNotMatchOtherSources`
+- `ReqStream-Test-SourceFiltering` (Test Result Retrieval Scenario):
+  `TraceMatrix_GetTestResult_WithMultipleSourceSpecifiers_MatchesAllRequirements`
+- `ReqStream-Test-CaseInsensitive` (Test Result Retrieval Scenario):
+  `TraceMatrix_GetTestResult_WithSourceSpecificTests_IsCaseInsensitive`
+- `ReqStream-Test-PartialFilenames` (Test Result Retrieval Scenario):
+  `TraceMatrix_GetTestResult_WithSourceSpecificTests_MatchesPartialFilename`
+- `ReqStream-Test-PlainTestNames` (Test Result Retrieval Scenario):
+  `TraceMatrix_GetTestResult_WithPlainTestNames_MatchesAllSources`
+- `ReqStream-Test-MixedTestNames` (Test Result Retrieval Scenario):
+  `TraceMatrix_GetTestResult_WithMixedTestNames_MatchesAppropriately`
+- `ReqStream-Test-MultipleRequirements` (Test Result Retrieval Scenario):
+  `TraceMatrix_GetTestResult_WithMixedFilterAndPlainReferences_MatchesBoth`
+- `ReqStream-Report-TraceMatrix` (Export Scenario): `TraceMatrix_Export_SimpleTraceMatrix_CreatesMarkdownFile`
+- `ReqStream-Report-TraceMatrix` (Export Scenario): `TraceMatrix_Export_WithFailedTests_ShowsFailures`
+- `ReqStream-Report-TraceMatrix` (Export Scenario): `TraceMatrix_Export_WithNoTests_ShowsNotSatisfied`
+- `ReqStream-Report-TraceMatrix` (Export Scenario): `TraceMatrix_Export_WithNotExecutedTests_ShowsNotExecuted`
+- `ReqStream-Report-TraceMatrixDepth` (Export Scenario): `TraceMatrix_Export_WithCustomDepth_UsesCorrectHeaderLevel`
+- `ReqStream-Report-TagFiltering` (Export Scenario): `TraceMatrix_Export_WithFilterTags_ExportsOnlyMatchingRequirements`
+- `ReqStream-Report-TagFiltering` (Export Scenario):
+  `TraceMatrix_CalculateSatisfiedRequirements_WithFilterTags_CountsOnlyMatchingRequirements`
+- `ReqStream-Report-TagFiltering` (Export Scenario):
+  `TraceMatrix_GetUnsatisfiedRequirements_WithFilterTags_ReturnsOnlyMatchingRequirements`
+- `ReqStream-Report-TraceMatrixTitles` (Export Scenario): `TraceMatrix_Export_WithIncludeTitlesTrue_AddsTitleColumn`
+- `ReqStream-Report-TraceMatrixTitles` (Export Scenario): `TraceMatrix_Export_WithIncludeTitlesFalse_OmitsTitleColumn`

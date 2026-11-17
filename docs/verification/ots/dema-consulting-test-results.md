@@ -38,9 +38,10 @@ test results to a JUnit XML file. This scenario is tested by
 
 ### Requirements Coverage
 
-| Requirement | Scenario | Test Method(s) |
-| --- | --- | --- |
-| ReqStream-OTS-TestResults-Trx | TRX File Parsing | `TraceMatrix_Constructor_WithTrxFile_ParsesCorrectly` |
-| ReqStream-OTS-TestResults-JUnit | JUnit File Parsing | `TraceMatrix_Constructor_WithJUnitFile_ParsesCorrectly` |
-| ReqStream-OTS-TestResults-TrxSerialize | TRX File Serialization | `Validation_Run_WithTrxResultsFile_WritesTrxFile` |
-| ReqStream-OTS-TestResults-JUnitSerialize | JUnit XML File Serialization | `Validation_Run_WithXmlResultsFile_WritesXmlFile` |
+Each entry gives the requirement, its scenario in parentheses, and the test methods that verify it.
+
+- ReqStream-OTS-TestResults-Trx (TRX File Parsing): `TraceMatrix_Constructor_WithTrxFile_ParsesCorrectly`
+- ReqStream-OTS-TestResults-JUnit (JUnit File Parsing): `TraceMatrix_Constructor_WithJUnitFile_ParsesCorrectly`
+- ReqStream-OTS-TestResults-TrxSerialize (TRX File Serialization): `Validation_Run_WithTrxResultsFile_WritesTrxFile`
+- ReqStream-OTS-TestResults-JUnitSerialize (JUnit XML File Serialization):
+  `Validation_Run_WithXmlResultsFile_WritesXmlFile`

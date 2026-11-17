@@ -545,7 +545,7 @@ reqstream --requirements "**/*.requirements.yaml"
 ReqStream supports the following command-line options:
 
 | Option | Description |
-| ------ | ----------- |
+| --- | --- |
 | `-v`, `--version` | Display version information |
 | `-?`, `-h`, `--help` | Display help message |
 | `--silent` | Suppress all console output (both stdout and stderr are suppressed; useful in CI/CD) |
@@ -671,7 +671,7 @@ only actionable issue lines appear in the output.
 **Issues detected by the linter:**
 
 | Issue | Description |
-| ----- | ----------- |
+| --- | --- |
 | Malformed YAML | File cannot be parsed as valid YAML |
 | Unknown document field | Top-level key other than `sections`, `mappings`, or `includes` |
 | Unknown section field | Section key other than `title`, `requirements`, or `sections` |

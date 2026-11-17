@@ -95,18 +95,33 @@ regression). This scenario is tested by
 
 ### Requirements Coverage
 
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-Program-Version` | `Program_Run_WithVersionFlag_PrintsVersion` |
-| `ReqStream-Program-Help` | `Program_Run_WithHelpFlag_PrintsHelp` |
-| `ReqStream-Program-Validate` | `Program_Run_WithValidateFlag_RunsValidation`, `Program_Run_WithValidateAndResults_WritesResultsFile` |
-| `ReqStream-Program-Requirements` | `Program_Run_WithNoRequirementsFiles_ShowsMessage`, `Program_Run_WithRequirementsFiles_ProcessesSuccessfully`, `Program_Run_WithRequirementsExport_GeneratesReport`, `Program_Run_WithTraceMatrixExport_GeneratesMatrix`, `Program_Run_WithMatrixTitlesFlag_IncludesTitleColumn`, `Program_Run_WithJustificationsExport_GeneratesJustificationsReport` |
-| `ReqStream-Program-MatrixNoTests` | `Program_Run_WithMatrixButNoTestFiles_ReportsError`, `Program_Run_WithMatrixAndUnmatchedTestsPattern_ReportsError` |
-| `ReqStream-Program-Enforce` | `Program_Run_WithEnforcementAndFullySatisfiedRequirements_Succeeds`, `Program_Run_WithEnforcementAndUnsatisfiedRequirements_Fails`, `Program_Run_WithEnforcementAndNoTests_Fails`, `Program_Run_WithEnforcementAndFailedTests_Fails` |
-| `ReqStream-Program-Lint` | `Program_Run_WithLintFlag_RunsLinter` |
-| `ReqStream-Program-LintNoBanner` | `Program_Run_WithLintFlag_SuppressesBanner` |
-| `ReqStream-Program-LintVerbosity` | `Program_Run_WithLintFlag_RunsLinter`, `Program_Run_WithLintFlag_SuppressesBanner` |
-| `ReqStream-Program-LintFailure` | `Program_Run_WithLintFlag_OnlyOutputsIssues` |
-| `ReqStream-Program-LintNoFiles` | `Program_Run_WithLintAndNoRequirements_PrintsInformationalMessage` |
-| `ReqStream-Program-OrphanWarning` | `Program_Run_WithRootTagsAndOrphans_PrintsWarningWithoutFailing`, `Program_Run_WithRootTagsNoOrphans_NoWarningPrinted`, `Program_Run_WithRootTagsDeclaredOnlyInYaml_NoCliFlag_StillChecksOrphans`, `Program_Run_WithCliRootTagsFlagOnly_NoYamlDeclaration_StillChecksOrphans`, `Program_Run_WithNoRootTagsAnywhere_SkipsOrphanCheckEntirely` |
-| `ReqStream-Program-OrphanEnforcement` | `Program_Run_WithEnforcementRootTagsAndOrphansNoTests_FailsEvenWithoutTests`, `Program_Run_WithEnforcementOrphansAndMissingCoverage_ReportsBothErrorBlocks`, `Program_Run_WithEnforcementNoTestsNoRootTags_ReportsNothingToEnforceError`, `Program_Run_WithFilterAndRootTagsOrphans_OrphanCheckIgnoresFilter`, `Program_Run_WithMatrixNoMatchAndEnforceRootTagsOrphan_ReportsBothMatrixAndOrphanErrors` |
+Each entry gives the requirement and the test methods that verify it.
+
+- `ReqStream-Program-Version`: `Program_Run_WithVersionFlag_PrintsVersion`
+- `ReqStream-Program-Help`: `Program_Run_WithHelpFlag_PrintsHelp`
+- `ReqStream-Program-Validate`: `Program_Run_WithValidateFlag_RunsValidation`,
+  `Program_Run_WithValidateAndResults_WritesResultsFile`
+- `ReqStream-Program-Requirements`: `Program_Run_WithNoRequirementsFiles_ShowsMessage`,
+  `Program_Run_WithRequirementsFiles_ProcessesSuccessfully`, `Program_Run_WithRequirementsExport_GeneratesReport`,
+  `Program_Run_WithTraceMatrixExport_GeneratesMatrix`, `Program_Run_WithMatrixTitlesFlag_IncludesTitleColumn`,
+  `Program_Run_WithJustificationsExport_GeneratesJustificationsReport`
+- `ReqStream-Program-MatrixNoTests`: `Program_Run_WithMatrixButNoTestFiles_ReportsError`,
+  `Program_Run_WithMatrixAndUnmatchedTestsPattern_ReportsError`
+- `ReqStream-Program-Enforce`: `Program_Run_WithEnforcementAndFullySatisfiedRequirements_Succeeds`,
+  `Program_Run_WithEnforcementAndUnsatisfiedRequirements_Fails`, `Program_Run_WithEnforcementAndNoTests_Fails`,
+  `Program_Run_WithEnforcementAndFailedTests_Fails`
+- `ReqStream-Program-Lint`: `Program_Run_WithLintFlag_RunsLinter`
+- `ReqStream-Program-LintNoBanner`: `Program_Run_WithLintFlag_SuppressesBanner`
+- `ReqStream-Program-LintVerbosity`: `Program_Run_WithLintFlag_RunsLinter`, `Program_Run_WithLintFlag_SuppressesBanner`
+- `ReqStream-Program-LintFailure`: `Program_Run_WithLintFlag_OnlyOutputsIssues`
+- `ReqStream-Program-LintNoFiles`: `Program_Run_WithLintAndNoRequirements_PrintsInformationalMessage`
+- `ReqStream-Program-OrphanWarning`: `Program_Run_WithRootTagsAndOrphans_PrintsWarningWithoutFailing`,
+  `Program_Run_WithRootTagsNoOrphans_NoWarningPrinted`,
+  `Program_Run_WithRootTagsDeclaredOnlyInYaml_NoCliFlag_StillChecksOrphans`,
+  `Program_Run_WithCliRootTagsFlagOnly_NoYamlDeclaration_StillChecksOrphans`,
+  `Program_Run_WithNoRootTagsAnywhere_SkipsOrphanCheckEntirely`
+- `ReqStream-Program-OrphanEnforcement`: `Program_Run_WithEnforcementRootTagsAndOrphansNoTests_FailsEvenWithoutTests`,
+  `Program_Run_WithEnforcementOrphansAndMissingCoverage_ReportsBothErrorBlocks`,
+  `Program_Run_WithEnforcementNoTestsNoRootTags_ReportsNothingToEnforceError`,
+  `Program_Run_WithFilterAndRootTagsOrphans_OrphanCheckIgnoresFilter`,
+  `Program_Run_WithMatrixNoMatchAndEnforceRootTagsOrphan_ReportsBothMatrixAndOrphanErrors`

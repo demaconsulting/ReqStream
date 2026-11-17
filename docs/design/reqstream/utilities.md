@@ -15,7 +15,8 @@ The `Utilities` subsystem contains the following software units:
   and relative paths.
 - **PathHelpers** (`Utilities/PathHelpers.cs`) — Safe path combination that guards against
   path-traversal attacks.
-- **TemporaryDirectory** (`Utilities/TemporaryDirectory.cs`) — Disposable temporary directory providing isolated file-system workspaces.
+- **TemporaryDirectory** (`Utilities/TemporaryDirectory.cs`) — Disposable temporary directory providing isolated
+  file-system workspaces.
 
 ### Interfaces
 

@@ -96,34 +96,54 @@ orphan IDs are returned in declaration order. This scenario is tested by
 
 #### Requirements Coverage
 
-| Requirement ID | Scenario(s) | Test Method(s) |
-| --- | --- | --- |
-| `ReqStream-Requirements-YamlProcessing` | YAML Processing Scenario | `Requirements_Load_ComplexStructure_ParsesCorrectly` |
-| `ReqStream-Requirements-Validation` | Validation Scenario | `Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation` |
-| `ReqStream-Requirements-YamlErrorReporting` | Validation Scenario | `Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation` |
-| `ReqStream-Requirements-Hierarchy` | Hierarchy Scenario | `Requirements_Export_NestedSections_CreatesHierarchy` |
-| `ReqStream-Requirements-Includes` | Includes Scenario | `Requirements_Load_WithIncludes_MergesFilesCorrectly` |
-| `ReqStream-Requirements-Includes` | Includes Scenario | `Requirements_Load_MultipleFiles_MergesAllFiles` |
-| `ReqStream-Requirements-Includes` | Includes Scenario | `Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop` |
-| `ReqStream-Requirements-CircularInclude` | Includes Scenario | `Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop` |
-| `ReqStream-Requirements-SectionMerging` | Section Merging Scenario | `Requirements_Load_IdenticalSections_MergesCorrectly` |
-| `ReqStream-Requirements-SectionMerging` | Section Merging Scenario | `Requirements_Load_MultipleFilesWithSameSections_MergesSections` |
-| `ReqStream-Report-MarkdownExport` | Export Scenario | `Requirements_Export_SimpleRequirements_CreatesMarkdownFile` |
-| `ReqStream-Report-MarkdownExport` | Export Scenario | `Requirements_Export_MultipleSections_ExportsAll` |
-| `ReqStream-Report-MarkdownExport` | Export Scenario | `Requirements_Export_EmptyRequirements_CreatesEmptyFile` |
-| `ReqStream-Report-HeaderDepth` | Export Scenario | `Requirements_Export_WithCustomDepth_UsesCorrectHeaderLevel` |
-| `ReqStream-Report-Justifications` | Export Scenario | `Requirements_ExportJustifications_WithJustifications_CreatesMarkdownFile` |
-| `ReqStream-Report-Justifications` | Export Scenario | `Requirements_ExportJustifications_WithoutJustifications_CreatesHeadersOnly` |
-| `ReqStream-Report-Justifications` | Export Scenario | `Requirements_ExportJustifications_NestedSections_CreatesHierarchy` |
-| `ReqStream-Report-JustificationsDepth` | Export Scenario | `Requirements_ExportJustifications_WithCustomDepth_UsesCorrectHeaderLevel` |
-| `ReqStream-Report-TagFilterExport` | Export Scenario | `Requirements_Export_WithFilterTags_ExportsOnlyMatchingRequirements` |
-| `ReqStream-Report-TagFilterExport` | Export Scenario | `Requirements_Export_WithMultipleFilterTags_ExportsRequirementsMatchingAnyTag` |
-| `ReqStream-Report-TagFilterExport` | Export Scenario | `Requirements_ExportJustifications_WithFilterTags_ExportsOnlyMatchingRequirements` |
-| `ReqStream-Requirements-RootTags` | Root Tags Parsing Scenario | `Requirements_Load_WithRootTagsInSingleFile_PopulatesRootTags` |
-| `ReqStream-Requirements-RootTags` | Root Tags Parsing Scenario | `Requirements_Load_WithRootTagsAcrossIncludedFiles_UnionsAllValues` |
-| `ReqStream-Requirements-OrphanReachability` | Orphan Detection Scenario | `Requirements_FindOrphans_ChildReachableFromRoot_IsNotOrphaned` |
-| `ReqStream-Requirements-OrphanReachability` | Orphan Detection Scenario | `Requirements_FindOrphans_DiamondMultiParentChild_VisitedOnce_NotOrphaned` |
-| `ReqStream-Requirements-OrphanRootExemption` | Orphan Detection Scenario | `Requirements_FindOrphans_RequirementTaggedRoot_IsNeverOrphaned` |
-| `ReqStream-Requirements-OrphanIsolated` | Orphan Detection Scenario | `Requirements_FindOrphans_IsolatedRequirement_NoTagsNoParentNoChildren_IsOrphaned` |
-| `ReqStream-Requirements-OrphanIsolated` | Orphan Detection Scenario | `Requirements_FindOrphans_UnreachableSubtree_AllMembersOrphaned` |
-| `ReqStream-Requirements-OrphanNoRootTags` | Orphan Detection Scenario | `Requirements_FindOrphans_EmptyRootTags_ReturnsNoOrphans` |
+Each entry gives the requirement, its scenario in parentheses, and the test methods that verify it.
+
+- `ReqStream-Requirements-YamlProcessing` (YAML Processing Scenario):
+  `Requirements_Load_ComplexStructure_ParsesCorrectly`
+- `ReqStream-Requirements-Validation` (Validation Scenario):
+  `Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation`
+- `ReqStream-Requirements-YamlErrorReporting` (Validation Scenario):
+  `Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation`
+- `ReqStream-Requirements-Hierarchy` (Hierarchy Scenario): `Requirements_Export_NestedSections_CreatesHierarchy`
+- `ReqStream-Requirements-Includes` (Includes Scenario): `Requirements_Load_WithIncludes_MergesFilesCorrectly`
+- `ReqStream-Requirements-Includes` (Includes Scenario): `Requirements_Load_MultipleFiles_MergesAllFiles`
+- `ReqStream-Requirements-Includes` (Includes Scenario): `Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop`
+- `ReqStream-Requirements-CircularInclude` (Includes Scenario): `Requirements_Load_IncludeLoop_DoesNotCauseInfiniteLoop`
+- `ReqStream-Requirements-SectionMerging` (Section Merging Scenario):
+  `Requirements_Load_IdenticalSections_MergesCorrectly`
+- `ReqStream-Requirements-SectionMerging` (Section Merging Scenario):
+  `Requirements_Load_MultipleFilesWithSameSections_MergesSections`
+- `ReqStream-Report-MarkdownExport` (Export Scenario): `Requirements_Export_SimpleRequirements_CreatesMarkdownFile`
+- `ReqStream-Report-MarkdownExport` (Export Scenario): `Requirements_Export_MultipleSections_ExportsAll`
+- `ReqStream-Report-MarkdownExport` (Export Scenario): `Requirements_Export_EmptyRequirements_CreatesEmptyFile`
+- `ReqStream-Report-HeaderDepth` (Export Scenario): `Requirements_Export_WithCustomDepth_UsesCorrectHeaderLevel`
+- `ReqStream-Report-Justifications` (Export Scenario):
+  `Requirements_ExportJustifications_WithJustifications_CreatesMarkdownFile`
+- `ReqStream-Report-Justifications` (Export Scenario):
+  `Requirements_ExportJustifications_WithoutJustifications_CreatesHeadersOnly`
+- `ReqStream-Report-Justifications` (Export Scenario):
+  `Requirements_ExportJustifications_NestedSections_CreatesHierarchy`
+- `ReqStream-Report-JustificationsDepth` (Export Scenario):
+  `Requirements_ExportJustifications_WithCustomDepth_UsesCorrectHeaderLevel`
+- `ReqStream-Report-TagFilterExport` (Export Scenario):
+  `Requirements_Export_WithFilterTags_ExportsOnlyMatchingRequirements`
+- `ReqStream-Report-TagFilterExport` (Export Scenario):
+  `Requirements_Export_WithMultipleFilterTags_ExportsRequirementsMatchingAnyTag`
+- `ReqStream-Report-TagFilterExport` (Export Scenario):
+  `Requirements_ExportJustifications_WithFilterTags_ExportsOnlyMatchingRequirements`
+- `ReqStream-Requirements-RootTags` (Root Tags Parsing Scenario):
+  `Requirements_Load_WithRootTagsInSingleFile_PopulatesRootTags`
+- `ReqStream-Requirements-RootTags` (Root Tags Parsing Scenario):
+  `Requirements_Load_WithRootTagsAcrossIncludedFiles_UnionsAllValues`
+- `ReqStream-Requirements-OrphanReachability` (Orphan Detection Scenario):
+  `Requirements_FindOrphans_ChildReachableFromRoot_IsNotOrphaned`
+- `ReqStream-Requirements-OrphanReachability` (Orphan Detection Scenario):
+  `Requirements_FindOrphans_DiamondMultiParentChild_VisitedOnce_NotOrphaned`
+- `ReqStream-Requirements-OrphanRootExemption` (Orphan Detection Scenario):
+  `Requirements_FindOrphans_RequirementTaggedRoot_IsNeverOrphaned`
+- `ReqStream-Requirements-OrphanIsolated` (Orphan Detection Scenario):
+  `Requirements_FindOrphans_IsolatedRequirement_NoTagsNoParentNoChildren_IsOrphaned`
+- `ReqStream-Requirements-OrphanIsolated` (Orphan Detection Scenario):
+  `Requirements_FindOrphans_UnreachableSubtree_AllMembersOrphaned`
+- `ReqStream-Requirements-OrphanNoRootTags` (Orphan Detection Scenario):
+  `Requirements_FindOrphans_EmptyRootTags_ReturnsNoOrphans`

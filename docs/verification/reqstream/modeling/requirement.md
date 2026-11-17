@@ -51,29 +51,49 @@ path so that authors can identify and correct the circular dependency. This scen
 
 #### Requirements Coverage
 
-| Requirement ID | Scenario(s) | Test Method(s) |
-| --- | --- | --- |
-| `ReqStream-Requirements-UniqueIds` | Validation Scenario | `Requirements_Load_DuplicateRequirementId_ReportsError` |
-| `ReqStream-Requirements-UniqueIds` | Validation Scenario | `Requirements_Load_DuplicateRequirementId_ErrorIncludesFileLocation` |
-| `ReqStream-Requirements-UniqueIds` | Validation Scenario | `Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation` |
-| `ReqStream-Requirements-UniqueIds` | Validation Scenario | `Requirements_Load_MultipleFilesWithDuplicateIds_ReportsError` |
-| `ReqStream-Requirements-RequiredTitle` | Validation Scenario | `Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation` |
-| `ReqStream-Requirements-ParentChild` | Properties Scenario | `Requirements_Load_RequirementWithChildren_ParsesChildrenCorrectly` |
-| `ReqStream-Requirements-BlankChildId` | Validation Scenario | `Requirements_Load_BlankChildIdInRequirement_ReportsErrorWithFileLocation` |
-| `ReqStream-Requirements-Tags` | Properties Scenario | `Requirements_Load_RequirementWithTags_ParsesTagsCorrectly` |
-| `ReqStream-Requirements-BlankTagName` | Validation Scenario | `Requirements_Load_BlankTagName_ReportsErrorWithFileLocation` |
-| `ReqStream-Requirements-Justification` | Properties Scenario | `Requirements_Load_RequirementWithJustification_ParsesJustificationCorrectly` |
-| `ReqStream-Requirements-TestMappings` | Properties Scenario | `Requirements_Load_RequirementWithTests_ParsesTestsCorrectly` |
-| `ReqStream-Requirements-TestMappings` | Properties Scenario | `Requirements_Load_BlankTestNameInRequirement_ReportsErrorWithFileLocation` |
-| `ReqStream-Requirements-TestMappings` | Properties Scenario | `Requirements_Load_TestMappings_AppliesMappingsCorrectly` |
-| `ReqStream-Requirements-TestMappings` | Properties Scenario | `Requirements_Load_BlankTestNameInMapping_ReportsErrorWithFileLocation` |
-| `ReqStream-Requirements-TestMappings` | Properties Scenario | `Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation` |
-| `ReqStream-Requirement-Location` | Validation Scenario | `Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation` |
-| `ReqStream-Requirement-Location` | Validation Scenario | `Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation` |
-| `ReqStream-Requirement-Location` | Validation Scenario | `Requirements_Load_BlankTestNameInRequirement_ReportsErrorWithFileLocation` |
-| `ReqStream-Requirement-Location` | Validation Scenario | `Requirements_Load_BlankTestNameInMapping_ReportsErrorWithFileLocation` |
-| `ReqStream-Requirement-Location` | Validation Scenario | `Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation` |
-| `ReqStream-Requirement-Location` | Validation Scenario | `Requirements_Load_BlankTagName_ReportsErrorWithFileLocation` |
-| `ReqStream-Requirement-Location` | Validation Scenario | `Requirements_Load_BlankChildIdInRequirement_ReportsErrorWithFileLocation` |
-| `ReqStream-Lint-CircularReferences` | Circular Reference Detection Scenario | `Requirements_Load_CircularRequirements_ReportsCircularReferenceError` |
-| `ReqStream-Lint-CircularReferences` | Circular Reference Detection Scenario | `Requirements_Load_SelfReferencingRequirement_ReportsCircularReferenceError` |
+Each entry gives the requirement, its scenario in parentheses, and the test methods that verify it.
+
+- `ReqStream-Requirements-UniqueIds` (Validation Scenario): `Requirements_Load_DuplicateRequirementId_ReportsError`
+- `ReqStream-Requirements-UniqueIds` (Validation Scenario):
+  `Requirements_Load_DuplicateRequirementId_ErrorIncludesFileLocation`
+- `ReqStream-Requirements-UniqueIds` (Validation Scenario):
+  `Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation`
+- `ReqStream-Requirements-UniqueIds` (Validation Scenario):
+  `Requirements_Load_MultipleFilesWithDuplicateIds_ReportsError`
+- `ReqStream-Requirements-RequiredTitle` (Validation Scenario):
+  `Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation`
+- `ReqStream-Requirements-ParentChild` (Properties Scenario):
+  `Requirements_Load_RequirementWithChildren_ParsesChildrenCorrectly`
+- `ReqStream-Requirements-BlankChildId` (Validation Scenario):
+  `Requirements_Load_BlankChildIdInRequirement_ReportsErrorWithFileLocation`
+- `ReqStream-Requirements-Tags` (Properties Scenario): `Requirements_Load_RequirementWithTags_ParsesTagsCorrectly`
+- `ReqStream-Requirements-BlankTagName` (Validation Scenario):
+  `Requirements_Load_BlankTagName_ReportsErrorWithFileLocation`
+- `ReqStream-Requirements-Justification` (Properties Scenario):
+  `Requirements_Load_RequirementWithJustification_ParsesJustificationCorrectly`
+- `ReqStream-Requirements-TestMappings` (Properties Scenario):
+  `Requirements_Load_RequirementWithTests_ParsesTestsCorrectly`
+- `ReqStream-Requirements-TestMappings` (Properties Scenario):
+  `Requirements_Load_BlankTestNameInRequirement_ReportsErrorWithFileLocation`
+- `ReqStream-Requirements-TestMappings` (Properties Scenario): `Requirements_Load_TestMappings_AppliesMappingsCorrectly`
+- `ReqStream-Requirements-TestMappings` (Properties Scenario):
+  `Requirements_Load_BlankTestNameInMapping_ReportsErrorWithFileLocation`
+- `ReqStream-Requirements-TestMappings` (Properties Scenario):
+  `Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation`
+- `ReqStream-Requirement-Location` (Validation Scenario):
+  `Requirements_Load_BlankRequirementId_ReportsErrorWithFileLocation`
+- `ReqStream-Requirement-Location` (Validation Scenario):
+  `Requirements_Load_BlankRequirementTitle_ReportsErrorWithFileLocation`
+- `ReqStream-Requirement-Location` (Validation Scenario):
+  `Requirements_Load_BlankTestNameInRequirement_ReportsErrorWithFileLocation`
+- `ReqStream-Requirement-Location` (Validation Scenario):
+  `Requirements_Load_BlankTestNameInMapping_ReportsErrorWithFileLocation`
+- `ReqStream-Requirement-Location` (Validation Scenario):
+  `Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation`
+- `ReqStream-Requirement-Location` (Validation Scenario): `Requirements_Load_BlankTagName_ReportsErrorWithFileLocation`
+- `ReqStream-Requirement-Location` (Validation Scenario):
+  `Requirements_Load_BlankChildIdInRequirement_ReportsErrorWithFileLocation`
+- `ReqStream-Lint-CircularReferences` (Circular Reference Detection Scenario):
+  `Requirements_Load_CircularRequirements_ReportsCircularReferenceError`
+- `ReqStream-Lint-CircularReferences` (Circular Reference Detection Scenario):
+  `Requirements_Load_SelfReferencingRequirement_ReportsCircularReferenceError`

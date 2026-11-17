@@ -36,12 +36,17 @@ scenario is tested by `Validation_Run_WithNullContext_ThrowsArgumentNullExceptio
 
 #### Requirements Coverage
 
-| Requirement ID | Scenario(s) | Test Method(s) |
-| --- | --- | --- |
-| `ReqStream-Validation-SelfValidation` | Self-Validation Scenario | `Validation_Run_WithSilentContext_CompletesSuccessfully` |
-| `ReqStream-Validation-SelfValidation` | Self-Validation Scenario | `Validation_Run_WithTrxResultsFile_WritesTrxFile` |
-| `ReqStream-Validation-SelfValidation` | Self-Validation Scenario | `Validation_Run_WithXmlResultsFile_WritesXmlFile` |
-| `ReqStream-Validation-NullContext` | Error and Continuation Scenario | `Validation_Run_WithNullContext_ThrowsArgumentNullException` |
-| `ReqStream-Validation-UnsupportedResultsFormat` | Error and Continuation Scenario | `Validation_Run_WithInvalidResultsExtension_ReportsError` |
-| `ReqStream-Validation-WriteFailure-ReportsError` | Error and Continuation Scenario | `Validation_Run_WithUnwritableResultsFile_ReportsError` |
-| `ReqStream-Validation-WriteFailure-Continues` | Error and Continuation Scenario | `Validation_Run_WithUnwritableResultsFile_Continues` |
+Each entry gives the requirement, its scenario in parentheses, and the test methods that verify it.
+
+- `ReqStream-Validation-SelfValidation` (Self-Validation Scenario):
+  `Validation_Run_WithSilentContext_CompletesSuccessfully`
+- `ReqStream-Validation-SelfValidation` (Self-Validation Scenario): `Validation_Run_WithTrxResultsFile_WritesTrxFile`
+- `ReqStream-Validation-SelfValidation` (Self-Validation Scenario): `Validation_Run_WithXmlResultsFile_WritesXmlFile`
+- `ReqStream-Validation-NullContext` (Error and Continuation Scenario):
+  `Validation_Run_WithNullContext_ThrowsArgumentNullException`
+- `ReqStream-Validation-UnsupportedResultsFormat` (Error and Continuation Scenario):
+  `Validation_Run_WithInvalidResultsExtension_ReportsError`
+- `ReqStream-Validation-WriteFailure-ReportsError` (Error and Continuation Scenario):
+  `Validation_Run_WithUnwritableResultsFile_ReportsError`
+- `ReqStream-Validation-WriteFailure-Continues` (Error and Continuation Scenario):
+  `Validation_Run_WithUnwritableResultsFile_Continues`
