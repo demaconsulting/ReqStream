@@ -28,7 +28,9 @@ This scenario is tested by `LintIssue_ToString_ErrorSeverity_FormatsAsError`,
 
 #### Requirements Coverage
 
-| Requirement ID | Scenario(s) | Test Method(s) |
-| --- | --- | --- |
-| `ReqStream-Lint-IssueType` | Issue Formatting Scenario | `LintIssue_ToString_ErrorSeverity_FormatsAsError`, `LintIssue_ToString_WarningSeverity_FormatsAsWarning` |
-| `ReqStream-Lint-SeverityString` | Issue Formatting Scenario | `LintIssue_ToString_ErrorSeverity_FormatsAsError`, `LintIssue_ToString_WarningSeverity_FormatsAsWarning` |
+Each entry gives the requirement, its scenario in parentheses, and the test methods that verify it.
+
+- `ReqStream-Lint-IssueType` (Issue Formatting Scenario): `LintIssue_ToString_ErrorSeverity_FormatsAsError`,
+  `LintIssue_ToString_WarningSeverity_FormatsAsWarning`
+- `ReqStream-Lint-SeverityString` (Issue Formatting Scenario): `LintIssue_ToString_ErrorSeverity_FormatsAsError`,
+  `LintIssue_ToString_WarningSeverity_FormatsAsWarning`

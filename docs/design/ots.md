@@ -8,7 +8,7 @@ WeasyPrint) are excluded from integration design documentation because they are 
 through source code APIs; their integration is through the CI configuration files. SysML2Tools is
 a pipeline tool but is documented here as an intentional exception because it validates and
 renders the SysML2 architecture model that this chapter and `docs/design/introduction.md`
-describe; see _SysML2Tools OTS Design_ for its integration pattern.
+describe; see *SysML2Tools OTS Design* for its integration pattern.
 
 ## Selection Criteria
 

@@ -43,8 +43,14 @@ intermediate subdirectories needed for a nested path. This scenario is tested by
 
 #### Requirements Coverage
 
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-Utilities-TemporaryDirectory-Lifecycle` | `TemporaryDirectory_Constructor_Default_CreatesDirectory`, `TemporaryDirectory_Constructor_TwoInstances_CreateUniqueDirectories`, `TemporaryDirectory_Dispose_PopulatedDirectory_DeletesDirectory`, `TemporaryDirectory_Dispose_AlreadyDeleted_DoesNotThrow` |
-| `ReqStream-Utilities-TemporaryDirectory-SafePathCombine` | `TemporaryDirectory_GetFilePath_SimpleFile_ReturnsPathUnderDirectory`, `TemporaryDirectory_GetFilePath_TraversalAttempt_ThrowsArgumentException` |
-| `ReqStream-Utilities-TemporaryDirectory-IntermediateDirectories` | `TemporaryDirectory_GetFilePath_NestedPath_CreatesIntermediateDirectories` |
+Each entry gives the requirement and the test methods that verify it.
+
+- `ReqStream-Utilities-TemporaryDirectory-Lifecycle`: `TemporaryDirectory_Constructor_Default_CreatesDirectory`,
+  `TemporaryDirectory_Constructor_TwoInstances_CreateUniqueDirectories`,
+  `TemporaryDirectory_Dispose_PopulatedDirectory_DeletesDirectory`,
+  `TemporaryDirectory_Dispose_AlreadyDeleted_DoesNotThrow`
+- `ReqStream-Utilities-TemporaryDirectory-SafePathCombine`:
+  `TemporaryDirectory_GetFilePath_SimpleFile_ReturnsPathUnderDirectory`,
+  `TemporaryDirectory_GetFilePath_TraversalAttempt_ThrowsArgumentException`
+- `ReqStream-Utilities-TemporaryDirectory-IntermediateDirectories`:
+  `TemporaryDirectory_GetFilePath_NestedPath_CreatesIntermediateDirectories`

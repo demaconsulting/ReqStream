@@ -101,56 +101,71 @@ coverage:
 
 #### Requirements Coverage
 
-| Requirement ID | Scenario(s) | Test Method(s) |
-| --- | --- | --- |
-| `ReqStream-Command-Cli` | CLI Parsing Scenario | `Context_Create_NoArguments_ReturnsDefaultContext` |
-| `ReqStream-Command-Cli` | CLI Parsing Scenario | `Context_Create_MultipleArguments_ParsesAllCorrectly` |
-| `ReqStream-Command-Version` | CLI Parsing Scenario | `Context_Create_VersionFlag_SetsVersionProperty` |
-| `ReqStream-Command-Help` | CLI Parsing Scenario | `Context_Create_HelpFlags_SetsHelpProperty` |
-| `ReqStream-Command-Silent` | CLI Parsing Scenario, Output Channel Scenario | `Context_Create_SilentFlag_SetsSilentProperty` |
-| `ReqStream-Command-Silent` | CLI Parsing Scenario, Output Channel Scenario | `Context_WriteLine_SilentMode_WritesToLogFile` |
-| `ReqStream-Command-Silent` | CLI Parsing Scenario, Output Channel Scenario | `Context_WriteError_SilentMode_WritesToLogFile` |
-| `ReqStream-Command-ErrorOutput` | Output Channel Scenario | `Context_WriteError_NormalMode_WritesToLogFile` |
-| `ReqStream-Command-ErrorOutput` | Output Channel Scenario | `Context_WriteError_NormalMode_WritesToStderr` |
-| `ReqStream-Command-UnknownArgs` | CLI Parsing Scenario | `Context_Create_UnsupportedArgument_ThrowsException` |
-| `ReqStream-Command-MissingLogValue` | CLI Parsing Scenario | `Context_Create_MissingLogFilename_ThrowsException` |
-| `ReqStream-Command-MissingResultsValue` | CLI Parsing Scenario, Results and Report Flags Scenario | `Context_Create_MissingResultsFilename_ThrowsException` |
-| `ReqStream-Command-MissingFilterValue` | CLI Parsing Scenario, Tag Filter Scenario | `Context_Create_FilterArgumentMissingValue_ThrowsException` |
-| `ReqStream-Command-RequirementsGlobPatterns` | Requirements and Tests Pattern Scenario | `Context_Create_WithRequirementsPattern_ExpandsGlobPattern` |
-| `ReqStream-Command-TestGlobPatterns` | Requirements and Tests Pattern Scenario | `Context_Create_WithTestsPattern_ExpandsGlobPattern` |
-| `ReqStream-Command-Validate` | CLI Parsing Scenario | `Context_Create_ValidateFlag_SetsValidateProperty` |
-| `ReqStream-Command-Enforce` | CLI Parsing Scenario | `Context_Create_EnforceFlag_SetsEnforceProperty` |
-| `ReqStream-Command-ExitCode` | Output Channel Scenario | `Context_ExitCode_AfterWriteError_ReturnsOne` |
-| `ReqStream-Command-ReportDepth` | Depth Flags Scenario | `Context_Create_ReportDepth_SetsReportDepthProperty` |
-| `ReqStream-Command-MatrixDepth` | Depth Flags Scenario | `Context_Create_MatrixDepth_SetsMatrixDepthProperty` |
-| `ReqStream-Command-Depth` | Depth Flags Scenario | `Context_Create_Depth_SetsAllDepths` |
-| `ReqStream-Command-Depth` | Depth Flags Scenario | `Context_Create_SpecificDepthOverridesDefaultDepth` |
-| `ReqStream-Command-Depth` | Depth Flags Scenario | `Context_Create_MissingDepth_ThrowsException` |
-| `ReqStream-Command-Depth` | Depth Flags Scenario | `Context_Create_InvalidDepth_ThrowsException` |
-| `ReqStream-Command-TagFilter` | Tag Filter Scenario | `Context_Create_FilterArgument_ParsesTagsCorrectly` |
-| `ReqStream-Command-TagFilter` | Tag Filter Scenario | `Context_Create_FilterArgumentWithSpaces_TrimsAndParsesTagsCorrectly` |
-| `ReqStream-Command-TagFilter` | Tag Filter Scenario | `Context_Create_FilterSingleTag_ParsesCorrectly` |
-| `ReqStream-Command-TagFilter` | Tag Filter Scenario | `Context_Create_MultipleFilterArguments_MergesIntoSingleSet` |
-| `ReqStream-Command-Lint` | CLI Parsing Scenario | `Context_Create_LintFlag_SetsLintProperty` |
-| `ReqStream-Command-Results` | Results and Report Flags Scenario | `Context_Create_ResultsFlag_SetsResultsFileProperty` |
-| `ReqStream-Command-Results` | Results and Report Flags Scenario | `Context_Create_ResultFlag_SetsResultsFileProperty` |
-| `ReqStream-Command-Results` | Results and Report Flags Scenario | `Context_Create_MissingResultsFilename_ThrowsException` |
-| `ReqStream-Command-Report` | Results and Report Flags Scenario | `Context_Create_ReportFile_SetsReportProperty` |
-| `ReqStream-Command-Report` | Results and Report Flags Scenario | `Context_Create_MissingReportFilename_ThrowsException` |
-| `ReqStream-Command-Matrix` | Results and Report Flags Scenario | `Context_Create_MatrixFile_SetsMatrixProperty` |
-| `ReqStream-Command-Matrix` | Results and Report Flags Scenario | `Context_Create_MissingMatrixFilename_ThrowsException` |
-| `ReqStream-Command-MatrixTitles` | Results and Report Flags Scenario | `Context_Create_MatrixTitlesFlag_SetsMatrixTitlesProperty` |
-| `ReqStream-Command-Justifications` | Results and Report Flags Scenario | `Context_Create_JustificationsFile_SetsJustificationsFileProperty` |
-| `ReqStream-Command-Justifications` | Results and Report Flags Scenario | `Context_Create_MissingJustificationsFilename_ThrowsException` |
-| `ReqStream-Command-JustificationsDepth` | Depth Flags Scenario | `Context_Create_JustificationsDepth_SetsJustificationsDepthProperty` |
-| `ReqStream-Command-JustificationsDepth` | Depth Flags Scenario | `Context_Create_MissingJustificationsDepth_ThrowsException` |
-| `ReqStream-Command-JustificationsDepth` | Depth Flags Scenario | `Context_Create_InvalidJustificationsDepth_ThrowsException` |
-| `ReqStream-Command-LogFileOutput` | Log File Scenario | `Context_Create_WithLogFile_WritesToLogFile` |
-| `ReqStream-Command-LogFileOutput` | Log File Scenario | `Context_Create_WithLogFileAndSilent_WritesToLogOnly` |
-| `ReqStream-Command-LogFileOutput` | Log File Scenario | `Context_Dispose_WithLogFile_ClosesLogFile` |
-| `ReqStream-Command-LogFileOutput` | Log File Scenario | `Context_Create_InvalidLogPath_ThrowsException` |
-| `ReqStream-Command-RootTags` | Root Tags Scenario | `Context_Create_RootTagsFlag_ParsesTagsCorrectly` |
-| `ReqStream-Command-RootTags` | Root Tags Scenario | `Context_Create_RootTagsFlagWithSpaces_TrimsAndParsesTagsCorrectly` |
-| `ReqStream-Command-RootTags` | Root Tags Scenario | `Context_Create_MultipleRootTagsArguments_MergesIntoSingleSet` |
-| `ReqStream-Command-RootTags` | Root Tags Scenario | `Context_Create_RootTagsArgumentMissingValue_ThrowsException` |
-| `ReqStream-Command-RootTags` | Root Tags Scenario | `Context_Create_NoRootTagsFlag_RootTagsIsNull` |
+Each entry gives the requirement, its scenario in parentheses, and the test methods that verify it.
+
+- `ReqStream-Command-Cli` (CLI Parsing Scenario): `Context_Create_NoArguments_ReturnsDefaultContext`
+- `ReqStream-Command-Cli` (CLI Parsing Scenario): `Context_Create_MultipleArguments_ParsesAllCorrectly`
+- `ReqStream-Command-Version` (CLI Parsing Scenario): `Context_Create_VersionFlag_SetsVersionProperty`
+- `ReqStream-Command-Help` (CLI Parsing Scenario): `Context_Create_HelpFlags_SetsHelpProperty`
+- `ReqStream-Command-Silent` (CLI Parsing Scenario, Output Channel Scenario):
+  `Context_Create_SilentFlag_SetsSilentProperty`
+- `ReqStream-Command-Silent` (CLI Parsing Scenario, Output Channel Scenario):
+  `Context_WriteLine_SilentMode_WritesToLogFile`
+- `ReqStream-Command-Silent` (CLI Parsing Scenario, Output Channel Scenario):
+  `Context_WriteError_SilentMode_WritesToLogFile`
+- `ReqStream-Command-ErrorOutput` (Output Channel Scenario): `Context_WriteError_NormalMode_WritesToLogFile`
+- `ReqStream-Command-ErrorOutput` (Output Channel Scenario): `Context_WriteError_NormalMode_WritesToStderr`
+- `ReqStream-Command-UnknownArgs` (CLI Parsing Scenario): `Context_Create_UnsupportedArgument_ThrowsException`
+- `ReqStream-Command-MissingLogValue` (CLI Parsing Scenario): `Context_Create_MissingLogFilename_ThrowsException`
+- `ReqStream-Command-MissingResultsValue` (CLI Parsing Scenario, Results and Report Flags Scenario):
+  `Context_Create_MissingResultsFilename_ThrowsException`
+- `ReqStream-Command-MissingFilterValue` (CLI Parsing Scenario, Tag Filter Scenario):
+  `Context_Create_FilterArgumentMissingValue_ThrowsException`
+- `ReqStream-Command-RequirementsGlobPatterns` (Requirements and Tests Pattern Scenario):
+  `Context_Create_WithRequirementsPattern_ExpandsGlobPattern`
+- `ReqStream-Command-TestGlobPatterns` (Requirements and Tests Pattern Scenario):
+  `Context_Create_WithTestsPattern_ExpandsGlobPattern`
+- `ReqStream-Command-Validate` (CLI Parsing Scenario): `Context_Create_ValidateFlag_SetsValidateProperty`
+- `ReqStream-Command-Enforce` (CLI Parsing Scenario): `Context_Create_EnforceFlag_SetsEnforceProperty`
+- `ReqStream-Command-ExitCode` (Output Channel Scenario): `Context_ExitCode_AfterWriteError_ReturnsOne`
+- `ReqStream-Command-ReportDepth` (Depth Flags Scenario): `Context_Create_ReportDepth_SetsReportDepthProperty`
+- `ReqStream-Command-MatrixDepth` (Depth Flags Scenario): `Context_Create_MatrixDepth_SetsMatrixDepthProperty`
+- `ReqStream-Command-Depth` (Depth Flags Scenario): `Context_Create_Depth_SetsAllDepths`
+- `ReqStream-Command-Depth` (Depth Flags Scenario): `Context_Create_SpecificDepthOverridesDefaultDepth`
+- `ReqStream-Command-Depth` (Depth Flags Scenario): `Context_Create_MissingDepth_ThrowsException`
+- `ReqStream-Command-Depth` (Depth Flags Scenario): `Context_Create_InvalidDepth_ThrowsException`
+- `ReqStream-Command-TagFilter` (Tag Filter Scenario): `Context_Create_FilterArgument_ParsesTagsCorrectly`
+- `ReqStream-Command-TagFilter` (Tag Filter Scenario):
+  `Context_Create_FilterArgumentWithSpaces_TrimsAndParsesTagsCorrectly`
+- `ReqStream-Command-TagFilter` (Tag Filter Scenario): `Context_Create_FilterSingleTag_ParsesCorrectly`
+- `ReqStream-Command-TagFilter` (Tag Filter Scenario): `Context_Create_MultipleFilterArguments_MergesIntoSingleSet`
+- `ReqStream-Command-Lint` (CLI Parsing Scenario): `Context_Create_LintFlag_SetsLintProperty`
+- `ReqStream-Command-Results` (Results and Report Flags Scenario): `Context_Create_ResultsFlag_SetsResultsFileProperty`
+- `ReqStream-Command-Results` (Results and Report Flags Scenario): `Context_Create_ResultFlag_SetsResultsFileProperty`
+- `ReqStream-Command-Results` (Results and Report Flags Scenario):
+  `Context_Create_MissingResultsFilename_ThrowsException`
+- `ReqStream-Command-Report` (Results and Report Flags Scenario): `Context_Create_ReportFile_SetsReportProperty`
+- `ReqStream-Command-Report` (Results and Report Flags Scenario): `Context_Create_MissingReportFilename_ThrowsException`
+- `ReqStream-Command-Matrix` (Results and Report Flags Scenario): `Context_Create_MatrixFile_SetsMatrixProperty`
+- `ReqStream-Command-Matrix` (Results and Report Flags Scenario): `Context_Create_MissingMatrixFilename_ThrowsException`
+- `ReqStream-Command-MatrixTitles` (Results and Report Flags Scenario):
+  `Context_Create_MatrixTitlesFlag_SetsMatrixTitlesProperty`
+- `ReqStream-Command-Justifications` (Results and Report Flags Scenario):
+  `Context_Create_JustificationsFile_SetsJustificationsFileProperty`
+- `ReqStream-Command-Justifications` (Results and Report Flags Scenario):
+  `Context_Create_MissingJustificationsFilename_ThrowsException`
+- `ReqStream-Command-JustificationsDepth` (Depth Flags Scenario):
+  `Context_Create_JustificationsDepth_SetsJustificationsDepthProperty`
+- `ReqStream-Command-JustificationsDepth` (Depth Flags Scenario):
+  `Context_Create_MissingJustificationsDepth_ThrowsException`
+- `ReqStream-Command-JustificationsDepth` (Depth Flags Scenario):
+  `Context_Create_InvalidJustificationsDepth_ThrowsException`
+- `ReqStream-Command-LogFileOutput` (Log File Scenario): `Context_Create_WithLogFile_WritesToLogFile`
+- `ReqStream-Command-LogFileOutput` (Log File Scenario): `Context_Create_WithLogFileAndSilent_WritesToLogOnly`
+- `ReqStream-Command-LogFileOutput` (Log File Scenario): `Context_Dispose_WithLogFile_ClosesLogFile`
+- `ReqStream-Command-LogFileOutput` (Log File Scenario): `Context_Create_InvalidLogPath_ThrowsException`
+- `ReqStream-Command-RootTags` (Root Tags Scenario): `Context_Create_RootTagsFlag_ParsesTagsCorrectly`
+- `ReqStream-Command-RootTags` (Root Tags Scenario): `Context_Create_RootTagsFlagWithSpaces_TrimsAndParsesTagsCorrectly`
+- `ReqStream-Command-RootTags` (Root Tags Scenario): `Context_Create_MultipleRootTagsArguments_MergesIntoSingleSet`
+- `ReqStream-Command-RootTags` (Root Tags Scenario): `Context_Create_RootTagsArgumentMissingValue_ThrowsException`
+- `ReqStream-Command-RootTags` (Root Tags Scenario): `Context_Create_NoRootTagsFlag_RootTagsIsNull`

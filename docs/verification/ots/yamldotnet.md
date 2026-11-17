@@ -36,10 +36,11 @@ structure is parsed correctly. This scenario is tested by
 
 ### Requirements Coverage
 
-| Requirement | Scenario | Test Method(s) |
-| --- | --- | --- |
-| ReqStream-OTS-YamlDotNet | Well-Formed YAML Parsing | `Requirements_Load_ValidFile_ReturnsRequirementsAndNoIssues` |
-| ReqStream-OTS-YamlDotNet | YAML Error Reporting with Location | `Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation` |
-| ReqStream-OTS-YamlDotNet | Malformed YAML Handling | `Requirements_Load_MalformedYaml_ReturnsNullAndIssues` |
-| ReqStream-OTS-YamlDotNet | Simple Requirement Parsing | `Section_Load_SimpleRequirement_ParsesCorrectly` |
-| ReqStream-OTS-YamlDotNet | Complex Structure Parsing | `Requirements_Load_ComplexStructure_ParsesCorrectly` |
+Each entry gives the requirement, its scenario in parentheses, and the test methods that verify it.
+
+- ReqStream-OTS-YamlDotNet (Well-Formed YAML Parsing): `Requirements_Load_ValidFile_ReturnsRequirementsAndNoIssues`
+- ReqStream-OTS-YamlDotNet (YAML Error Reporting with Location):
+  `Requirements_Load_InvalidYamlContent_ReportsErrorWithFileLocation`
+- ReqStream-OTS-YamlDotNet (Malformed YAML Handling): `Requirements_Load_MalformedYaml_ReturnsNullAndIssues`
+- ReqStream-OTS-YamlDotNet (Simple Requirement Parsing): `Section_Load_SimpleRequirement_ParsesCorrectly`
+- ReqStream-OTS-YamlDotNet (Complex Structure Parsing): `Requirements_Load_ComplexStructure_ParsesCorrectly`

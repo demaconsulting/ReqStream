@@ -154,34 +154,39 @@ macOS in the CI pipeline. This scenario is tested by `macos@ReqStream_VersionDis
 
 ## Requirements Coverage
 
-| Requirement ID | Test Method(s) |
-| --- | --- |
-| `ReqStream-System-VersionDisplay` | `ReqStream_System_CliInterface_VersionFlag_PrintsVersion` |
-| `ReqStream-System-HelpDisplay` | `ReqStream_System_CliInterface_HelpFlag_PrintsHelp` |
-| `ReqStream-System-FullPipeline` | `ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces` |
-| `ReqStream-System-SourceFilter` | `ReqStream_SourceFilter_NamedSourceInRequirement_MatchesTestsBySourceFile` |
-| `ReqStream-System-EnforceMode` | `ReqStream_EnforcementMode_RequirementLacksTestEvidence_FailsWithNonZeroExitCode` |
-| `ReqStream-System-OrphanChecking` | `ReqStream_System_OrphanChecking_RootTagsWithOrphan_EnforceReportsError` |
-| `ReqStream-System-Lint` | `ReqStream_System_Lint_Flag_ReportsLintIssues`, `ReqStream_System_Lint_ValidRequirementsFile_ExitsSilentlyWithZero` |
-| `ReqStream-System-Validate` | `ReqStream_System_Validate_Flag_RunsSelfValidation` |
-| `ReqStream-System-ValidateResultsOutput` | `ReqStream_System_ValidateResultsOutput_ResultsFlag_WritesResultsFile` |
-| `ReqStream-System-RequirementsReport` | `ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces` |
-| `ReqStream-System-TraceMatrix` | `ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces` |
-| `ReqStream-System-Justifications` | `ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces` |
-| `ReqStream-System-TagFilter` | `ReqStream_System_TagFilter_Flag_FiltersRequirements` |
-| `ReqStream-System-LogFileOutput` | `ReqStream_System_OutputControl_LogFlag_WritesOutputToFile`, `ReqStream_System_OutputControl_LogFlag_WithoutSilent_WritesOutputToFileAndConsole` |
-| `ReqStream-System-SilentMode` | `ReqStream_System_OutputControl_SilentFlag_SuppressesConsoleOutput` |
-| `ReqStream-System-ReportDepth` | `ReqStream_System_ReportDepth_DepthFlag_GeneratesReportWithCorrectHeadingLevel` |
-| `ReqStream-System-CrossPlatform` | Satisfied by children: `ReqStream-Platform-Windows`, `ReqStream-Platform-Linux`, `ReqStream-Platform-MacOS`, `ReqStream-Platform-Net10`, `ReqStream-Platform-Net11` |
-| `ReqStream-System-FileIncludes` | `ReqStream_System_FileIncludes_RequirementsWithIncludes_LoadsAllRequirements` |
-| `ReqStream-System-SectionMerging` | `ReqStream_System_SectionMerging_TwoFilesWithSameSection_ProducesSingleMergedSection` |
-| `ReqStream-System-CircularIncludeDetection` | `ReqStream_System_CircularIncludeDetection_CircularInclude_ReportsError` |
-| `ReqStream-System-TestFileErrorHandling` | `ReqStream_System_TestFileErrorHandling_MissingTestFile_ReportsFatalError`, `ReqStream_System_TestFileErrorHandling_MalformedTestFile_ReportsFatalError` |
-| `ReqStream-System-MatrixErrorHandling` | `ReqStream_System_MatrixErrorHandling_MatrixWithoutTests_ReportsError` |
-| `ReqStream-System-EnforceNoTests` | `ReqStream_System_EnforceNoTests_EnforceWithoutTests_ReportsError` |
-| `ReqStream-System-CyclicChildDetection` | `ReqStream_System_CyclicChildDetection_CyclicChildRequirements_ReportsError` |
-| `ReqStream-Platform-Windows` | `windows@ReqStream_VersionDisplay`, `windows@ReqStream_HelpDisplay` |
-| `ReqStream-Platform-Linux` | `ubuntu@ReqStream_VersionDisplay`, `ubuntu@ReqStream_HelpDisplay` |
-| `ReqStream-Platform-MacOS` | `macos@ReqStream_VersionDisplay`, `macos@ReqStream_HelpDisplay` |
-| `ReqStream-Platform-Net10` | `dotnet10.x@ReqStream_VersionDisplay`, `dotnet10.x@ReqStream_HelpDisplay` |
-| `ReqStream-Platform-Net11` | `dotnet11.x@ReqStream_VersionDisplay`, `dotnet11.x@ReqStream_HelpDisplay` |
+Each entry gives the requirement and the test methods that verify it.
+
+- `ReqStream-System-VersionDisplay`: `ReqStream_System_CliInterface_VersionFlag_PrintsVersion`
+- `ReqStream-System-HelpDisplay`: `ReqStream_System_CliInterface_HelpFlag_PrintsHelp`
+- `ReqStream-System-FullPipeline`: `ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces`
+- `ReqStream-System-SourceFilter`: `ReqStream_SourceFilter_NamedSourceInRequirement_MatchesTestsBySourceFile`
+- `ReqStream-System-EnforceMode`: `ReqStream_EnforcementMode_RequirementLacksTestEvidence_FailsWithNonZeroExitCode`
+- `ReqStream-System-OrphanChecking`: `ReqStream_System_OrphanChecking_RootTagsWithOrphan_EnforceReportsError`
+- `ReqStream-System-Lint`: `ReqStream_System_Lint_Flag_ReportsLintIssues`,
+  `ReqStream_System_Lint_ValidRequirementsFile_ExitsSilentlyWithZero`
+- `ReqStream-System-Validate`: `ReqStream_System_Validate_Flag_RunsSelfValidation`
+- `ReqStream-System-ValidateResultsOutput`: `ReqStream_System_ValidateResultsOutput_ResultsFlag_WritesResultsFile`
+- `ReqStream-System-RequirementsReport`: `ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces`
+- `ReqStream-System-TraceMatrix`: `ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces`
+- `ReqStream-System-Justifications`: `ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces`
+- `ReqStream-System-TagFilter`: `ReqStream_System_TagFilter_Flag_FiltersRequirements`
+- `ReqStream-System-LogFileOutput`: `ReqStream_System_OutputControl_LogFlag_WritesOutputToFile`,
+  `ReqStream_System_OutputControl_LogFlag_WithoutSilent_WritesOutputToFileAndConsole`
+- `ReqStream-System-SilentMode`: `ReqStream_System_OutputControl_SilentFlag_SuppressesConsoleOutput`
+- `ReqStream-System-ReportDepth`: `ReqStream_System_ReportDepth_DepthFlag_GeneratesReportWithCorrectHeadingLevel`
+- `ReqStream-System-CrossPlatform`: Satisfied by children: `ReqStream-Platform-Windows`, `ReqStream-Platform-Linux`,
+  `ReqStream-Platform-MacOS`, `ReqStream-Platform-Net10`, `ReqStream-Platform-Net11`
+- `ReqStream-System-FileIncludes`: `ReqStream_System_FileIncludes_RequirementsWithIncludes_LoadsAllRequirements`
+- `ReqStream-System-SectionMerging`:
+  `ReqStream_System_SectionMerging_TwoFilesWithSameSection_ProducesSingleMergedSection`
+- `ReqStream-System-CircularIncludeDetection`: `ReqStream_System_CircularIncludeDetection_CircularInclude_ReportsError`
+- `ReqStream-System-TestFileErrorHandling`: `ReqStream_System_TestFileErrorHandling_MissingTestFile_ReportsFatalError`,
+  `ReqStream_System_TestFileErrorHandling_MalformedTestFile_ReportsFatalError`
+- `ReqStream-System-MatrixErrorHandling`: `ReqStream_System_MatrixErrorHandling_MatrixWithoutTests_ReportsError`
+- `ReqStream-System-EnforceNoTests`: `ReqStream_System_EnforceNoTests_EnforceWithoutTests_ReportsError`
+- `ReqStream-System-CyclicChildDetection`: `ReqStream_System_CyclicChildDetection_CyclicChildRequirements_ReportsError`
+- `ReqStream-Platform-Windows`: `windows@ReqStream_VersionDisplay`, `windows@ReqStream_HelpDisplay`
+- `ReqStream-Platform-Linux`: `ubuntu@ReqStream_VersionDisplay`, `ubuntu@ReqStream_HelpDisplay`
+- `ReqStream-Platform-MacOS`: `macos@ReqStream_VersionDisplay`, `macos@ReqStream_HelpDisplay`
+- `ReqStream-Platform-Net10`: `dotnet10.x@ReqStream_VersionDisplay`, `dotnet10.x@ReqStream_HelpDisplay`
+- `ReqStream-Platform-Net11`: `dotnet11.x@ReqStream_VersionDisplay`, `dotnet11.x@ReqStream_HelpDisplay`

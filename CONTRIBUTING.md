@@ -50,7 +50,6 @@ We follow a standard GitHub workflow for contributions:
 - [.NET SDK][dotnet-download] 10.0 and 11.0 (both are required: the 11.0 SDK builds the
   `net11.0` target and the .NET 10 runtime runs the `net10.0` tests)
 - Git
-- Node.js (with npm, required for running JavaScript-based tools and lint scripts)
 - Python 3 (with venv and pip, required for Python-based tooling used by lint scripts)
 - A code editor (Visual Studio, VS Code, or Rider recommended)
 
@@ -178,7 +177,7 @@ dotnet run --project src/DemaConsulting.ReqStream \
 
 ### Markdown Guidelines
 
-All markdown files must follow these rules (enforced by markdownlint):
+All markdown files must follow these rules (enforced by LintMark):
 
 - Maximum line length: 120 characters
 - Use ATX-style headers (`# Header`)

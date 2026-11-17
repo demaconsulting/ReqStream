@@ -46,18 +46,21 @@ only, and no issues. This scenario is tested by
 
 #### Requirements Coverage
 
-| Requirement ID | Scenario(s) | Test Method(s) |
-| --- | --- | --- |
-| `ReqStream-LoadResult-UnifiedLoad` | Unified Load Scenario | `Requirements_Load_ValidFile_ReturnsRequirementsAndNoIssues` |
-| `ReqStream-LoadResult-UnifiedLoad` | Unified Load Scenario | `Requirements_Load_WithLintError_ReturnsNullAndIssues` |
-| `ReqStream-LoadResult-UnifiedLoad` | Unified Load Scenario | `Requirements_Load_MissingFile_ReturnsNullAndIssues` |
-| `ReqStream-LoadResult-UnifiedLoad` | Unified Load Scenario | `Requirements_Load_MalformedYaml_ReturnsNullAndIssues` |
-| `ReqStream-LoadResult-UnifiedLoad` | Unified Load Scenario | `Requirements_Load_WithMultipleLintErrors_ReportsAllIssues` |
-| `ReqStream-LoadResult-UnifiedLoad` | Unified Load Scenario | `Requirements_Load_WithIncludes_LintsIncludedFiles` |
-| `ReqStream-LoadResult-UnifiedLoad` | Unified Load Scenario | `Requirements_Load_WithLintError_IssueIncludesLocation` |
-| `ReqStream-LoadResult-ReportIssues` | Issue Routing Scenario | `LoadResult_ReportIssues_ErrorIssue_SetsContextError` |
-| `ReqStream-LoadResult-ReportIssues` | Issue Routing Scenario | `LoadResult_ReportIssues_WarningIssue_DoesNotSetContextError` |
-| `ReqStream-LoadResult-ReportIssues` | Issue Routing Scenario | `LoadResult_ReportIssues_NoIssues_ProducesNoOutput` |
-| `ReqStream-LoadResult-HasErrors` | HasErrors Scenario | `LoadResult_HasErrors_WithErrorIssue_ReturnsTrue` |
-| `ReqStream-LoadResult-HasErrors` | HasErrors Scenario | `LoadResult_HasErrors_WithOnlyWarnings_ReturnsFalse` |
-| `ReqStream-LoadResult-HasErrors` | HasErrors Scenario | `LoadResult_HasErrors_NoIssues_ReturnsFalse` |
+Each entry gives the requirement, its scenario in parentheses, and the test methods that verify it.
+
+- `ReqStream-LoadResult-UnifiedLoad` (Unified Load Scenario):
+  `Requirements_Load_ValidFile_ReturnsRequirementsAndNoIssues`
+- `ReqStream-LoadResult-UnifiedLoad` (Unified Load Scenario): `Requirements_Load_WithLintError_ReturnsNullAndIssues`
+- `ReqStream-LoadResult-UnifiedLoad` (Unified Load Scenario): `Requirements_Load_MissingFile_ReturnsNullAndIssues`
+- `ReqStream-LoadResult-UnifiedLoad` (Unified Load Scenario): `Requirements_Load_MalformedYaml_ReturnsNullAndIssues`
+- `ReqStream-LoadResult-UnifiedLoad` (Unified Load Scenario):
+  `Requirements_Load_WithMultipleLintErrors_ReportsAllIssues`
+- `ReqStream-LoadResult-UnifiedLoad` (Unified Load Scenario): `Requirements_Load_WithIncludes_LintsIncludedFiles`
+- `ReqStream-LoadResult-UnifiedLoad` (Unified Load Scenario): `Requirements_Load_WithLintError_IssueIncludesLocation`
+- `ReqStream-LoadResult-ReportIssues` (Issue Routing Scenario): `LoadResult_ReportIssues_ErrorIssue_SetsContextError`
+- `ReqStream-LoadResult-ReportIssues` (Issue Routing Scenario):
+  `LoadResult_ReportIssues_WarningIssue_DoesNotSetContextError`
+- `ReqStream-LoadResult-ReportIssues` (Issue Routing Scenario): `LoadResult_ReportIssues_NoIssues_ProducesNoOutput`
+- `ReqStream-LoadResult-HasErrors` (HasErrors Scenario): `LoadResult_HasErrors_WithErrorIssue_ReturnsTrue`
+- `ReqStream-LoadResult-HasErrors` (HasErrors Scenario): `LoadResult_HasErrors_WithOnlyWarnings_ReturnsFalse`
+- `ReqStream-LoadResult-HasErrors` (HasErrors Scenario): `LoadResult_HasErrors_NoIssues_ReturnsFalse`
