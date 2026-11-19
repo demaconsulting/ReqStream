@@ -66,15 +66,70 @@
       "problemMatcher": []
     },
     {
-      "label": "lint",
-      "command": "bash",
+      "label": "lint markdown",
+      "command": "dotnet",
       "type": "shell",
       "args": [
-        "${workspaceFolder}/lint.sh"
+        "lintmark"
       ],
+      "problemMatcher": []
+    },
+    {
+      "label": "spell check",
+      "command": "dotnet",
+      "type": "shell",
+      "args": [
+        "textlint"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "create python venv",
+      "detail": "Creates .venv for the Python lint tools, as lint.ps1 and fix.ps1 do",
+      "type": "process",
+      "command": "python3",
       "windows": {
-        "command": "${workspaceFolder}/lint.bat"
+        "command": "python"
       },
+      "args": ["-m", "venv", ".venv"],
+      "problemMatcher": []
+    },
+    {
+      "label": "setup python venv",
+      "detail": "Installs pip-requirements.txt into .venv, as lint.ps1 and fix.ps1 do",
+      "dependsOn": "create python venv",
+      "type": "process",
+      "command": "${workspaceFolder}/.venv/bin/python",
+      "windows": {
+        "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe"
+      },
+      "args": ["-m", "pip", "install", "-r", "pip-requirements.txt", "--quiet", "--disable-pip-version-check"],
+      "problemMatcher": []
+    },
+    {
+      "label": "lint yaml",
+      "dependsOn": "setup python venv",
+      "command": "${workspaceFolder}/.venv/bin/yamllint",
+      "windows": {
+        "command": "${workspaceFolder}\\.venv\\Scripts\\yamllint.exe"
+      },
+      "detail": "Uses the .venv that lint.ps1 and fix.ps1 create from pip-requirements.txt",
+      "type": "shell",
+      "args": [
+        "."
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "lint",
+      "detail": "Runs every lint check (lint.ps1)",
+      "command": "pwsh",
+      "type": "process",
+      "args": [
+        "-NoProfile",
+        "-File",
+        "${workspaceFolder}/lint.ps1"
+      ],
       "problemMatcher": []
     },
     {

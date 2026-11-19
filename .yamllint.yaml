@@ -3,9 +3,7 @@
 #
 # DO NOT MODIFY: These rules represent coding standards.
 # If files fail linting, fix the files to meet these standards.
-
 extends: default
-
 ignore: |
   **/.git/**
   **/node_modules/**
@@ -15,14 +13,13 @@ ignore: |
   **/3rd-party/**
   **/generated/**
   **/.agent-logs/**
-
 rules:
   # Allow 'on:' in GitHub Actions workflows (not a boolean value)
   truthy:
     allowed-values: ['true', 'false']
     check-keys: false
 
-  # Disable line-length rule
+  # No YAML line-length limit in DEMA repositories (yamlfix uses line_length = 10000 for the same reason)
   line-length: disable
 
   # Ensure proper indentation
