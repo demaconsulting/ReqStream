@@ -54,8 +54,7 @@ sections:
                   - RequirementsLoader_Load_WithCircularFileInclude_ReportsError
 
               - id: ReqStream-Lint-NonMappingRoot
-                title: The requirements loader shall report an error when the requirements document root is not a mapping
-                  node.
+                title: The requirements loader shall report an error when the requirements document root is not a mapping node.
                 justification: |
                   The YAML document root must be a mapping node to be a valid requirements file. A non-mapping
                   root (e.g. a sequence or scalar at the top level) cannot contain sections, requirements, or
