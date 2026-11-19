@@ -1,0 +1,276 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="640" viewBox="0 0 1600 640">
+  <!-- The README hero banner. A requirements YAML file and TRX and JUnit test results flow into the reqstream
+       tool, which writes a trace matrix, a requirements report, a justifications document, and gates CI with
+       its lint and enforce checks and its exit code.
+       The definitions and the left panel follow the shared DEMA Consulting hero (CanvasNet and BuildMark).
+       This file is docs/images/hero.svg, beside its rendered docs/images/hero.png (matching base names, per the
+       diagram documentation standard); the files it embeds are in docs/images/hero/. -->
+  <defs>
+    <style>
+      .word { font: bold 92px sans-serif; fill: #ffffff; }
+      .eyebrow { font: bold 25px sans-serif; fill: #a5b4fc; }
+      .tag { font: bold 40px sans-serif; fill: #f8fafc; }
+      .body { font: 25px sans-serif; fill: #cbd5e1; }
+      .cmd { font: 25px monospace; fill: #e2e8f0; }
+      .prompt { fill: #5eead4; }
+      .file { fill: #f9a8d4; }
+      .brandText { fill: url(#brand); }
+      .note { font: italic 25px sans-serif; fill: #94a3b8; }
+      .label { font: bold 25px sans-serif; fill: #f1f5f9; text-anchor: middle; }
+      .engine { font: bold 32px monospace; fill: #ffffff; }
+      .api { font: bold 25px sans-serif; fill: #c4b5fd; }
+      .card { fill: url(#glass); stroke: url(#rim); stroke-width: 1.5; filter: url(#shadow); }
+      .panel { fill: #0a1022; stroke: #ffffff; stroke-opacity: 0.06; }
+      .flow { fill: none; stroke-width: 3; stroke-linecap: round; }
+      .page { fill: #ffffff; filter: url(#paper); }
+    </style>
+
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#070b1f"/>
+      <stop offset="0.55" stop-color="#130f3b"/>
+      <stop offset="1" stop-color="#071a2e"/>
+    </linearGradient>
+    <radialGradient id="glowViolet" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#7c3aed" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#7c3aed" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowCyan" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#06b6d4" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#06b6d4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowPink" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#db2777" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#db2777" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="12" cy="12" r="1.2" fill="#a5b4fc" fill-opacity="0.16"/>
+    </pattern>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22d3ee"/>
+      <stop offset="0.5" stop-color="#a78bfa"/>
+      <stop offset="1" stop-color="#f472b6"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.04"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.08"/>
+    </linearGradient>
+    <linearGradient id="engineFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1e1b4b"/>
+      <stop offset="1" stop-color="#0b1022"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <filter id="paper" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+    <filter id="blur" x="-30%" y="-150%" width="160%" height="400%">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+    <filter id="heat" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+
+    <marker id="headPink" viewBox="0 0 10 10" refX="2.5" refY="5" markerWidth="4" markerHeight="4" orient="auto">
+      <path d="M0,0 L10,5 L0,10 L2.5,5 z" fill="#f472b6"/>
+    </marker>
+    <marker id="headAmber" viewBox="0 0 10 10" refX="2.5" refY="5" markerWidth="4" markerHeight="4" orient="auto">
+      <path d="M0,0 L10,5 L0,10 L2.5,5 z" fill="#fbbf24"/>
+    </marker>
+    <marker id="headCyan" viewBox="0 0 10 10" refX="2.5" refY="5" markerWidth="4" markerHeight="4" orient="auto">
+      <path d="M0,0 L10,5 L0,10 L2.5,5 z" fill="#22d3ee"/>
+    </marker>
+    <marker id="headViolet" viewBox="0 0 10 10" refX="2.5" refY="5" markerWidth="4" markerHeight="4" orient="auto">
+      <path d="M0,0 L10,5 L0,10 L2.5,5 z" fill="#a78bfa"/>
+    </marker>
+    <marker id="headBlue" viewBox="0 0 10 10" refX="2.5" refY="5" markerWidth="4" markerHeight="4" orient="auto">
+      <path d="M0,0 L10,5 L0,10 L2.5,5 z" fill="#60a5fa"/>
+    </marker>
+    <marker id="headMint" viewBox="0 0 10 10" refX="2.5" refY="5" markerWidth="4" markerHeight="4" orient="auto">
+      <path d="M0,0 L10,5 L0,10 L2.5,5 z" fill="#5eead4"/>
+    </marker>
+
+    <!-- The text and shapes inside the mini illustrations -->
+    <style>
+      .mini { font: bold 22px sans-serif; }
+      .miniMono { font: bold 22px monospace; }
+      .bar { fill: #cbd5e1; }
+      .ink { fill: #1e293b; }
+    </style>
+  </defs>
+
+  <!-- Background: deep gradient, soft glows, and a dot grid -->
+  <rect width="1600" height="640" fill="url(#bg)"/>
+  <ellipse cx="250" cy="170" rx="420" ry="300" fill="url(#glowViolet)"/>
+  <ellipse cx="1070" cy="294" rx="420" ry="220" fill="url(#glowCyan)"/>
+  <ellipse cx="1480" cy="620" rx="380" ry="260" fill="url(#glowPink)"/>
+  <rect width="1600" height="640" fill="url(#dots)"/>
+
+  <!-- Wordmark and tagline -->
+  <image href="hero/dc-logo-dark.svg" x="46" y="54" width="50" height="50"/>
+  <text class="eyebrow" x="100" y="90">DEMA Consulting</text>
+  <text class="word" x="52" y="176">Req</text>
+  <text class="word brandText" x="225.8" y="176">Stream</text>
+  <rect x="58" y="200" width="132" height="6" rx="3" fill="url(#brand)"/>
+  <text class="tag" x="56" y="266">Every requirement,</text>
+  <text class="tag brandText" x="56" y="316">traced to a test.</text>
+  <text class="body" x="58" y="368">Lints YAML requirements, links them</text>
+  <text class="body" x="58" y="402">to TRX and JUnit test results, writes</text>
+  <text class="body" x="58" y="436">reports, and gates CI on the gaps.</text>
+  <rect x="56" y="468" width="480" height="90" rx="12" fill="#0a1022" fill-opacity="0.8" stroke="#a78bfa" stroke-opacity="0.45" stroke-width="1.5"/>
+  <text class="cmd prompt" x="78" y="503">$</text>
+  <text class="cmd" x="108" y="503">reqstream --tests</text>
+  <text class="cmd file" x="378" y="503">"*.trx"</text>
+  <text class="cmd" x="138" y="539">--requirements</text>
+  <text class="cmd file" x="363" y="539">"*.yaml"</text>
+  <text class="note" x="58" y="604">Add --enforce to gate the build.</text>
+
+  <!-- Input cards -->
+  <g>
+    <!-- requirements.yaml: a requirement with its id, title, and linked test -->
+    <rect class="card" x="580" y="40" width="380" height="160" rx="16"/>
+    <rect x="714" y="40" width="112" height="3" rx="1.5" fill="#fbbf24"/>
+    <rect class="panel" x="588" y="48" width="364" height="112" rx="10"/>
+    <text class="miniMono" x="606" y="80" fill="#fde68a">- id:</text>
+    <text class="miniMono" x="685.2" y="80" fill="#f8fafc">App-Login</text>
+    <text class="miniMono" x="632.4" y="113" fill="#fde68a">title:</text>
+    <text class="miniMono" x="724.8" y="113" fill="#f8fafc">Sign in</text>
+    <text class="miniMono" x="632.4" y="146" fill="#fde68a">tests:</text>
+    <text class="miniMono" x="724.8" y="146" fill="#f8fafc">[Login_Ok]</text>
+    <text class="label" x="770" y="190">requirements.yaml</text>
+
+    <!-- TRX test results: a .trx file with a passing test -->
+    <rect class="card" x="972" y="40" width="288" height="160" rx="16"/>
+    <rect x="1060.0" y="40" width="112" height="3" rx="1.5" fill="#22d3ee"/>
+    <rect class="panel" x="980" y="48" width="272" height="112" rx="10"/>
+    <g transform="translate(980 48)">
+      <path class="page" d="M18 12 L62 12 L78 28 L78 100 L18 100 Z"/>
+      <path d="M62 12 L62 28 L78 28 Z" fill="#cbd5e1"/>
+      <rect x="28" y="40" width="40" height="5" rx="2.5" fill="#22d3ee"/>
+      <rect class="bar" x="28" y="52" width="40" height="5" rx="2.5"/>
+      <rect class="bar" x="28" y="64" width="30" height="5" rx="2.5"/>
+      <rect class="bar" x="28" y="76" width="36" height="5" rx="2.5"/>
+      <rect x="96" y="14" width="80" height="32" rx="7" fill="#22d3ee" fill-opacity="0.16" stroke="#22d3ee" stroke-width="1.5"/>
+      <text class="mini" x="136" y="38" fill="#a5f3fc" text-anchor="middle">.trx</text>
+      <circle cx="108" cy="79" r="11" fill="#4ade80" fill-opacity="0.2" stroke="#4ade80" stroke-width="1.5"/><path d="M103,79 L106.5,83 L113.5,74.5" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <text class="miniMono" x="126" y="87" fill="#bbf7d0">Login_Ok</text>
+    </g>
+    <text class="label" x="1116.0" y="190">TRX results</text>
+
+    <!-- JUnit test results: an .xml file with a passing test -->
+    <rect class="card" x="1272" y="40" width="288" height="160" rx="16"/>
+    <rect x="1360.0" y="40" width="112" height="3" rx="1.5" fill="#f472b6"/>
+    <rect class="panel" x="1280" y="48" width="272" height="112" rx="10"/>
+    <g transform="translate(1280 48)">
+      <path class="page" d="M18 12 L62 12 L78 28 L78 100 L18 100 Z"/>
+      <path d="M62 12 L62 28 L78 28 Z" fill="#cbd5e1"/>
+      <rect x="28" y="40" width="40" height="5" rx="2.5" fill="#f472b6"/>
+      <rect class="bar" x="28" y="52" width="40" height="5" rx="2.5"/>
+      <rect class="bar" x="28" y="64" width="30" height="5" rx="2.5"/>
+      <rect class="bar" x="28" y="76" width="36" height="5" rx="2.5"/>
+      <rect x="96" y="14" width="80" height="32" rx="7" fill="#f472b6" fill-opacity="0.16" stroke="#f472b6" stroke-width="1.5"/>
+      <text class="mini" x="136" y="38" fill="#fbcfe8" text-anchor="middle">.xml</text>
+      <circle cx="108" cy="79" r="11" fill="#4ade80" fill-opacity="0.2" stroke="#4ade80" stroke-width="1.5"/><path d="M103,79 L106.5,83 L113.5,74.5" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <text class="miniMono" x="126" y="87" fill="#bbf7d0">Audit_Ok</text>
+    </g>
+    <text class="label" x="1416.0" y="190">JUnit XML</text>
+  </g>
+
+  <!-- Flows into the engine -->
+  <g class="flow">
+    <path d="M770,206 C770,236 980,226 980,253" stroke="#fbbf24" marker-end="url(#headAmber)"/>
+    <path d="M1116,206 C1116,236 1070,226 1070,253" stroke="#22d3ee" marker-end="url(#headCyan)"/>
+    <path d="M1416,206 C1416,236 1160,226 1160,253" stroke="#f472b6" marker-end="url(#headPink)"/>
+  </g>
+  <g stroke="#0a1022" stroke-width="2">
+    <circle cx="770" cy="206" r="5" fill="#fbbf24"/>
+    <circle cx="1116" cy="206" r="5" fill="#22d3ee"/>
+    <circle cx="1416" cy="206" r="5" fill="#f472b6"/>
+  </g>
+  <!-- The engine -->
+  <rect x="860" y="262" width="420" height="64" rx="32" fill="url(#brand)" opacity="0.55" filter="url(#blur)"/>
+  <rect x="860" y="262" width="420" height="64" rx="32" fill="url(#engineFill)" stroke="url(#brand)" stroke-width="2.5"/>
+  <rect x="884" y="276" width="36" height="36" rx="9" fill="url(#brand)"/>
+  <path d="M893 282 L906 282 L912 288 L912 306 L893 306 Z" fill="#ffffff"/>
+  <g fill="#7c3aed">
+    <rect x="897" y="290" width="11" height="2.5" rx="1.2"/>
+    <rect x="897" y="295" width="11" height="2.5" rx="1.2"/>
+    <rect x="897" y="300" width="7" height="2.5" rx="1.2"/>
+  </g>
+  <text class="engine" x="936" y="305">reqstream</text>
+  <line x1="1120" y1="278" x2="1120" y2="310" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1.5"/>
+  <text class="api" x="1140" y="303">.NET tool</text>
+
+  <!-- Flows out of the engine -->
+  <g class="flow" stroke="#5eead4">
+    <path d="M980,330 C980,356 728,356 728,381" marker-end="url(#headMint)"/>
+    <path d="M1040,330 C1040,356 999,356 999,381" marker-end="url(#headMint)"/>
+    <path d="M1100,330 C1100,356 1232,356 1232,381" marker-end="url(#headMint)"/>
+    <path d="M1160,330 C1160,356 1457,356 1457,381" marker-end="url(#headMint)"/>
+  </g>
+  <g fill="#5eead4" stroke="#0a1022" stroke-width="2">
+    <circle cx="980" cy="330" r="5"/>
+    <circle cx="1040" cy="330" r="5"/>
+    <circle cx="1100" cy="330" r="5"/>
+    <circle cx="1160" cy="330" r="5"/>
+  </g>
+
+  <!-- Output tiles -->
+  <g>
+    <!-- Trace matrix: each requirement with its passing tests -->
+    <rect class="card" x="580" y="390" width="296" height="210" rx="16"/>
+    <rect class="panel" x="588" y="398" width="280" height="152" rx="10"/>
+    <text class="miniMono" x="604" y="437" fill="#f8fafc">App-Login</text>
+    <rect x="772" y="415" width="80" height="30" rx="15" fill="#4ade80" fill-opacity="0.18" stroke="#4ade80" stroke-width="1.5"/>
+    <text class="miniMono" x="812" y="437" fill="#bbf7d0" text-anchor="middle">1/1</text>
+    <line x1="602" y1="455" x2="854" y2="455" stroke="#ffffff" stroke-opacity="0.15"/>
+    <text class="miniMono" x="604" y="482" fill="#f8fafc">App-Logout</text>
+    <rect x="772" y="460" width="80" height="30" rx="15" fill="#4ade80" fill-opacity="0.18" stroke="#4ade80" stroke-width="1.5"/>
+    <text class="miniMono" x="812" y="482" fill="#bbf7d0" text-anchor="middle">2/2</text>
+    <line x1="602" y1="500" x2="854" y2="500" stroke="#ffffff" stroke-opacity="0.15"/>
+    <text class="miniMono" x="604" y="527" fill="#f8fafc">App-Audit</text>
+    <rect x="772" y="505" width="80" height="30" rx="15" fill="#4ade80" fill-opacity="0.18" stroke="#4ade80" stroke-width="1.5"/>
+    <text class="miniMono" x="812" y="527" fill="#bbf7d0" text-anchor="middle">1/1</text>
+    <text class="label" x="728" y="585">Trace matrix</text>
+
+    <!-- Requirements report: a Markdown document with its sections -->
+    <rect class="card" x="889" y="390" width="220" height="210" rx="16"/>
+    <rect class="panel" x="897" y="398" width="204" height="152" rx="10"/>
+    <path class="page" d="M930 408 L1052 408 L1068 424 L1068 542 L930 542 Z"/>
+    <path d="M1052 408 L1052 424 L1068 424 Z" fill="#cbd5e1"/>
+    <text class="mini" x="942" y="440" fill="#7c3aed">#</text>
+    <rect x="962" y="426" width="62" height="8" rx="4" fill="#4f46e5"/>
+    <rect class="bar" x="942" y="452" width="96" height="5" rx="2.5"/>
+    <rect class="bar" x="942" y="462" width="80" height="5" rx="2.5"/>
+    <text class="mini" x="942" y="498" fill="#7c3aed">#</text>
+    <rect x="962" y="484" width="50" height="8" rx="4" fill="#4f46e5"/>
+    <rect class="bar" x="942" y="510" width="90" height="5" rx="2.5"/>
+    <rect class="bar" x="942" y="520" width="70" height="5" rx="2.5"/>
+    <text class="label" x="999" y="585">Requirements</text>
+
+    <!-- Justifications: the reason recorded for each requirement -->
+    <rect class="card" x="1122" y="390" width="220" height="210" rx="16"/>
+    <rect class="panel" x="1130" y="398" width="204" height="152" rx="10"/>
+    <path d="M1150 412 L1314 412 Q1320 412 1320 418 L1320 458 Q1320 464 1314 464 L1182 464 L1168 478 L1170 464 L1150 464 Q1144 464 1144 458 L1144 418 Q1144 412 1150 412 Z" fill="#f472b6" fill-opacity="0.16" stroke="#f472b6" stroke-width="1.5"/>
+    <text class="mini" x="1232" y="446" fill="#fbcfe8" text-anchor="middle">Why it exists</text>
+    <rect class="bar" x="1150" y="494" width="164" height="8" rx="4" fill-opacity="0.75"/>
+    <rect class="bar" x="1150" y="512" width="136" height="8" rx="4" fill-opacity="0.75"/>
+    <rect class="bar" x="1150" y="530" width="150" height="8" rx="4" fill-opacity="0.75"/>
+    <text class="label" x="1232" y="585">Justifications</text>
+
+    <!-- CI gate: the lint and enforce checks pass, so reqstream exits 0 -->
+    <rect class="card" x="1355" y="390" width="205" height="210" rx="16"/>
+    <rect class="panel" x="1363" y="398" width="189" height="152" rx="10"/>
+    <text class="miniMono" x="1378" y="438" fill="#f8fafc">--lint</text>
+    <circle cx="1526" cy="430" r="11" fill="#4ade80" fill-opacity="0.2" stroke="#4ade80" stroke-width="1.5"/><path d="M1521,430 L1524.5,434 L1531.5,425.5" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text class="miniMono" x="1378" y="478" fill="#f8fafc">--enforce</text>
+    <circle cx="1526" cy="470" r="11" fill="#4ade80" fill-opacity="0.2" stroke="#4ade80" stroke-width="1.5"/><path d="M1521,470 L1524.5,474 L1531.5,465.5" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="1385" y="498" width="144" height="38" rx="8" fill="#ffffff" fill-opacity="0.08" stroke="#5eead4" stroke-opacity="0.6" stroke-width="1.5"/>
+    <text class="miniMono" x="1457" y="524" fill="#e2e8f0" text-anchor="middle">exit 0</text>
+    <text class="label" x="1457" y="585">CI gate</text>
+  </g>
+</svg>

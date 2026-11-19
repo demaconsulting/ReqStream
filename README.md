@@ -9,6 +9,12 @@
 [![Security][security-shield]][security-url]
 [![NuGet][nuget-shield]][nuget-url]
 
+![ReqStream banner: the ReqStream name with the tagline 'Every requirement, traced to a test.' and the command
+reqstream --tests "*.trx" --requirements "*.yaml". A requirements.yaml with a requirement id, title, and linked test,
+TRX test results, and JUnit XML test results flow on curved arrows into the reqstream .NET tool, and arrows lead out
+to a trace matrix of requirements with their passing tests, a Markdown requirements report, a justifications document,
+and a CI gate where the --lint and --enforce checks pass with exit 0][hero]
+
 ## Overview
 
 ReqStream is a .NET command-line tool for managing software requirements in YAML format,
@@ -607,6 +613,7 @@ For information about reporting security vulnerabilities, please see our [Securi
 [mstest]: https://github.com/microsoft/testfx
 [github-actions]: https://github.com/features/actions
 [sonarcloud]: https://sonarcloud.io
+[hero]: https://raw.githubusercontent.com/demaconsulting/ReqStream/main/docs/images/hero.png
 [workflow]: https://raw.githubusercontent.com/demaconsulting/ReqStream/main/docs/images/workflow.png
 [link-guide]: https://github.com/demaconsulting/ReqStream/releases
 [link-continuous-compliance]: https://github.com/demaconsulting/ContinuousCompliance
