@@ -86,8 +86,7 @@ sections:
                   - Requirements_Load_BlankMappingId_ReportsErrorWithFileLocation
 
               - id: ReqStream-Requirement-Location
-                title: Requirement definitions shall carry a source file location, and validation errors shall include file-location
-                  information.
+                title: Requirement definitions shall carry a source file location, and validation errors shall include file-location information.
                 justification: |
                   Carrying a source file location on each requirement enables precise error reporting
                   that directs authors to the exact file where an invalid value was declared,

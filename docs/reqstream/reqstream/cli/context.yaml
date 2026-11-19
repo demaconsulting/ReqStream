@@ -167,8 +167,7 @@ sections:
                   - Context_Create_MatrixDepth_SetsMatrixDepthProperty
 
               - id: ReqStream-Command-MatrixTitles
-                title: The tool shall accept a `--matrix-titles` flag to include requirement titles as a column in the trace
-                  matrix.
+                title: The tool shall accept a `--matrix-titles` flag to include requirement titles as a column in the trace matrix.
                 justification: |
                   An opt-in title column lets readers identify requirements by their title text directly
                   from the trace matrix without cross-referencing the requirements report.
