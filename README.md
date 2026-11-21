@@ -1,4 +1,4 @@
-# ![ReqStream: Requirements traced to test results. Reads YAML requirements and TRX or JUnit test results; writes a trace matrix, reports and justifications. Shown with the command 'reqstream --requirements "*.yaml" --tests "*.trx"' and the note '.NET 10 and 11, Windows, Linux, macOS'. A requirements.yaml with a requirement id, title, and linked test, TRX test results, and JUnit XML test results flow into the reqstream .NET tool, and arrows lead out to a trace matrix of requirements with their passing tests, a Markdown requirements report, a justifications document, and a CI gate where the --lint and --enforce checks pass with exit 0][hero]
+# ![ReqStream: Requirements traced to test results][hero]
 
 [![GitHub forks][forks-shield]][forks-url]
 [![GitHub stars][stars-shield]][stars-url]
