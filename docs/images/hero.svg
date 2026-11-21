@@ -9,7 +9,7 @@
     <style>
       .word { font: bold 92px sans-serif; fill: #ffffff; }
       .eyebrow { font: bold 25px sans-serif; fill: #a5b4fc; }
-      .tag { font: bold 40px sans-serif; fill: #f8fafc; }
+      .tag { font: bold 36px sans-serif; fill: #f8fafc; }
       .body { font: 25px sans-serif; fill: #cbd5e1; }
       .cmd { font: 25px monospace; fill: #e2e8f0; }
       .prompt { fill: #5eead4; }
@@ -116,18 +116,18 @@
   <text class="word" x="52" y="176">Req</text>
   <text class="word brandText" x="225.8" y="176">Stream</text>
   <rect x="58" y="200" width="132" height="6" rx="3" fill="url(#brand)"/>
-  <text class="tag" x="56" y="266">Every requirement,</text>
-  <text class="tag brandText" x="56" y="316">traced to a test.</text>
-  <text class="body" x="58" y="368">Lints YAML requirements, links them</text>
-  <text class="body" x="58" y="402">to TRX and JUnit test results, writes</text>
-  <text class="body" x="58" y="436">reports, and gates CI on the gaps.</text>
+  <text class="tag" x="56" y="266">Requirements traced</text>
+  <text class="tag" x="56" y="314" style="fill: #a5b4fc">to test results.</text>
+  <text class="body" x="58" y="368">Reads YAML requirements and TRX or</text>
+  <text class="body" x="58" y="402">JUnit test results; writes a trace</text>
+  <text class="body" x="58" y="436">matrix, reports and justifications.</text>
   <rect x="56" y="468" width="480" height="90" rx="12" fill="#0a1022" fill-opacity="0.8" stroke="#a78bfa" stroke-opacity="0.45" stroke-width="1.5"/>
   <text class="cmd prompt" x="78" y="503">$</text>
-  <text class="cmd" x="108" y="503">reqstream --tests</text>
-  <text class="cmd file" x="378" y="503">"*.trx"</text>
-  <text class="cmd" x="138" y="539">--requirements</text>
-  <text class="cmd file" x="363" y="539">"*.yaml"</text>
-  <text class="note" x="58" y="604">Add --enforce to gate the build.</text>
+  <text class="cmd" x="108" y="503">reqstream --requirements</text>
+  <text class="cmd file" x="138" y="539">"*.yaml"</text>
+  <text class="cmd" x="273" y="539">--tests</text>
+  <text class="cmd file" x="393" y="539">"*.trx"</text>
+  <text class="note" x="58" y="604">.NET 10 and 11 &#183; Windows, Linux, macOS</text>
 
   <!-- Input cards -->
   <g>
