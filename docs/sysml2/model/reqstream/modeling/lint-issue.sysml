@@ -1,4 +1,4 @@
-package ReqStream {
+package ReqStream_LintIssue {
     private import SoftwareItemMetadata::*;
 
     part def LintIssue {

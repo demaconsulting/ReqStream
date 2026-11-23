@@ -1,4 +1,4 @@
-package ReqStream {
+package ReqStream_Section {
     private import SoftwareItemMetadata::*;
 
     part def Section {

@@ -1,4 +1,5 @@
-package ReqStream {
+package ReqStream_SelfTestSubsystem {
+    public import ReqStream_Validation::*;
     private import SoftwareItemMetadata::*;
 
     part def SelfTestSubsystem {

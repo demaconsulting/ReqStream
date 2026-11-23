@@ -1,4 +1,5 @@
-package ReqStream {
+package ReqStream_CliSubsystem {
+    public import ReqStream_Context::*;
     private import SoftwareItemMetadata::*;
 
     part def CliSubsystem {

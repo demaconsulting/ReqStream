@@ -1,4 +1,4 @@
-package ReqStream {
+package ReqStream_GlobMatcher {
     private import SoftwareItemMetadata::*;
 
     part def GlobMatcher {

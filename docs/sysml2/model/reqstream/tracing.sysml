@@ -1,4 +1,5 @@
-package ReqStream {
+package ReqStream_TracingSubsystem {
+    public import ReqStream_TraceMatrix::*;
     private import SoftwareItemMetadata::*;
 
     part def TracingSubsystem {

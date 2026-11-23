@@ -1,4 +1,4 @@
-package ReqStream {
+package ReqStream_LoadResult {
     private import SoftwareItemMetadata::*;
 
     part def LoadResult {
