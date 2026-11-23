@@ -1,7 +1,12 @@
 package ReqStream {
+    public import ReqStream_CliSubsystem::*;
+    public import ReqStream_ModelingSubsystem::*;
+    public import ReqStream_Program::*;
+    public import ReqStream_SelfTestSubsystem::*;
+    public import ReqStream_TracingSubsystem::*;
+    public import ReqStream_UtilitiesSubsystem::*;
     private import SoftwareItemMetadata::*;
-
-    import OtsDependencies::*;
+    private import OtsDependencies::*;
 
     doc
     /*

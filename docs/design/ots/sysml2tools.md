@@ -20,7 +20,7 @@ dotnet-tool restore and CI pipeline used by the other pipeline tools.
 
 ### Features Used
 
-- Model validation via `dotnet sysml2tools lint 'docs/sysml2/**/*.sysml'`, which reports syntax
+- Model validation via `dotnet sysml2tools lint --strict-unresolved 'docs/sysml2/**/*.sysml'`, which reports syntax
   errors and unresolved references without producing output files.
 - View rendering via `dotnet sysml2tools render` with the `common`, `model` and `views` globs
   (`docs/sysml2/common/**/*.sysml`, `docs/sysml2/model/**/*.sysml` and
@@ -41,7 +41,7 @@ required.
 It is used in three places in the pipeline:
 
 - **Lint** (`lint.ps1`, run from the `build.yaml` `quality-checks` job and available for local
-  pre-PR checks): `dotnet sysml2tools lint 'docs/sysml2/**/*.sysml'` fails the build if the model
+  pre-PR checks): `dotnet sysml2tools lint --strict-unresolved 'docs/sysml2/**/*.sysml'` fails the build if the model
   contains syntax errors or unresolved references.
 - **Self-validation** (`build.yaml` `build-docs` job, "Run SysML2Tools self-validation" step):
   `dotnet sysml2tools --validate` runs the tool's own self-test suite and captures the results to

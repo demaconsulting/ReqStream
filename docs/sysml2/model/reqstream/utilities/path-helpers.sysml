@@ -1,4 +1,4 @@
-package ReqStream {
+package ReqStream_PathHelpers {
     private import SoftwareItemMetadata::*;
 
     part def PathHelpers {

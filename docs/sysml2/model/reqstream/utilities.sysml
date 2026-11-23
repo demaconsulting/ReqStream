@@ -1,4 +1,7 @@
-package ReqStream {
+package ReqStream_UtilitiesSubsystem {
+    public import ReqStream_GlobMatcher::*;
+    public import ReqStream_PathHelpers::*;
+    public import ReqStream_TemporaryDirectory::*;
     private import SoftwareItemMetadata::*;
 
     part def UtilitiesSubsystem {

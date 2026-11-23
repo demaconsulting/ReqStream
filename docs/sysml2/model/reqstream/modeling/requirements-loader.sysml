@@ -1,4 +1,4 @@
-package ReqStream {
+package ReqStream_RequirementsLoader {
     private import SoftwareItemMetadata::*;
 
     part def RequirementsLoader {

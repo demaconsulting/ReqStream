@@ -1,4 +1,10 @@
-package ReqStream {
+package ReqStream_ModelingSubsystem {
+    public import ReqStream_LintIssue::*;
+    public import ReqStream_LoadResult::*;
+    public import ReqStream_Requirement::*;
+    public import ReqStream_RequirementsLoader::*;
+    public import ReqStream_Requirements::*;
+    public import ReqStream_Section::*;
     private import SoftwareItemMetadata::*;
 
     part def ModelingSubsystem {

@@ -1,4 +1,4 @@
-package ReqStream {
+package ReqStream_Validation {
     private import SoftwareItemMetadata::*;
 
     part def Validation {

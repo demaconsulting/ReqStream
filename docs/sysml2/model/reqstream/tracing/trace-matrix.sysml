@@ -1,4 +1,4 @@
-package ReqStream {
+package ReqStream_TraceMatrix {
     private import SoftwareItemMetadata::*;
 
     part def TraceMatrix {
