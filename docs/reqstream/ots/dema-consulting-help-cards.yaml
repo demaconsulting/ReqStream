@@ -1,0 +1,68 @@
+---
+# DemaConsulting.HelpCards OTS requirements
+# Note: Requirement IDs in OTS files use the project-wide ReqStream-OTS-{ToolName} pattern,
+# which is an accepted deviation from the System-Component-Feature naming standard defined
+# in reqstream-usage.md. Renaming would break traceability across all test files.
+sections:
+  - title: OTS Software Requirements
+    sections:
+      - title: DemaConsulting.HelpCards
+        requirements:
+          - id: ReqStream-OTS-HelpCards-Cli
+            title: >-
+              DemaConsulting.HelpCards shall answer a help command with a topic index, a card, or an
+              error, and shall build its catalog only after the help verb is recognized.
+            justification: |
+              ReqStream uses the command-line helper of DemaConsulting.HelpCards to serve
+              `reqstream help` for people and AI agents. The helper must answer only when the first
+              argument is the help verb, so that every other run of the tool never loads or parses a
+              card, and it must report a wrong topic with its own exit code so scripts can tell a
+              usage error from success.
+            tags: [ots]
+            tests:
+              - HelpCommand_TryRun_HelpVerb_PrintsTopicIndexAndReturnsZero
+              - HelpCommand_TryRun_CardPath_PrintsCardWithExamples
+              - HelpCommand_TryRun_UnknownTopic_ReturnsTwo
+              - HelpCommand_TryRun_NonHelpArguments_ReturnsFalseWithoutBuildingCatalog
+          - id: ReqStream-OTS-HelpCards-Catalog
+            title: >-
+              DemaConsulting.HelpCards shall load help cards into a validated catalog that supports
+              search and JSON output.
+            justification: |
+              ReqStream ships its help as Markdown cards. The catalog turns the embedded cards into
+              one validated structure that the command-line helper renders as text, ranks for a
+              search, and writes as a versioned JSON document, which is the form an AI agent
+              consumes. A catalog that enforces the closed tag vocabulary and the expected topics
+              keeps the topic list stable.
+            tags: [ots]
+            tests:
+              - HelpCommand_TryRun_SearchOption_ListsMatchingCards
+              - HelpCommand_TryRun_JsonOption_WritesJsonDocument
+              - HelpCommand_Cards_RootsMatchExpectedTopics
+          - id: ReqStream-OTS-HelpCards-Validator
+            title: >-
+              DemaConsulting.HelpCards shall report defects in help cards and in their command
+              examples to the tests of a tool.
+            justification: |
+              Help that disagrees with the tool is worse than no help. The validator and the
+              command-example parser let the ReqStream test suite fail when a card is defective,
+              too long, or holds a command line that cannot be run, so that card defects are caught
+              before release.
+            tags: [ots]
+            tests:
+              - HelpCommand_Cards_AreValid
+              - HelpCommand_Cards_CommandExamplesParse
+          - id: ReqStream-OTS-HelpCards-Embedding
+            title: >-
+              DemaConsulting.HelpCards shall embed the Help folder of the tool project in the tool
+              assembly.
+            justification: |
+              The tool is installed as a single .NET tool package with no loose files. The package
+              build targets embed the card files in the assembly, so `reqstream help` works wherever
+              the tool is installed. The test output holds no card files, so tests that load the
+              cards, print one, and run every example prove that the embedded copy is complete.
+            tags: [ots]
+            tests:
+              - HelpCommand_Cards_AreValid
+              - HelpCommand_TryRun_CardPath_PrintsCardWithExamples
+              - ReqStream_System_HelpExamples_AllCommandExamples_RunAgainstScratchSet

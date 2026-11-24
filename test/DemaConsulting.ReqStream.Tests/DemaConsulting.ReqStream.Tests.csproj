@@ -63,6 +63,11 @@
     <Using Include="Polyfills" />
   </ItemGroup>
 
+  <!-- Test Data: result files that the help-example test stages beside each card's examples -->
+  <ItemGroup>
+    <None Update="TestData\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <!-- Project References -->
   <ItemGroup>
     <ProjectReference Include="..\..\src\DemaConsulting.ReqStream\DemaConsulting.ReqStream.csproj" />

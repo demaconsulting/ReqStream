@@ -18,7 +18,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Globalization;
+using DemaConsulting.HelpCards.Catalog;
+using DemaConsulting.HelpCards.Testing;
+using DemaConsulting.ReqStream.Cli;
 using DemaConsulting.ReqStream.Utilities;
+using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 namespace DemaConsulting.ReqStream.Tests;
 
 /// <summary>
@@ -1007,5 +1013,236 @@ public sealed class IntegrationTests : IDisposable
         Assert.NotEqual(0, exitCode);
         Assert.Contains("orphaned", output, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("Integration-System-Orphan", output);
+    }
+
+    /// <summary>
+    /// Integration test verifying that the help verb lists the topics, answering before the
+    /// regular option parser would reject it, and exits with code 0.
+    /// </summary>
+    [Fact]
+    public void ReqStream_System_HelpTopics_HelpCommand_ListsTopics()
+    {
+        // Act: run the tool with the bare help verb
+        var exitCode = Runner.Run(out var output, "dotnet", _dllPath, "help");
+
+        // Assert: the topics are listed and the command succeeded without a banner
+        Assert.Equal(0, exitCode);
+        Assert.Contains("reqstream help getting-started", output);
+        Assert.Contains("reqstream help orphans", output);
+        Assert.DoesNotContain("Copyright", output);
+    }
+
+    /// <summary>
+    /// Integration test verifying that a help card path prints the card with its worked examples.
+    /// </summary>
+    [Fact]
+    public void ReqStream_System_HelpTopics_HelpCard_PrintsCardWithExamples()
+    {
+        // Act: run the tool for a card that has a child card
+        var exitCode = Runner.Run(out var output, "dotnet", _dllPath, "help", "orphans");
+
+        // Assert: the card prints with its examples
+        Assert.Equal(0, exitCode);
+        Assert.Contains("# Orphans and root tags", output);
+        Assert.Contains("## Examples", output);
+        Assert.Contains("lint-enforce [command]", output);
+
+        // Act: print one example alone
+        exitCode = Runner.Run(out output, "dotnet", _dllPath, "help", "orphans", "--example", "lint-enforce");
+
+        // Assert: only the command line is printed
+        Assert.Equal(0, exitCode);
+        Assert.Equal("reqstream --requirements requirements.yaml --lint --enforce", output.Trim());
+    }
+
+    /// <summary>
+    /// Integration test verifying that help search finds the cards that match the words.
+    /// </summary>
+    [Fact]
+    public void ReqStream_System_HelpTopics_HelpSearch_FindsCards()
+    {
+        // Act: search for the source-filter syntax
+        var exitCode = Runner.Run(out var output, "dotnet", _dllPath, "help", "--search", "windows");
+
+        // Assert: the source-filter card is among the results
+        Assert.Equal(0, exitCode);
+        Assert.Contains("reqstream help test-linking source-filters", output);
+    }
+
+    /// <summary>
+    /// Integration test verifying that help writes a JSON document for agents with --json, and
+    /// that an unknown topic exits with code 2.
+    /// </summary>
+    [Fact]
+    public void ReqStream_System_HelpTopics_HelpJson_WritesJsonDocument()
+    {
+        // Act: print the topic index as JSON
+        var exitCode = Runner.Run(out var output, "dotnet", _dllPath, "help", "--json");
+
+        // Assert: a versioned JSON document that lists the topics
+        Assert.Equal(0, exitCode);
+        Assert.StartsWith("{", output.Trim());
+        Assert.Contains("\"helpSchemaVersion\":1", output);
+        Assert.Contains("getting-started", output);
+
+        // Act: ask for an unknown topic
+        exitCode = Runner.Run(out output, "dotnet", _dllPath, "help", "no-such-topic");
+
+        // Assert: the usage-error exit code and a hint
+        Assert.Equal(2, exitCode);
+        Assert.Contains("no-such-topic", output);
+    }
+
+    /// <summary>
+    /// Integration test verifying that every command example of every help card works: for each card the
+    /// source examples are written to a fresh scratch folder, the result files that the card's commands read
+    /// are staged beside them from the test data, and the command examples run against the built tool with the
+    /// exit code the card claims.
+    /// </summary>
+    [Fact]
+    public void ReqStream_System_HelpExamples_AllCommandExamples_RunAgainstScratchSet()
+    {
+        // Arrange: the catalog the tool ships. Command examples are expected to exit with 0 and print
+        // nothing about failure unless listed here with the exit code and text they demonstrate.
+        var catalog = HelpCommand.CreateCatalog(CultureInfo.InvariantCulture);
+        var expectations = new Dictionary<string, (int ExitCode, string OutputContains)>(StringComparer.Ordinal)
+        {
+            ["lint#lint-broken"] = (1, "Unknown field 'priority' in requirement"),
+            ["orphans#lint-warning"] = (0, "Warning: 1 of 3 requirements orphaned"),
+            ["orphans#lint-enforce"] = (1, "Error: 1 of 3 requirements orphaned"),
+            ["enforcement#enforce-fail"] = (1, "Error: Only 1 of 3 requirements are satisfied with tests."),
+            ["enforcement#enforce-nothing"] = (1, "Cannot enforce requirements without test results or root tags"),
+            ["reports/filter#enforce-all"] = (1, "Error: Only 1 of 3 requirements are satisfied with tests."),
+            ["command-line/self-validation#validate-bad-extension"] = (1, "Unsupported results file format"),
+            ["command-line/self-validation#validate-missing-folder"] = (1, "Failed to write results file"),
+            ["reports/matrix#matrix-enforce"] = (1, "Error: Only 1 of 4 requirements are satisfied with tests."),
+            ["troubleshooting#no-files"] = (0, "No requirements files specified."),
+            ["troubleshooting#unknown-option"] = (1, "Unsupported argument '--lint-all'"),
+            ["troubleshooting/requirements-errors#lint-broken"] = (1, "Duplicate requirement ID 'Shop-Cart-Total'"),
+            ["troubleshooting/requirements-errors#lint-loop"] = (1, "Circular include detected"),
+            ["troubleshooting/test-errors#unsatisfied"] = (1, "Error: Only 0 of 1 requirements are satisfied with tests."),
+            ["troubleshooting/test-errors#no-result-files"] = (1, "No test result files were provided or matched"),
+            ["troubleshooting/test-errors#bad-result-file"] = (1, "Failed to parse test result file")
+        };
+        var failures = new List<string>();
+        var noResultFiles = new HashSet<string>(StringComparer.Ordinal) { "troubleshooting/test-errors#no-result-files" };
+        var used = new HashSet<string>(StringComparer.Ordinal);
+        var commandCount = 0;
+
+        // Act: run the command examples of each card in order, in a scratch folder holding the card's sources
+        // and the result files that its commands read (test data, because the cards ship no result files)
+        foreach (var card in catalog.Cards.Where(c => c.Examples.Any(e => e.Kind == HelpExample.CommandKind)))
+        {
+            using var scratch = new TemporaryDirectory();
+            foreach (var source in card.Examples.Where(e => e.Kind != HelpExample.CommandKind))
+            {
+                var path = Path.Combine(scratch.DirectoryPath, source.FileName!);
+                Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+                File.WriteAllText(path, source.Content + "\n");
+            }
+
+            StageResultFiles(card.Id, scratch.DirectoryPath);
+
+            foreach (var example in card.Examples.Where(e => e.Kind == HelpExample.CommandKind))
+            {
+                var key = $"{card.Id}#{example.Name}";
+                var parsed = ExampleCommandLine.TryParse(example.Content, HelpCommand.ToolName, out var arguments, out var error);
+                if (!parsed)
+                {
+                    failures.Add($"{key}: does not parse: {error}");
+                    continue;
+                }
+
+                var expected = expectations.TryGetValue(key, out var found) ? found : (ExitCode: 0, OutputContains: string.Empty);
+                used.Add(key);
+                commandCount++;
+
+                // A --tests value that matches no staged file would let a root-tag --enforce exit 0 for the wrong reason
+                if (!noResultFiles.Contains(key))
+                {
+                    failures.AddRange(FindUnmatchedTestPatterns(arguments.ToArray(), scratch.DirectoryPath)
+                        .Select(pattern => $"{key}: --tests '{pattern}' matches no staged result file"));
+                }
+
+                var exitCode = Runner.RunInDirectory(out var output, scratch.DirectoryPath, "dotnet", [_dllPath, .. arguments]);
+                if (exitCode != expected.ExitCode)
+                {
+                    failures.Add($"{key}: expected exit code {expected.ExitCode} but was {exitCode}. Output: {output}");
+                }
+                else if (!output.Contains(expected.OutputContains, StringComparison.Ordinal))
+                {
+                    failures.Add($"{key}: output does not contain '{expected.OutputContains}'. Output: {output}");
+                }
+            }
+        }
+
+        // Assert: no example failed, every expectation names an example that exists, and every folder of
+        // result files belongs to a card that has command examples
+        Assert.True(commandCount > 20, $"Expected more than 20 command examples but ran {commandCount}.");
+        failures.AddRange(expectations.Keys.Where(key => !used.Contains(key)).Select(key => $"{key}: expectation names no example"));
+        var cardIds = catalog.Cards
+            .Where(c => c.Examples.Any(e => e.Kind == HelpExample.CommandKind))
+            .Select(c => c.Id.Replace("/", "__", StringComparison.Ordinal))
+            .ToHashSet(StringComparer.Ordinal);
+        failures.AddRange(Directory.GetDirectories(HelpExamplesDataFolder())
+            .Select(Path.GetFileName)
+            .Where(name => !cardIds.Contains(name!))
+            .Select(name => $"TestData/HelpExamples/{name}: names no card with command examples"));
+        Assert.True(failures.Count == 0, string.Join(Environment.NewLine, failures));
+    }
+
+    /// <summary>
+    /// Gets the folder in the test output that holds the result files for the help examples.
+    /// </summary>
+    /// <returns>The full path of the <c>TestData/HelpExamples</c> folder in the test output.</returns>
+    private static string HelpExamplesDataFolder() =>
+        Path.Combine(AppContext.BaseDirectory, "TestData", "HelpExamples");
+
+    /// <summary>
+    /// Copies the result files that the commands of a card read into the scratch folder, keeping their relative paths.
+    /// </summary>
+    /// <param name="cardId">The id of the card; its folder name replaces each '/' with "__".</param>
+    /// <param name="scratchFolder">The scratch folder the card's commands run in.</param>
+    private static void StageResultFiles(string cardId, string scratchFolder)
+    {
+        var folder = Path.Combine(HelpExamplesDataFolder(), cardId.Replace("/", "__", StringComparison.Ordinal));
+        if (!Directory.Exists(folder))
+        {
+            return;
+        }
+
+        foreach (var file in Directory.GetFiles(folder, "*", SearchOption.AllDirectories))
+        {
+            var target = Path.Combine(scratchFolder, Path.GetRelativePath(folder, file));
+            Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+            File.Copy(file, target, overwrite: true);
+        }
+    }
+
+    /// <summary>
+    /// Finds the <c>--tests</c> patterns of a command line that match no file in the scratch folder.
+    /// </summary>
+    /// <param name="arguments">The arguments of the command line.</param>
+    /// <param name="scratchFolder">The folder the command runs in.</param>
+    /// <returns>The patterns that match no file.</returns>
+    private static List<string> FindUnmatchedTestPatterns(string[] arguments, string scratchFolder)
+    {
+        var unmatched = new List<string>();
+        for (var i = 0; i < arguments.Length - 1; i++)
+        {
+            if (arguments[i] != "--tests")
+            {
+                continue;
+            }
+
+            var matcher = new Matcher();
+            matcher.AddInclude(arguments[i + 1]);
+            if (!matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(scratchFolder))).HasMatches)
+            {
+                unmatched.Add(arguments[i + 1]);
+            }
+        }
+
+        return unmatched;
     }
 }

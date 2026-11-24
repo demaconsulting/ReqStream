@@ -41,6 +41,36 @@ sections:
               - ReqStream-Cli-Interface
               - ReqStream-Program-Help
 
+          - id: ReqStream-System-HelpTopics
+            title: >-
+              The system shall answer a help command with topics, cards, search results, and JSON
+              output from built-in help cards.
+            justification: |
+              People and AI agents that have only the installed tool must be able to learn how to use
+              it correctly from the tool itself, with short usage text pointing to topics that have
+              worked examples.
+            tags: [system]
+            tests:
+              - ReqStream_System_HelpTopics_HelpCommand_ListsTopics
+              - ReqStream_System_HelpTopics_HelpCard_PrintsCardWithExamples
+              - ReqStream_System_HelpTopics_HelpSearch_FindsCards
+              - ReqStream_System_HelpTopics_HelpJson_WritesJsonDocument
+            children:
+              - ReqStream-Cli-HelpTopics
+              - ReqStream-Program-HelpFooter
+
+          - id: ReqStream-System-HelpExamples
+            title: >-
+              The system shall provide help command examples that run successfully against the tool.
+            justification: |
+              A worked example in the help is only useful when it works. Running every example of
+              every help card against the built tool proves that the guidance matches the behavior.
+            tags: [system]
+            tests:
+              - ReqStream_System_HelpExamples_AllCommandExamples_RunAgainstScratchSet
+            children:
+              - ReqStream-Cli-HelpCommand-CommandExamples
+
           - id: ReqStream-System-FullPipeline
             title: >-
               The system shall execute the full requirements-processing pipeline — loading,

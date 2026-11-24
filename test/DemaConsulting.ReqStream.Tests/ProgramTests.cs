@@ -82,6 +82,27 @@ public sealed class ProgramTests : IDisposable
     }
 
     /// <summary>
+    /// Test Run with help flag ends the usage text with the pointer to the help command.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithHelpFlag_PrintsHelpFooter()
+    {
+        // Arrange: create log file path to capture output
+        var logFile = _testDirectory.GetFilePath("help-footer.log");
+
+        // Act: run with help flag, capturing output to log file
+        using (var context = Context.Create(["--help", "--log", logFile]))
+        {
+            Program.Run(context);
+        }
+
+        // Assert: the last line of the usage text points to the help command
+        var lines = File.ReadAllLines(logFile).Where(line => line.Length > 0).ToList();
+        Assert.Equal("Run 'reqstream help' for topics and examples.", lines[^1]);
+        Assert.Contains(lines, line => line.Trim() == "reqstream help [topic]");
+    }
+
+    /// <summary>
     /// Test Run with help flag prints help information.
     /// </summary>
     [Fact]

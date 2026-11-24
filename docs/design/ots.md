@@ -52,6 +52,8 @@ through a single dedicated wrapper or utility class within ReqStream:
   the rest of the system.
 - **DemaConsulting.TestResults** is accessed through `TraceMatrix` and `Validation`, which are
   the only units that call the package's deserialization and serialization APIs directly.
+- **DemaConsulting.HelpCards** is accessed through `HelpCommand`, which is the only unit that
+  references the package in the shipped tool; test code uses the package's validation helpers.
 
 This single-use-site pattern means that replacing an OTS package requires changes to only one
 unit in the codebase, minimizing the impact of future upgrades or substitutions.

@@ -1,0 +1,35 @@
+---
+root-tags:
+  - system
+sections:
+  - title: Shop Requirements
+    requirements:
+      - id: Shop-System-Checkout
+        title: The shop shall let a customer check out a basket.
+        justification: |
+          Checkout is the purpose of the shop.
+          Every other requirement supports it.
+        tags:
+          - system
+        children:
+          - Shop-Cart-Total
+          - Shop-Payment-Charge
+    sections:
+      - title: Cart Requirements
+        requirements:
+          - id: Shop-Cart-Total
+            title: The cart shall total the prices of its items.
+            tests:
+              - Cart_Total_SumsItems
+      - title: Payment Requirements
+        requirements:
+          - id: Shop-Payment-Charge
+            title: The payment service shall charge the total once.
+            tags:
+              - security
+
+mappings:
+  - id: Shop-Payment-Charge
+    tests:
+      - windows@Payment_Charge_ChargesOnce
+      - Payment_Charge_RefusesDuplicates

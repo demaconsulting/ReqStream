@@ -49,6 +49,13 @@ comma-separated list is parsed into `RootTags`, and
 `Context_Create_MultipleRootTagsArguments_MergesIntoSingleSet`, which verifies repeated
 `--root-tags` occurrences union into a single set.
 
+**Help Topics**: Tests verify that the Cli subsystem answers the help verb before option parsing and
+leaves every other argument to the option parser. This scenario is tested by
+`Cli_HelpTopics_HelpVerb_IsAnsweredBeforeArgumentParsing`, which verifies that `HelpCommand` answers
+`help lint` while `Context.Create` alone rejects the verb as an unsupported argument, and
+`Cli_HelpTopics_OtherArguments_AreLeftToContext`, which verifies that `--version` is not answered by
+`HelpCommand`, writes nothing, and is parsed by `Context`.
+
 ### Requirements Coverage
 
 Each entry gives the requirement, its scenario in parentheses, and the test methods that verify it.
@@ -66,3 +73,5 @@ Each entry gives the requirement, its scenario in parentheses, and the test meth
 - `ReqStream-Cli-DepthInheritance` (Interface Scenario): `Cli_Interface_DepthFlag_SetsDefaultForAllReportDepths`
 - `ReqStream-Cli-RootTags` (Root Tags Scenario): `Context_Create_RootTagsFlag_ParsesTagsCorrectly`,
   `Context_Create_MultipleRootTagsArguments_MergesIntoSingleSet`
+- `ReqStream-Cli-HelpTopics` (Help Topics Scenario): `Cli_HelpTopics_HelpVerb_IsAnsweredBeforeArgumentParsing`,
+  `Cli_HelpTopics_OtherArguments_AreLeftToContext`

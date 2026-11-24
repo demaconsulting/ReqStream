@@ -2,6 +2,7 @@
 # Cli subsystem requirements
 includes:
   - cli/context.yaml
+  - cli/help-command.yaml
 
 sections:
   - title: ReqStream Requirements
@@ -38,6 +39,26 @@ sections:
               - ReqStream-Command-JustificationsDepth
               - ReqStream-Command-Depth
               - ReqStream-Command-TagFilter
+
+          - id: ReqStream-Cli-HelpTopics
+            title: >-
+              The Cli subsystem shall answer the help command from built-in help cards before the
+              command-line options are parsed.
+            justification: |
+              A person or an AI agent that has only the installed tool must be able to learn how to
+              use it correctly from the tool itself. The help verb is not an option, so it must be
+              answered before option parsing, and it must cost nothing for any other run of the tool.
+            tags: [cli]
+            tests:
+              - Cli_HelpTopics_HelpVerb_IsAnsweredBeforeArgumentParsing
+              - Cli_HelpTopics_OtherArguments_AreLeftToContext
+            children:
+              - ReqStream-Cli-HelpCommand-HelpVerb
+              - ReqStream-Cli-HelpCommand-Search
+              - ReqStream-Cli-HelpCommand-DeferredCatalog
+              - ReqStream-Cli-HelpCommand-Footer
+              - ReqStream-Cli-HelpCommand-ValidCards
+              - ReqStream-Cli-HelpCommand-CommandExamples
 
           - id: ReqStream-Cli-Output
             title: The Cli subsystem shall provide output channels to write messages to the console and optional log file.

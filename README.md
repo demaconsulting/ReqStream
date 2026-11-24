@@ -32,6 +32,7 @@ CI quality gate, compliance evidence, release documents, or focused audits][work
 - 🧩 **Orphan Detection** - Detect requirements not reachable from any root-tagged requirement, catching
   disconnected/scope-creep requirements
 - 📤 **Export Capabilities** - Generate markdown reports for requirements, trace matrices, and justifications
+- 📖 **Built-in Help** - `reqstream help` teaches the tool with topics and worked examples, for people and AI agents
 - 🔒 **Continuous Compliance** - Compliance evidence generated automatically on every CI run, following
   the [Continuous Compliance][link-continuous-compliance] methodology
 
@@ -94,6 +95,7 @@ This will display:
 
 ```text
 Usage: reqstream [options]
+       reqstream help [topic]
 
 Options:
   -v, --version                    Display version information
@@ -116,7 +118,26 @@ Options:
   --filter <tags>                  Comma-separated list of tags to filter requirements
   --root-tags <tags>               Comma-separated tags marking root requirements for orphan detection
   --enforce                        Fail if requirements are not fully tested or are orphaned (when root tags are configured)
+
+Run 'reqstream help' for topics and examples.
 ```
+
+### Built-in Help
+
+`--help` stays short. For the guidance of a skill file, use the built-in help: it lists topics, prints a focused
+card with worked examples that run as written, searches, and writes JSON for AI agents:
+
+```bash
+reqstream help                               # list the topics
+reqstream help getting-started               # a first requirements file, lint, and report
+reqstream help test-linking source-filters   # a topic below a topic
+reqstream help --search orphan               # find cards by words
+reqstream help orphans --json                # the same answer as a versioned JSON document
+```
+
+The topics are `getting-started`, `requirements-file`, `includes`, `test-linking`, `test-results`, `reports`,
+`lint`, `orphans`, `enforcement`, `command-line`, and `troubleshooting`. An AI agent with only the `reqstream` tool
+installed can learn to use it correctly from `reqstream help` alone.
 
 ## Self Validation
 

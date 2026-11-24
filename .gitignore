@@ -92,6 +92,10 @@ TestResults/
 *.xml
 coverage.opencover.xml
 
+# Test input data (result files the help-example tests read), not generated results
+!test/*/TestData/**/*.trx
+!test/*/TestData/**/*.xml
+
 # VersionMark captures (generated during CI/CD)
 versionmark-*.json
 

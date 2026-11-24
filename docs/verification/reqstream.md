@@ -62,6 +62,25 @@ invocation and exits silently when no issues are found. This scenario is tested 
 `ReqStream_System_Lint_Flag_ReportsLintIssues` and
 `ReqStream_System_Lint_ValidRequirementsFile_ExitsSilentlyWithZero`.
 
+**Help Topics**: Verifies that the tool answers `help` from its built-in cards when run as a separate
+process: the bare verb lists the topics without a banner, a card path prints the card with its
+examples, one example prints alone, `--search` finds the cards that match, and `--json` writes a
+versioned JSON document. An unknown topic exits with code 2. This scenario is tested by
+`ReqStream_System_HelpTopics_HelpCommand_ListsTopics`,
+`ReqStream_System_HelpTopics_HelpCard_PrintsCardWithExamples`,
+`ReqStream_System_HelpTopics_HelpSearch_FindsCards`, and
+`ReqStream_System_HelpTopics_HelpJson_WritesJsonDocument`.
+
+**Help Examples**: Verifies that every command example of every help card works. For each card the
+test writes the card's source examples to a fresh scratch folder, stages the result files that the
+card's commands read from the test data (`TestData/HelpExamples/<card id>`, copied to the test output),
+and runs its command examples, in order, against the built tool. Every `--tests` pattern must match a
+staged file, except in the example that shows a glob matching nothing. Each run must give the exit code
+the card claims, which is 0 unless the test names the example as a deliberate failure with its expected
+exit code and message. Every such expectation must name an existing example, and every folder of test
+data must name a card with command examples. This scenario is tested by
+`ReqStream_System_HelpExamples_AllCommandExamples_RunAgainstScratchSet`.
+
 **Validate**: Verifies that the tool runs a built-in self-test suite when `--validate` is passed.
 This scenario is tested by `ReqStream_System_Validate_Flag_RunsSelfValidation`.
 
@@ -158,6 +177,10 @@ Each entry gives the requirement and the test methods that verify it.
 
 - `ReqStream-System-VersionDisplay`: `ReqStream_System_CliInterface_VersionFlag_PrintsVersion`
 - `ReqStream-System-HelpDisplay`: `ReqStream_System_CliInterface_HelpFlag_PrintsHelp`
+- `ReqStream-System-HelpTopics`: `ReqStream_System_HelpTopics_HelpCommand_ListsTopics`,
+  `ReqStream_System_HelpTopics_HelpCard_PrintsCardWithExamples`,
+  `ReqStream_System_HelpTopics_HelpSearch_FindsCards`, `ReqStream_System_HelpTopics_HelpJson_WritesJsonDocument`
+- `ReqStream-System-HelpExamples`: `ReqStream_System_HelpExamples_AllCommandExamples_RunAgainstScratchSet`
 - `ReqStream-System-FullPipeline`: `ReqStream_FullPipeline_WithCoveredRequirements_GeneratesAllReportsAndEnforces`
 - `ReqStream-System-SourceFilter`: `ReqStream_SourceFilter_NamedSourceInRequirement_MatchesTestsBySourceFile`
 - `ReqStream-System-EnforceMode`: `ReqStream_EnforcementMode_RequirementLacksTestEvidence_FailsWithNonZeroExitCode`

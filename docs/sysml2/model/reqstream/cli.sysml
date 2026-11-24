@@ -1,5 +1,6 @@
 package ReqStream_CliSubsystem {
     public import ReqStream_Context::*;
+    public import ReqStream_HelpCommand::*;
     private import SoftwareItemMetadata::*;
 
     part def CliSubsystem {
@@ -13,5 +14,6 @@ package ReqStream_CliSubsystem {
         }
 
         part context : Context;
+        part helpCommand : HelpCommand;
     }
 }

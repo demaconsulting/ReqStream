@@ -24,7 +24,10 @@ in Key Methods.
 
 - *Type*: CLI entry point.
 - *Role*: Provider (host environment calls this).
-- *Contract*: Accepts `string[] args`; returns process exit code (`0` or `1`).
+- *Contract*: Accepts `string[] args`; first offers the arguments to `HelpCommand.TryRun` and, when
+  the first argument is the `help` verb, returns the exit code of the help command (`0`, `2`, or
+  `70`) without creating a `Context`; otherwise creates the `Context`, calls `Run`, and returns
+  process exit code `0` or `1`.
 - *Constraints*: Must never block waiting for interactive input.
 
 **Program.Run**: Internal dispatch method.
@@ -35,7 +38,8 @@ in Key Methods.
   priority-ordered sequence:
   1. `--version` — print version string and return.
   2. If not lint mode — print banner (falls through to next step).
-  3. `--help` — print usage and return.
+  3. `--help` — print usage, ending with the `HelpCommand.Footer` pointer to `reqstream help`, and
+     return.
   4. `--validate` — call `Validation.Run(context)` and return.
   5. `--lint` with no files — print "No requirements files specified" and return.
   6. `--lint` — load requirements, report lint issues, and return.
@@ -113,6 +117,8 @@ caught by the `Main` unexpected-exception handler.
 
 - `Cli.Context` — created by `Main` via `Context.Create(args)`; all output and program state flow
   through it.
+- `Cli.HelpCommand` — offered the arguments by `Main` before the `Context` is created
+  (`TryRun`), and read by `PrintHelp` for the usage footer (`Footer`).
 - `Modeling.Requirements` — loaded via `Requirements.Load` in both the lint and default dispatch
   paths.
 - `SelfTest.Validation` — invoked via `Validation.Run(context)` in the `--validate` dispatch

@@ -1,0 +1,10 @@
+---
+sections:
+  - title: Shop Requirements
+    requirements:
+      - id: Shop-System-Checkout
+        title: The shop shall let a customer check out a basket.
+        tags:
+          - system
+        children:
+          - Shop-Cart-Pricing
