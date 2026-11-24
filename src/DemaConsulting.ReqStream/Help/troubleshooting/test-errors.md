@@ -62,8 +62,8 @@ examples:
     content: '{{tool}} --requirements requirements.yaml --tests broken.trx --matrix matrix.md'
 ---
 
-- `Only N of M requirements are satisfied with tests.`: the next lines list the unsatisfied ids. Open the matrix and
-  read the columns described below.
+- `Only N of M requirements are satisfied with tests.`: the next lines list the unsatisfied ids, a failing requirement
+  and its ancestors ([[reports/matrix]]). Open the matrix and read the columns described below.
 - `No test result files were provided or matched.`: `--matrix` found no file for `--tests` ([[#no-result-files]]).
   Run the tests first, and check the glob, its quotes, and the current folder.
 - `Failed to parse test result file: path`: the file is not valid TRX or JUnit XML, often because it is empty or
@@ -71,13 +71,15 @@ examples:
 - `Cannot enforce requirements without test results or root tags`: add `--tests`, or set root tags
   ([[enforcement]]).
 
-**Reading the matrix** ([[reports/matrix]]). For an unsatisfied requirement, look at its row:
+**Reading the matrix** ([[reports/matrix]]). The columns count a row's **own** tests only. For an unsatisfied
+requirement from the list, look at its row:
 
-- *Tests Linked* is 0: the requirement and its children name no test. Add `tests:` ([[test-linking]]).
+- *Tests Linked* is 0: the requirement names no test of its own. A leaf with no children needs `tests:`
+  ([[test-linking]]). A parent with zeros can still be unsatisfied through a descendant: follow its `children`.
 - *Not Executed* above 0: no result matches the name. Names are exact and case-sensitive, as [[#unsatisfied]] shows with
   [[#requirements-tests]] and [[#results-tests]]. Copy the test method name, without namespace or class. A skipped
   test also counts here.
-- *Failed* above 0: a test failed. Fix the test, not the requirement.
+- *Failed* above 0: a test of this row failed. Fix the test, not the requirement.
 - A `windows@` style entry is not executed: no result file name contains the filter
   ([[test-linking/source-filters]]). Name the result files after the job.
 

@@ -1,0 +1,12 @@
+<testsuites name="ubuntu run">
+  <testsuite name="Shop.Tests" tests="4" failures="1" errors="0" skipped="1">
+    <testcase name="Cart_Total_SumsItems" classname="Shop.Tests.CartTests" time="0.010" />
+    <testcase name="Payment_Charge_ChargesOnce" classname="Shop.Tests.PaymentTests" time="0.020" />
+    <testcase name="Payment_Charge_UsesWindowsApi" classname="Shop.Tests.PaymentTests" time="0.000">
+      <skipped />
+    </testcase>
+    <testcase name="Cart_PrintReceipt_Fails" classname="Shop.Tests.CartTests" time="0.005">
+      <failure message="printer missing" />
+    </testcase>
+  </testsuite>
+</testsuites>

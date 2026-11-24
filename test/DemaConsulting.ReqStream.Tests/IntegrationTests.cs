@@ -1111,6 +1111,8 @@ public sealed class IntegrationTests : IDisposable
             ["enforcement#enforce-nothing"] = (1, "Cannot enforce requirements without test results or root tags"),
             ["reports/filter#enforce-all"] = (1, "Error: Only 1 of 3 requirements are satisfied with tests."),
             ["command-line/self-validation#validate-bad-extension"] = (1, "Unsupported results file format"),
+            ["command-line/self-validation#validate-missing-folder"] = (1, "Failed to write results file"),
+            ["reports/matrix#matrix-enforce"] = (1, "Error: Only 1 of 4 requirements are satisfied with tests."),
             ["troubleshooting#no-files"] = (0, "No requirements files specified."),
             ["troubleshooting#unknown-option"] = (1, "Unsupported argument '--lint-all'"),
             ["troubleshooting/requirements-errors#lint-broken"] = (1, "Duplicate requirement ID 'Shop-Cart-Total'"),

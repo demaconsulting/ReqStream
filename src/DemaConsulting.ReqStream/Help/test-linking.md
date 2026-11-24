@@ -66,14 +66,19 @@ A requirement is proven by tests. List their names in one of two places ([[#requ
   requirement id`.
 
 **What a test name is.** It is the name the test run records, without namespace or class: the test method name, such as
-`Cart_Total_SumsItems`. In a TRX file that is the test method name, and in a JUnit file it is the `name` of the
-`testcase` ([[test-results]]). Matching is exact and case-sensitive. To accept a result from one platform only, prefix
-the name with a source filter such as `windows@` ([[test-linking/source-filters]]).
+`Cart_Total_SumsItems`. In a TRX file that is the test method name (not the display name), and in a JUnit file it is
+the `name` of the `testcase` ([[test-results]]). Matching is exact and case-sensitive. To accept a result from one
+platform only, prefix the name with a source filter such as `windows@` ([[test-linking/source-filters]]).
 
 **How a requirement is proven.** A requirement counts as satisfied when it has at least one test, counting the tests of
 every requirement below it through `children`, and every one of those tests ran and passed. A test that is listed but
 missing from the results, or skipped, counts as not executed and fails the requirement. A test name that appears in
 several result files is aggregated, and all of its runs must pass.
 
-[[#matrix]] shows the whole flow. To see why a requirement is unsatisfied, read the Testing table of the matrix
-([[reports/matrix]]).
+**Tests that no requirement lists are ignored.** Every result file is read, but only the names a requirement lists are
+looked up. An unlinked test, passed, failed or skipped, is not in the matrix, never changes the exit code, and gets no
+warning. No option lists them. To audit, compare the test names in the result files with the Testing table of the
+matrix ([[reports/matrix]]).
+
+[[#matrix]] shows the whole flow. The ids of unsatisfied requirements are printed only by `--enforce`
+([[enforcement]]).

@@ -8,6 +8,7 @@ tags:
   - reference
 order: 3
 see-also:
+  - includes/hierarchy
   - requirements-file/sections
   - orphans
   - troubleshooting/requirements-errors
@@ -90,3 +91,6 @@ every matching file is read as a requirements file, and a workflow or settings f
 `Unknown field`. Name the root file, or a folder that holds only requirements.
 
 A pattern that matches several files is also fine; each matching file is a root, and ids still must not repeat.
+The console line `Reading N requirements file(s)` counts these roots, not the included files, so a root with five
+includes reads `Reading 1`. For a tree of system, subsystem and unit requirements over several files, see
+[[includes/hierarchy]].

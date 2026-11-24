@@ -1,0 +1,13 @@
+---
+includes:
+  - units.yaml
+sections:
+  - title: Shop Requirements
+    sections:
+      - title: Cart Subsystem
+        requirements:
+          - id: Shop-Cart-Pricing
+            title: The cart subsystem shall price a basket.
+            children:
+              - Shop-Cart-Total
+              - Shop-Cart-Save

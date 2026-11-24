@@ -92,6 +92,9 @@ TestResults/
 *.xml
 coverage.opencover.xml
 
+# Help card example data: result files that are part of the cards, not generated results
+!src/*/Help/**/*.trx
+!src/*/Help/**/*.xml
 # VersionMark captures (generated during CI/CD)
 versionmark-*.json
 

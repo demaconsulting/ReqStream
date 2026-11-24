@@ -1,0 +1,8 @@
+---
+root-tags:
+  - system
+  - quality
+includes:
+  - system.yaml
+  - quality.yaml
+  - cart/subsystem.yaml

@@ -1,0 +1,16 @@
+---
+sections:
+  - title: Shop Requirements
+    sections:
+      - title: Cart Subsystem
+        sections:
+          - title: Cart Units
+            requirements:
+              - id: Shop-Cart-Total
+                title: The cart shall total the prices of its items.
+                tests:
+                  - Cart_Total_SumsItems
+              - id: Shop-Cart-Save
+                title: The cart shall save a basket to a file on Windows.
+                tests:
+                  - windows@Cart_Save_WritesFile

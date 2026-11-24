@@ -1,0 +1,12 @@
+---
+sections:
+  - title: Shop Requirements
+    sections:
+      - title: Quality
+        requirements:
+          - id: Shop-Quality-Lint
+            title: The requirements shall pass lint with enforcement.
+            tags:
+              - quality
+            tests:
+              - Requirements_Lint_Passes

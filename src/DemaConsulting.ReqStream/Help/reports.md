@@ -72,3 +72,7 @@ exist: a missing folder stops the run with an unexpected-error message.
 
 Reports are written before `--enforce` checks coverage, so a failing enforcement run still leaves its reports for
 inspection ([[enforcement]]).
+
+**Reports are Markdown fragments.** There is no title or front matter, and headings start at `--depth`, so a report can
+be one input file of Pandoc or pasted into a larger document under a heading. `--matrix` needs `--tests`, which can be
+repeated for TRX and XML ([[test-results]]).

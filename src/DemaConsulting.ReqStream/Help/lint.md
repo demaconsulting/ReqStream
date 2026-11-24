@@ -61,5 +61,15 @@ It checks:
 - **Orphans**: when root tags are set, requirements that no root requirement reaches through `children`. These are
   warnings, and errors with `--enforce`: `--lint --enforce` is the usual CI check ([[orphans]]).
 
-It does not read test results. Whether a test exists or passes is checked by `--tests` with `--enforce`
-([[enforcement]]). For the meaning of each message and its fix, see [[troubleshooting/requirements-errors]].
+It does not read test results, so it cannot see a missing, misspelled, or failing test: that is `--tests` with
+`--enforce` ([[enforcement]]). The CI recipe in [[enforcement]] runs lint first and the report run second.
+
+**What lint does not check.** All of these are clean, with exit 0 and no output:
+
+- A requirement with no `tests`, no `justification`, or no `tags`.
+- Id naming, title wording (no "shall" check), and tag names.
+- A test name that no result file contains, or one shared by two requirements.
+- Orphans, unless root tags are set (from a file or `--root-tags`). Then they are warnings, or errors with `--enforce`.
+
+`--lint` also ignores `--tests`, `--report`, `--justifications`, and `--matrix`. For the meaning of each message and its
+fix, see [[troubleshooting/requirements-errors]].

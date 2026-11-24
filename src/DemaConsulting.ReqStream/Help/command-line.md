@@ -49,7 +49,8 @@ positional arguments: an unknown argument stops the run with `Unsupported argume
 
 **Globs.** Put every pattern in double quotes so the tool expands it: `**` crosses folders, `*` matches within a
 name. Relative patterns start at the current folder. A pattern that matches no file is silent: a run with no
-requirements prints `No requirements files specified.` and exits 0.
+requirements prints `No requirements files specified.` and exits 0. `Reading N requirements file(s)` and
+`Processing N test result file(s)` count matched files, so included requirements files are not counted.
 
 **Repeating options.** `--requirements`, `--tests`, `--filter`, and `--root-tags` add up when given more than once.
 Tag lists are comma-separated without spaces.

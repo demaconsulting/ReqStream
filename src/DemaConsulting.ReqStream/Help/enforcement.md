@@ -96,6 +96,16 @@ examples:
     language: shell
     description: No tests and no root tags give --enforce nothing to check. This is an error and exits 1.
     content: '{{tool}} --requirements plain.yaml --enforce'
+  - name: ci-lint
+    kind: command
+    language: shell
+    description: CI step 1, before the tests run. Lints the files and checks orphans. Prints nothing and exits 0.
+    content: '{{tool}} --requirements requirements.yaml --lint --enforce'
+  - name: ci-report
+    kind: command
+    language: shell
+    description: CI step 2, after the tests ran. Writes all three reports, then enforces coverage. Exits 0.
+    content: '{{tool}} --requirements requirements.yaml --tests results-pass.xml --report requirements-report.md --justifications justifications.md --matrix matrix.md --enforce'
 ---
 `--enforce` turns a report run into a gate. It checks two things, each only when it has something to check:
 
@@ -111,12 +121,24 @@ Reports are written first, so a failed gate still leaves the matrix to read ([[r
 | 0 | The run succeeded: lint warnings and a clean enforcement are both 0. |
 | 1 | Any error: a lint error, a failed enforcement, a bad option, an unreadable result file, or a missing file. |
 
-`{{tool}} help` has its own codes: 0 on success, 2 for a wrong help argument or an unknown topic.
+An `Unexpected error` message, such as a report folder that does not exist, ends with the runtime's own non-zero crash
+code instead of 1, so treat any non-zero exit as a failure. `{{tool}} help` has its own codes: 0 on success, 2 for a
+wrong help argument or an unknown topic. For `--validate` see [[command-line/self-validation]].
 
-In CI, run the report and the gate together, after the tests have written their result files:
+**Where the unsatisfied ids go.** A failed gate prints `Error: Only N of M requirements are satisfied with tests.`
+and one `  - <id>` line per unsatisfied requirement, in file order. They go to the error stream, to `--log`, and not to
+the console with `--silent`. The matrix file does not list them ([[reports/matrix]]). Use [[#enforce-pass]] and
+[[#enforce-fail]] to see both outcomes.
 
-```shell
-{{tool}} --requirements requirements.yaml --tests "test-results/**/*.trx" --matrix matrix.md --enforce
-```
+**What `--enforce` does not check.** Tests that are in a result file but that no requirement lists are ignored: no
+warning, no failure ([[test-linking]]). Missing justifications are not checked either; see [[lint]] for what lint
+checks.
 
-Use [[#enforce-pass]] and [[#enforce-fail]] to see both outcomes; the failing run lists the unsatisfied ids.
+**CI recipe.** Two commands, because `--lint` ignores the report options. Create the output folders first.
+
+1. Before the tests, as a fast check that needs no results ([[#ci-lint]]):
+   `{{tool}} --requirements requirements.yaml --lint --enforce`
+2. After the tests have written their result files ([[#ci-report]]):
+   `{{tool}} --requirements requirements.yaml --tests "test-results/**/*.trx" --report r.md --matrix m.md --enforce`
+
+Step 2 writes the reports first and then enforces, so a failed gate still leaves the reports to publish.
