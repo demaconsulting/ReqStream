@@ -154,7 +154,7 @@ Full `build.ps1 -All` and `lint.ps1 -All` runs can take many minutes on large re
 them once, not after every edit. The scripts require a scope: with no arguments they print usage
 and exit 1.
 
-- **While iterating**, use `-Changed` (or `lint.ps1`/`fix.ps1 -Check`) so only
+- **While iterating**, use `-Changed` (or `lint.ps1`/`fix.ps1 -Check`, or `build.ps1 -Project`) so only
   the affected work runs; add `-DryRun` to see the selection without running anything
 - **Before handing back**, run the full gates your agent requires once (`build.ps1 -All`,
   `lint.ps1 -All`); re-run them only if you change files after they pass
@@ -164,10 +164,13 @@ and exit 1.
 
 # Scoped Validation (ALL Agents Must Follow)
 
-ReqStream has one library and one test project, so `build.ps1 -Changed` is all or nothing: a change to
-either project, a file linked into one, or a build-wide file (solution, project, props/targets,
-`global.json`, `.editorconfig`, `nuget.config`, tool manifest, `build.ps1`, `scripts/ProjectScripts.psm1`)
-runs the full build and tests; documentation-only changes build nothing. Run `pwsh ./fix.ps1 -Changed` and
+ReqStream has one library (`DemaConsulting.ReqStream`) and one test project (`DemaConsulting.ReqStream.Tests`).
+`build.ps1 -Changed` selects the test projects a change affects through the project reference graph, and
+`build.ps1 -Project ReqStream` or `-Project Tests` (full names also work) selects them by name. A build-wide file
+(solution, project, props/targets, `global.json`, `.editorconfig`, `nuget.config`, tool manifest, `build.ps1`,
+`scripts/ProjectScripts.psm1`) runs the full build and tests; documentation-only changes build nothing. The tests read
+no repository files at run time, so `$RuntimeReads` in `build.ps1` is empty; keep it in step if a test starts reading
+one. Run `pwsh ./fix.ps1 -Changed` and
 `pwsh ./lint.ps1 -Changed` for them, then `pwsh ./lint.ps1 -All` before the pull request.
 
 # Scope Discipline (ALL Agents Must Follow)
