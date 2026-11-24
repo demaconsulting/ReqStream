@@ -1,0 +1,6 @@
+<testsuites name="all tests">
+  <testsuite name="Shop.Tests" tests="2" failures="0">
+    <testcase name="Cart_Total_SumsItems" classname="Shop.Tests.CartTests" time="0.010" />
+    <testcase name="Payment_Charge_ChargesOnce" classname="Shop.Tests.PaymentTests" time="0.020" />
+  </testsuite>
+</testsuites>

@@ -168,10 +168,9 @@ ReqStream has one library (`DemaConsulting.ReqStream`) and one test project (`De
 `build.ps1 -Changed` selects the test projects a change affects through the project reference graph, and
 `build.ps1 -Project ReqStream` or `-Project Tests` (full names also work) selects them by name. A build-wide file
 (solution, project, props/targets, `global.json`, `.editorconfig`, `nuget.config`, tool manifest, `build.ps1`,
-`scripts/ProjectScripts.psm1`) runs the full build and tests; documentation-only changes build nothing. One test
-reads repository files at run time, the help cards in `src/DemaConsulting.ReqStream/Help/`, and `$RuntimeReads` in
-`build.ps1` maps them to the test project; keep it in step if another test starts reading one. Run
-`pwsh ./fix.ps1 -Changed` and
+`scripts/ProjectScripts.psm1`) runs the full build and tests; documentation-only changes build nothing. The tests read
+no repository files at run time, so `$RuntimeReads` in `build.ps1` is empty; keep it in step if a test starts reading
+one. Run `pwsh ./fix.ps1 -Changed` and
 `pwsh ./lint.ps1 -Changed` for them, then `pwsh ./lint.ps1 -All` before the pull request.
 
 # Scope Discipline (ALL Agents Must Follow)

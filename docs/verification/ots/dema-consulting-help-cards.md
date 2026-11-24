@@ -14,7 +14,7 @@ card folder in the tool assembly. DemaConsulting.HelpCards is the library that s
 DemaConsulting.HelpCards is verified by integration test evidence. The `HelpCommand` unit tests drive
 the package's command-line helper with the cards embedded in the tool assembly and check the answers,
 exit codes, and the deferred creation of the catalog. The same tests run the package's validator,
-root-card check, command-example parser, and folder comparison against the shipped cards. The system
+root-card check, and command-example parser against the shipped cards. The system
 tests run the built tool to confirm that the same behavior holds in a separate process and that every
 command example of every card runs.
 
@@ -36,9 +36,11 @@ and `HelpCommand_Cards_RootsMatchExpectedTopics`.
 and that every command example parses. This scenario is tested by `HelpCommand_Cards_AreValid` and
 `HelpCommand_Cards_CommandExamplesParse`.
 
-**Embedding**: Verifies that the cards embedded in the assembly by the package build targets are exactly
-the files of the source folder. This scenario is tested by
-`HelpCommand_Cards_EmbeddedFilesMatchFolderOnDisk`.
+**Embedding**: Verifies that the cards embedded in the assembly by the package build targets are complete
+and usable. The test output holds no card files, so a validated catalog, a printed card, and every
+command example of every card running against the built tool prove that the embedded copy is complete.
+This scenario is tested by `HelpCommand_Cards_AreValid`, `HelpCommand_TryRun_CardPath_PrintsCardWithExamples`,
+and `ReqStream_System_HelpExamples_AllCommandExamples_RunAgainstScratchSet`.
 
 ### Requirements Coverage
 
@@ -51,4 +53,6 @@ Each entry gives the requirement, its scenario in parentheses, and the test meth
   `HelpCommand_TryRun_JsonOption_WritesJsonDocument`, `HelpCommand_Cards_RootsMatchExpectedTopics`
 - ReqStream-OTS-HelpCards-Validator (Validation): `HelpCommand_Cards_AreValid`,
   `HelpCommand_Cards_CommandExamplesParse`
-- ReqStream-OTS-HelpCards-Embedding (Embedding): `HelpCommand_Cards_EmbeddedFilesMatchFolderOnDisk`
+- ReqStream-OTS-HelpCards-Embedding (Embedding): `HelpCommand_Cards_AreValid`,
+  `HelpCommand_TryRun_CardPath_PrintsCardWithExamples`,
+  `ReqStream_System_HelpExamples_AllCommandExamples_RunAgainstScratchSet`

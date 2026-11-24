@@ -1,0 +1,5 @@
+<testsuites name="payment tests">
+  <testsuite name="Shop.Tests" tests="1" failures="0">
+    <testcase name="Payment_Charge_ChargesOnce" classname="Shop.Tests.PaymentTests" time="0.020" />
+  </testsuite>
+</testsuites>

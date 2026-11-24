@@ -67,10 +67,7 @@ Import-Module (Join-Path $PSScriptRoot 'scripts/ProjectScripts.psm1') -Force
 # [PROJECT-SPECIFIC] Repository files that tests read at run time (through the repository root, not through a
 # project item), mapped to the test project that reads them. Keep in step with the tests. Example:
 #   '^docs/user_guide/tool\.md$' = 'DemaConsulting.ReqStream.Tests'
-$RuntimeReads = [ordered]@{
-    # HelpCommandTests compares the embedded help cards with the files of the Help folder.
-    '^src/DemaConsulting\.ReqStream/Help/' = 'DemaConsulting.ReqStream.Tests'
-}
+$RuntimeReads = [ordered]@{}
 
 # [PROJECT-SPECIFIC] Short -Project names that no resolution rule can derive (exact name, unique dot-segment suffix,
 # Core), as data: alias = project name. Empty by default. Example:

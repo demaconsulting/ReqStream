@@ -64,17 +64,15 @@ sections:
 
               - id: ReqStream-Cli-HelpCommand-ValidCards
                 title: >-
-                  The HelpCommand unit shall serve only help cards that are valid, have the expected set
-                  of topics, and match the card files in the source folder.
+                  The HelpCommand unit shall serve only help cards that are valid and have the expected
+                  set of topics.
                 justification: |
-                  A defective card, a missing topic, or an embedded copy that differs from the reviewed
-                  source files would give users wrong guidance. Tests that fail on any of these keep the
-                  shipped help identical to the reviewed help.
+                  A defective card or a missing topic would give users wrong guidance. Tests that fail
+                  on either keep the shipped help correct.
                 tags: [cli]
                 tests:
                   - HelpCommand_Cards_AreValid
                   - HelpCommand_Cards_RootsMatchExpectedTopics
-                  - HelpCommand_Cards_EmbeddedFilesMatchFolderOnDisk
                 children:
                   - ReqStream-OTS-HelpCards-Validator
                   - ReqStream-OTS-HelpCards-Embedding

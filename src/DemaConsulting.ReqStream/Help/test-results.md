@@ -17,7 +17,7 @@ examples:
     kind: source
     language: yaml
     file: requirements.yaml
-    description: Requirements whose tests appear in the two result files below.
+    description: Requirements whose tests appear in the result files that the matrix command reads.
     content: |
       root-tags:
         - system
@@ -39,24 +39,14 @@ examples:
               title: The payment service shall charge the total once.
               tests:
                 - Payment_Charge_ChargesOnce
-  - name: trx
-    kind: source
-    language: xml
-    file: test-results/windows-results.trx
-    description: A TRX file, the format of `dotnet test --logger trx`. Two tests passed.
-  - name: junit
-    kind: source
-    language: xml
-    file: test-results/ubuntu-results.xml
-    description: A JUnit XML file. Two tests passed, one was skipped, and one failed. No requirement lists the last two.
   - name: matrix
     kind: command
     language: shell
-    description: Read every TRX and every XML file below test-results, write the matrix, and enforce coverage. Exits 0.
+    description: Read every TRX and every XML file below test-results, write the matrix, and enforce coverage. The folder holds the TRX file of a Windows run and the JUnit file of a Linux run, in which both linked tests passed and a failing test is linked by no requirement. Exits 0.
     content: '{{tool}} --requirements requirements.yaml --tests "test-results/**/*.trx" --tests "test-results/**/*.xml" --matrix matrix.md --enforce'
 ---
-`--tests <pattern>` names the result files. ReqStream detects the format of each file, so TRX and JUnit files can
-be mixed ([[#trx]], [[#junit]]):
+`--tests <pattern>` names the result files that your test runs write. ReqStream detects the format of each file from
+its content, whatever the extension, so TRX and JUnit files can be mixed:
 
 - **TRX** is what `dotnet test --logger trx` or `--report-trx` writes. A test is a `UnitTestResult`, and its test
   name is the `name` of its `TestMethod`: the method name only. The `testName` and display name are not used, so a
@@ -78,13 +68,14 @@ Facts to know:
 
 - Only tests that ran count. A skipped or not-run test is ignored, so a requirement that depends on it is unsatisfied.
 - **Tests that no requirement lists are ignored**, passed, failed or skipped: they never change the matrix or the exit
-  code, and nothing lists them ([[test-linking]]). In [[#junit]] the failing `Cart_PrintReceipt_Fails` is such a test,
-  so [[#matrix]] still exits 0.
+  code, and nothing lists them ([[test-linking]]). A failing test that no requirement lists is such a test, so
+  [[#matrix]] still exits 0 when one result file holds one.
 - Results with one method name from different classes in the same file are combined into one test.
 - The name of the result file, without its extension, is what a source filter such as `windows@` matches
   ([[test-linking/source-filters]]).
 - A file that is not a valid TRX or JUnit file stops the run with `Failed to parse test result file`.
-- `--matrix` and `--enforce` need at least one matching file; with none, `--matrix` reports an error
-  ([[troubleshooting/test-errors]]).
+- `--matrix` needs at least one matching file; with none it reports an error ([[troubleshooting/test-errors]]).
+  `--enforce` checks coverage against the matching files and, when root tags are set, also checks orphans without any
+  `--tests` ([[enforcement]]). It fails only when it has neither files nor root tags.
 
-[[#matrix]] reads both files and writes the trace matrix ([[reports/matrix]]).
+[[#matrix]] reads the result files and writes the trace matrix ([[reports/matrix]]).

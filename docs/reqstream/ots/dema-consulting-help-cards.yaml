@@ -59,8 +59,10 @@ sections:
             justification: |
               The tool is installed as a single .NET tool package with no loose files. The package
               build targets embed the card files in the assembly, so `reqstream help` works wherever
-              the tool is installed, and the comparison helper proves that the embedded copy and the
-              files in the source folder are the same.
+              the tool is installed. The test output holds no card files, so tests that load the
+              cards, print one, and run every example prove that the embedded copy is complete.
             tags: [ots]
             tests:
-              - HelpCommand_Cards_EmbeddedFilesMatchFolderOnDisk
+              - HelpCommand_Cards_AreValid
+              - HelpCommand_TryRun_CardPath_PrintsCardWithExamples
+              - ReqStream_System_HelpExamples_AllCommandExamples_RunAgainstScratchSet

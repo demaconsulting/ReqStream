@@ -40,7 +40,8 @@ lines, an index preamble, the output writers, and the catalog factory.
 
 The cards are Markdown files with front matter in the `Help/` folder of the tool project, one file per topic. The
 path of a card is its id, so `Help/test-linking/source-filters.md` is the card `test-linking/source-filters`, a
-child of `test-linking`. Example data files live beside the cards.
+child of `test-linking`. Example requirements files live beside the cards. Result files are not shipped: they are
+produced by test runners, so the example tests keep them as test data.
 
 #### Key Methods
 

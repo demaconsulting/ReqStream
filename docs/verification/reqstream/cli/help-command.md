@@ -12,8 +12,7 @@ cards embedded in the tool assembly.
 #### Test Environment
 
 The HelpCommand unit tests require no setup beyond the standard xUnit test runner and .NET runtime.
-The test project reads the `Help` folder of the tool project from the repository, by walking up from the test output,
-so that the embedded cards can be compared with the files on disk. No temporary files are created.
+No temporary files are created.
 
 #### Acceptance Criteria
 
@@ -42,9 +41,7 @@ answered and never build the catalog, whereas the help verb builds it exactly on
 
 **Valid Cards**: Tests verify the shipped cards. `HelpCommand_Cards_AreValid` validates the exact
 catalog configuration with warnings treated as errors; `HelpCommand_Cards_RootsMatchExpectedTopics`
-verifies that the root cards are the expected topics and that every card carries a purpose tag; and
-`HelpCommand_Cards_EmbeddedFilesMatchFolderOnDisk` verifies that the embedded resources are exactly the
-files of the source folder.
+verifies that the root cards are the expected topics and that every card carries a purpose tag.
 
 **Command Examples**: `HelpCommand_Cards_CommandExamplesParse` verifies that every command example
 parses into arguments of the tool, starts with an option, and has a unique name. That the examples also
@@ -62,5 +59,5 @@ Each entry gives the requirement, its scenario in parentheses, and the test meth
   `HelpCommand_TryRun_NonHelpArguments_ReturnsFalseWithoutBuildingCatalog`
 - `ReqStream-Cli-HelpCommand-Footer` (Footer): `HelpCommand_Footer_PointsToHelpCommand`
 - `ReqStream-Cli-HelpCommand-ValidCards` (Valid Cards): `HelpCommand_Cards_AreValid`,
-  `HelpCommand_Cards_RootsMatchExpectedTopics`, `HelpCommand_Cards_EmbeddedFilesMatchFolderOnDisk`
+  `HelpCommand_Cards_RootsMatchExpectedTopics`
 - `ReqStream-Cli-HelpCommand-CommandExamples` (Command Examples): `HelpCommand_Cards_CommandExamplesParse`

@@ -23,6 +23,8 @@ using DemaConsulting.HelpCards.Catalog;
 using DemaConsulting.HelpCards.Testing;
 using DemaConsulting.ReqStream.Cli;
 using DemaConsulting.ReqStream.Utilities;
+using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 namespace DemaConsulting.ReqStream.Tests;
 
 /// <summary>
@@ -1093,8 +1095,9 @@ public sealed class IntegrationTests : IDisposable
 
     /// <summary>
     /// Integration test verifying that every command example of every help card works: for each card the
-    /// source examples are written to a fresh scratch folder and the command examples run against the
-    /// built tool with the exit code the card claims.
+    /// source examples are written to a fresh scratch folder, the result files that the card's commands read
+    /// are staged beside them from the test data, and the command examples run against the built tool with the
+    /// exit code the card claims.
     /// </summary>
     [Fact]
     public void ReqStream_System_HelpExamples_AllCommandExamples_RunAgainstScratchSet()
@@ -1122,10 +1125,12 @@ public sealed class IntegrationTests : IDisposable
             ["troubleshooting/test-errors#bad-result-file"] = (1, "Failed to parse test result file")
         };
         var failures = new List<string>();
+        var noResultFiles = new HashSet<string>(StringComparer.Ordinal) { "troubleshooting/test-errors#no-result-files" };
         var used = new HashSet<string>(StringComparer.Ordinal);
         var commandCount = 0;
 
         // Act: run the command examples of each card in order, in a scratch folder holding the card's sources
+        // and the result files that its commands read (test data, because the cards ship no result files)
         foreach (var card in catalog.Cards.Where(c => c.Examples.Any(e => e.Kind == HelpExample.CommandKind)))
         {
             using var scratch = new TemporaryDirectory();
@@ -1135,6 +1140,8 @@ public sealed class IntegrationTests : IDisposable
                 Directory.CreateDirectory(Path.GetDirectoryName(path)!);
                 File.WriteAllText(path, source.Content + "\n");
             }
+
+            StageResultFiles(card.Id, scratch.DirectoryPath);
 
             foreach (var example in card.Examples.Where(e => e.Kind == HelpExample.CommandKind))
             {
@@ -1150,6 +1157,13 @@ public sealed class IntegrationTests : IDisposable
                 used.Add(key);
                 commandCount++;
 
+                // A --tests value that matches no staged file would let a root-tag --enforce exit 0 for the wrong reason
+                if (!noResultFiles.Contains(key))
+                {
+                    failures.AddRange(FindUnmatchedTestPatterns(arguments.ToArray(), scratch.DirectoryPath)
+                        .Select(pattern => $"{key}: --tests '{pattern}' matches no staged result file"));
+                }
+
                 var exitCode = Runner.RunInDirectory(out var output, scratch.DirectoryPath, "dotnet", [_dllPath, .. arguments]);
                 if (exitCode != expected.ExitCode)
                 {
@@ -1162,9 +1176,73 @@ public sealed class IntegrationTests : IDisposable
             }
         }
 
-        // Assert: no example failed, and every expectation names an example that exists
+        // Assert: no example failed, every expectation names an example that exists, and every folder of
+        // result files belongs to a card that has command examples
         Assert.True(commandCount > 20, $"Expected more than 20 command examples but ran {commandCount}.");
         failures.AddRange(expectations.Keys.Where(key => !used.Contains(key)).Select(key => $"{key}: expectation names no example"));
+        var cardIds = catalog.Cards
+            .Where(c => c.Examples.Any(e => e.Kind == HelpExample.CommandKind))
+            .Select(c => c.Id.Replace("/", "__", StringComparison.Ordinal))
+            .ToHashSet(StringComparer.Ordinal);
+        failures.AddRange(Directory.GetDirectories(HelpExamplesDataFolder())
+            .Select(Path.GetFileName)
+            .Where(name => !cardIds.Contains(name!))
+            .Select(name => $"TestData/HelpExamples/{name}: names no card with command examples"));
         Assert.True(failures.Count == 0, string.Join(Environment.NewLine, failures));
+    }
+
+    /// <summary>
+    /// Gets the folder in the test output that holds the result files for the help examples.
+    /// </summary>
+    /// <returns>The full path of the <c>TestData/HelpExamples</c> folder in the test output.</returns>
+    private static string HelpExamplesDataFolder() =>
+        Path.Combine(AppContext.BaseDirectory, "TestData", "HelpExamples");
+
+    /// <summary>
+    /// Copies the result files that the commands of a card read into the scratch folder, keeping their relative paths.
+    /// </summary>
+    /// <param name="cardId">The id of the card; its folder name replaces each '/' with "__".</param>
+    /// <param name="scratchFolder">The scratch folder the card's commands run in.</param>
+    private static void StageResultFiles(string cardId, string scratchFolder)
+    {
+        var folder = Path.Combine(HelpExamplesDataFolder(), cardId.Replace("/", "__", StringComparison.Ordinal));
+        if (!Directory.Exists(folder))
+        {
+            return;
+        }
+
+        foreach (var file in Directory.GetFiles(folder, "*", SearchOption.AllDirectories))
+        {
+            var target = Path.Combine(scratchFolder, Path.GetRelativePath(folder, file));
+            Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+            File.Copy(file, target, overwrite: true);
+        }
+    }
+
+    /// <summary>
+    /// Finds the <c>--tests</c> patterns of a command line that match no file in the scratch folder.
+    /// </summary>
+    /// <param name="arguments">The arguments of the command line.</param>
+    /// <param name="scratchFolder">The folder the command runs in.</param>
+    /// <returns>The patterns that match no file.</returns>
+    private static List<string> FindUnmatchedTestPatterns(string[] arguments, string scratchFolder)
+    {
+        var unmatched = new List<string>();
+        for (var i = 0; i < arguments.Length - 1; i++)
+        {
+            if (arguments[i] != "--tests")
+            {
+                continue;
+            }
+
+            var matcher = new Matcher();
+            matcher.AddInclude(arguments[i + 1]);
+            if (!matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(scratchFolder))).HasMatches)
+            {
+                unmatched.Add(arguments[i + 1]);
+            }
+        }
+
+        return unmatched;
     }
 }

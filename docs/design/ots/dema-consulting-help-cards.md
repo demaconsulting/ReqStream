@@ -31,8 +31,7 @@ follows the same pattern as `DemaConsulting.TestResults`.
 - **`HelpCatalog.Create(builder)`** with **`HelpCatalogBuilder.AddSource`**, **`ToolName`**,
   **`ToolVersion`**, **`Culture`**, **`TagVocabulary`**, and **`ExpectedRoots`** — builds and validates
   the catalog, and fixes the allowed tags and the set of topics.
-- **`HelpCardValidator.AssertValid`** and **`HelpCardValidator.CompareToDirectory`**, with
-  **`HelpValidationOptions`** — tests prove the cards are valid and match the source folder.
+- **`HelpCardValidator.AssertValid`** with **`HelpValidationOptions`** — tests prove the cards are valid.
 - **`HelpExamples.Enumerate`** and **`ExampleCommandLine.TryParse`** — tests enumerate every command
   example and prove it parses; the system test runs each one against the built tool.
 - **MSBuild targets** shipped in the package — embed `Help/**` as resources of the tool assembly.
@@ -49,8 +48,7 @@ help verb has been recognized.
 The project file references the package directly, because only a project with its own
 `PackageReference` embeds cards. The reference is a normal runtime dependency of the tool. Test code
 uses the validator and example helpers from the same package, which flow to the test project through the
-project reference; the validity test also reads the `Help` folder from the repository, by walking up from the test
-output, so that `CompareToDirectory` can find it.
+project reference.
 
 The help answer is written by the package directly to the console (or to writers supplied at creation),
 not through `Context`. `--silent` and `--log` therefore do not apply to the help command; see the

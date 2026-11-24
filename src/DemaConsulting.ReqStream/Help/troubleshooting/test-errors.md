@@ -27,28 +27,10 @@ examples:
                 - system
               tests:
                 - Cart_total_SumsItems
-  - name: results-tests
-    kind: source
-    language: xml
-    file: results.xml
-    description: The test passed, but under a name with different capitals.
-    content: |
-      <testsuites name="all tests">
-        <testsuite name="Shop.Tests" tests="1" failures="0">
-          <testcase name="Cart_Total_SumsItems" classname="Shop.Tests.CartTests" time="0.010" />
-        </testsuite>
-      </testsuites>
-  - name: broken-results
-    kind: source
-    language: xml
-    file: broken.trx
-    description: A file that is not a valid test result file.
-    content: |
-      this is not a test result file
   - name: unsatisfied
     kind: command
     language: shell
-    description: The name does not match, so the test counts as not executed. Exits 1.
+    description: results.xml is a result file of your test run that records the test as Cart_Total_SumsItems, with different capitals than the requirement lists. The name does not match, so the test counts as not executed. Exits 1.
     content: '{{tool}} --requirements requirements.yaml --tests results.xml --matrix matrix.md --enforce'
   - name: no-result-files
     kind: command
@@ -58,7 +40,7 @@ examples:
   - name: bad-result-file
     kind: command
     language: shell
-    description: The result file cannot be parsed. Exits 1.
+    description: broken.trx is not a valid result file, for example an empty or truncated one, so it cannot be parsed. Exits 1.
     content: '{{tool}} --requirements requirements.yaml --tests broken.trx --matrix matrix.md'
 ---
 
@@ -77,7 +59,7 @@ requirement from the list, look at its row:
 - *Tests Linked* is 0: the requirement names no test of its own. A leaf with no children needs `tests:`
   ([[test-linking]]). A parent with zeros can still be unsatisfied through a descendant: follow its `children`.
 - *Not Executed* above 0: no result matches the name. Names are exact and case-sensitive, as [[#unsatisfied]] shows with
-  [[#requirements-tests]] and [[#results-tests]]. Copy the test method name, without namespace or class. A skipped
+  [[#requirements-tests]]. Copy the test method name, without namespace or class. A skipped
   test also counts here.
 - *Failed* above 0: a test of this row failed. Fix the test, not the requirement.
 - A `windows@` style entry is not executed: no result file name contains the filter

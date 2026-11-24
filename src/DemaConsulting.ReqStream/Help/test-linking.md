@@ -40,22 +40,10 @@ examples:
         - id: Shop-Payment-Charge
           tests:
             - Payment_Charge_ChargesOnce
-  - name: results
-    kind: source
-    language: xml
-    file: results.xml
-    description: A JUnit result file. The testcase names are the names that requirements list.
-    content: |
-      <testsuites name="all tests">
-        <testsuite name="Shop.Tests" tests="2" failures="0">
-          <testcase name="Cart_Total_SumsItems" classname="Shop.Tests.CartTests" time="0.010" />
-          <testcase name="Payment_Charge_ChargesOnce" classname="Shop.Tests.PaymentTests" time="0.020" />
-        </testsuite>
-      </testsuites>
   - name: matrix
     kind: command
     language: shell
-    description: Link the tests, write the trace matrix, and fail if any requirement is not proven. Exits 0 here.
+    description: Link the tests, write the trace matrix, and fail if any requirement is not proven. results.xml is a result file of your test run (for example dotnet test --logger trx) that records both tests as passed. Exits 0 here.
     content: '{{tool}} --requirements requirements.yaml --tests results.xml --matrix matrix.md --enforce'
 ---
 A requirement is proven by tests. List their names in one of two places ([[#requirements]]):

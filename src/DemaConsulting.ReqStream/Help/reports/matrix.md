@@ -34,24 +34,10 @@ examples:
                 - Payment_Charge_ChargesOnce
             - id: Shop-Cart-Owner
               title: The cart shall remember its owner.
-  - name: results-matrix
-    kind: source
-    language: xml
-    file: results.xml
-    description: Results where the payment test failed.
-    content: |
-      <testsuites name="all tests">
-        <testsuite name="Shop.Tests" tests="2" failures="1">
-          <testcase name="Cart_Total_SumsItems" classname="Shop.Tests.CartTests" time="0.010" />
-          <testcase name="Payment_Charge_ChargesOnce" classname="Shop.Tests.PaymentTests" time="0.020">
-            <failure message="charged twice" />
-          </testcase>
-        </testsuite>
-      </testsuites>
   - name: matrix
     kind: command
     language: shell
-    description: Write the trace matrix. Without --enforce it exits 0 even though a requirement fails.
+    description: Write the trace matrix. results.xml is a result file of your test run in which Cart_Total_SumsItems passed and Payment_Charge_ChargesOnce failed. Without --enforce it exits 0 even though a requirement fails.
     content: '{{tool}} --requirements requirements.yaml --tests results.xml --matrix matrix.md'
   - name: matrix-titles
     kind: command
@@ -89,8 +75,10 @@ matrix is written first, so read it after the failure. To find the culprit: of t
 or *Not Executed* above 0 are the failing requirements; a listed row with all zeros is an ancestor, or a leaf with no
 test. Follow its `children` down to the failing rows.
 
-[[#requirements-matrix]] and [[#results-matrix]] give a matrix with a parent, a failing test and a requirement with no
-test; run [[#matrix]] to see them. To turn the numbers into a failing build, add `--enforce` ([[enforcement]]).
+[[#requirements-matrix]] and a result file in which the payment test failed give a matrix with a parent, a failing test
+and a requirement with no test; run [[#matrix]] to see them. The result file is what your test run writes, for example
+`dotnet test --logger trx`; the file name may end in `.trx` or `.xml`, because the format is detected from the content.
+To turn the numbers into a failing build, add `--enforce` ([[enforcement]]).
 `--tests` can be repeated to mix TRX and JUnit files ([[test-results]]).
 
 Ids and test names contain invisible zero-width spaces so long names can wrap in rendered documents. Remove them with

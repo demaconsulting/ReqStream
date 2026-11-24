@@ -1,0 +1,6 @@
+<testsuites name="windows">
+  <testsuite name="Shop.Tests" tests="2" failures="0">
+    <testcase name="Paths_Read_HandlesBackslashes" classname="Shop.Tests.PathTests" time="0.010" />
+    <testcase name="Runtime_Starts_Succeeds" classname="Shop.Tests.RuntimeTests" time="0.010" />
+  </testsuite>
+</testsuites>

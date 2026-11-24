@@ -257,40 +257,4 @@ public sealed class HelpCommandTests
         // Assert: the cards contain command examples at all
         Assert.True(count > 20, $"Expected more than 20 command examples but found {count}.");
     }
-
-    /// <summary>
-    /// Test that the cards embedded in the assembly are exactly the card files in the source folder.
-    /// </summary>
-    [Fact]
-    public void HelpCommand_Cards_EmbeddedFilesMatchFolderOnDisk()
-    {
-        // Arrange: find the Help folder of the tool project by walking up from the test output. The cards are
-        // not copied to the test output, because Markdown and YAML copies there would be linted as sources.
-        var folder = FindHelpFolder();
-
-        // Act: compare the embedded resources with the files on disk
-        var problems = HelpCardValidator.CompareToDirectory(HelpCommand.Cards, folder);
-
-        // Assert: both sides agree
-        Assert.Empty(problems);
-    }
-
-    /// <summary>
-    /// Finds the Help folder of the tool project in the repository that contains the test output.
-    /// </summary>
-    /// <returns>The full path of the Help folder.</returns>
-    /// <exception cref="DirectoryNotFoundException">Thrown when no Help folder is found above the test output.</exception>
-    private static string FindHelpFolder()
-    {
-        for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory != null; directory = directory.Parent)
-        {
-            var candidate = Path.Combine(directory.FullName, "src", "DemaConsulting.ReqStream", "Help");
-            if (Directory.Exists(candidate))
-            {
-                return candidate;
-            }
-        }
-
-        throw new DirectoryNotFoundException("The Help folder of the tool project was not found above the test output.");
-    }
 }

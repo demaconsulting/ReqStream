@@ -72,10 +72,13 @@ versioned JSON document. An unknown topic exits with code 2. This scenario is te
 `ReqStream_System_HelpTopics_HelpJson_WritesJsonDocument`.
 
 **Help Examples**: Verifies that every command example of every help card works. For each card the
-test writes the card's source examples to a fresh scratch folder and runs its command examples, in
-order, against the built tool. Each run must give the exit code the card claims, which is 0 unless
-the test names the example as a deliberate failure with its expected exit code and message. Every
-such expectation must name an existing example. This scenario is tested by
+test writes the card's source examples to a fresh scratch folder, stages the result files that the
+card's commands read from the test data (`TestData/HelpExamples/<card id>`, copied to the test output),
+and runs its command examples, in order, against the built tool. Every `--tests` pattern must match a
+staged file, except in the example that shows a glob matching nothing. Each run must give the exit code
+the card claims, which is 0 unless the test names the example as a deliberate failure with its expected
+exit code and message. Every such expectation must name an existing example, and every folder of test
+data must name a card with command examples. This scenario is tested by
 `ReqStream_System_HelpExamples_AllCommandExamples_RunAgainstScratchSet`.
 
 **Validate**: Verifies that the tool runs a built-in self-test suite when `--validate` is passed.

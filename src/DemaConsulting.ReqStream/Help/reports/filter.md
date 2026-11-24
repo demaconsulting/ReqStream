@@ -40,17 +40,6 @@ examples:
                 - security
               tests:
                 - Payment_Charge_ChargesOnce
-  - name: results-partial
-    kind: source
-    language: xml
-    file: results.xml
-    description: Results that contain only the payment test.
-    content: |
-      <testsuites name="payment tests">
-        <testsuite name="Shop.Tests" tests="1" failures="0">
-          <testcase name="Payment_Charge_ChargesOnce" classname="Shop.Tests.PaymentTests" time="0.020" />
-        </testsuite>
-      </testsuites>
   - name: filter-report
     kind: command
     language: shell
@@ -64,7 +53,7 @@ examples:
   - name: enforce-filtered
     kind: command
     language: shell
-    description: Enforce only the security requirements. They are all proven, so this exits 0.
+    description: Enforce only the security requirements. results.xml is a result file of your test run that records only Payment_Charge_ChargesOnce, as passed, so they are all proven and this exits 0.
     content: '{{tool}} --requirements requirements.yaml --tests results.xml --filter security --enforce'
   - name: enforce-all
     kind: command
@@ -88,4 +77,4 @@ Two things the filter does not change:
 
 Filtering is how a pipeline checks one concern at a time. [[#enforce-filtered]] enforces the security requirements
 alone and exits 0; [[#enforce-all]] enforces everything and exits 1 because the cart requirement has no passing test in
-[[#results-partial]]. A filter that matches nothing is not an error: the reports are empty and nothing is enforced.
+that result file. A filter that matches nothing is not an error: the reports are empty and nothing is enforced.

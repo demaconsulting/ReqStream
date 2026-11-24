@@ -66,7 +66,7 @@ src/DemaConsulting.ReqStream/
 ├── Cli/
 │   ├── Context.cs              — command-line argument parser and I/O owner
 │   └── HelpCommand.cs          — built-in help command served from the embedded help cards
-├── Help/                       — help cards (Markdown with front matter) and example data files,
+├── Help/                       — help cards (Markdown with front matter) and example requirements files,
 │                                 embedded in the assembly by the DemaConsulting.HelpCards build targets
 ├── Utilities/
 │   ├── GlobMatcher.cs          — glob-pattern file matching utility
@@ -91,6 +91,8 @@ test/DemaConsulting.ReqStream.Tests/
 ├── CliTests.cs                 — CLI subsystem integration tests
 ├── Cli/
 │   └── HelpCommandTests.cs     — HelpCommand unit tests and help card validity tests
+├── TestData/
+│   └── HelpExamples/           — result files that the help-example system test stages for each card
 ├── Modeling/
 │   └── ModelingTests.cs        — Modeling subsystem integration tests
 ├── Tracing/

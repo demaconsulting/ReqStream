@@ -39,41 +39,15 @@ examples:
               title: The payment service shall charge the total once.
               tests:
                 - Payment_Charge_ChargesOnce
-  - name: results-pass
-    kind: source
-    language: xml
-    file: results-pass.xml
-    description: Both tests passed.
-    content: |
-      <testsuites name="all tests">
-        <testsuite name="Shop.Tests" tests="2" failures="0">
-          <testcase name="Cart_Total_SumsItems" classname="Shop.Tests.CartTests" time="0.010" />
-          <testcase name="Payment_Charge_ChargesOnce" classname="Shop.Tests.PaymentTests" time="0.020" />
-        </testsuite>
-      </testsuites>
-  - name: results-fail
-    kind: source
-    language: xml
-    file: results-fail.xml
-    description: The payment test failed.
-    content: |
-      <testsuites name="all tests">
-        <testsuite name="Shop.Tests" tests="2" failures="1">
-          <testcase name="Cart_Total_SumsItems" classname="Shop.Tests.CartTests" time="0.010" />
-          <testcase name="Payment_Charge_ChargesOnce" classname="Shop.Tests.PaymentTests" time="0.020">
-            <failure message="charged twice" />
-          </testcase>
-        </testsuite>
-      </testsuites>
   - name: enforce-pass
     kind: command
     language: shell
-    description: Every requirement is proven and none is orphaned. Exits 0.
+    description: results-pass.xml is a result file in which both tests passed. Every requirement is proven and none is orphaned. Exits 0.
     content: '{{tool}} --requirements requirements.yaml --tests results-pass.xml --enforce'
   - name: enforce-fail
     kind: command
     language: shell
-    description: A test failed, so the requirement is unsatisfied. Prints the ids and exits 1.
+    description: results-fail.xml is a result file in which Payment_Charge_ChargesOnce failed, so the requirement is unsatisfied. Prints the ids and exits 1.
     content: '{{tool}} --requirements requirements.yaml --tests results-fail.xml --enforce'
   - name: enforce-orphans
     kind: command
@@ -133,6 +107,10 @@ the console with `--silent`. The matrix file does not list them ([[reports/matri
 **What `--enforce` does not check.** Tests that are in a result file but that no requirement lists are ignored: no
 warning, no failure ([[test-linking]]). Missing justifications are not checked either; see [[lint]] for what lint
 checks.
+
+**The result files.** The commands read result files that your test run writes: `dotnet test --logger trx` writes a
+`.trx` file, and any JUnit XML works too ([[test-results]]). `results-pass.xml` must record both linked tests as
+passed, and `results-fail.xml` must record `Payment_Charge_ChargesOnce` as failed.
 
 **CI recipe.** Two commands, because `--lint` ignores the report options. Create the output folders first.
 

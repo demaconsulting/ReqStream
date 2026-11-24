@@ -36,16 +36,6 @@ examples:
     language: yaml
     file: hierarchy/cart/units.yaml
     description: The unit requirements with their tests. One test accepts a result from a Windows run only.
-  - name: tree-windows
-    kind: source
-    language: xml
-    file: hierarchy/test-results/windows-results.xml
-    description: The Windows run. Every linked test passed; the last test is linked by no requirement.
-  - name: tree-ubuntu
-    kind: source
-    language: xml
-    file: hierarchy/test-results/ubuntu-results.xml
-    description: The Linux run. The Windows-only test fails here, and the filter makes the matrix ignore it.
   - name: tree-lint
     kind: command
     language: shell
@@ -54,7 +44,7 @@ examples:
   - name: tree-matrix
     kind: command
     language: shell
-    description: Write the matrix from both runs and enforce coverage. Exits 0.
+    description: Write the matrix from the result files of both runs in the hierarchy/test-results folder and enforce coverage. Exits 0.
     content: '{{tool}} --requirements hierarchy/requirements.yaml --tests "hierarchy/test-results/*.xml" --matrix matrix.md --enforce'
 ---
 A system of any size follows one chain: a **system** requirement lists a **subsystem** requirement under `children`,
@@ -73,8 +63,10 @@ If [[#tree-system]] dropped its `children` entry, the subsystem and both units w
 `--lint --enforce` fails ([[#tree-lint]]).
 
 [[#tree-units]] links `windows@Cart_Save_WritesFile`, so only a result file whose name contains `windows` counts
-([[test-linking/source-filters]]). The failure in [[#tree-ubuntu]] is ignored, so [[#tree-matrix]] exits 0. Without the
-prefix the unit would fail on the Linux failure. `Cart_Unlinked_Test` in [[#tree-windows]] is linked by no requirement,
+([[test-linking/source-filters]]). [[#tree-matrix]] reads two result files that your test runs write, in the folder
+`hierarchy/test-results`: `windows-results.xml`, in which all four tests passed, and `ubuntu-results.xml`, in which
+`Cart_Save_WritesFile` failed. The failure in the Linux file is ignored, so [[#tree-matrix]] exits 0. Without the
+prefix the unit would fail on the Linux failure. `Cart_Unlinked_Test` in the Windows file is linked by no requirement,
 so it is ignored ([[test-linking]]).
 
 The matrix shows `Shop-System-Checkout` and `Shop-Cart-Pricing` with zero tests of their own: they are satisfied

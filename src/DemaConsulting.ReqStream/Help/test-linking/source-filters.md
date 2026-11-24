@@ -1,6 +1,6 @@
 ---
 title: Source filters
-summary: Accept a test result from one platform or runtime only.
+summary: Accept a test result from one platform, such as windows, or runtime only.
 aliases:
   - source
   - platform
@@ -37,33 +37,10 @@ examples:
               title: The shop shall start on .NET 10.
               tests:
                 - net10.0@Runtime_Starts_Succeeds
-  - name: windows-results
-    kind: source
-    language: xml
-    file: windows-net10.0-results.xml
-    description: Results from the Windows job. The file name contains both windows and net10.0.
-    content: |
-      <testsuites name="windows">
-        <testsuite name="Shop.Tests" tests="2" failures="0">
-          <testcase name="Paths_Read_HandlesBackslashes" classname="Shop.Tests.PathTests" time="0.010" />
-          <testcase name="Runtime_Starts_Succeeds" classname="Shop.Tests.RuntimeTests" time="0.010" />
-        </testsuite>
-      </testsuites>
-  - name: ubuntu-results
-    kind: source
-    language: xml
-    file: ubuntu-net10.0-results.xml
-    description: Results from the Linux job. The file name contains ubuntu.
-    content: |
-      <testsuites name="ubuntu">
-        <testsuite name="Shop.Tests" tests="1" failures="0">
-          <testcase name="Paths_Read_HandlesSlashes" classname="Shop.Tests.PathTests" time="0.010" />
-        </testsuite>
-      </testsuites>
   - name: matrix-filtered
     kind: command
     language: shell
-    description: Both results files are read; each filtered test counts only from a matching file. Exits 0.
+    description: Both result files are read, windows-net10.0-results.xml from the Windows job and ubuntu-net10.0-results.xml from the Linux job; each filtered test counts only from a matching file. Exits 0.
     content: '{{tool}} --requirements requirements.yaml --tests "*-results.xml" --matrix matrix.md --enforce'
 ---
 Without a filter a test passes when any result file records it. That is wrong for platform requirements: a
@@ -74,9 +51,13 @@ file decides what counts, as in [[#platform-requirements]]:
 - `net10.0@Runtime_Starts_Succeeds` counts only results from a file whose name contains `net10.0`.
 
 **How the match works.** The text before the first `@` is a case-insensitive substring of the result file name
-without its extension, such as `windows-net10.0-results` ([[#windows-results]], [[#ubuntu-results]]). It is not a
-match against anything inside the file. The `@` must be neither first nor last in the entry; otherwise the whole entry
-is read as a plain test name.
+without its extension, such as `windows-net10.0-results`. It is not a match against anything inside the file. The `@`
+must be neither first nor last in the entry; otherwise the whole entry is read as a plain test name.
+
+In [[#matrix-filtered]] the Windows job wrote `windows-net10.0-results.xml`, which records
+`Paths_Read_HandlesBackslashes` and `Runtime_Starts_Succeeds`, and the Linux job wrote `ubuntu-net10.0-results.xml`,
+which records `Paths_Read_HandlesSlashes`. Each job's test run writes its own file, for example with
+`dotnet test --logger trx`.
 
 Name the result files after the job that produced them, for example `test-results-windows-latest.trx`, so that every
 filter finds exactly the files it means. If no file name contains the filter, the test counts as not executed and the
