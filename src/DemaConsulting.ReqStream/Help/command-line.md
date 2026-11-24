@@ -23,8 +23,9 @@ examples:
     description: Print the short usage text. The topics are listed by the help command.
     content: '{{tool}} --help'
 ---
-Options start with `--` (or a single letter after `-`). There are no sub-commands apart from `{{tool}} help`, and no
-positional arguments: an unknown argument stops the run with `Unsupported argument`, exit code 1.
+Options start with `--` (or a single letter after `-`). Every operation is an option; the only subcommand is
+`{{tool}} help`, which takes topic names, and there are no other positional arguments: any other unknown argument
+stops the run with `Unsupported argument`, exit code 1.
 
 | Option | Meaning |
 | --- | --- |
