@@ -32,6 +32,7 @@ The `Cli` subsystem contains the following software units:
 - *Role*: Provider (`Program.PrintHelp` consumes it).
 - *Contract*: Returns `Run 'reqstream help' for topics and examples.`
 - *Constraints*: Reading it never builds the help catalog.
+
 **Context.Create**: Factory method constructing a `Context` from `string[] args`.
 
 - *Type*: In-process .NET public API (static factory).
