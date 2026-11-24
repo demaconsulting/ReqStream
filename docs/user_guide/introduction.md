@@ -45,6 +45,8 @@ ReqStream offers the following capabilities:
 - **Configurable Report Depth** — control Markdown heading levels via `--depth`, `--report-depth`,
   `--matrix-depth`, and `--justifications-depth` flags
 - **Export Capabilities** — generate Markdown reports for requirements, justifications, and test trace matrices
+- **Built-in Help** — run `reqstream help` for topics with worked examples, search, and JSON output, so a person or an
+  AI agent can learn the tool from the tool alone
 - **Continuous Compliance** — automatically generate compliance evidence on every CI run
 - **Error Handling: Missing Test Files** — exits with a fatal error when a test result file is missing or cannot
   be parsed
@@ -58,6 +60,7 @@ This guide covers the following topics:
 - Installation as a global or local .NET tool
 - Requirements YAML file format, including sections, requirements, test mappings, tags, and file includes
 - The full command-line interface with all options and usage examples
+- The built-in `reqstream help` command, its topics, search, and JSON output
 - Exporting requirements reports, justifications, and trace matrices
 - Requirements enforcement in CI/CD pipelines
 - Frequently asked questions and troubleshooting
@@ -534,6 +537,12 @@ Display version:
 reqstream --version
 ```
 
+Learn the tool from the tool itself (see [Built-in Help](#built-in-help)):
+
+```bash
+reqstream help
+```
+
 Process requirements files:
 
 ```bash
@@ -566,6 +575,31 @@ ReqStream supports the following command-line options:
 | `--justifications <file>` | Export justifications to markdown file |
 | `--justifications-depth <depth>` | Starting header depth for justifications (overrides `--depth`) |
 | `--enforce` | Fail if requirements are not fully tested or are orphaned (when root tags are configured) |
+
+The `help` verb is not an option: `reqstream help [topic]` is answered by the built-in help before any option is read,
+and so `--silent` and `--log` do not apply to it (see [Built-in Help](#built-in-help)).
+
+## Built-in Help
+
+`reqstream --help` prints the short option list and ends with a pointer to `reqstream help`. The built-in help is
+written for people and for AI agents that have only the tool installed: it lists topics, prints a focused card for
+each topic with worked examples, and can search and write JSON.
+
+| Command | Result |
+| --- | --- |
+| `reqstream help` | List the topics, one line each. |
+| `reqstream help <topic> [<subtopic>]` | Print a card, such as `reqstream help orphans`. |
+| `reqstream help <topic> --examples` | Print every example of the card in full. |
+| `reqstream help <topic> --example <name>` | Print one example alone, ready to copy. |
+| `reqstream help --search <words>` | Rank the cards that match the words. |
+| `reqstream help ... --json` | Write the same answer as a versioned JSON document. |
+
+A card also lists its child cards, such as `reqstream help test-linking source-filters`, and related cards.
+
+The topics are `getting-started`, `requirements-file`, `includes`, `test-linking`, `test-results`, `reports`, `lint`,
+`orphans`, `enforcement`, `command-line`, and `troubleshooting`. Every command example in the cards is run against the
+tool by the test suite, so the examples work as printed. The command exits with 0 on success, and with 2 when a
+topic is unknown or an option is wrong.
 
 ## Examples
 
@@ -1305,6 +1339,12 @@ A: Install ReqStream as a local tool and add the commands to your build script. 
 - name: Generate Requirements Report
   run: dotnet reqstream --requirements "docs/**/*.yaml" --report requirements.md
 ```
+
+**Q: How do I learn what a command or file format does without leaving the terminal?**
+
+A: Run `reqstream help`. It lists the topics, and `reqstream help <topic>` prints a card with worked examples, for
+example `reqstream help orphans`. Use `reqstream help --search <words>` to find a card and add `--json` for
+machine-readable output. AI agents can use the same commands; see [Built-in Help](#built-in-help).
 
 **Q: Can I have requirements without IDs?**
 
