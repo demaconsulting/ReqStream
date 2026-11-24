@@ -1,5 +1,5 @@
 ---
-# cspell:ignore yamldotnet testresults
+# cspell:ignore yamldotnet testresults helpcards
 root-tags:
   - system
   - quality
@@ -21,4 +21,5 @@ includes:
   - docs/reqstream/ots/yamldotnet.yaml
   - docs/reqstream/ots/microsoft-extensions-file-system-globbing.yaml
   - docs/reqstream/ots/dema-consulting-test-results.yaml
+  - docs/reqstream/ots/dema-consulting-help-cards.yaml
   - docs/reqstream/ots/sysml2tools.yaml

@@ -53,10 +53,17 @@ internal static class Program
     public static string Version => _version;
 
     /// <summary>
-    ///     Process entry point. Responsible solely for creating the <see cref="Cli.Context"/>,
+    ///     Process entry point. Responsible for answering the <c>help</c> verb from the built-in
+    ///     help cards before any option parsing, creating the <see cref="Cli.Context"/>,
     ///     delegating all program logic to <see cref="Run"/>, and mapping exceptions to exit
     ///     codes so that callers receive a well-defined exit code regardless of failure mode.
     /// </summary>
+    /// <remarks>
+    ///     The <c>help</c> verb is not an option, so <see cref="Cli.Context.Create"/> would reject it as an
+    ///     unsupported argument. <see cref="Cli.HelpCommand.TryRun"/> therefore runs first; it returns
+    ///     <see langword="false"/> at once, without building the help catalog, for every other first
+    ///     argument.
+    /// </remarks>
     /// <param name="args">Command line arguments.</param>
     /// <returns>Exit code.</returns>
     /// <exception cref="Exception">Thrown when an unexpected error occurs that is not an <see cref="ArgumentException"/> or <see cref="InvalidOperationException"/>.</exception>
@@ -64,6 +71,12 @@ internal static class Program
     {
         try
         {
+            // Answer 'reqstream help ...' from the built-in help cards before the option parser sees it
+            if (HelpCommand.Default.TryRun(args, out var helpExitCode))
+            {
+                return helpExitCode;
+            }
+
             // Create context from arguments
             using var context = Context.Create(args);
 
@@ -206,6 +219,7 @@ internal static class Program
     private static void PrintHelp(Context context)
     {
         context.WriteLine("Usage: reqstream [options]");
+        context.WriteLine("       reqstream help [topic]");
         context.WriteLine("");
         context.WriteLine("Options:");
         context.WriteLine("  -v, --version              Display version information");
@@ -229,6 +243,8 @@ internal static class Program
         context.WriteLine("  --matrix-depth <depth>     Markdown header depth for trace matrix (overrides --depth)");
         context.WriteLine("  --matrix-titles            Include requirement titles as a column in the trace matrix");
         context.WriteLine("  --enforce                  Fail if requirements are not fully tested or are orphaned (when root tags are configured)");
+        context.WriteLine("");
+        context.WriteLine(HelpCommand.Default.Footer);
     }
 
     /// <summary>

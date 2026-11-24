@@ -11,6 +11,7 @@ software items:
 flowchart TD
     subgraph Cli
         Context
+        HelpCommand
     end
     subgraph Utilities
         GlobMatcher
@@ -32,6 +33,7 @@ flowchart TD
         Validation
     end
     Program --> Context
+    Program --> HelpCommand
     Program --> Validation
     Program --> Requirements
     Program --> TraceMatrix
@@ -54,6 +56,7 @@ to produce output.
 | `Program` | Unit | Entry point and top-level dispatch orchestrator |
 | `Cli` | Subsystem | Command-line argument parsing and I/O ownership |
 | `Context` | Unit | Argument parser, output channels, and exit code |
+| `HelpCommand` | Unit | Built-in help command served from embedded help cards |
 | `Utilities` | Subsystem | Shared low-level file-system helpers |
 | `GlobMatcher` | Unit | Glob pattern expansion to file paths |
 | `PathHelpers` | Unit | Path combination with traversal protection |
@@ -82,6 +85,18 @@ to produce output.
   `--justifications-depth`, `--results`/`--result`, `--log`); unknown flags cause
   `ArgumentException`.
 - *Constraints*: No interactive prompts; all information must be on the command line.
+
+**Help command**: `reqstream help [topic] [--search <words>] [--json]`, answered by `HelpCommand`
+before option parsing.
+
+- *Type*: CLI.
+- *Role*: Provider (the user receives help text, search results, or a JSON document).
+- *Contract*: Offered the arguments before `Context.Create`; answers only when the first argument
+  is `help`, writing topics, a card with its worked examples, ranked search results, or a versioned
+  JSON document to stdout. Exit code `0` for success, `2` for a wrong help argument or an unknown
+  topic, and `70` for a defective card catalog. It is the only part of the command line outside
+  `Context`, so `--silent` and `--log` do not apply to it.
+- *Constraints*: The help cards are embedded in the tool assembly; no file access is needed.
 
 **Standard output (stdout)**: Plain text lines via `Context.WriteLine`.
 
@@ -150,6 +165,8 @@ to produce output.
   `GlobMatcher.FindMatchingFiles`; see *Microsoft.Extensions.FileSystemGlobbing Integration Design*
 - **DemaConsulting.TestResults** — used for test result deserialization (TRX, JUnit) in
   `TraceMatrix` and `Validation`; see *DemaConsulting.TestResults Integration Design*
+- **DemaConsulting.HelpCards** — used for the built-in help command and its embedded help cards
+  in `HelpCommand`; see *DemaConsulting.HelpCards Integration Design*
 
 ## Risk Control Measures
 
@@ -222,6 +239,9 @@ flowchart LR
 
 Alternative flows:
 
+- `help` as the first argument is answered by `HelpCommand` before `Context.Create` and exits
+  immediately; every other first argument returns from `HelpCommand` at once without building the
+  help catalog.
 - `--version` prints the version string and exits immediately before any pipeline steps.
 - `--help` prints usage information and exits immediately.
 - `--validate` delegates entirely to `Validation.Run(context)` for self-validation.

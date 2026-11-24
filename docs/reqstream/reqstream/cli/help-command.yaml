@@ -1,0 +1,94 @@
+---
+# HelpCommand unit requirements
+sections:
+  - title: ReqStream Requirements
+    sections:
+      - title: Cli Requirements
+        sections:
+          - title: HelpCommand Requirements
+            requirements:
+              - id: ReqStream-Cli-HelpCommand-HelpVerb
+                title: >-
+                  The HelpCommand unit shall print the topic index for the help verb, print a card with
+                  its examples for a card path, and exit with code 2 for an unknown topic.
+                justification: |
+                  A user or an AI agent that has only the installed tool must be able to learn it from
+                  `reqstream help`: the index lists the topics, a topic prints with worked examples,
+                  and a mistyped topic fails with a distinct exit code and a hint that scripts can
+                  detect.
+                tags: [cli]
+                tests:
+                  - HelpCommand_TryRun_HelpVerb_PrintsTopicIndexAndReturnsZero
+                  - HelpCommand_TryRun_CardPath_PrintsCardWithExamples
+                  - HelpCommand_TryRun_UnknownTopic_ReturnsTwo
+                children:
+                  - ReqStream-OTS-HelpCards-Cli
+
+              - id: ReqStream-Cli-HelpCommand-Search
+                title: >-
+                  The HelpCommand unit shall rank the cards that match search words and shall write any
+                  help answer as a versioned JSON document on request.
+                justification: |
+                  An agent finds the right card by searching for what it wants to do, and it reads the
+                  answer more reliably as structured JSON than as text.
+                tags: [cli]
+                tests:
+                  - HelpCommand_TryRun_SearchOption_ListsMatchingCards
+                  - HelpCommand_TryRun_JsonOption_WritesJsonDocument
+                children:
+                  - ReqStream-OTS-HelpCards-Catalog
+
+              - id: ReqStream-Cli-HelpCommand-DeferredCatalog
+                title: >-
+                  The HelpCommand unit shall build the help catalog only when the first argument is the
+                  help verb.
+                justification: |
+                  Every other run of the tool, including every CI run, must not pay for loading or
+                  validating help cards, and a defective card must never break a normal command.
+                tags: [cli]
+                tests:
+                  - HelpCommand_TryRun_NonHelpArguments_ReturnsFalseWithoutBuildingCatalog
+                children:
+                  - ReqStream-OTS-HelpCards-Cli
+
+              - id: ReqStream-Cli-HelpCommand-Footer
+                title: >-
+                  The HelpCommand unit shall provide a one-line pointer to the help command for the end
+                  of the usage text.
+                justification: |
+                  The short usage text stays short and still tells a reader where the full guidance is,
+                  without building the help catalog.
+                tags: [cli]
+                tests:
+                  - HelpCommand_Footer_PointsToHelpCommand
+
+              - id: ReqStream-Cli-HelpCommand-ValidCards
+                title: >-
+                  The HelpCommand unit shall serve only help cards that are valid, have the expected set
+                  of topics, and match the card files in the source folder.
+                justification: |
+                  A defective card, a missing topic, or an embedded copy that differs from the reviewed
+                  source files would give users wrong guidance. Tests that fail on any of these keep the
+                  shipped help identical to the reviewed help.
+                tags: [cli]
+                tests:
+                  - HelpCommand_Cards_AreValid
+                  - HelpCommand_Cards_RootsMatchExpectedTopics
+                  - HelpCommand_Cards_EmbeddedFilesMatchFolderOnDisk
+                children:
+                  - ReqStream-OTS-HelpCards-Validator
+                  - ReqStream-OTS-HelpCards-Embedding
+
+              - id: ReqStream-Cli-HelpCommand-CommandExamples
+                title: >-
+                  The HelpCommand unit shall provide command examples that parse as command lines of
+                  the tool.
+                justification: |
+                  A worked example that cannot be parsed cannot be run. Parsing every command example
+                  in a test proves that each one is a single command line of the tool with options
+                  that exist.
+                tags: [cli]
+                tests:
+                  - HelpCommand_Cards_CommandExamplesParse
+                children:
+                  - ReqStream-OTS-HelpCards-Validator

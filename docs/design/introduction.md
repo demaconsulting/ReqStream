@@ -25,11 +25,12 @@ OTS items:
 - **YamlDotNet**: integration and usage design.
 - **Microsoft.Extensions.FileSystemGlobbing**: integration and usage design.
 - **DemaConsulting.TestResults**: integration and usage design.
+- **DemaConsulting.HelpCards**: integration and usage design.
 
 The following topics are out of scope:
 
 - Internal design of OTS items (YamlDotNet, Microsoft.Extensions.FileSystemGlobbing,
-  DemaConsulting.TestResults)
+  DemaConsulting.TestResults, DemaConsulting.HelpCards)
 - Build pipeline configuration and the build/pipeline OTS tools that support it (for example
   SysML2Tools, Pandoc, WeasyPrint, BuildMark, VersionMark, ReviewMark, SarifMark, SonarMark,
   XUnit, and FileAssert). These pipeline tools are not modeled as SysML2 structural parts; each
@@ -63,7 +64,10 @@ and an exit code](architecture.svg)
 src/DemaConsulting.ReqStream/
 ├── Program.cs                  — entry point and execution orchestrator
 ├── Cli/
-│   └── Context.cs              — command-line argument parser and I/O owner
+│   ├── Context.cs              — command-line argument parser and I/O owner
+│   └── HelpCommand.cs          — built-in help command served from the embedded help cards
+├── Help/                       — help cards (Markdown with front matter) and example data files,
+│                                 embedded in the assembly by the DemaConsulting.HelpCards build targets
 ├── Utilities/
 │   ├── GlobMatcher.cs          — glob-pattern file matching utility
 │   ├── PathHelpers.cs          — safe path combination with traversal protection
@@ -85,6 +89,8 @@ test/DemaConsulting.ReqStream.Tests/
 ├── IntegrationTests.cs         — system-level integration tests
 ├── Runner.cs                   — test runner infrastructure
 ├── CliTests.cs                 — CLI subsystem integration tests
+├── Cli/
+│   └── HelpCommandTests.cs     — HelpCommand unit tests and help card validity tests
 ├── Modeling/
 │   └── ModelingTests.cs        — Modeling subsystem integration tests
 ├── Tracing/

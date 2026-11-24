@@ -238,4 +238,45 @@ public sealed class CliTests : IDisposable
         Assert.Equal(3, context.MatrixDepth);
         Assert.Equal(3, context.JustificationsDepth);
     }
+
+    /// <summary>
+    /// Test that the help verb is answered by the help command before the option parser sees it.
+    /// </summary>
+    [Fact]
+    public void Cli_HelpTopics_HelpVerb_IsAnsweredBeforeArgumentParsing()
+    {
+        // Arrange: capture the output of a help command that is not connected to the console
+        var output = new StringWriter();
+        var command = HelpCommand.Create(output, new StringWriter());
+
+        // Act: offer the help verb to the help command and to the option parser
+        var answered = command.TryRun(["help", "lint"], out var exitCode);
+        var parserException = Record.Exception(() => Context.Create(["help", "lint"]));
+
+        // Assert: the help command answers, whereas the option parser alone rejects the verb
+        Assert.True(answered);
+        Assert.Equal(0, exitCode);
+        Assert.Contains("# Lint requirements files", output.ToString());
+        Assert.IsType<ArgumentException>(parserException);
+    }
+
+    /// <summary>
+    /// Test that arguments other than the help verb are left to the option parser.
+    /// </summary>
+    [Fact]
+    public void Cli_HelpTopics_OtherArguments_AreLeftToContext()
+    {
+        // Arrange: capture the output of a help command that is not connected to the console
+        var output = new StringWriter();
+        var command = HelpCommand.Create(output, new StringWriter());
+
+        // Act: offer ordinary options to the help command, then parse them
+        var answered = command.TryRun(["--version"], out _);
+        using var context = Context.Create(["--version"]);
+
+        // Assert: the help command ignores them, writes nothing, and the option parser accepts them
+        Assert.False(answered);
+        Assert.Equal(string.Empty, output.ToString());
+        Assert.True(context.Version);
+    }
 }

@@ -7,6 +7,7 @@ input-files:
   - docs/verification/reqstream/program.md
   - docs/verification/reqstream/cli.md
   - docs/verification/reqstream/cli/context.md
+  - docs/verification/reqstream/cli/help-command.md
   - docs/verification/reqstream/utilities.md
   - docs/verification/reqstream/utilities/glob-matcher.md
   - docs/verification/reqstream/utilities/path-helpers.md
@@ -26,6 +27,7 @@ input-files:
   - docs/verification/ots/yamldotnet.md
   - docs/verification/ots/microsoft-extensions-file-system-globbing.md
   - docs/verification/ots/dema-consulting-test-results.md
+  - docs/verification/ots/dema-consulting-help-cards.md
   - docs/verification/ots/sysml2tools.md
   - docs/verification/ots/xunit.md
   - docs/verification/ots/weasyprint.md

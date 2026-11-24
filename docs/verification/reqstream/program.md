@@ -29,6 +29,11 @@ which asserts `--version` prints the version and returns 0.
 exit code 0. This scenario is tested by `Program_Run_WithHelpFlag_PrintsHelp`, which asserts
 `--help` prints usage text.
 
+**Help Footer**: Tests verify that the usage text ends with the pointer to the built-in help
+command. This scenario is tested by `Program_Run_WithHelpFlag_PrintsHelpFooter`, which asserts that
+the last line is `Run 'reqstream help' for topics and examples.` and that the usage lists
+`reqstream help [topic]`.
+
 **Validate**: Tests verify that the `--validate` flag causes `Run` to invoke the self-validation
 framework and return exit code 0. This scenario is tested by
 `Program_Run_WithValidateFlag_RunsValidation`, which asserts validation runs and exits cleanly,
@@ -99,6 +104,7 @@ Each entry gives the requirement and the test methods that verify it.
 
 - `ReqStream-Program-Version`: `Program_Run_WithVersionFlag_PrintsVersion`
 - `ReqStream-Program-Help`: `Program_Run_WithHelpFlag_PrintsHelp`
+- `ReqStream-Program-HelpFooter`: `Program_Run_WithHelpFlag_PrintsHelpFooter`
 - `ReqStream-Program-Validate`: `Program_Run_WithValidateFlag_RunsValidation`,
   `Program_Run_WithValidateAndResults_WritesResultsFile`
 - `ReqStream-Program-Requirements`: `Program_Run_WithNoRequirementsFiles_ShowsMessage`,

@@ -23,6 +23,15 @@ sections:
             tests:
               - Program_Run_WithHelpFlag_PrintsHelp
 
+          - id: ReqStream-Program-HelpFooter
+            title: The tool shall end its usage help with a pointer to the built-in help command.
+            justification: |
+              The usage help stays a short option list. Pointing at the help command tells a reader,
+              or an AI agent, where the topics and worked examples are.
+            tags: [cli]
+            tests:
+              - Program_Run_WithHelpFlag_PrintsHelpFooter
+
           - id: ReqStream-Program-Banner
             title: >-
               The tool shall display its name and version on startup for non-lint invocations.

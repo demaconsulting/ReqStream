@@ -20,6 +20,7 @@ input-files:
   - docs/design/reqstream/program.md
   - docs/design/reqstream/cli.md
   - docs/design/reqstream/cli/context.md
+  - docs/design/reqstream/cli/help-command.md
   - docs/design/reqstream/utilities.md
   - docs/design/reqstream/utilities/glob-matcher.md
   - docs/design/reqstream/utilities/path-helpers.md
@@ -39,6 +40,7 @@ input-files:
   - docs/design/ots/yamldotnet.md
   - docs/design/ots/microsoft-extensions-file-system-globbing.md
   - docs/design/ots/dema-consulting-test-results.md
+  - docs/design/ots/dema-consulting-help-cards.md
   - docs/design/ots/sysml2tools.md
 template: template.html
 

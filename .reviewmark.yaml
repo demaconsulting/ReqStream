@@ -14,6 +14,7 @@ needs-review:
   - "docs/verification/**/*.md"   # Verification documentation files
   - "docs/user_guide/**/*.md"     # User guide documentation
   - "docs/sysml2/**/*.sysml"      # SysML2 architecture model
+  - "src/**/Help/**"              # Built-in help cards and their example data files
   - "!**/obj/**"                  # Exclude build output
   - "!**/bin/**"                  # Exclude build output
   - "!node_modules/**"            # Exclude npm dependencies
@@ -87,6 +88,7 @@ reviews:
       - "docs/design/ots/yamldotnet.md"                           # YamlDotNet integration design
       - "docs/design/ots/microsoft-extensions-file-system-globbing.md"  # FileSystemGlobbing design
       - "docs/design/ots/dema-consulting-test-results.md"         # TestResults integration design
+      - "docs/design/ots/dema-consulting-help-cards.md"           # HelpCards integration design
 
   - id: ReqStream-AllRequirements
     title: Review that All ReqStream Requirements are Complete
@@ -138,6 +140,21 @@ reviews:
       - "docs/verification/reqstream/cli/context.md"              # unit verification design
       - "src/**/Cli/Context.cs"                                   # implementation
       - "test/**/Cli/ContextTests.cs"                             # unit tests
+
+  - id: ReqStream-Cli-HelpCommand
+    title: Review that ReqStream Cli HelpCommand Implementation and Help Cards are Correct
+    context:
+      - "docs/design/reqstream.md"
+      - "docs/reqstream/reqstream.yaml"
+      - "docs/design/reqstream/cli.md"
+      - "docs/reqstream/reqstream/cli.yaml"
+    paths:
+      - "docs/reqstream/reqstream/cli/help-command.yaml"          # unit requirements
+      - "docs/design/reqstream/cli/help-command.md"               # unit design
+      - "docs/verification/reqstream/cli/help-command.md"         # unit verification design
+      - "src/**/Cli/HelpCommand.cs"                               # implementation
+      - "src/**/Help/**"                                          # help cards and example data files
+      - "test/**/Cli/HelpCommandTests.cs"                         # unit tests
 
   # ReqStream - Modeling
   - id: ReqStream-Modeling
@@ -383,6 +400,12 @@ reviews:
     paths:
       - "docs/reqstream/ots/dema-consulting-test-results.yaml"          # OTS requirements
       - "docs/verification/ots/dema-consulting-test-results.md"         # OTS verification
+
+  - id: OTS-HelpCards
+    title: Review that DemaConsulting.HelpCards Provides Required Functionality
+    paths:
+      - "docs/reqstream/ots/dema-consulting-help-cards.yaml"            # OTS requirements
+      - "docs/verification/ots/dema-consulting-help-cards.md"           # OTS verification
 
   - id: OTS-ReviewMark
     title: Review that ReviewMark Provides Required Functionality

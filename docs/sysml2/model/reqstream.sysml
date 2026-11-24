@@ -34,5 +34,6 @@ package ReqStream {
         part yamlDotNet : YamlDotNet;
         part fileSystemGlobbing : FileSystemGlobbing;
         part testResults : TestResults;
+        part helpCards : HelpCards;
     }
 }

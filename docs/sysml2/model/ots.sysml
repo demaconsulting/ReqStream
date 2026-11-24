@@ -32,4 +32,14 @@ package OtsDependencies {
             requirementFiles = ("docs/reqstream/ots/dema-consulting-test-results.yaml");
         }
     }
+
+    part def HelpCards {
+        doc /* OTS: DemaConsulting.HelpCards. */
+
+        metadata info : SoftwareInfo {
+            designFiles = ("docs/design/ots/dema-consulting-help-cards.md");
+            verificationFiles = ("docs/verification/ots/dema-consulting-help-cards.md");
+            requirementFiles = ("docs/reqstream/ots/dema-consulting-help-cards.yaml");
+        }
+    }
 }

@@ -39,6 +39,7 @@ The following OTS items are also verified:
 
 - **BuildMark** — build-notes documentation generator
 - **DemaConsulting.TestResults** — test result file reader
+- **DemaConsulting.HelpCards** — built-in help cards and help command
 - **FileAssert** — document assertion tool
 - **xUnit** — unit testing framework
 - **Pandoc** — Markdown to HTML converter
