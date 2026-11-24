@@ -48,7 +48,7 @@ The following table lists all OTS items and their primary evidence type.
 When an OTS item version is updated:
 
 1. Review the vendor release notes and changelog for breaking changes or known issues.
-2. Re-run the full test suite via `build.ps1` to confirm all integration tests still pass.
+2. Re-run the full test suite via `build.ps1 -All` to confirm all integration tests still pass.
 3. Re-run any self-validation commands for tools that support `--validate`.
 4. Confirm that CI pipeline steps that depend on the updated tool still succeed.
 5. Update the version entry in `.versionmark.yaml` and the OTS requirements file.

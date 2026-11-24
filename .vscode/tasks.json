@@ -128,7 +128,8 @@
       "args": [
         "-NoProfile",
         "-File",
-        "${workspaceFolder}/lint.ps1"
+        "${workspaceFolder}/lint.ps1",
+        "-All"
       ],
       "problemMatcher": []
     },
