@@ -9,10 +9,10 @@ see-also:
   - requirements-file/requirement
   - reports
 examples:
-  - name: requirements-just
+  - name: requirements
     kind: source
     language: yaml
-    file: requirements.yaml
+    save-as: requirements.yaml
     description: Requirements with a short and a multi-line justification.
     content: |
       sections:
@@ -36,7 +36,7 @@ examples:
     description: Start at heading level 3, for example to embed the report under two outer headings.
     content: '{{tool}} --requirements requirements.yaml --justifications justifications.md --justifications-depth 3'
 ---
-`--justifications <file>` writes the `justification` text of every requirement ([[#requirements-just]]), so a reviewer
+`--justifications <file>` writes the `justification` text of every requirement ([[#requirements]]), so a reviewer
 can read why each requirement exists without reading the YAML.
 
 The file has a heading for each section. Under it each requirement has a sub-heading with its id, its title in bold,

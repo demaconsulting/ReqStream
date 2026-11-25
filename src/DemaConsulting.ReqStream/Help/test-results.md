@@ -16,7 +16,7 @@ examples:
   - name: requirements
     kind: source
     language: yaml
-    file: requirements.yaml
+    save-as: requirements.yaml
     description: Requirements whose tests appear in the result files that the matrix command reads.
     content: |
       root-tags:

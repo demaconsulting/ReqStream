@@ -9,10 +9,10 @@ see-also:
   - requirements-file/requirement
   - troubleshooting/requirements-errors
 examples:
-  - name: ids
+  - name: requirements
     kind: source
     language: yaml
-    file: requirements.yaml
+    save-as: requirements.yaml
     description: Ids that name the system, the component, and the feature.
     content: |
       root-tags:
@@ -35,14 +35,14 @@ examples:
               title: The payment service shall charge the total once.
               tests:
                 - Payment_Charge_ChargesOnce
-  - name: lint-ids
+  - name: lint
     kind: command
     language: shell
     description: Check that every id is present and unique.
     content: '{{tool}} --requirements requirements.yaml --lint'
 ---
 {{tool}} prints each id exactly as written in every report and in the trace matrix, so the id is the name people
-read. Use the pattern `System-Component-Feature`, shown in [[#ids]]:
+read. Use the pattern `System-Component-Feature`, shown in [[#requirements]]:
 
 - System level: `Shop-System-Checkout`
 - Component or subsystem level: `Shop-Cart-Total`

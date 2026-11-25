@@ -15,7 +15,7 @@ examples:
   - name: requirements
     kind: source
     language: yaml
-    file: requirements.yaml
+    save-as: requirements.yaml
     description: The checkout requirement is a root. The owner requirement is linked from no parent.
     content: |
       root-tags:
@@ -38,15 +38,18 @@ examples:
     language: shell
     description: Lint reports the orphan as a warning and exits 0.
     content: '{{tool}} --requirements requirements.yaml --lint'
+    expect: 'Warning: 1 of 3 requirements orphaned'
   - name: lint-enforce
     kind: command
     language: shell
     description: With --enforce the orphan is an error and the exit code is 1.
     content: '{{tool}} --requirements requirements.yaml --lint --enforce'
+    exit: 1
+    expect: 'Error: 1 of 3 requirements orphaned'
   - name: fixed
     kind: source
     language: yaml
-    file: fixed.yaml
+    save-as: fixed.yaml
     description: The same requirements with the missing link added to the children of the root.
     content: |
       root-tags:

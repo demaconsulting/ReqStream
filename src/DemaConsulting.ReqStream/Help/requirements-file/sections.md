@@ -12,7 +12,7 @@ examples:
   - name: root
     kind: source
     language: yaml
-    file: requirements.yaml
+    save-as: requirements.yaml
     description: The root file. It adds a requirement to the Shop Requirements section and includes a second file.
     content: |
       includes:
@@ -25,7 +25,7 @@ examples:
   - name: cart
     kind: source
     language: yaml
-    file: cart.yaml
+    save-as: cart.yaml
     description: A second file whose section has the same title path, so its requirement joins the same section.
     content: |
       sections:

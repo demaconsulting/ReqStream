@@ -15,7 +15,7 @@ examples:
   - name: requirements
     kind: source
     language: yaml
-    file: requirements.yaml
+    save-as: requirements.yaml
     description: Two sections of requirements to export.
     content: |
       root-tags:

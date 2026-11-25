@@ -4,6 +4,7 @@ summary: Name the tests that prove each requirement.
 aliases:
   - link
   - tests-field
+  - tests
 tags:
   - reference
 order: 4
@@ -15,7 +16,7 @@ examples:
   - name: requirements
     kind: source
     language: yaml
-    file: requirements.yaml
+    save-as: requirements.yaml
     description: One requirement lists its tests inline; another gets its tests from a mappings entry.
     content: |
       root-tags:

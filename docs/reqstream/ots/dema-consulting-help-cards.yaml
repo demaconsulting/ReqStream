@@ -52,6 +52,21 @@ sections:
             tests:
               - HelpCommand_Cards_AreValid
               - HelpCommand_Cards_CommandExamplesParse
+          - id: ReqStream-OTS-HelpCards-ExampleRunner
+            title: >-
+              DemaConsulting.HelpCards shall run every command example of a catalog through a
+              delegate of the tool's test and compare each result with the exit code and the output
+              fragments that the example states.
+            justification: |
+              A worked example in the help is only useful when it works, and a deliberate failure
+              (a lint error, a failed gate) is only a good example when it fails the way the card
+              says. The runner saves the source examples of each card to a fresh folder, calls the
+              test's delegate for each command with the parsed arguments, and reports every
+              difference in the exit code (`exit`) or in the output (`expect`), so the cards state
+              their own expected results and the test needs no side table of exceptions.
+            tags: [ots]
+            tests:
+              - ReqStream_System_HelpExamples_AllCommandExamples_RunAgainstScratchSet
           - id: ReqStream-OTS-HelpCards-Embedding
             title: >-
               DemaConsulting.HelpCards shall embed the Help folder of the tool project in the tool

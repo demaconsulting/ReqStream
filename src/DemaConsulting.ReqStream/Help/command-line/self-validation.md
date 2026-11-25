@@ -28,11 +28,15 @@ examples:
     language: shell
     description: Any other extension is rejected with an error and exit code 1.
     content: '{{tool}} --validate --results validation.txt'
+    exit: 1
+    expect: 'Unsupported results file format'
   - name: validate-missing-folder
     kind: command
     language: shell
     description: The results folder does not exist, so the file cannot be written. Exits 1.
     content: '{{tool}} --validate --results missing/validation.xml'
+    exit: 1
+    expect: 'Failed to write results file'
 ---
 `--validate` runs a short set of tests of the tool itself against temporary files, so a regulated project can show that
 the installed version works on its build machine. Each test prints `Passed` or `Failed`, and the exit code is 0 only

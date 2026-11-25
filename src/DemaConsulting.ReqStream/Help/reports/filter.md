@@ -10,10 +10,10 @@ see-also:
   - requirements-file/requirement
   - enforcement
 examples:
-  - name: requirements-tagged
+  - name: requirements
     kind: source
     language: yaml
-    file: requirements.yaml
+    save-as: requirements.yaml
     description: Requirements with different tags. Only the payment requirement is tagged security.
     content: |
       root-tags:
@@ -40,7 +40,7 @@ examples:
                 - security
               tests:
                 - Payment_Charge_ChargesOnce
-  - name: filter-report
+  - name: report
     kind: command
     language: shell
     description: Report only the requirements tagged security.
@@ -60,9 +60,11 @@ examples:
     language: shell
     description: Without the filter the cart requirement has no passing test, so this exits 1.
     content: '{{tool}} --requirements requirements.yaml --tests results.xml --enforce'
+    exit: 1
+    expect: 'Error: Only 1 of 3 requirements are satisfied with tests.'
 ---
 `--filter <tags>` takes a comma-separated list of tags and keeps the requirements that carry **any** of them
-([[#filter-report]], [[#filter-either]]). Repeat the option to add more tags. Tags are matched exactly, and a
+([[#report]], [[#filter-either]]). Repeat the option to add more tags. Tags are matched exactly, and a
 requirement with no tags is dropped whenever a filter is active.
 
 The filter applies to all three reports (`--report`, `--justifications`, `--matrix`) and to the coverage count of

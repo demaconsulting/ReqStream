@@ -12,7 +12,7 @@ examples:
   - name: broken
     kind: source
     language: yaml
-    file: broken.yaml
+    save-as: broken.yaml
     description: A file with an unknown field, a duplicate id, an unknown child, and a missing title.
     content: |
       sections:
@@ -31,10 +31,12 @@ examples:
     language: shell
     description: Lint prints every problem with its line and column, and exits 1.
     content: '{{tool}} --requirements broken.yaml --lint'
+    exit: 1
+    expect: "Duplicate requirement ID 'Shop-Cart-Total'"
   - name: loop-a
     kind: source
     language: yaml
-    file: loop-a.yaml
+    save-as: loop-a.yaml
     description: A file that includes loop-b.yaml.
     content: |
       includes:
@@ -42,7 +44,7 @@ examples:
   - name: loop-b
     kind: source
     language: yaml
-    file: loop-b.yaml
+    save-as: loop-b.yaml
     description: A file that includes loop-a.yaml, which closes the loop.
     content: |
       includes:
@@ -52,6 +54,8 @@ examples:
     language: shell
     description: The circular include is reported once, and the exit code is 1.
     content: '{{tool}} --requirements loop-a.yaml --lint'
+    exit: 1
+    expect: 'Circular include detected'
 ---
 Each line has the form `path(line,column): error: message`. Fix the first one first, then lint again: [[#broken]] and
 [[#lint-broken]] show several at once.

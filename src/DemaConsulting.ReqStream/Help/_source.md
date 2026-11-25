@@ -1,5 +1,6 @@
 ---
 name: reqstream
+schema: 2
 title: ReqStream
 summary: Requirements traceability from YAML files, test results, and reports.
 ---

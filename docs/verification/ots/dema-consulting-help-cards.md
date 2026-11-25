@@ -3,10 +3,12 @@
 ### Required Functionality
 
 DemaConsulting.HelpCards (`ReqStream-OTS-HelpCards-Cli`, `ReqStream-OTS-HelpCards-Catalog`,
-`ReqStream-OTS-HelpCards-Validator`, `ReqStream-OTS-HelpCards-Embedding`) shall answer a help command
+`ReqStream-OTS-HelpCards-Validator`, `ReqStream-OTS-HelpCards-ExampleRunner`,
+`ReqStream-OTS-HelpCards-Embedding`) shall answer a help command
 from a catalog of Markdown help cards, build that catalog only after the help verb is recognized,
-support search and JSON output, report defects in cards and command examples to tests, and embed the
-card folder in the tool assembly. DemaConsulting.HelpCards is the library that serves
+support search and JSON output, report defects in cards and command examples to tests, run every
+command example through a test delegate and compare the exit code and output the example states, and
+embed the card folder in the tool assembly. DemaConsulting.HelpCards is the library that serves
 `reqstream help` to people and AI agents.
 
 ### Verification Approach
@@ -36,6 +38,12 @@ and `HelpCommand_Cards_RootsMatchExpectedTopics`.
 and that every command example parses. This scenario is tested by `HelpCommand_Cards_AreValid` and
 `HelpCommand_Cards_CommandExamplesParse`.
 
+**Example Runner**: Verifies that the runner of the package saves the source examples of every card to a
+scratch folder, runs every command example through the test's delegate against the built tool, and
+compares the exit code (`exit`) and the output fragments (`expect`) that each example states, so a
+deliberate failure is declared in the card. This scenario is tested by
+`ReqStream_System_HelpExamples_AllCommandExamples_RunAgainstScratchSet`.
+
 **Embedding**: Verifies that the cards embedded in the assembly by the package build targets are complete
 and usable. The test output holds no card files, so a validated catalog, a printed card, and every
 command example of every card running against the built tool prove that the embedded copy is complete.
@@ -53,6 +61,8 @@ Each entry gives the requirement, its scenario in parentheses, and the test meth
   `HelpCommand_TryRun_JsonOption_WritesJsonDocument`, `HelpCommand_Cards_RootsMatchExpectedTopics`
 - ReqStream-OTS-HelpCards-Validator (Validation): `HelpCommand_Cards_AreValid`,
   `HelpCommand_Cards_CommandExamplesParse`
+- ReqStream-OTS-HelpCards-ExampleRunner (Example Runner):
+  `ReqStream_System_HelpExamples_AllCommandExamples_RunAgainstScratchSet`
 - ReqStream-OTS-HelpCards-Embedding (Embedding): `HelpCommand_Cards_AreValid`,
   `HelpCommand_TryRun_CardPath_PrintsCardWithExamples`,
   `ReqStream_System_HelpExamples_AllCommandExamples_RunAgainstScratchSet`

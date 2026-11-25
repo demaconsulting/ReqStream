@@ -18,11 +18,14 @@ examples:
     language: shell
     description: A pattern that matches nothing is not an error. The run prints one line and exits 0.
     content: '{{tool}} --requirements "nothing/*.yaml" --report report.md'
+    expect: 'No requirements files specified.'
   - name: unknown-option
     kind: command
     language: shell
     description: An unknown option stops the run with an error and exit code 1.
     content: '{{tool}} --lint-all'
+    exit: 1
+    expect: "Unsupported argument '--lint-all'"
 ---
 Find the symptom, then follow the link or the fix.
 

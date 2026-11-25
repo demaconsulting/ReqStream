@@ -4,6 +4,8 @@ summary: Layout of a requirements YAML file.
 aliases:
   - format
   - yaml
+  - requirements
+  - config
 tags:
   - reference
 order: 2
@@ -16,13 +18,14 @@ examples:
     kind: source
     language: yaml
     file: requirements-file/shop.yaml
+    save-as: requirements-file/shop.yaml
     description: A complete file with nested sections, tags, children, and a separate mappings block.
-  - name: lint-shop
+  - name: lint
     kind: command
     language: shell
     description: Check the file. Silence and exit code 0 mean it is valid.
     content: '{{tool}} --requirements requirements-file/shop.yaml --lint'
-  - name: report-shop
+  - name: report
     kind: command
     language: shell
     description: Export the sections and requirements, with headings starting at level 2.
@@ -40,6 +43,7 @@ A requirements file is one YAML document. Every top-level key is optional, and a
 A section needs a `title` and may hold `requirements` and nested `sections`. Nest as deeply as the structure of the
 system needs; sections that repeat a title path across files merge ([[requirements-file/sections]]). Each requirement
 needs an `id` and a `title` ([[requirements-file/requirement]]), and its id should follow the
-`System-Component-Feature` pattern ([[requirements-file/ids]]).
+`System-Component-Feature` pattern ([[requirements-file/ids]]). Give each requirement a `justification` that says why
+it exists, for the report reviewers read ([[reports/justifications]]).
 
-[[#shop]] shows every key. Save it as shown, then run [[#lint-shop]]. A file that is empty is valid and loads nothing.
+[[#shop]] shows every key. Save it as shown, then run [[#lint]]. A file that is empty is valid and loads nothing.
