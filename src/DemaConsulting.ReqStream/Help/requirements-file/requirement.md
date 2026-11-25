@@ -33,6 +33,7 @@ examples:
                 - Shop-Cart-Total
             - id: Shop-Cart-Total
               title: The cart shall total the prices of its items.
+              justification: A customer must see what they will pay.
               tests:
                 - Cart_Total_SumsItems
   - name: lint
@@ -42,12 +43,13 @@ examples:
     content: '{{tool}} --requirements requirement.yaml --lint'
 ---
 
-Two fields are required and four are optional:
+Two fields are required, one is recommended for every requirement, and three are optional:
 
 - `id` (required): unique across every loaded file and used as written in all reports.
 - `title` (required): one sentence, usually "The X shall Y." Neither field may be blank.
-- `justification`: why the requirement exists. Write several lines as a YAML literal block.
-  See [[reports/justifications]].
+- `justification` (recommended): why the requirement exists. Give every requirement one: it feeds the
+  `--justifications` report that reviewers read ([[reports/justifications]]). Lint does not require it. Write several
+  lines as a YAML literal block.
 - `tags`: free-form words for `--filter` ([[reports/filter]]) and for root tags ([[orphans]]).
 - `children`: ids of the lower-level requirements that decompose this one. They must exist and must not loop.
 - `tests`: names of the tests that prove it. See [[test-linking]].

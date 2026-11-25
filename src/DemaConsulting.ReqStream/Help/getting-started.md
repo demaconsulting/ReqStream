@@ -4,6 +4,7 @@ summary: Write a first requirements file, lint it, and report.
 aliases:
   - start
   - quickstart
+  - examples
 tags:
   - tutorial
 order: 1
@@ -55,7 +56,8 @@ examples:
 reports. It only reads your files and writes the report files you name.
 
 1. **Write a requirements file.** Save the file printed by [[#requirements]] as `requirements.yaml`. A requirement
-   needs an `id` and a `title`; [[requirements-file]] lists every field.
+   needs an `id` and a `title`, and should have a `justification` that says why it exists; [[requirements-file]]
+   lists every field.
 2. **Lint it.** [[#lint]] prints nothing and exits 0 when the file is clean. A problem prints as
    `path(line,column): error: message` and the exit code is 1. See [[lint]].
 3. **Write reports.** [[#report]] lists the requirements and [[#justifications]] lists why each exists.

@@ -4,6 +4,8 @@ summary: Layout of a requirements YAML file.
 aliases:
   - format
   - yaml
+  - requirements
+  - config
 tags:
   - reference
 order: 2
@@ -41,6 +43,7 @@ A requirements file is one YAML document. Every top-level key is optional, and a
 A section needs a `title` and may hold `requirements` and nested `sections`. Nest as deeply as the structure of the
 system needs; sections that repeat a title path across files merge ([[requirements-file/sections]]). Each requirement
 needs an `id` and a `title` ([[requirements-file/requirement]]), and its id should follow the
-`System-Component-Feature` pattern ([[requirements-file/ids]]).
+`System-Component-Feature` pattern ([[requirements-file/ids]]). Give each requirement a `justification` that says why
+it exists, for the report reviewers read ([[reports/justifications]]).
 
 [[#shop]] shows every key. Save it as shown, then run [[#lint]]. A file that is empty is valid and loads nothing.

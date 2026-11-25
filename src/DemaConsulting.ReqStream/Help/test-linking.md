@@ -4,6 +4,7 @@ summary: Name the tests that prove each requirement.
 aliases:
   - link
   - tests-field
+  - tests
 tags:
   - reference
 order: 4
