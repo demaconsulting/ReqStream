@@ -16,7 +16,7 @@ examples:
   - name: root
     kind: source
     language: yaml
-    file: requirements.yaml
+    save-as: requirements.yaml
     description: The root file holds only root-tags and includes.
     content: |
       root-tags:
@@ -27,7 +27,7 @@ examples:
   - name: cart
     kind: source
     language: yaml
-    file: cart.yaml
+    save-as: cart.yaml
     description: An included file with the system requirement and a unit requirement.
     content: |
       sections:
@@ -50,7 +50,7 @@ examples:
   - name: payment
     kind: source
     language: yaml
-    file: payment.yaml
+    save-as: payment.yaml
     description: A second included file. Its section path merges into the same Shop Requirements section.
     content: |
       sections:

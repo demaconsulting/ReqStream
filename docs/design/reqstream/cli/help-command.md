@@ -35,13 +35,15 @@ the source reads nothing.
 
 **`Default`**: `HelpCommand` — the instance the tool uses; it writes to the console at the time of the command.
 
-**`_cli`**: `HelpCli` — the HelpCards command-line helper configured with the tool name, the version, the usage
-lines, an index preamble, the output writers, and the catalog factory.
+**`_cli`**: `HelpCli` — the HelpCards command-line helper configured by `CreateOptions` with the tool name, the
+version, the usage lines, an index preamble, the output writers, and the catalog configuration.
 
 The cards are Markdown files with front matter in the `Help/` folder of the tool project, one file per topic. The
 path of a card is its id, so `Help/test-linking/source-filters.md` is the card `test-linking/source-filters`, a
-child of `test-linking`. Example requirements files live beside the cards. Result files are not shipped: they are
-produced by test runners, so the example tests keep them as test data.
+child of `test-linking`. The source declares `schema: 2`: an inline example names its file with `save-as`, and a
+command example states its result with `exit` (default 0) and `expect` (output fragments). Example names are unique
+within a card only. Example requirements files that the cards show live beside the cards. Result files are not
+shipped: they are produced by test runners, so the example tests keep them as test data.
 
 #### Key Methods
 
@@ -57,16 +59,20 @@ produced by test runners, so the example tests keep them as test data.
 **Footer**: Read-only property returning the constant sentence `Run 'reqstream help' for topics and examples.`
 Reading it never builds the catalog; `Program.PrintHelp` ends the usage text with it.
 
-**CreateCatalog(culture)**: Builds the validated catalog. It is the catalog factory of the helper and is called
-only after the help verb was recognized, once per help command. It delegates to `Configure`.
+**CreateCatalog(culture)**: Builds the validated catalog with `HelpCatalog.Create` from
+`CreateOptions().GetCatalogConfiguration(culture)`, so it is exactly the catalog the helper builds. The helper
+itself builds the catalog only after the help verb was recognized, once per help command.
 
-**Configure(builder, culture)**: Applies the catalog configuration shared by the tool and the tests: the embedded
-`Cards` source, the tool name, the tool version (`Program.Version`, which supplies the `{{version}}` token), the
-culture, the closed tag vocabulary with the required purpose tags, and the expected set of root cards. Tests
-validate exactly this composition.
+**CreateOptions(output, error, configure)**: Creates the `HelpCliOptions` of the helper. The tool name and the
+version (`Program.Version`, which supplies the `{{version}}` token and the `version` field of the JSON index) are
+set here once; the helper gives both, and the culture of `--lang`, to the catalog builder.
 
-**Create(output, error, catalogFactory)**: Creates an instance that writes to the given writers, optionally with a
-replacement catalog factory. Used by tests to capture output and to count catalog builds.
+**Configure(builder)**: Adds ReqStream's part of the catalog configuration: the embedded `Cards` source, the closed
+tag vocabulary with the required purpose tags, and the expected set of root cards. Tests validate the composition
+that `CreateOptions().GetCatalogConfiguration()` returns, which is this configuration plus the tool name and version.
+
+**Create(output, error, configure)**: Creates an instance that writes to the given writers, optionally with a
+replacement catalog configuration. Used by tests to capture output and to count catalog builds.
 
 #### Error Handling
 
@@ -76,7 +82,10 @@ catalog — a card that fails validation, a missing source name, or a root card 
 with 70 after writing `Help is unavailable` and the reason to the error writer.
 
 `help` bypasses `Context`: `--silent` and `--log` do not apply to it and it prints no banner. This is deliberate,
-because the help answer is the product of the command, and an agent that asks for help must always receive it.
+because the help answer is the product of the command, and an agent that asks for help must always receive it. The
+`OutputProvider` and `ErrorProvider` hooks of HelpCards could route the answer through a `Context`, but the verb is
+answered before the options are parsed, so no `Context` exists; making one would mean parsing `--silent` and `--log`
+twice or teaching `Context.Create` the help verb, for no gain.
 
 #### Interactions
 

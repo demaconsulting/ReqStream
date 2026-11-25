@@ -51,10 +51,10 @@ public sealed class HelpCommandTests
         var outputWriter = new StringWriter();
         var errorWriter = new StringWriter();
         var calls = 0;
-        var command = HelpCommand.Create(outputWriter, errorWriter, culture =>
+        var command = HelpCommand.Create(outputWriter, errorWriter, (builder, _) =>
         {
             calls++;
-            return HelpCommand.CreateCatalog(culture);
+            HelpCommand.Configure(builder);
         });
 
         answered = command.TryRun(args, out exitCode);
@@ -136,6 +136,13 @@ public sealed class HelpCommandTests
         Assert.StartsWith("{", output);
         Assert.Contains("\"helpSchemaVersion\":1", output);
         Assert.Contains("\"id\":\"orphans\"", output);
+
+        // Act: print the index as JSON
+        Run(["help", "--json"], out _, out _, out var index, out _, out _);
+
+        // Assert: the tool name and the version are those that were set once on the helper options
+        Assert.Contains($"\"tool\":\"{HelpCommand.ToolName}\"", index);
+        Assert.Contains($"\"version\":\"{Program.Version}\"", index);
     }
 
     /// <summary>
@@ -210,7 +217,7 @@ public sealed class HelpCommandTests
         var options = new HelpValidationOptions { WarningsAreErrors = true };
 
         // Act and Assert: the validator throws a HelpCatalogException that lists every defect
-        HelpCardValidator.AssertValid(builder => HelpCommand.Configure(builder, null), options);
+        HelpCardValidator.AssertValid(HelpCommand.CreateOptions().GetCatalogConfiguration(), options);
     }
 
     /// <summary>

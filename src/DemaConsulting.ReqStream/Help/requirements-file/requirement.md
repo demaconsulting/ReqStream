@@ -13,7 +13,7 @@ examples:
   - name: full
     kind: source
     language: yaml
-    file: requirement.yaml
+    save-as: requirement.yaml
     description: One requirement that uses every field.
     content: |
       root-tags:
@@ -35,7 +35,7 @@ examples:
               title: The cart shall total the prices of its items.
               tests:
                 - Cart_Total_SumsItems
-  - name: lint-fields
+  - name: lint
     kind: command
     language: shell
     description: Check the fields. An unknown field name fails with an unknown-field error.

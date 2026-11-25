@@ -20,6 +20,7 @@
 
 using System.Globalization;
 using DemaConsulting.HelpCards.Catalog;
+using DemaConsulting.HelpCards.Composition;
 using DemaConsulting.HelpCards.Integration;
 using DemaConsulting.HelpCards.Loading;
 
@@ -44,9 +45,12 @@ namespace DemaConsulting.ReqStream.Cli;
 ///     </para>
 ///     <para>
 ///         The command bypasses <see cref="Context"/>: <c>--silent</c> and <c>--log</c> do not apply to
-///         it and no banner is printed. It writes to the console (or to the writers supplied to
-///         <see cref="Create"/>) and reports an exit code of 0 for success, 2 for wrong arguments or an
-///         unknown topic, and 70 for a defective card catalog.
+///         it and no banner is printed. The verb is answered before the option parser runs, and the
+///         <see cref="HelpCliOptions.OutputProvider"/> and <see cref="HelpCliOptions.ErrorProvider"/> hooks of
+///         HelpCards are not used: a context does not exist yet when the verb is answered, and parsing the
+///         options a second time just for help would duplicate <see cref="Context.Create"/>. It writes to
+///         the console (or to the writers supplied to <see cref="Create"/>) and reports an exit code of 0
+///         for success, 2 for wrong arguments or an unknown topic, and 70 for a defective card catalog.
 ///     </para>
 /// </remarks>
 internal sealed class HelpCommand
@@ -94,26 +98,15 @@ internal sealed class HelpCommand
     /// </summary>
     /// <param name="output">The writer for output, or <see langword="null"/> for the console output.</param>
     /// <param name="error">The writer for errors, or <see langword="null"/> for the console error.</param>
-    /// <param name="catalogFactory">
-    ///     The function that builds the catalog from the culture the user asked for, or
-    ///     <see langword="null"/> to use <see cref="CreateCatalog"/>. Supplied only by tests.
+    /// <param name="configure">
+    ///     The action that configures the catalog builder, or <see langword="null"/> to use
+    ///     <see cref="Configure"/>. Supplied only by tests.
     /// </param>
     private HelpCommand(
         TextWriter? output,
         TextWriter? error,
-        Func<CultureInfo?, HelpCatalog>? catalogFactory)
-    {
-        _cli = HelpCli.Create(new HelpCliOptions
-        {
-            ToolName = ToolName,
-            Version = Program.Version,
-            CatalogFactory = catalogFactory ?? CreateCatalog,
-            UsageLines = ["reqstream help [topic]", "reqstream help --search <words>"],
-            IndexPreamble = "Start with 'reqstream help getting-started'.",
-            Output = output,
-            Error = error
-        });
-    }
+        Action<HelpCatalogBuilder, CultureInfo?>? configure) =>
+        _cli = HelpCli.Create(CreateOptions(output, error, configure));
 
     /// <summary>
     ///     Gets the cards embedded in the tool assembly. Creating the source reads nothing.
@@ -124,6 +117,33 @@ internal sealed class HelpCommand
     ///     Gets the instance used by the tool, which writes to the console at the time of the command.
     /// </summary>
     internal static HelpCommand Default { get; } = new(null, null, null);
+
+    /// <summary>
+    ///     Creates the options of the command-line helper. The tool name and the version are set here
+    ///     and nowhere else: the helper gives them to the catalog builder itself.
+    /// </summary>
+    /// <param name="output">The writer for output, or <see langword="null"/> for the console output.</param>
+    /// <param name="error">The writer for errors, or <see langword="null"/> for the console error.</param>
+    /// <param name="configure">
+    ///     Optional replacement for <see cref="Configure"/>, used by tests to observe when the catalog
+    ///     is built.
+    /// </param>
+    /// <returns>The options; <see cref="HelpCliOptions.GetCatalogConfiguration"/> gives the tests the
+    /// composition that the tool ships.</returns>
+    internal static HelpCliOptions CreateOptions(
+        TextWriter? output = null,
+        TextWriter? error = null,
+        Action<HelpCatalogBuilder, CultureInfo?>? configure = null) =>
+        new()
+        {
+            ToolName = ToolName,
+            Version = Program.Version,
+            ConfigureCatalog = configure ?? ((builder, _) => Configure(builder)),
+            UsageLines = ["reqstream help [topic]", "reqstream help --search <words>"],
+            IndexPreamble = "Start with 'reqstream help getting-started'.",
+            Output = output,
+            Error = error
+        };
 
     /// <summary>
     ///     Gets the sentence that points a reader of the usage text to <c>reqstream help</c>.
@@ -138,39 +158,35 @@ internal sealed class HelpCommand
     /// </summary>
     /// <param name="output">The writer for output.</param>
     /// <param name="error">The writer for errors.</param>
-    /// <param name="catalogFactory">
-    ///     Optional replacement for <see cref="CreateCatalog"/>, used by tests to observe when the
+    /// <param name="configure">
+    ///     Optional replacement for <see cref="Configure"/>, used by tests to observe when the
     ///     catalog is built.
     /// </param>
     /// <returns>The new help command.</returns>
     internal static HelpCommand Create(
         TextWriter output,
         TextWriter error,
-        Func<CultureInfo?, HelpCatalog>? catalogFactory = null) =>
-        new(output, error, catalogFactory);
+        Action<HelpCatalogBuilder, CultureInfo?>? configure = null) =>
+        new(output, error, configure);
 
     /// <summary>
-    ///     Builds the help catalog of the tool: the embedded cards, the tool name and version, the
-    ///     closed tag vocabulary, and the expected set of topics.
+    ///     Builds the help catalog of the tool exactly as the command does.
     /// </summary>
     /// <param name="culture">The culture of the <c>--lang</c> option, or <see langword="null"/>.</param>
     /// <returns>The validated catalog.</returns>
     /// <exception cref="HelpCatalogException">Thrown when a card is defective.</exception>
     internal static HelpCatalog CreateCatalog(CultureInfo? culture) =>
-        HelpCatalog.Create(builder => Configure(builder, culture));
+        HelpCatalog.Create(CreateOptions().GetCatalogConfiguration(culture));
 
     /// <summary>
-    ///     Applies the tool's catalog configuration to a builder. Shared by the tool and the tests so
-    ///     both validate exactly the composition the tool ships.
+    ///     Adds the tool's own part of the catalog configuration to a builder: the embedded cards, the
+    ///     closed tag vocabulary, and the expected set of topics. The tool name, the version, and the
+    ///     culture are set by the helper from <see cref="CreateOptions"/>.
     /// </summary>
     /// <param name="builder">The builder to configure.</param>
-    /// <param name="culture">The culture of the catalog, or <see langword="null"/> for the invariant culture.</param>
-    internal static void Configure(DemaConsulting.HelpCards.Composition.HelpCatalogBuilder builder, CultureInfo? culture) =>
+    internal static void Configure(HelpCatalogBuilder builder) =>
         builder
             .AddSource(Cards)
-            .ToolName(ToolName)
-            .ToolVersion(Program.Version)
-            .Culture(culture ?? CultureInfo.InvariantCulture)
             .TagVocabulary(CardTags, RequiredCardTags)
             .ExpectedRoots(RootCardIds);
 

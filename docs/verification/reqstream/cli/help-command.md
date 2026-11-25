@@ -4,10 +4,10 @@
 
 The HelpCommand unit is verified using xUnit unit tests in `HelpCommandTests.cs`. Each test creates a
 `HelpCommand` with in-memory output and error writers and, where the test observes catalog creation,
-a counting catalog factory, then runs a set of arguments and asserts on the answer, the exit code, and
+a counting catalog configuration, then runs a set of arguments and asserts on the answer, the exit code, and
 the number of times the catalog was built. Card validity is verified with the HelpCards test helpers
-against the exact catalog configuration that the tool ships. No component is mocked: the tests use the
-cards embedded in the tool assembly.
+against the exact catalog configuration that the tool ships (`CreateOptions().GetCatalogConfiguration()`).
+No component is mocked: the tests use the cards embedded in the tool assembly.
 
 #### Test Environment
 
@@ -31,10 +31,11 @@ which verifies that an unknown topic exits 2 with a hint on the error writer.
 **Search and JSON**: Tests verify search and structured output. This scenario is tested by
 `HelpCommand_TryRun_SearchOption_ListsMatchingCards`, which verifies that `--search` ranks the card
 that matches the words, and `HelpCommand_TryRun_JsonOption_WritesJsonDocument`, which verifies that
-`--json` writes a versioned JSON document.
+`--json` writes a versioned JSON document, and that the JSON index carries the tool name and the version
+that were set once on the helper options.
 
 **Deferred Catalog**: `HelpCommand_TryRun_NonHelpArguments_ReturnsFalseWithoutBuildingCatalog` verifies
-with a counting catalog factory that ordinary arguments, the `--help` flag, and no arguments are not
+with a counting catalog configuration that ordinary arguments, the `--help` flag, and no arguments are not
 answered and never build the catalog, whereas the help verb builds it exactly once.
 
 **Footer**: `HelpCommand_Footer_PointsToHelpCommand` verifies the constant pointer sentence.

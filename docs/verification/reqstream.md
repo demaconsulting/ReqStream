@@ -71,14 +71,15 @@ versioned JSON document. An unknown topic exits with code 2. This scenario is te
 `ReqStream_System_HelpTopics_HelpSearch_FindsCards`, and
 `ReqStream_System_HelpTopics_HelpJson_WritesJsonDocument`.
 
-**Help Examples**: Verifies that every command example of every help card works. For each card the
-test writes the card's source examples to a fresh scratch folder, stages the result files that the
-card's commands read from the test data (`TestData/HelpExamples/<card id>`, copied to the test output),
-and runs its command examples, in order, against the built tool. Every `--tests` pattern must match a
-staged file, except in the example that shows a glob matching nothing. Each run must give the exit code
-the card claims, which is 0 unless the test names the example as a deliberate failure with its expected
-exit code and message. Every such expectation must name an existing example, and every folder of test
-data must name a card with command examples. This scenario is tested by
+**Help Examples**: Verifies that every command example of every help card works and gives the result the card
+states. The help library's example runner saves the card's source examples to a fresh scratch folder; the
+test's delegate stages the result files that the card's commands read from the test data
+(`TestData/HelpExamples/<card id>`, with `/` in the id written as `__`, copied to the test output) into that
+folder the first time it sees it, and runs each command against the built tool with the folder as working
+directory. The runner compares the exit code with the `exit` of the example (0 when absent) and the output
+with the `expect` fragments, so a deliberate failure is declared in the card itself. Every `--tests`
+pattern of an example that is expected to succeed must match a staged file. Every folder of test data must
+name a card with command examples. This scenario is tested by
 `ReqStream_System_HelpExamples_AllCommandExamples_RunAgainstScratchSet`.
 
 **Validate**: Verifies that the tool runs a built-in self-test suite when `--validate` is passed.

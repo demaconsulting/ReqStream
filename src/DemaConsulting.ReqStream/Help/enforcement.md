@@ -16,7 +16,7 @@ examples:
   - name: requirements
     kind: source
     language: yaml
-    file: requirements.yaml
+    save-as: requirements.yaml
     description: A system requirement proven through two children.
     content: |
       root-tags:
@@ -49,6 +49,8 @@ examples:
     language: shell
     description: results-fail.xml is a result file in which Payment_Charge_ChargesOnce failed, so the requirement is unsatisfied. Prints the ids and exits 1.
     content: '{{tool}} --requirements requirements.yaml --tests results-fail.xml --enforce'
+    exit: 1
+    expect: 'Error: Only 1 of 3 requirements are satisfied with tests.'
   - name: enforce-orphans
     kind: command
     language: shell
@@ -57,7 +59,7 @@ examples:
   - name: plain
     kind: source
     language: yaml
-    file: plain.yaml
+    save-as: plain.yaml
     description: A file with no root tags.
     content: |
       sections:
@@ -70,6 +72,8 @@ examples:
     language: shell
     description: No tests and no root tags give --enforce nothing to check. This is an error and exits 1.
     content: '{{tool}} --requirements plain.yaml --enforce'
+    exit: 1
+    expect: 'Cannot enforce requirements without test results or root tags'
   - name: ci-lint
     kind: command
     language: shell

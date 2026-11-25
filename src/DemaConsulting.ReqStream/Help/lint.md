@@ -13,7 +13,7 @@ examples:
   - name: requirements
     kind: source
     language: yaml
-    file: requirements.yaml
+    save-as: requirements.yaml
     description: A valid file with no root tags.
     content: |
       sections:
@@ -31,7 +31,7 @@ examples:
   - name: broken
     kind: source
     language: yaml
-    file: broken.yaml
+    save-as: broken.yaml
     description: A file with an unknown field and a missing title.
     content: |
       sections:
@@ -44,6 +44,8 @@ examples:
     language: shell
     description: Lint the broken file. It prints one line per problem and exits 1.
     content: '{{tool}} --requirements broken.yaml --lint'
+    exit: 1
+    expect: "Unknown field 'priority' in requirement"
 ---
 `--lint` checks requirements files without writing reports. Run it before every commit and in CI. Unlike a normal run
 it reports **all** problems in one pass, and it does not print the version banner, so silence means success

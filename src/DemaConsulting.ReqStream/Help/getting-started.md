@@ -15,7 +15,7 @@ examples:
   - name: requirements
     kind: source
     language: yaml
-    file: requirements.yaml
+    save-as: requirements.yaml
     description: A small requirements file with one system requirement and one tested requirement.
     content: |
       root-tags:

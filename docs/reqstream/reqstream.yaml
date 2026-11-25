@@ -70,6 +70,7 @@ sections:
               - ReqStream_System_HelpExamples_AllCommandExamples_RunAgainstScratchSet
             children:
               - ReqStream-Cli-HelpCommand-CommandExamples
+              - ReqStream-OTS-HelpCards-ExampleRunner
 
           - id: ReqStream-System-FullPipeline
             title: >-

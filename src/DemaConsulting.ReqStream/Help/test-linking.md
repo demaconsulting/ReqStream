@@ -15,7 +15,7 @@ examples:
   - name: requirements
     kind: source
     language: yaml
-    file: requirements.yaml
+    save-as: requirements.yaml
     description: One requirement lists its tests inline; another gets its tests from a mappings entry.
     content: |
       root-tags:
